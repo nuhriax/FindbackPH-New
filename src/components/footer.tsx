@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, HeartHandshake, Twitter, Facebook, Instagram } from "lucide-react";
+import { MapPin, HeartHandshake } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const EXPLORE = [
@@ -11,10 +11,15 @@ const EXPLORE = [
 ];
 
 const LEARN = [
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "Safety", href: "/#safety" },
-  { label: "About", href: "/#impact" },
-  { label: "Community", href: "/#impact" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Safety", href: "/safety" },
+  { label: "About", href: "/about" },
+  { label: "FAQ / Help", href: "/faq" },
+];
+
+const LEGAL = [
+  { label: "Terms", href: "/terms" },
+  { label: "Privacy", href: "/privacy" },
 ];
 
 const ACCOUNT = [
@@ -28,7 +33,7 @@ export function Footer() {
     <footer className="relative overflow-hidden border-t border-white/10 bg-[#070b17]/70">
       <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[42rem] -translate-x-1/2 rounded-full bg-electric-500/10 blur-3xl" />
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr]">
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
@@ -42,6 +47,7 @@ export function Footer() {
 
           <FooterColumn title="Explore" links={EXPLORE} />
           <FooterColumn title="Learn" links={LEARN} />
+          <FooterColumn title="Legal" links={LEGAL} />
           <FooterColumn title="Account" links={ACCOUNT} />
         </div>
 
@@ -53,18 +59,6 @@ export function Footer() {
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
               <HeartHandshake size={14} /> Community powered
             </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {[Twitter, Facebook, Instagram].map((Icon, i) => (
-              <a
-                key={i}
-                href="#"
-                aria-label="Social link"
-                className="rounded-lg border border-white/10 p-2 text-slate-400 transition-colors hover:border-electric-500/40 hover:text-white"
-              >
-                <Icon size={16} />
-              </a>
-            ))}
           </div>
         </div>
       </div>

@@ -81,3 +81,56 @@ export async function logoutAction() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+// --- Phase 11: Password Reset ---
+
+export async function requestPasswordResetAction(formData: FormData): Promise<ActionResult> {
+  const email = formData.get("email")?.toString() ?? "";
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: "Enter a valid email address" };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
+  });
+
+  if (error) {
+    console.error("Password reset error:", error);
+    return { error: "Could not send reset email. Please try again." };
+  }
+
+  // Always return success message — don't reveal whether email is registered
+  return {};
+}
+
+export async function resetPasswordAction(formData: FormData): Promise<ActionResult> {
+  const password = formData.get("password")?.toString() ?? "";
+  const confirmPassword = formData.get("confirmPassword")?.toString() ?? "";
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters" };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { error: "Include at least one uppercase letter" };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { error: "Include at least one number" };
+  }
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match" };
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.auth.updateUser({
+    password: password,
+  });
+
+  if (error) {
+    console.error("Password reset update error:", error);
+    return { error: "Could not update password. Please try again." };
+  }
+
+  redirect("/login");
+}

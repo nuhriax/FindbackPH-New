@@ -1,773 +1,1329 @@
 import Link from "next/link";
 import {
-  Search,
-  MapPin,
-  ShieldCheck,
-  Lock,
-  Users,
-  Sparkles,
-  Fingerprint,
-  MessageCircle,
-  Handshake,
-  Radar,
-  BrainCircuit,
-  LocateFixed,
-  ClipboardList,
-  EyeOff,
-  Heart,
   ArrowRight,
-  Smartphone,
-  Wallet,
-  CreditCard,
-  KeyRound,
-  ShoppingBag,
-  Cpu,
+  ArrowUpRight,
+  BadgeCheck,
+  BriefcaseBusiness,
+  CheckCircle2,
   FileText,
-  Package,
-  Compass,
-  RefreshCcw,
-  BellRing,
+  Gem,
+  HeartHandshake,
+  KeyRound,
+  MapPin,
+  PackageSearch,
+  PawPrint,
+  Radar,
+  Search,
+  ShieldCheck,
+  Shirt,
+  Smartphone,
+  Sparkles,
+  Users,
+  WalletCards,
+  Zap,
+  GraduationCap,
 } from "lucide-react";
+
 import { Reveal } from "@/components/reveal";
 import { createClient } from "@/lib/supabase/server";
+import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 
 export default async function HomePage() {
   const supabase = createClient();
-  const [{ count: lostCount }, { count: foundCount }, { count: recoveredCount }] = await Promise.all([
-    supabase.from("lost_items").select("*", { count: "exact", head: true }).eq("status", "active"),
-    supabase.from("found_items").select("*", { count: "exact", head: true }).eq("status", "active"),
-    supabase.from("lost_items").select("*", { count: "exact", head: true }).eq("status", "recovered"),
+
+  const [
+    { count: lostCount },
+    { count: foundCount },
+    { count: recoveredCount },
+  ] = await Promise.all([
+    supabase
+      .from("lost_items")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active"),
+
+    supabase
+      .from("found_items")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active"),
+
+    supabase
+      .from("lost_items")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "recovered"),
   ]);
 
-  const categories = [
-    { label: "Phones", icon: Smartphone },
-    { label: "Wallets", icon: Wallet },
-    { label: "IDs", icon: CreditCard },
-    { label: "Keys", icon: KeyRound },
-    { label: "Bags", icon: ShoppingBag },
-    { label: "Electronics", icon: Cpu },
-    { label: "Documents", icon: FileText },
-    { label: "Other", icon: Package },
+  const activeLost = lostCount ?? 0;
+  const activeFound = foundCount ?? 0;
+  const recovered = recoveredCount ?? 0;
+
+  const totalActive = activeLost + activeFound;
+  const hasReports = totalActive > 0;
+
+  /*
+  |--------------------------------------------------------------------------
+  | CATEGORY ICONS
+  |--------------------------------------------------------------------------
+  */
+
+  const categoryIcons: Record<string, React.ReactNode> = {
+    phones: <Smartphone size={20} />,
+    wallets: <WalletCards size={20} />,
+    ids: <BadgeCheck size={20} />,
+    bags: <BriefcaseBusiness size={20} />,
+    keys: <KeyRound size={20} />,
+    jewelry: <Gem size={20} />,
+    electronics: <Zap size={20} />,
+    documents: <FileText size={20} />,
+    clothing: <Shirt size={20} />,
+    pets: <PawPrint size={20} />,
+    school_items: <GraduationCap size={20} />,
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | CATEGORY COLORS
+  |--------------------------------------------------------------------------
+  */
+
+  const categoryStyles = [
+    {
+      bg: "bg-blue-50",
+      text: "text-blue-600",
+      hoverBg: "group-hover:bg-blue-600",
+      hoverText: "group-hover:text-white",
+      glow: "bg-blue-400/20",
+      line: "group-hover:bg-blue-500",
+      title: "group-hover:text-blue-600",
+    },
+    {
+      bg: "bg-indigo-50",
+      text: "text-indigo-600",
+      hoverBg: "group-hover:bg-indigo-600",
+      hoverText: "group-hover:text-white",
+      glow: "bg-indigo-400/20",
+      line: "group-hover:bg-indigo-500",
+      title: "group-hover:text-indigo-600",
+    },
+    {
+      bg: "bg-cyan-50",
+      text: "text-cyan-600",
+      hoverBg: "group-hover:bg-cyan-600",
+      hoverText: "group-hover:text-white",
+      glow: "bg-cyan-400/20",
+      line: "group-hover:bg-cyan-500",
+      title: "group-hover:text-cyan-600",
+    },
+    {
+      bg: "bg-emerald-50",
+      text: "text-emerald-600",
+      hoverBg: "group-hover:bg-emerald-600",
+      hoverText: "group-hover:text-white",
+      glow: "bg-emerald-400/20",
+      line: "group-hover:bg-emerald-500",
+      title: "group-hover:text-emerald-600",
+    },
   ];
 
   return (
-    <>
-      {/* ---------------- HERO ---------------- */}
-      <section className="relative overflow-hidden pb-4 pt-14 lg:pt-20">
-        {/* Background decoration */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-32 top-6 h-96 w-96 rounded-full bg-electric-500/20 blur-3xl motion-safe:animate-glow-drift" />
-          <div className="absolute right-[-4rem] top-48 h-96 w-96 rounded-full bg-indigo-500/25 blur-3xl motion-safe:animate-glow-drift [animation-delay:-9s]" />
-          <div className="absolute bottom-8 left-1/3 h-72 w-72 rounded-full bg-electric-500/10 blur-3xl" />
-          <div className="absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_78%)]" />
+    <main className="min-h-screen overflow-hidden bg-[#f8faff] text-[#101828]">
+      {/* =========================================================
+          GLOBAL BACKGROUND
+      ========================================================= */}
+
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute left-[-15%] top-[-10%] h-[550px] w-[550px] rounded-full bg-blue-200/30 blur-[120px]" />
+
+        <div className="absolute right-[-12%] top-[5%] h-[650px] w-[650px] rounded-full bg-indigo-200/25 blur-[140px]" />
+
+        <div className="absolute bottom-[-15%] left-[25%] h-[500px] w-[500px] rounded-full bg-cyan-100/40 blur-[120px]" />
+
+        <div
+          className="absolute inset-0 opacity-[0.28]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(99,102,241,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.055) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+          }}
+        />
+
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_15%,#f8faff_85%)]" />
+      </div>
+
+      {/* =========================================================
+          HERO
+      ========================================================= */}
+
+      <section
+        className="relative overflow-hidden pb-20 pt-10 sm:pt-14 lg:pb-28 lg:pt-20"
+        aria-labelledby="hero-heading"
+      >
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-[8%] top-[20%] h-2 w-2 animate-pulse rounded-full bg-blue-500 shadow-[0_0_25px_7px_rgba(59,130,246,.22)]" />
+
+          <div className="absolute right-[14%] top-[23%] h-2 w-2 animate-pulse rounded-full bg-indigo-400 shadow-[0_0_25px_7px_rgba(99,102,241,.2)] [animation-delay:1s]" />
+
+          <div className="absolute bottom-[25%] left-[22%] h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_20px_5px_rgba(34,211,238,.18)] [animation-delay:2s]" />
+
+          <div className="absolute right-[30%] top-[40%] h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400 [animation-delay:1.5s]" />
         </div>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-8">
-            {/* -------- LEFT: copy -------- */}
-            <div>
-              <div
-                className="animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
-                style={{ animationDelay: "40ms" }}
-              >
-                <span className="eyebrow">
-                  <Sparkles size={14} /> Community-powered · Philippines
-                </span>
-              </div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-14 lg:grid-cols-[.92fr_1.08fr] lg:gap-10">
+            {/* HERO LEFT */}
 
-              <h1
-                className="mt-5 animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_both] font-display text-[2.65rem] font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-[4rem]"
-                style={{ animationDelay: "140ms" }}
-              >
-                Lost something?
-                <br />
-                <span className="gradient-text">Let&apos;s bring it back.</span>
-              </h1>
+            <div className="relative z-10">
+              <Reveal delay={30}>
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/75 px-4 py-2 text-xs font-semibold text-blue-700 shadow-[0_8px_30px_rgba(37,99,235,.07)] backdrop-blur-xl">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
+                  </span>
 
-              <p
-                className="mt-6 max-w-md animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_both] text-lg leading-relaxed text-ink-secondary"
-                style={{ animationDelay: "240ms" }}
-              >
-                FindBack PH connects people who lost something with people who found it — safely,
-                quickly, and locally.
-              </p>
+                  Made for the Philippines
 
-              <div
-                className="mt-8 flex flex-wrap gap-3 animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
-                style={{ animationDelay: "340ms" }}
-              >
-                <Link href="/report/lost" className="btn-primary !px-6 !py-3 text-sm">
-                  I Lost Something <ArrowRight size={16} />
-                </Link>
-                <Link href="/report/found" className="btn-secondary !px-6 !py-3 text-sm">
-                  I Found Something
-                </Link>
-              </div>
-
-              {/* Premium search bar */}
-              <form
-                action="/search"
-                className="mt-9 max-w-xl animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_both] rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 shadow-[0_18px_50px_-24px_rgba(2,6,23,0.9)] backdrop-blur-md transition-colors focus-within:border-electric-500/40 sm:flex sm:items-center sm:gap-1.5"
-                style={{ animationDelay: "440ms" }}
-              >
-                <div className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5 focus-within:bg-white/[0.04]">
-                  <Search size={16} className="shrink-0 text-electric-400" />
-                  <input
-                    name="q"
-                    placeholder="What did you lose?"
-                    className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
-                  />
+                  <ArrowUpRight size={13} />
                 </div>
-                <div className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5 focus-within:bg-white/[0.04]">
-                  <MapPin size={16} className="shrink-0 text-electric-400" />
-                  <input
-                    name="city"
-                    placeholder="Where?"
-                    className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
-                  />
-                </div>
-                <button type="submit" className="btn-primary w-full !px-5 !py-2.5 text-sm sm:w-auto">
-                  Search
-                </button>
-              </form>
+              </Reveal>
 
-              <p
-                className="mt-3 text-sm text-ink-muted animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
-                style={{ animationDelay: "520ms" }}
-              >
-                Try{" "}
-                <span className="text-slate-300">
-                  “iPhone”, “black wallet”, “student ID”, or “AirPods”
-                </span>
-              </p>
+              <Reveal delay={80}>
+                <h1
+                  id="hero-heading"
+                  className="mt-7 max-w-3xl font-display text-[3.5rem] font-bold leading-[.94] tracking-[-0.055em] text-[#111827] sm:text-6xl md:text-7xl lg:text-[5.8rem]"
+                >
+                  Lost something?
+                  <br />
+
+                  <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
+                    Let&apos;s bring it back.
+                  </span>
+                </h1>
+              </Reveal>
+
+              <Reveal delay={130}>
+                <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                  FindBack PH connects people who lost something with people
+                  who found it — safely, quickly, and locally.
+                </p>
+              </Reveal>
+
+              {/* ACTIONS */}
+
+              <Reveal delay={170}>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    href="/report/lost"
+                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_35px_rgba(37,99,235,.22)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(37,99,235,.3)]"
+                  >
+                    I Lost Something
+
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </Link>
+
+                  <Link
+                    href="/report/found"
+                    className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-6 py-3.5 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white"
+                  >
+                    <HeartHandshake
+                      size={17}
+                      className="text-emerald-500"
+                    />
+
+                    I Found Something
+                  </Link>
+                </div>
+              </Reveal>
+
+              {/* SEARCH */}
+
+              <Reveal delay={210}>
+                <div className="mt-9 max-w-2xl">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-800">
+                    <Search size={15} className="text-blue-600" />
+                    Search lost & found reports
+                  </div>
+
+                  <form
+                    action="/search"
+                    method="GET"
+                    className="group rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_15px_45px_rgba(15,23,42,.08)] transition duration-300 focus-within:border-blue-300 focus-within:shadow-[0_20px_55px_rgba(37,99,235,.12)]"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-xl px-3">
+                        <Search
+                          size={19}
+                          className="shrink-0 text-slate-400"
+                        />
+
+                        <input
+                          type="text"
+                          name="q"
+                          placeholder="What did you lose?"
+                          className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
+                          aria-label="Search item"
+                        />
+                      </div>
+
+                      <div className="hidden h-10 w-px self-center bg-slate-200 sm:block" />
+
+                      <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-xl px-3">
+                        <MapPin
+                          size={19}
+                          className="shrink-0 text-slate-400"
+                        />
+
+                        <input
+                          type="text"
+                          name="location"
+                          placeholder="Where?"
+                          className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
+                          aria-label="Search location"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="flex min-h-[54px] items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,.2)] transition hover:bg-blue-700 active:scale-[.98]"
+                      >
+                        Search
+                        <ArrowRight size={16} />
+                      </button>
+                    </div>
+                  </form>
+
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-500">
+                    <span className="flex items-center gap-1.5">
+                      <ShieldCheck
+                        size={13}
+                        className="text-emerald-500"
+                      />
+                      Private by default
+                    </span>
+
+                    <span className="flex items-center gap-1.5">
+                      <MapPin size={13} className="text-blue-500" />
+                      Location-based
+                    </span>
+
+                    <span className="flex items-center gap-1.5">
+                      <Users size={13} className="text-indigo-500" />
+                      Community-powered
+                    </span>
+                  </div>
+                </div>
+              </Reveal>
             </div>
 
-            {/* -------- RIGHT: product visual -------- */}
-            <HeroVisual />
-          </div>
+            {/* HERO VISUAL */}
 
-          {/* -------- TRUST STRIP -------- */}
-          <div className="mt-20 grid grid-cols-2 gap-6 border-t border-white/10 pt-10 sm:grid-cols-4">
-            <TrustItem icon={Sparkles} title="Free to use" desc="For the community" />
-            <TrustItem icon={Fingerprint} title="Private by default" desc="Sensitive details stay hidden" />
-            <TrustItem icon={MessageCircle} title="Secure messaging" desc="Talk without rushing to share numbers" />
-            <TrustItem icon={Users} title="Community powered" desc="People helping people" />
+            <Reveal delay={180}>
+              <div className="relative mx-auto w-full max-w-[650px] lg:ml-auto">
+                <div className="absolute left-1/2 top-1/2 h-[400px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-300/25 blur-[100px]" />
+
+                <div className="absolute left-1/2 top-1/2 hidden h-[470px] w-[470px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-200/40 lg:block" />
+
+                <div className="absolute left-1/2 top-1/2 hidden h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-100/50 lg:block" />
+
+                <div className="relative z-10 rounded-[30px] border border-white/80 bg-white/80 p-2.5 shadow-[0_35px_90px_rgba(37,65,120,.17)] backdrop-blur-2xl">
+                  <div className="overflow-hidden rounded-[24px] border border-slate-200/80 bg-white">
+                    <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5">
+                      <div className="flex gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+                      </div>
+
+                      <div className="hidden rounded-full bg-slate-50 px-6 py-1.5 text-[10px] font-medium text-slate-400 sm:block">
+                        findback.ph
+                      </div>
+
+                      <div className="h-7 w-7 rounded-full bg-blue-50" />
+                    </div>
+
+                    <div className="relative min-h-[390px] overflow-hidden bg-[#f5f8ff]">
+                      <div
+                        className="absolute inset-0 opacity-60"
+                        style={{
+                          backgroundImage:
+                            "linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px)",
+                          backgroundSize: "42px 42px",
+                        }}
+                      />
+
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(96,165,250,.15),transparent_55%)]" />
+
+                      {/* Phone */}
+
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <div className="relative h-[210px] w-[125px] rotate-[-8deg] rounded-[27px] border-[7px] border-slate-800 bg-slate-900 shadow-[0_25px_60px_rgba(15,23,42,.22)]">
+                          <div className="absolute inset-[5px] overflow-hidden rounded-[18px] bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600">
+                            <div className="absolute left-1/2 top-3 h-4 w-12 -translate-x-1/2 rounded-full bg-slate-900/80" />
+
+                            <div className="absolute bottom-8 left-5 right-5 space-y-2">
+                              <div className="h-2 rounded-full bg-white/50" />
+                              <div className="h-2 w-2/3 rounded-full bg-white/30" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="absolute -inset-8 -z-10 rounded-full bg-blue-400/20 blur-3xl" />
+                      </div>
+
+                      {/* Markers */}
+
+                      <div className="absolute left-[15%] top-[30%] animate-bounce [animation-duration:3s]">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-lg">
+                          <MapPin size={15} />
+                        </div>
+                      </div>
+
+                      <div className="absolute right-[18%] top-[53%] animate-bounce [animation-duration:3.5s] [animation-delay:.5s]">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-indigo-500 text-white shadow-lg">
+                          <MapPin size={15} />
+                        </div>
+                      </div>
+
+                      <div className="absolute left-[22%] top-[44%] h-[1px] w-[150px] rotate-[20deg] border-t border-dashed border-blue-300" />
+
+                      {/* Preview */}
+
+                      <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white bg-white/90 p-4 shadow-[0_15px_40px_rgba(15,23,42,.1)] backdrop-blur-xl">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                            <Smartphone size={19} />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-blue-600">
+                                Found item
+                              </span>
+
+                              <span className="h-1 w-1 rounded-full bg-slate-300" />
+
+                              <span className="text-[9px] text-slate-400">
+                                Nearby
+                              </span>
+                            </div>
+
+                            <p className="mt-1 truncate text-sm font-bold text-slate-900">
+                              Possible phone match
+                            </p>
+
+                            <p className="mt-0.5 text-[10px] text-slate-500">
+                              Reported by a community member
+                            </p>
+                          </div>
+
+                          <div className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-bold text-emerald-600">
+                            MATCH
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating notification */}
+
+                <div className="absolute -left-4 top-[22%] z-20 hidden w-56 animate-[float_4s_ease-in-out_infinite] rounded-2xl border border-white bg-white/95 p-3.5 shadow-[0_20px_50px_rgba(15,23,42,.13)] backdrop-blur-xl sm:block lg:-left-10">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                      <Sparkles size={17} />
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">
+                        New possible match
+                      </p>
+
+                      <p className="mt-0.5 text-[10px] text-slate-500">
+                        Your item may have been found
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Match */}
+
+                <div className="absolute -right-4 top-[50%] z-20 hidden animate-[float_5s_ease-in-out_infinite_reverse] rounded-2xl border border-white bg-white/95 p-3.5 shadow-[0_20px_50px_rgba(15,23,42,.13)] backdrop-blur-xl sm:block lg:-right-8">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-blue-600">
+                      <CheckCircle2 size={17} />
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                        Possible match
+                      </p>
+
+                      <p className="mt-0.5 text-sm font-bold text-slate-900">
+                        92% match
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Safe handover */}
+
+                <div className="absolute -bottom-4 right-[7%] z-20 hidden animate-[float_4.5s_ease-in-out_infinite] rounded-2xl border border-white bg-white/95 px-4 py-3 shadow-[0_20px_50px_rgba(15,23,42,.13)] backdrop-blur-xl sm:block">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                      <ShieldCheck size={15} />
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">
+                        Safer handover
+                      </p>
+
+                      <p className="text-[9px] text-slate-500">
+                        Verify before returning
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ---------------- HOW IT WORKS ---------------- */}
-      <section id="how-it-works" className="relative scroll-mt-24 py-24 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      {/* =========================================================
+          TRUST STRIP
+      ========================================================= */}
+
+      <section className="border-y border-slate-200/80 bg-white/65">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid divide-y divide-slate-200/80 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+            {[
+              {
+                icon: ShieldCheck,
+                title: "Private by default",
+                text: "Sensitive details stay protected.",
+              },
+              {
+                icon: MapPin,
+                title: "Local discovery",
+                text: "Find reports near relevant places.",
+              },
+              {
+                icon: HeartHandshake,
+                title: "Safer returns",
+                text: "Verify before handing anything over.",
+              },
+              {
+                icon: Users,
+                title: "Community powered",
+                text: "People helping people recover.",
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div
+                  key={item.title}
+                  className="group flex items-center gap-3 px-5 py-6 transition hover:bg-blue-50/40 sm:justify-center sm:py-7"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600 transition duration-300 group-hover:scale-110">
+                    <Icon size={17} />
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">
+                      {item.title}
+                    </p>
+
+                    <p className="mt-0.5 text-[10px] leading-4 text-slate-500">
+                      {item.text}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          LIVE STATS
+      ========================================================= */}
+
+      <section className="relative py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="eyebrow">
-                <Compass size={14} /> How it works
-              </span>
-              <h2 className="mt-5 font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-[2.75rem]">
-                From lost to found, <span className="gradient-text">without the stress.</span>
+            <div className="mb-10 max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                Community pulse
+              </p>
+
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                Real people. Real reports.
               </h2>
-              <p className="mt-4 text-lg leading-relaxed text-ink-secondary">
-                FindBack PH makes it easier to report, discover, connect, and safely return lost
-                belongings.
+
+              <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">
+                See what&apos;s happening across the FindBack PH community.
               </p>
             </div>
           </Reveal>
 
-          <div className="relative mt-16">
-            {/* Connecting line (desktop) */}
-            <div className="pointer-events-none absolute left-0 right-0 top-8 hidden h-px bg-gradient-to-r from-transparent via-electric-500/40 to-transparent lg:block" />
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              <StepCard
-                index="01"
-                icon={ClipboardList}
-                title="Report it"
-                desc="Tell the community what you lost or found — in just a few minutes."
-                delay={0}
-              />
-              <StepCard
-                index="02"
-                icon={Radar}
-                title="Find a match"
-                desc="We help surface possible matches based on item details and location."
-                delay={120}
-              />
-              <StepCard
-                index="03"
-                icon={Handshake}
-                title="Connect safely"
-                desc="Communicate privately and arrange a safe handover on your terms."
-                delay={240}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+          <div className="grid gap-0 border-y border-slate-200 lg:grid-cols-3 lg:divide-x lg:divide-slate-200">
+            {/* Lost */}
 
-      {/* ---------------- WHY FINDBACK PH ---------------- */}
-      <section className="relative py-24 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <Reveal>
-            <div className="max-w-2xl">
-              <span className="eyebrow">
-                <Sparkles size={14} /> Why FindBack PH
-              </span>
-              <h2 className="mt-5 font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-[2.75rem]">
-                Built for the moment you realize{" "}
-                <span className="gradient-text">something is missing.</span>
-              </h2>
-              <p className="mt-4 text-lg leading-relaxed text-ink-secondary">
-                Every feature is designed to help you report, search, match, and safely reconnect —
-                without exposing sensitive information.
-              </p>
-            </div>
-          </Reveal>
+            <Reveal delay={50}>
+              <div className="group relative overflow-hidden px-2 py-10 sm:px-6 lg:px-8">
+                <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-blue-100/70 blur-3xl transition group-hover:scale-125" />
 
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <Reveal delay={0} className="sm:col-span-2">
-              <FeatureCard
-                icon={BrainCircuit}
-                title="Smart matching"
-                desc="Surface possible matches using item details, location, and timing — so the right report finds you, not the other way around."
-                accent="blue"
-                featured
-              />
+                <div className="relative">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    <Search size={14} className="text-blue-500" />
+                    Active lost
+                  </div>
+
+                  <div className="mt-3 flex items-end gap-3">
+                    <span className="font-display text-5xl font-bold tracking-tight text-slate-950 sm:text-6xl">
+                      {activeLost.toLocaleString()}
+                    </span>
+
+                    <span className="mb-2 text-xs text-slate-500">
+                      people searching
+                    </span>
+                  </div>
+
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full w-[68%] animate-pulse rounded-full bg-blue-500" />
+                  </div>
+                </div>
+              </div>
             </Reveal>
-            <Reveal delay={80}>
-              <FeatureCard
-                icon={Fingerprint}
-                title="Privacy first"
-                desc="Keep sensitive contact details private until both sides agree to connect."
-                accent="violet"
-              />
+
+            {/* Found */}
+
+            <Reveal delay={100}>
+              <div className="group relative overflow-hidden px-2 py-10 sm:px-6 lg:px-8">
+                <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-emerald-100/70 blur-3xl transition group-hover:scale-125" />
+
+                <div className="relative">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    <HeartHandshake
+                      size={14}
+                      className="text-emerald-500"
+                    />
+                    Active found
+                  </div>
+
+                  <div className="mt-3 flex items-end gap-3">
+                    <span className="font-display text-5xl font-bold tracking-tight text-slate-950 sm:text-6xl">
+                      {activeFound.toLocaleString()}
+                    </span>
+
+                    <span className="mb-2 text-xs text-slate-500">
+                      waiting for owners
+                    </span>
+                  </div>
+
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full w-[54%] animate-pulse rounded-full bg-emerald-500 [animation-delay:.4s]" />
+                  </div>
+                </div>
+              </div>
             </Reveal>
-            <Reveal delay={0}>
-              <FeatureCard
-                icon={LocateFixed}
-                title="Local by design"
-                desc="Find lost and found items within your own community and neighborhood."
-                accent="cyan"
-              />
-            </Reveal>
-            <Reveal delay={80}>
-              <FeatureCard
-                icon={ShieldCheck}
-                title="Safer handovers"
-                desc="Encourage secure communication and practical handover arrangements."
-                accent="emerald"
-              />
-            </Reveal>
-            <Reveal delay={160}>
-              <FeatureCard
-                icon={Users}
-                title="Community powered"
-                desc="Turn good intentions into real-world returns, one neighbor at a time."
-                accent="amber"
-              />
-            </Reveal>
-            <Reveal delay={240}>
-              <FeatureCard
-                icon={ClipboardList}
-                title="Simple reporting"
-                desc="Create a lost or found report in minutes — no complicated forms."
-                accent="blue"
-              />
+
+            {/* Recovered */}
+
+            <Reveal delay={150}>
+              <div className="group relative overflow-hidden px-2 py-10 sm:px-6 lg:px-8">
+                <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-cyan-100/70 blur-3xl transition group-hover:scale-125" />
+
+                <div className="relative">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    <CheckCircle2
+                      size={14}
+                      className="text-cyan-500"
+                    />
+                    Successfully returned
+                  </div>
+
+                  <div className="mt-3 flex items-end gap-3">
+                    <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text font-display text-5xl font-bold tracking-tight text-transparent sm:text-6xl">
+                      {recovered.toLocaleString()}
+                    </span>
+
+                    <span className="mb-2 text-xs text-slate-500">
+                      recovery stories
+                    </span>
+                  </div>
+
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full w-[82%] animate-pulse rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 [animation-delay:.8s]" />
+                  </div>
+                </div>
+              </div>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ---------------- SAFETY ---------------- */}
-      <section id="safety" className="relative scroll-mt-24 overflow-hidden py-24 lg:py-28">
-        <div className="pointer-events-none absolute right-[-6rem] top-1/3 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
-            {/* Left: copy + principles */}
+      {/* =========================================================
+          WHAT DO YOU NEED?
+      ========================================================= */}
+
+      <section className="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-28">
+        <div className="absolute right-[-10%] top-[-30%] h-[500px] w-[500px] rounded-full bg-blue-100/60 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-14 lg:grid-cols-[.75fr_1.25fr] lg:items-center">
             <Reveal>
               <div>
-                <span className="eyebrow">
-                  <ShieldCheck size={14} /> Safety
-                </span>
-                <h2 className="mt-5 font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-[2.75rem]">
-                  Designed around <span className="gradient-text">safer reunions.</span>
-                </h2>
-                <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-secondary">
-                  Your safety comes first. FindBack PH is designed to help people reconnect without
-                  requiring them to immediately expose personal contact information.
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                  Start here
                 </p>
 
-                <div className="mt-8 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-                  <SafetyPoint icon={Lock} text="Private contact details" />
-                  <SafetyPoint icon={MessageCircle} text="Secure communication" />
-                  <SafetyPoint icon={EyeOff} text="No unnecessary personal info" />
-                  <SafetyPoint icon={MapPin} text="Public-place handover guidance" />
-                  <SafetyPoint icon={Users} text="Community reporting" />
-                  <SafetyPoint icon={BellRing} text="Clear safety reminders" />
-                </div>
+                <h2 className="mt-4 max-w-lg font-display text-4xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-5xl">
+                  What brings you to FindBack?
+                </h2>
+
+                <p className="mt-5 max-w-md text-sm leading-7 text-slate-500 sm:text-base">
+                  Whether you lost something or found something, there&apos;s
+                  a simple next step.
+                </p>
               </div>
             </Reveal>
 
-            {/* Right: shield visual */}
-            <Reveal delay={120}>
-              <div className="relative mx-auto w-full max-w-md">
-                <div className="absolute left-1/2 top-1/2 h-[110%] w-[110%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/15 blur-3xl" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {/* LOST */}
 
-                <div className="card relative z-10 flex flex-col items-center px-8 py-12 text-center shadow-card">
-                  <div className="flex h-24 w-24 items-center justify-center rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/25 to-navy-800 shadow-[0_0_40px_rgba(16,185,129,0.25)]">
-                    <ShieldCheck size={44} className="text-emerald-300" />
-                  </div>
-                  <h3 className="mt-6 font-display text-xl font-semibold text-white">
-                    Safer by design
-                  </h3>
-                  <p className="mt-2 max-w-xs text-sm leading-relaxed text-slate-400">
-                    You choose how and when to share. Reconnect with confidence, on your terms.
-                  </p>
-                  <div className="mt-6 w-full space-y-2.5 border-t border-white/10 pt-6 text-left">
-                    {[
-                      "No phone numbers shown by default",
-                      "In-app messaging keeps things private",
-                      "Public-place meetup guidance",
-                    ].map((line) => (
-                      <div key={line} className="flex items-center gap-2.5 text-sm text-slate-300">
-                        <CheckDot /> {line}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="absolute -left-3 -top-4 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-[#0e1526]/90 px-3 py-2 shadow-card backdrop-blur-xl">
-                  <Lock size={13} className="text-emerald-300" />
-                  <span className="text-xs font-medium text-white">Private by default</span>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- IMPACT / COMMUNITY ---------------- */}
-      <section id="impact" className="relative scroll-mt-24 overflow-hidden py-24 lg:py-28">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-72 w-[44rem] -translate-x-1/2 rounded-full bg-electric-500/15 blur-3xl" />
-        </div>
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <Reveal>
-            <span className="eyebrow">
-              <Heart size={14} /> Our community
-            </span>
-            <h2 className="mt-6 font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-[2.75rem]">
-              Sometimes, it&apos;s more than <span className="gradient-text">just an item.</span>
-            </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-secondary">
-              A lost phone can contain years of memories. A wallet can hold someone&apos;s
-              livelihood. An ID can be the key to getting through tomorrow. FindBack PH helps turn a
-              stressful loss into a chance for someone to help.
-            </p>
-          </Reveal>
-
-          <Reveal delay={120}>
-            <div className="mx-auto mt-10 flex max-w-xl items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-5 shadow-card backdrop-blur-sm">
-              <Heart size={26} className="shrink-0 text-white" />
-              <p className="font-display text-xl font-semibold text-white sm:text-2xl">
-                Help someone find their way back.
-              </p>
-            </div>
-          </Reveal>
-
-          <Reveal delay={200}>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/found" className="btn-primary !px-6 !py-3 text-sm">
-                Search Lost Items <ArrowRight size={16} />
-              </Link>
-              <Link href="/report/found" className="btn-secondary !px-6 !py-3 text-sm">
-                Report Something Found
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------- STATISTICS ---------------- */}
-      <section className="relative py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-navy-900/80 via-navy-800/60 to-navy-900/40 p-8 shadow-card sm:p-10">
-              <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-electric-500/15 blur-3xl" />
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
-                    The community in numbers
-                  </h2>
-                  <p className="mt-1 text-sm text-slate-400">
-                    Real counts pulled live from FindBack PH reports.
-                  </p>
-                </div>
-                <span className="hidden items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 sm:inline-flex">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 motion-safe:animate-pulse-soft" />
-                  Live data
-                </span>
-              </div>
-
-              <div className="mt-8 grid gap-8 border-t border-white/10 pt-8 sm:grid-cols-3">
-                <Stat number={lostCount ?? 0} label="Lost reports" />
-                <Stat number={foundCount ?? 0} label="Found reports" />
-                <Stat number={recoveredCount ?? 0} label="Items recovered" accent />
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------- SEARCH EXPERIENCE ---------------- */}
-      <section id="search" className="relative scroll-mt-24 py-24 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <Reveal>
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="eyebrow">
-                <Search size={14} /> Search
-              </span>
-              <h2 className="mt-5 font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-[2.75rem]">
-                Looking for <span className="gradient-text">something?</span>
-              </h2>
-              <p className="mt-4 text-lg leading-relaxed text-ink-secondary">
-                Search reports by item, location, category, or date — find what belongs to you.
-              </p>
-            </div>
-          </Reveal>
-
-          <Reveal delay={100}>
-            <form
-              action="/search"
-              className="mx-auto mt-12 max-w-4xl rounded-3xl border border-white/10 bg-white/[0.03] p-2.5 shadow-card backdrop-blur-md transition-colors focus-within:border-electric-500/40 sm:p-3"
-            >
-              <div className="grid gap-2.5 md:grid-cols-[1.6fr_1fr_1fr_auto]">
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-navy-900/60 px-4 py-3.5 focus-within:border-electric-400/60">
-                  <Search size={18} className="shrink-0 text-electric-400" />
-                  <input
-                    name="q"
-                    placeholder="Item — “wallet”, “iPhone”…"
-                    className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
-                  />
-                </div>
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-navy-900/60 px-4 py-3.5 focus-within:border-electric-400/60">
-                  <MapPin size={18} className="shrink-0 text-electric-400" />
-                  <input
-                    name="city"
-                    placeholder="Location"
-                    className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
-                  />
-                </div>
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-navy-900/60 px-4 py-3.5 focus-within:border-electric-400/60">
-                  <Package size={18} className="shrink-0 text-electric-400" />
-                  <select
-                    name="category"
-                    defaultValue=""
-                    className="w-full cursor-pointer bg-transparent text-sm text-slate-300 focus:outline-none [&>option]:bg-navy-900"
-                  >
-                    <option value="">All categories</option>
-                    {categories.map((c) => (
-                      <option key={c.label} value={c.label.toLowerCase()}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button type="submit" className="btn-primary !px-6 !py-3.5 text-sm">
-                  Search
-                </button>
-              </div>
-            </form>
-          </Reveal>
-
-          {/* Category chips */}
-          <Reveal delay={180}>
-            <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-center gap-2.5">
-              <span className="mr-1 text-xs font-medium uppercase tracking-wide text-slate-500">
-                Browse
-              </span>
-              {categories.map((c) => (
+              <Reveal delay={80}>
                 <Link
-                  key={c.label}
-                  href={`/search?category=${c.label.toLowerCase()}`}
-                  className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-electric-500/40 hover:bg-electric-500/10 hover:text-white"
+                  href="/report/lost"
+                  className="group relative block overflow-hidden rounded-[28px] border border-slate-200 bg-[#f7f9ff] p-7 transition duration-500 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_25px_60px_rgba(37,99,235,.1)]"
                 >
-                  <c.icon size={15} className="text-electric-400" />
-                  {c.label}
+                  <div className="absolute right-[-35px] top-[-35px] h-36 w-36 rounded-full bg-blue-100 opacity-70 blur-2xl transition group-hover:bg-blue-200" />
+
+                  <div className="relative">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200 transition duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <Search size={21} />
+                      </div>
+
+                      <ArrowUpRight
+                        size={20}
+                        className="text-slate-300 transition group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-blue-600"
+                      />
+                    </div>
+
+                    <p className="mt-8 text-xs font-bold uppercase tracking-wider text-blue-600">
+                      I need help
+                    </p>
+
+                    <h3 className="mt-2 font-display text-2xl font-bold text-slate-950">
+                      I lost something
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-6 text-slate-500">
+                      Search reports, create a lost item report, and look for
+                      possible matches.
+                    </p>
+
+                    <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      Start searching
+                      <ArrowRight
+                        size={15}
+                        className="text-blue-600 transition-transform group-hover:translate-x-1"
+                      />
+                    </div>
+                  </div>
                 </Link>
-              ))}
+              </Reveal>
+
+              {/* FOUND */}
+
+              <Reveal delay={140}>
+                <Link
+                  href="/report/found"
+                  className="group relative block overflow-hidden rounded-[28px] border border-slate-200 bg-[#f8fcfa] p-7 transition duration-500 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_25px_60px_rgba(16,185,129,.1)]"
+                >
+                  <div className="absolute right-[-35px] top-[-35px] h-36 w-36 rounded-full bg-emerald-100 opacity-70 blur-2xl transition group-hover:bg-emerald-200" />
+
+                  <div className="relative">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 transition duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <HeartHandshake size={21} />
+                      </div>
+
+                      <ArrowUpRight
+                        size={20}
+                        className="text-slate-300 transition group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-emerald-600"
+                      />
+                    </div>
+
+                    <p className="mt-8 text-xs font-bold uppercase tracking-wider text-emerald-600">
+                      I can help
+                    </p>
+
+                    <h3 className="mt-2 font-display text-2xl font-bold text-slate-950">
+                      I found something
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-6 text-slate-500">
+                      Report what you found and give its owner a better chance
+                      of getting it back.
+                    </p>
+
+                    <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      Create found report
+                      <ArrowRight
+                        size={15}
+                        className="text-emerald-600 transition-transform group-hover:translate-x-1"
+                      />
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          PREMIUM CATEGORY EXPLORER
+      ========================================================= */}
+
+      <section
+        className="relative overflow-hidden border-y border-slate-200 bg-[#f7f9ff] py-20 sm:py-24 lg:py-28"
+        aria-labelledby="categories-heading"
+      >
+        {/* Background atmosphere */}
+
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-[-10%] top-[10%] h-[400px] w-[400px] rounded-full bg-blue-200/30 blur-[120px]" />
+
+          <div className="absolute right-[-10%] bottom-[-20%] h-[450px] w-[450px] rounded-full bg-indigo-200/25 blur-[130px]" />
+
+          <div
+            className="absolute inset-0 opacity-[0.22]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px)",
+              backgroundSize: "56px 56px",
+            }}
+          />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* HEADER */}
+
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+            <Reveal>
+              <div className="max-w-2xl">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="h-px w-10 bg-blue-500" />
+
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-600">
+                    Explore reports
+                  </span>
+                </div>
+
+                <h2
+                  id="categories-heading"
+                  className="font-display text-4xl font-bold tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl"
+                >
+                  What are you
+                  <span className="block text-slate-300">
+                    looking for?
+                  </span>
+                </h2>
+
+                <p className="mt-5 max-w-xl text-sm leading-7 text-slate-500 sm:text-base">
+                  Start with a category and quickly narrow down reports
+                  to find something that looks familiar.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={100}>
+              <Link
+                href="/search"
+                className="group inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-600 hover:shadow-lg"
+              >
+                Browse everything
+
+                <ArrowUpRight
+                  size={16}
+                  className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </Link>
+            </Reveal>
+          </div>
+
+          {/* CATEGORY GRID */}
+
+          <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {CATEGORIES.map((category, index) => {
+              const icon =
+                categoryIcons[category] ?? <PackageSearch size={20} />;
+
+              const accent =
+                categoryStyles[index % categoryStyles.length];
+
+              return (
+                <Reveal
+                  key={category}
+                  delay={index * 45}
+                >
+                  <Link
+                    href={`/search?category=${category}`}
+                    className="group relative block h-full min-h-[190px] overflow-hidden rounded-[26px] border border-slate-200/80 bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,.035)] transition-all duration-500 hover:-translate-y-1.5 hover:border-transparent hover:shadow-[0_25px_60px_rgba(15,23,42,.1)]"
+                  >
+                    {/* Glow */}
+
+                    <div
+                      className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full ${accent.glow} opacity-0 blur-3xl transition duration-500 group-hover:opacity-100`}
+                    />
+
+                    {/* Large number */}
+
+                    <div className="absolute right-5 top-5 font-display text-[52px] font-bold leading-none tracking-[-0.08em] text-slate-100 transition duration-500 group-hover:scale-110 group-hover:text-slate-200">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+
+                    <div className="relative flex h-full flex-col justify-between">
+                      {/* ICON */}
+
+                      <div className="flex items-start justify-between">
+                        <div
+                          className={`flex h-12 w-12 items-center justify-center rounded-2xl ${accent.bg} ${accent.text} ${accent.hoverBg} ${accent.hoverText} transition-all duration-500 group-hover:scale-110 group-hover:rotate-3`}
+                        >
+                          {icon}
+                        </div>
+
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-300 transition-all duration-300 group-hover:border-slate-300 group-hover:text-slate-900">
+                          <ArrowUpRight
+                            size={15}
+                            className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                          />
+                        </div>
+                      </div>
+
+                      {/* TEXT */}
+
+                      <div className="mt-10">
+                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                          Category {String(index + 1).padStart(2, "0")}
+                        </p>
+
+                        <h3
+                          className={`mt-2 font-display text-xl font-bold tracking-tight text-slate-900 transition-colors duration-300 ${accent.title}`}
+                        >
+                          {CATEGORY_LABELS[category]}
+                        </h3>
+
+                        {/* Animated line */}
+
+                        <div className="mt-4 h-px w-full bg-slate-100">
+                          <div
+                            className={`h-full w-0 ${accent.line} transition-all duration-500 group-hover:w-full`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
+          </div>
+
+          {/* FOOTER */}
+
+          <Reveal delay={180}>
+            <div className="mt-5 flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f7f9ff] bg-blue-100 text-blue-600">
+                    <Search size={13} />
+                  </div>
+
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f7f9ff] bg-emerald-100 text-emerald-600">
+                    <HeartHandshake size={13} />
+                  </div>
+
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f7f9ff] bg-indigo-100 text-indigo-600">
+                    <MapPin size={13} />
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-500">
+                  Search by category, location, and item details.
+                </p>
+              </div>
+
+              <Link
+                href="/search"
+                className="group inline-flex items-center gap-2 text-xs font-bold text-slate-700 transition hover:text-blue-600"
+              >
+                Start a smarter search
+
+                <ArrowRight
+                  size={14}
+                  className="text-blue-600 transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </Link>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ---------------- CTA ---------------- */}
-      <section className="relative overflow-hidden px-4 pb-24 pt-10 sm:px-6 lg:pb-32">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-1/2 h-[30rem] w-[52rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-electric-500/20 blur-[110px] motion-safe:animate-glow-drift" />
-          <div className="absolute inset-0 bg-grid opacity-40 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+      {/* =========================================================
+          HOW IT WORKS
+      ========================================================= */}
+
+      <section
+        className="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-28"
+        aria-labelledby="how-heading"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
+            <Reveal>
+              <div className="lg:sticky lg:top-24 lg:self-start">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                  How it works
+                </p>
+
+                <h2
+                  id="how-heading"
+                  className="mt-4 max-w-xl font-display text-4xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-5xl"
+                >
+                  From lost
+                  <br />
+                  <span className="text-slate-300">to found.</span>
+                </h2>
+
+                <p className="mt-5 max-w-md text-sm leading-7 text-slate-500 sm:text-base">
+                  A simple process designed to make searching and returning
+                  belongings easier.
+                </p>
+
+                <Link
+                  href="/how-it-works"
+                  className="group mt-7 inline-flex items-center gap-2 text-sm font-semibold text-slate-900"
+                >
+                  See how FindBack works
+                  <ArrowRight
+                    size={16}
+                    className="text-blue-600 transition-transform group-hover:translate-x-1"
+                  />
+                </Link>
+              </div>
+            </Reveal>
+
+            <div className="relative">
+              <div className="absolute bottom-6 left-5 top-6 w-px bg-gradient-to-b from-blue-200 via-indigo-200 to-emerald-200" />
+
+              {[
+                {
+                  number: "01",
+                  title: "Report it",
+                  text: "Tell the community what you lost or found. Add useful details so others can recognize the item.",
+                  icon: PackageSearch,
+                },
+                {
+                  number: "02",
+                  title: "Discover a match",
+                  text: "Search reports using item details, categories, and locations to find something that looks familiar.",
+                  icon: Radar,
+                },
+                {
+                  number: "03",
+                  title: "Verify ownership",
+                  text: "Use private communication and identifying details to make sure the item belongs to the right person.",
+                  icon: ShieldCheck,
+                },
+                {
+                  number: "04",
+                  title: "Bring it home",
+                  text: "Arrange a safe handover and turn a lost-item report into a successful recovery.",
+                  icon: HeartHandshake,
+                },
+              ].map((step, index) => {
+                const Icon = step.icon;
+
+                return (
+                  <Reveal
+                    key={step.number}
+                    delay={index * 90}
+                  >
+                    <div className="group relative flex gap-6 pb-12 last:pb-0">
+                      <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-lg shadow-blue-100 transition duration-300 group-hover:scale-110">
+                        <Icon size={15} />
+                      </div>
+
+                      <div className="pt-0.5">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">
+                          Step {step.number}
+                        </p>
+
+                        <h3 className="mt-2 font-display text-2xl font-bold text-slate-950">
+                          {step.title}
+                        </h3>
+
+                        <p className="mt-3 max-w-xl text-sm leading-7 text-slate-500">
+                          {step.text}
+                        </p>
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
         </div>
+      </section>
 
-        <Reveal>
-          <div className="relative mx-auto max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-navy-800/80 via-navy-900/80 to-[#070b17]/90 p-10 text-center shadow-card sm:p-14">
-            <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-electric-500/25 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-20 -left-16 h-44 w-44 rounded-full bg-indigo-500/20 blur-3xl" />
+      {/* =========================================================
+          SAFETY
+      ========================================================= */}
 
-            <RefreshCcw size={30} className="mx-auto text-electric-300" />
-            <h2 className="mt-6 font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-[2.75rem]">
-              Lost something? <span className="gradient-text">Don&apos;t give up yet.</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-ink-secondary">
-              Someone may have found it. Start searching the FindBack PH community.
+      <section
+        className="relative overflow-hidden bg-[#f5f9ff] py-20"
+        aria-labelledby="safety-heading"
+      >
+        <div className="absolute left-1/2 top-1/2 h-[400px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-100/60 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="flex flex-col items-start gap-8 border-y border-slate-200 py-10 md:flex-row md:items-center md:justify-between">
+              <div className="flex max-w-3xl gap-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+                  <ShieldCheck size={22} />
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2
+                      id="safety-heading"
+                      className="font-display text-xl font-bold text-slate-950"
+                    >
+                      Your safety comes first.
+                    </h2>
+
+                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-600">
+                      Safety first
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-6 text-slate-500">
+                    Keep sensitive information private, verify ownership before
+                    returning an item, and choose a safe public place for
+                    handovers.
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href="/safety"
+                className="group inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-blue-200 hover:text-blue-600"
+              >
+                Safety guidelines
+
+                <ArrowRight
+                  size={15}
+                  className="transition-transform group-hover:translate-x-1"
+                />
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* =========================================================
+          COMMUNITY MESSAGE
+      ========================================================= */}
+
+      <section className="relative py-20 sm:py-24 lg:py-28">
+        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+              <HeartHandshake size={24} />
+            </div>
+
+            <p className="mt-7 text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+              Built by community
             </p>
 
-            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/search" className="btn-primary w-full !px-7 !py-3.5 text-sm sm:w-auto">
-                Search Lost Items <ArrowRight size={16} />
+            <h2 className="mx-auto mt-4 max-w-3xl font-display text-4xl font-bold leading-tight tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl">
+              Sometimes all it takes is
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
+                {" "}
+                one person
+              </span>{" "}
+              to help.
+            </h2>
+
+            <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+              Every report gives someone another chance to recover something
+              important. Every person who helps makes the community stronger.
+            </p>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/search"
+                className="group inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+              >
+                Search Reports
+
+                <ArrowRight
+                  size={16}
+                  className="transition-transform group-hover:translate-x-1"
+                />
               </Link>
-              <Link href="/report/found" className="btn-secondary w-full !px-7 !py-3.5 text-sm sm:w-auto">
-                Report Something Found
+
+              <Link
+                href="/report/found"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:text-emerald-600"
+              >
+                <HeartHandshake size={17} />
+                Help someone
               </Link>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
       </section>
-    </>
-  );
-}
-/* ---------------- Hero product visual ---------------- */
-function HeroVisual() {
-  return (
-    <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-      {/* Ambient glow behind the card */}
-      <div className="absolute left-1/2 top-1/2 h-[118%] w-[118%] -translate-x-1/2 -translate-y-1/2 rounded-[2.5rem] bg-electric-500/15 blur-3xl" />
 
-      {/* Floating "New possible match" notification */}
-      <div
-        className="absolute -left-2 top-4 z-20 flex items-center gap-3 rounded-xl border border-white/10 bg-[#0e1526]/90 p-3 shadow-card backdrop-blur-xl motion-safe:animate-float"
-        style={{ animationDelay: "-2s" }}
-      >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-electric-500/15 text-electric-300">
-          <BellRing size={17} />
-        </span>
-        <div>
-          <p className="text-xs font-semibold text-white">New possible match</p>
-          <p className="text-[11px] text-slate-400">Your item may have been found</p>
-        </div>
-      </div>
+      {/* =========================================================
+          FINAL CTA
+      ========================================================= */}
 
-      {/* Main found-item card */}
-      <div
-        className="card relative z-10 overflow-hidden p-5 shadow-card motion-safe:animate-float [animation-duration:8s]"
-        style={{ animationDelay: "-1s" }}
+      <section
+        className="relative overflow-hidden bg-[#0f172a] py-20 sm:py-24 lg:py-28"
+        aria-labelledby="cta-heading"
       >
-        <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-electric-500/20 blur-2xl" />
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1.5 rounded-full bg-electric-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-electric-300">
-            <Radar size={13} /> Found item
-          </span>
-          <span className="text-xs text-slate-500">2h ago</span>
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-[15%] top-[-20%] h-[450px] w-[450px] rounded-full bg-blue-500/20 blur-[120px]" />
+
+          <div className="absolute bottom-[-20%] right-[10%] h-[450px] w-[450px] rounded-full bg-indigo-500/20 blur-[120px]" />
+
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.7) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
         </div>
 
-        {/* Phone visual */}
-        <div className="relative mt-4 flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-navy-800 via-navy-900 to-[#070b17]">
-          <div className="absolute inset-0 bg-grid opacity-40" />
-          <div className="absolute left-1/2 top-1/2 h-24 w-16 -translate-x-1/2 -translate-y-1/2 rotate-[-8deg] rounded-2xl border border-slate-600 bg-gradient-to-b from-slate-800 to-black p-1.5 shadow-2xl">
-            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 rounded-lg bg-gradient-to-b from-electric-500/50 to-navy-900">
-              <span className="h-1 w-6 rounded-full bg-white/40" />
-              <span className="text-[6px] font-semibold text-white">iPhone 15</span>
+        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-blue-300">
+              <HeartHandshake size={24} />
             </div>
-          </div>
-          <span className="absolute bottom-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 text-[10px] text-slate-200 backdrop-blur-sm">
-            <MapPin size={10} className="text-electric-300" /> Pasay City
-          </span>
+
+            <h2
+              id="cta-heading"
+              className="mt-7 font-display text-4xl font-bold leading-tight tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl"
+            >
+              Lost it?
+              <br />
+
+              <span className="bg-gradient-to-r from-blue-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent">
+                Found it?
+              </span>
+            </h2>
+
+            <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+              Let&apos;s give it a way home. Search the community or create a
+              report in just a few minutes.
+            </p>
+
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/search"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-slate-950 shadow-[0_15px_40px_rgba(255,255,255,.08)] transition hover:-translate-y-0.5 hover:bg-blue-50"
+              >
+                <Search size={17} />
+
+                Search Reports
+
+                <ArrowRight
+                  size={16}
+                  className="text-blue-600 transition-transform group-hover:translate-x-1"
+                />
+              </Link>
+
+              <Link
+                href="/report/found"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/10"
+              >
+                <HeartHandshake
+                  size={17}
+                  className="text-emerald-300"
+                />
+
+                I Found Something
+              </Link>
+            </div>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-5 text-xs text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2
+                  size={13}
+                  className="text-emerald-400"
+                />
+                Safe
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2
+                  size={13}
+                  className="text-emerald-400"
+                />
+                Private
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2
+                  size={13}
+                  className="text-emerald-400"
+                />
+                Community-driven
+              </span>
+            </div>
+          </Reveal>
         </div>
+      </section>
 
-        <div className="mt-4">
-          <h3 className="font-display text-lg font-semibold text-white">Black iPhone 15 Pro</h3>
-          <p className="mt-1 text-sm leading-relaxed text-slate-400">
-            Found near a mall information desk. The finder is willing to arrange a safe handover.
-          </p>
-        </div>
+      {/* =========================================================
+          LOCAL ANIMATIONS
+      ========================================================= */}
 
-        <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-200">
-          <ShieldCheck size={16} className="shrink-0 text-emerald-300" />
-          <span>
-            <span className="font-medium text-emerald-100">Safer handover.</span> Contact details
-            stay private until you both agree to connect.
-          </span>
-        </div>
-      </div>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes float {
+              0%, 100% {
+                transform: translateY(0px);
+              }
 
-      {/* Floating "Safer handover" pill */}
-      <div
-        className="absolute -right-2 top-24 z-20 flex items-center gap-2 rounded-full border border-emerald-500/30 bg-[#0e1526]/90 px-3 py-2 shadow-card backdrop-blur-xl motion-safe:animate-float"
-        style={{ animationDelay: "-4s", animationDuration: "9s" }}
-      >
-        <Lock size={14} className="text-emerald-300" />
-        <span className="text-xs font-medium text-white">Safer handover</span>
-      </div>
+              50% {
+                transform: translateY(-9px);
+              }
+            }
 
-      {/* Floating "Possible match" badge */}
-      <div className="absolute -bottom-4 left-6 z-20 flex items-center gap-2.5 rounded-xl border border-white/10 bg-[#0e1526]/90 px-3.5 py-2.5 shadow-card backdrop-blur-xl">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-electric-400 opacity-60" />
-          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-electric-400" />
-        </span>
-        <span className="text-xs font-medium text-white">
-          Possible match <span className="font-semibold text-electric-300">92%</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Trust item ---------------- */
-function TrustItem({ icon: Icon, title, desc }: { icon: React.ElementType; title: string; desc: string }) {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-electric-500/20 bg-electric-500/10 text-electric-300 shadow-ring">
-        <Icon size={20} />
-      </span>
-      <div>
-        <p className="font-medium text-white">{title}</p>
-        <p className="mt-0.5 text-sm leading-snug text-slate-400">{desc}</p>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- How-it-works step card ---------------- */
-function StepCard({
-  index,
-  icon: Icon,
-  title,
-  desc,
-  delay,
-}: {
-  index: string;
-  icon: React.ElementType;
-  title: string;
-  desc: string;
-  delay: number;
-}) {
-  return (
-    <Reveal delay={delay}>
-      <div className="group relative rounded-2xl border border-white/10 bg-gradient-to-b from-navy-800/60 to-navy-900/40 p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-electric-500/30">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-electric-500/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
-        <div className="flex items-center justify-between">
-          <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-electric-500/20 bg-electric-500/10 text-electric-300 shadow-ring">
-            <Icon size={22} />
-          </span>
-          <span className="font-display text-4xl font-bold text-white/10 transition-colors duration-300 group-hover:text-electric-500/30">
-            {index}
-          </span>
-        </div>
-        <h3 className="mt-5 font-display text-lg font-semibold text-white">{title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">{desc}</p>
-      </div>
-    </Reveal>
-  );
-}
-
-/* ---------------- Why-feature card ---------------- */
-const FEATURE_ACCENTS: Record<string, { chip: string; glow: string }> = {
-  blue: {
-    chip: "border-electric-500/25 bg-electric-500/10 text-electric-300",
-    glow: "bg-electric-500/20",
-  },
-  violet: {
-    chip: "border-violet-500/25 bg-violet-500/10 text-violet-300",
-    glow: "bg-violet-500/20",
-  },
-  cyan: {
-    chip: "border-cyan-500/25 bg-cyan-500/10 text-cyan-300",
-    glow: "bg-cyan-500/20",
-  },
-  emerald: {
-    chip: "border-emerald-500/25 bg-emerald-500/10 text-emerald-300",
-    glow: "bg-emerald-500/20",
-  },
-  amber: {
-    chip: "border-amber-500/25 bg-amber-500/10 text-amber-300",
-    glow: "bg-amber-500/20",
-  },
-};
-
-function FeatureCard({
-  icon: Icon,
-  title,
-  desc,
-  accent,
-  featured = false,
-}: {
-  icon: React.ElementType;
-  title: string;
-  desc: string;
-  accent: keyof typeof FEATURE_ACCENTS;
-  featured?: boolean;
-}) {
-  const a = FEATURE_ACCENTS[accent];
-  return (
-    <div
-      className={`group relative h-full overflow-hidden rounded-2xl border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 ${
-        featured
-          ? "bg-gradient-to-br from-navy-800/80 via-navy-900/70 to-navy-900/40 p-8 shadow-card lg:flex lg:items-center lg:gap-8"
-          : "bg-navy-900/40 p-7 shadow-card hover:shadow-glow"
-      }`}
-    >
-      <div
-        className={`pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full blur-3xl opacity-60 transition-opacity duration-300 group-hover:opacity-100 ${a.glow}`}
+            @media (prefers-reduced-motion: reduce) {
+              *,
+              *::before,
+              *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+              }
+            }
+          `,
+        }}
       />
-      <span
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border shadow-ring ${a.chip}`}
-      >
-        <Icon size={22} />
-      </span>
-      <div className="mt-5 lg:mt-0">
-        <h3 className="font-display text-lg font-semibold text-white">{title}</h3>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-400">{desc}</p>
-      </div>
-    </div>
+    </main>
   );
 }
-
-/* ---------------- Safety point ---------------- */
-function SafetyPoint({ icon: Icon, text }: { icon: React.ElementType; text: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 shadow-ring">
-        <Icon size={17} />
-      </span>
-      <span className="text-sm font-medium text-slate-200">{text}</span>
-    </div>
-  );
-}
-
-/* ---------------- Check dot ---------------- */
-function CheckDot() {
-  return (
-    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 6 9 17l-5-5" />
-      </svg>
-    </span>
-  );
-}
-
-/* ---------------- Stat ---------------- */
-function Stat({ number, label, accent = false }: { number: number; label: string; accent?: boolean }) {
-  return (
-    <div>
-      <div
-        className={`font-display text-4xl font-bold tabular-nums sm:text-5xl ${
-          accent ? "gradient-text" : "text-white"
-        }`}
-      >
-        {number.toLocaleString()}
-      </div>
-      <div className="mt-1.5 text-sm text-slate-400">{label}</div>
-    </div>
-  );
-}
-
-

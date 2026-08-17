@@ -3,6 +3,12 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { MapPin, Calendar, ShieldCheck } from "lucide-react";
+import { MessageButton } from "@/components/message-button";
+import { SaveButton } from "@/components/save-button";
+import { ShareButton } from "@/components/share-button";
+import { ReportFlagButton } from "@/components/report-flag-button";
+import { ImageGallery } from "@/components/image-gallery";
+import { getImagePublicUrl } from "@/lib/storage";
 
 export default async function FoundItemDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -22,13 +28,35 @@ export default async function FoundItemDetailPage({ params }: { params: { id: st
   const isOwner = user?.id === item.reporter_id;
   const reporter = (item as any).profiles as { username: string; successful_returns: number } | null;
 
+  const { data: images } = await supabase
+    .from("item_images")
+    .select("storage_path, position")
+    .eq("found_item_id", params.id)
+    .order("position", { ascending: true });
+
+  const imageUrls =
+    images?.map((img) => ({ url: getImagePublicUrl(img.storage_path) })) ?? [];
+
+  let savedItemId: string | null = null;
+  if (user) {
+    const { data: saved } = await supabase
+      .from("saved_items")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("found_item_id", params.id)
+      .maybeSingle();
+    savedItemId = saved?.id ?? null;
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <div className="mb-6">
+        <ShareButton title={item.title} />
+      </div>
+
       <div className="grid gap-8 md:grid-cols-3">
         <div className="md:col-span-2">
-          <div className="aspect-video w-full rounded-2xl bg-navy-900 flex items-center justify-center text-slate-600">
-            No photo uploaded
-          </div>
+          <ImageGallery images={imageUrls} alt={item.title} />
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
@@ -71,17 +99,24 @@ export default async function FoundItemDetailPage({ params }: { params: { id: st
               {reporter?.successful_returns ?? 0} successful return{reporter?.successful_returns === 1 ? "" : "s"}
             </p>
 
-            {!isOwner && (
-              <button className="btn-primary mt-4 w-full" disabled title="Messaging ships in the next phase">
-                This is mine — contact safely
-              </button>
-            )}
+            <div className="mt-4 space-y-2">
+              {!isOwner && (
+                <MessageButton itemType="found_item" itemId={item.id} label="Message Finder" />
+              )}
+              <SaveButton
+                foundItemId={item.id}
+                savedItemId={savedItemId}
+                isOwner={isOwner}
+              />
+            </div>
           </div>
 
           <div className="card flex items-start gap-2 p-4 text-sm text-slate-400">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-electric-400" />
             Never hand over an item without confirming ownership details that weren&apos;t posted publicly.
           </div>
+
+          <ReportFlagButton itemType="found_item" itemId={item.id} />
         </aside>
       </div>
     </div>

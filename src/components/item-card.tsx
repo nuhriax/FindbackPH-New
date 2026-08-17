@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MapPin, Calendar } from "lucide-react";
+import Image from "next/image";
+import { MapPin, Calendar, ImageOff } from "lucide-react";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import type { ItemCategory } from "@/types/database";
 
@@ -12,6 +13,7 @@ export function ItemCard({
   date,
   description,
   kind,
+  imageUrl,
 }: {
   href: string;
   title: string;
@@ -21,14 +23,29 @@ export function ItemCard({
   date: string;
   description: string;
   kind: "lost" | "found";
+  imageUrl?: string | null;
 }) {
   return (
     <Link
       href={href}
-      className="card group block overflow-hidden transition-colors hover:border-electric-500/50"
+      className="card group block overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-electric-500/50"
     >
-      <div className="flex aspect-[4/3] items-center justify-center bg-navy-900 text-slate-600">
-        No photo
+      <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-navy-900">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-1 text-slate-600">
+            <ImageOff size={28} />
+            <span className="text-xs">No photo</span>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <div className="flex items-center justify-between gap-2">

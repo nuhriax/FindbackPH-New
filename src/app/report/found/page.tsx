@@ -3,12 +3,15 @@
 import { useState, useTransition } from "react";
 import { createFoundItemAction } from "@/lib/actions/items";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
+import { ImageUpload } from "@/components/image-upload";
 
 export default function ReportFoundPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [images, setImages] = useState<File[]>([]);
 
   async function handleSubmit(formData: FormData) {
+    images.forEach((file) => formData.append("images", file));
     setError(null);
     startTransition(async () => {
       const result = await createFoundItemAction(formData);
@@ -78,6 +81,11 @@ export default function ReportFoundPage() {
             Where it&apos;s currently being kept <span className="text-slate-500">(optional)</span>
           </label>
           <input id="currentHoldingInfo" name="currentHoldingInfo" placeholder="e.g. Kept at barangay hall" className="input" />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm text-slate-300">Photos</label>
+          <ImageUpload onChange={setImages} />
         </div>
 
         {error && <p className="field-error" role="alert">{error}</p>}

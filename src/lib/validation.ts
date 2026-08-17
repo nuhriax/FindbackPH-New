@@ -76,3 +76,32 @@ export const foundItemSchema = z.object({
 });
 
 export type FoundItemInput = z.infer<typeof foundItemSchema>;
+
+// --- Phase 5: Messaging ---
+export const messageSchema = z.object({
+  conversationId: z.string().uuid("Invalid conversation"),
+  body: z.string().min(1, "Message cannot be empty").max(2000, "Message is too long (max 2000 characters)"),
+});
+
+export type MessageInput = z.infer<typeof messageSchema>;
+
+// --- Phase 8: Saved Items ---
+export const saveItemSchema = z.object({
+  lostItemId: z.string().uuid().optional(),
+  foundItemId: z.string().uuid().optional(),
+}).refine((data) => data.lostItemId || data.foundItemId, {
+  message: "Either lostItemId or foundItemId is required",
+});
+
+export type SaveItemInput = z.infer<typeof saveItemSchema>;
+
+// --- Phase 9: Report Flags ---
+export const reportFlagSchema = z.object({
+  itemType: z.enum(["lost_item", "found_item"]),
+  itemId: z.string().uuid(),
+  reason: z.enum([
+    "scam", "fake_report", "harassment",
+    "suspicious_behavior", "inappropriate_content", "wrong_information", "other",
+  ]),
+  details: z.string().max(1000).optional(),
+});

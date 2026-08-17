@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Search, Bell, Menu, X, LogOut, LayoutDashboard } from "lucide-react";
+import { Search, Bell, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
@@ -13,9 +13,9 @@ const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Lost Items", href: "/lost" },
   { label: "Found Items", href: "/found" },
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "Safety", href: "/#safety" },
-  { label: "About", href: "/#impact" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Safety", href: "/safety" },
+  { label: "About", href: "/about" },
 ];
 
 function getInitials(profile: Profile | null) {
@@ -62,9 +62,9 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-1 lg:flex">
           <Link
-            href="/#search"
+            href="/search"
             aria-label="Search"
             className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
           >
@@ -74,12 +74,26 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
           {user ? (
             <>
               <Link
-                href="/dashboard"
+                href="/notifications"
                 aria-label="Notifications"
                 className="relative rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
               >
                 <Bell size={18} />
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-electric-400" />
+              </Link>
+              <Link
+                href="/messages"
+                aria-label="Messages"
+                className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                <MessageCircle size={18} />
+              </Link>
+              <Link
+                href="/saved"
+                aria-label="Saved items"
+                className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                <Bookmark size={18} />
               </Link>
               <Link
                 href="/dashboard"
@@ -145,7 +159,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
       <div
         className={clsx(
           "overflow-hidden border-t border-white/10 bg-[#070b17]/95 backdrop-blur-xl transition-[max-height,opacity] duration-300 lg:hidden",
-          open ? "max-h-[32rem] opacity-100" : "max-h-0 opacity-0"
+          open ? "max-h-[40rem] opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
@@ -171,6 +185,15 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                 </div>
                 <Link href="/dashboard" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                   Dashboard
+                </Link>
+                <Link href="/messages" onClick={() => setOpen(false)} className="btn-ghost justify-start">
+                  Messages
+                </Link>
+                <Link href="/notifications" onClick={() => setOpen(false)} className="btn-ghost justify-start">
+                  Notifications
+                </Link>
+                <Link href="/saved" onClick={() => setOpen(false)} className="btn-ghost justify-start">
+                  Saved Items
                 </Link>
                 <form action={logoutAction}>
                   <button type="submit" className="btn-ghost w-full justify-start text-slate-300">

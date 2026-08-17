@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 import { CATEGORY_LABELS } from "@/lib/validation";
+import { Sparkles, Bookmark } from "lucide-react";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -12,24 +13,42 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  const [{ data: lostItems }, { data: foundItems }] = await Promise.all([
-    supabase
-      .from("lost_items")
-      .select("id, title, category, status, date_lost")
-      .eq("reporter_id", user.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("found_items")
-      .select("id, title, category, status, date_found")
-      .eq("reporter_id", user.id)
-      .order("created_at", { ascending: false }),
-  ]);
+  const [{ data: lostItems }, { data: foundItems }, { data: matches }, { data: savedItems }] =
+    await Promise.all([
+      supabase
+        .from("lost_items")
+        .select("id, title, category, status, date_lost")
+        .eq("reporter_id", user.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("found_items")
+        .select("id, title, category, status, date_found")
+        .eq("reporter_id", user.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("matches")
+        .select(
+          "id, score, dismissed, lost_item_id, found_item_id, found_items(id, title, city, province, category)"
+        )
+        .in(
+          "lost_item_id",
+          (lostItems ?? []).map((i) => i.id)
+        ),
+      supabase
+        .from("saved_items")
+        .select("id, lost_item_id, found_item_id, lost_items(title, status), found_items(title, status)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
 
   const activeLost = lostItems?.filter((i) => i.status === "active").length ?? 0;
   const activeFound = foundItems?.filter((i) => i.status === "active").length ?? 0;
   const recovered =
     (lostItems?.filter((i) => i.status === "recovered").length ?? 0) +
     (foundItems?.filter((i) => i.status === "recovered").length ?? 0);
+
+  const undismissedMatches = (matches ?? []).filter((m: any) => !m.dismissed);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -47,6 +66,74 @@ export default async function DashboardPage() {
         <div className="card p-5">
           <p className="text-sm text-slate-400">Items recovered</p>
           <p className="mt-1 font-display text-2xl">{recovered}</p>
+        </div>
+      </div>
+
+      {/* ---------------- POSSIBLE MATCHES ---------------- */}
+      <div className="mt-10">
+        <div className="flex items-center gap-2">
+          <Sparkles size={18} className="text-electric-400" />
+          <h2 className="font-display text-lg font-semibold">Possible Matches</h2>
+        </div>
+        <div className="card mt-3 divide-y divide-navy-700">
+          {undismissedMatches.length > 0 ? (
+            undismissedMatches.map((match: any) => {
+              const found = match.found_items;
+              return (
+                <div key={match.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+                  <div>
+                    <p className="text-sm text-slate-300">
+                      A found report may match one of your lost items in{" "}
+                      <span className="text-white">{found?.city}</span>, {found?.province}.
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Found: {found?.title} ·{" "}
+                      {match.score != null ? `${Math.round(match.score * 100)}% match` : "Possible match"}
+                    </p>
+                  </div>
+                  <Link href={`/found/${match.found_item_id}`} className="btn-secondary !py-1.5 text-xs">
+                    View Possible Match
+                  </Link>
+                </div>
+              );
+            })
+          ) : (
+            <p className="px-5 py-6 text-sm text-slate-500">
+              No possible matches yet. We'll notify you when a potential match is found.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* ---------------- SAVED ITEMS ---------------- */}
+      <div className="mt-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bookmark size={18} className="text-electric-400" />
+            <h2 className="font-display text-lg font-semibold">Saved Items</h2>
+          </div>
+          <Link href="/saved" className="text-sm text-electric-400 hover:underline">
+            View all
+          </Link>
+        </div>
+        <div className="card mt-3 divide-y divide-navy-700">
+          {savedItems && savedItems.length > 0 ? (
+            savedItems.map((saved: any) => {
+              const item = saved.lost_items || saved.found_items;
+              const isLost = !!saved.lost_items;
+              const href = isLost ? `/lost/${saved.lost_item_id}` : `/found/${saved.found_item_id}`;
+              return (
+                <Link key={saved.id} href={href} className="flex items-center justify-between px-5 py-3 hover:bg-navy-700/40">
+                  <p className="font-medium">{item?.title ?? "Saved item"}</p>
+                  <span className="rounded-full bg-navy-700 px-2.5 py-0.5 text-xs capitalize text-slate-300">
+                    {item?.status ?? "active"}
+                  </span>
+                </Link>
+              );
+            })
+          ) : (
+            <p className="px-5 py-6 text-sm text-slate-500">You haven't saved any reports yet.</p>
+          )}
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { ItemCard } from "@/components/item-card";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { format } from "date-fns";
 import Link from "next/link";
+import { getImagePublicUrl } from "@/lib/storage";
 
 export default async function LostItemsPage({
   searchParams,
@@ -29,6 +30,21 @@ export default async function LostItemsPage({
   }
 
   const { data: items, error } = await query;
+
+  // Fetch the first image for each item
+  const itemIds = items?.map((i) => i.id) ?? [];
+  let imageMap: Record<string, string> = {};
+  if (itemIds.length > 0) {
+    const { data: images } = await supabase
+      .from("item_images")
+      .select("lost_item_id, storage_path")
+      .in("lost_item_id", itemIds)
+      .eq("position", 0);
+
+    for (const img of images ?? []) {
+      imageMap[img.lost_item_id!] = getImagePublicUrl(img.storage_path);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -82,6 +98,7 @@ export default async function LostItemsPage({
             date={format(new Date(item.date_lost), "MMM d, yyyy")}
             description={item.description}
             kind="lost"
+            imageUrl={imageMap[item.id]}
           />
         ))}
       </div>
