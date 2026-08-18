@@ -62,17 +62,17 @@ export default async function LostItemDetailPage({ params }: { params: { id: str
           <ImageGallery images={imageUrls} alt={item.title} />
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-medium text-red-300">
+            <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200">
               {item.status === "active" ? "Still missing" : item.status}
             </span>
-            <span className="rounded-full bg-navy-800 px-3 py-1 text-xs text-slate-300">
+            <span className="chip">
               {CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS]}
             </span>
           </div>
 
-          <h1 className="mt-3 font-display text-2xl font-semibold">{item.title}</h1>
+          <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">{item.title}</h1>
 
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-400">
+          <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-600">
             <span className="flex items-center gap-1">
               <MapPin size={14} /> {item.approximate_location ?? `${item.city}, ${item.province}`}
             </span>
@@ -80,30 +80,30 @@ export default async function LostItemDetailPage({ params }: { params: { id: str
               <Calendar size={14} /> Lost {format(new Date(item.date_lost), "MMM d, yyyy")}
             </span>
             {item.reward_amount ? (
-              <span className="flex items-center gap-1 text-emerald-300">
+              <span className="flex items-center gap-1 font-medium text-emerald-700">
                 <Banknote size={14} /> ₱{item.reward_amount.toLocaleString()} reward
               </span>
             ) : null}
           </div>
 
-          <div className="card mt-6 p-5">
-            <h2 className="font-medium">Description</h2>
-            <p className="mt-2 whitespace-pre-line text-sm text-slate-300">{item.description}</p>
+          <div className="card mt-6 p-6">
+            <h2 className="font-display text-base font-semibold text-navy-900">Description</h2>
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-700">{item.description}</p>
           </div>
 
           {item.distinguishing_features && (
-            <div className="card mt-4 p-5">
-              <h2 className="font-medium">Distinguishing features</h2>
-              <p className="mt-2 whitespace-pre-line text-sm text-slate-300">{item.distinguishing_features}</p>
+            <div className="card mt-4 p-6">
+              <h2 className="font-display text-base font-semibold text-navy-900">Distinguishing features</h2>
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-700">{item.distinguishing_features}</p>
             </div>
           )}
         </div>
 
         <aside className="space-y-4">
           <div className="card p-5">
-            <p className="text-sm text-slate-400">Reported by</p>
-            <p className="font-medium">{reporter?.username ?? "FindBack user"}</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="text-sm text-slate-600">Reported by</p>
+            <p className="font-medium text-navy-900">{reporter?.username ?? "FindBack user"}</p>
+            <p className="mt-1 text-xs text-slate-600">
               {reporter?.successful_returns ?? 0} successful return{reporter?.successful_returns === 1 ? "" : "s"}
             </p>
 
@@ -123,8 +123,8 @@ export default async function LostItemDetailPage({ params }: { params: { id: str
             )}
           </div>
 
-          <div className="card flex items-start gap-2 p-4 text-sm text-slate-400">
-            <ShieldCheck size={16} className="mt-0.5 shrink-0 text-electric-400" />
+          <div className="card flex items-start gap-2 p-4 text-sm leading-relaxed text-slate-600">
+            <ShieldCheck size={16} className="mt-0.5 shrink-0 text-electric-500" />
             Always meet in a public place and avoid sharing sensitive personal information until you&apos;ve verified the other person.
           </div>
 

@@ -29,33 +29,34 @@ export default async function AdminUsersPage() {
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="font-display text-3xl font-bold text-white">Users</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Users</h1>
           <Link href="/admin" className="btn-ghost">
             Back
           </Link>
         </div>
 
         {!users || users.length === 0 ? (
-          <div className="mt-8 card p-8 text-center">
-            <p className="text-slate-400">No users found.</p>
+          <div className="mt-8 card p-10 text-center">
+            <p className="font-display text-lg font-semibold text-navy-900">No users found</p>
           </div>
         ) : (
-          <div className="mt-8 overflow-x-auto rounded-2xl border border-white/10">
+          <div className="mt-8 card overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-navy-900 text-slate-400">
+              <thead className="bg-ice-50 text-slate-600">
                 <tr>
-                  <th className="px-4 py-3 font-medium">User</th>
-                  <th className="px-4 py-3 font-medium">Role</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Joined</th>
-                  <th className="px-4 py-3 font-medium">Actions</th>
+                  <th className="px-4 py-3 font-semibold">User</th>
+                  <th className="px-4 py-3 font-semibold">Role</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Joined</th>
+                  <th className="px-4 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700">
+              <tbody className="divide-y divide-slate-100">
                 {users.map((user: any) => (
-                  <tr key={user.id} className="text-slate-300">
+                  <tr key={user.id} className="text-slate-600 hover:bg-blue-50/40">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-white">
+                      <span className="font-medium text-navy-900">
                         {user.first_name} {user.last_name}
                       </span>
                       <span className="block text-xs text-slate-500">
@@ -65,11 +66,11 @@ export default async function AdminUsersPage() {
                     <td className="px-4 py-3 capitalize">{user.role}</td>
                     <td className="px-4 py-3">
                       {user.is_suspended ? (
-                        <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-300">
+                        <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
                           Suspended
                         </span>
                       ) : (
-                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300">
+                        <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
                           Active
                         </span>
                       )}
@@ -92,7 +93,7 @@ export default async function AdminUsersPage() {
                         <button
                           type="submit"
                           className={`btn-ghost !py-1.5 text-xs ${
-                            user.is_suspended ? "!text-emerald-300" : "!text-amber-300"
+                            user.is_suspended ? "!text-emerald-700" : "!text-amber-700"
                           }`}
                         >
                           {user.is_suspended ? "Restore" : "Suspend"}
@@ -103,6 +104,7 @@ export default async function AdminUsersPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </div>

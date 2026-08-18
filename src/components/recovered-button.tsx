@@ -11,7 +11,7 @@ export function RecoveredButton({ itemId }: { itemId: string }) {
 
   if (done) {
     return (
-      <p className="mt-4 flex items-center gap-2 text-sm text-emerald-300">
+      <p className="mt-4 flex items-center gap-2 text-sm text-emerald-700">
         <CheckCircle2 size={16} /> Marked as recovered
       </p>
     );

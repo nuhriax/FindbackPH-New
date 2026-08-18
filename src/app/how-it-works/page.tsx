@@ -206,7 +206,7 @@ const stats = [
 
 export default function HowItWorksPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#070B14] py-16 text-slate-200 selection:bg-cyan-400/20 selection:text-white lg:py-24">
+    <main className="relative min-h-screen overflow-hidden py-16 text-navy-900 selection:bg-cyan-400/20 selection:text-navy-900 lg:py-24">
       {/* =========================================================
           BACKGROUND
       ========================================================== */}
@@ -224,7 +224,7 @@ export default function HowItWorksPage() {
           className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
+              "linear-gradient(rgba(148,163,184,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.5) 1px, transparent 1px)",
             backgroundSize: "72px 72px",
             maskImage:
               "linear-gradient(to bottom, black, transparent 75%)",
@@ -244,36 +244,36 @@ export default function HowItWorksPage() {
 
           {/* Decorative left icon */}
           <div className="pointer-events-none absolute -left-4 top-20 hidden lg:block">
-            <div className="flex h-14 w-14 rotate-[-8deg] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.035] text-cyan-300 shadow-[0_20px_50px_rgba(0,0,0,0.2)] backdrop-blur-xl">
+            <div className="flex h-14 w-14 rotate-[-8deg] items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-cyan-700 shadow-[0_20px_50px_rgba(0,0,0,0.2)] backdrop-blur-xl">
               <Search size={21} strokeWidth={1.8} />
             </div>
           </div>
 
           {/* Decorative right icon */}
           <div className="pointer-events-none absolute -right-4 top-36 hidden lg:block">
-            <div className="flex h-14 w-14 rotate-[8deg] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.035] text-emerald-300 shadow-[0_20px_50px_rgba(0,0,0,0.2)] backdrop-blur-xl">
+            <div className="flex h-14 w-14 rotate-[8deg] items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-emerald-700 shadow-[0_20px_50px_rgba(0,0,0,0.2)] backdrop-blur-xl">
               <CheckCircle size={21} strokeWidth={1.8} />
             </div>
           </div>
 
           {/* Eyebrow */}
-          <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.035] px-4 py-2 text-xs font-medium text-slate-300 shadow-lg shadow-black/10 backdrop-blur-xl">
-            <Sparkles size={13} className="text-cyan-300" />
+          <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-700 shadow-lg shadow-slate-900/5 backdrop-blur-xl">
+            <Sparkles size={13} className="text-cyan-700" />
             A simpler way to reunite lost belongings
           </div>
 
           {/* Heading */}
-          <h1 className="font-display text-[3.4rem] font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-6xl lg:text-[6.5rem]">
+          <h1 className="font-display text-[3.4rem] font-semibold leading-[0.98] tracking-[-0.045em] text-navy-900 sm:text-6xl lg:text-[6.5rem]">
             From lost
             <br />
             to{" "}
-            <span className="bg-gradient-to-r from-cyan-200 via-sky-300 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-600 via-sky-500 to-cyan-500 bg-clip-text text-transparent">
               found.
             </span>
           </h1>
 
           {/* Description */}
-          <p className="mx-auto mt-7 max-w-2xl text-[15px] leading-7 text-slate-300/80 sm:text-lg sm:leading-8">
+          <p className="mx-auto mt-7 max-w-2xl text-[15px] leading-7 text-slate-700/80 sm:text-lg sm:leading-8">
             FindBack makes it easier to recover lost belongings and return
             found items to their rightful owners through one simple,
             community-powered process.
@@ -294,9 +294,9 @@ export default function HowItWorksPage() {
 
             <Link
               href="/report/found"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.11] bg-white/[0.045] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-black/10 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.07]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-slate-50 px-6 py-3.5 text-sm font-semibold text-navy-900 shadow-lg shadow-slate-900/5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100"
             >
-              <ClipboardList size={17} className="text-cyan-300" />
+              <ClipboardList size={17} className="text-cyan-700" />
               I Found Something
             </Link>
           </div>
@@ -309,12 +309,12 @@ export default function HowItWorksPage() {
               return (
                 <div
                   key={item.text}
-                  className="group flex items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.025] px-4 py-2 text-xs text-slate-400 backdrop-blur-xl transition-all duration-300 hover:border-white/[0.13] hover:bg-white/[0.045] hover:text-slate-200"
+                  className="group flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-600 backdrop-blur-xl transition-all duration-300 hover:border-slate-300 hover:bg-slate-100 hover:text-navy-900"
                 >
                   <Icon
                     size={14}
                     strokeWidth={1.8}
-                    className="text-cyan-300/90 transition-transform duration-300 group-hover:scale-110"
+                    className="text-cyan-700 transition-transform duration-300 group-hover:scale-110"
                   />
                   {item.text}
                 </div>
@@ -327,7 +327,7 @@ export default function HowItWorksPage() {
             TRUST / STATS
         ========================================================== */}
         <section className="mx-auto mt-16 max-w-5xl lg:mt-20">
-          <div className="grid overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-white/[0.03] shadow-[0_20px_70px_rgba(0,0,0,0.15)] backdrop-blur-xl sm:grid-cols-3">
+          <div className="grid overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 shadow-[0_20px_70px_rgba(0,0,0,0.15)] backdrop-blur-xl sm:grid-cols-3">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
 
@@ -336,20 +336,20 @@ export default function HowItWorksPage() {
                   key={stat.label}
                   className={`group flex items-center justify-center gap-4 px-6 py-6 ${
                     index !== 0
-                      ? "border-t border-white/[0.06] sm:border-l sm:border-t-0"
+                      ? "border-t border-slate-200 sm:border-l sm:border-t-0"
                       : ""
                   }`}
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/[0.1] bg-cyan-300/[0.05] text-cyan-300">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-200 bg-cyan-50 text-cyan-700">
                     <Icon size={19} strokeWidth={1.8} />
                   </div>
 
                   <div className="text-left">
-                    <div className="font-display text-xl font-semibold text-white">
+                    <div className="font-display text-xl font-semibold text-navy-900">
                       {stat.value}
                     </div>
 
-                    <div className="mt-0.5 text-xs text-slate-400">
+                    <div className="mt-0.5 text-xs text-slate-600">
                       {stat.label}
                     </div>
                   </div>
@@ -364,21 +364,21 @@ export default function HowItWorksPage() {
         ========================================================== */}
         <section className="mx-auto mt-24 max-w-6xl lg:mt-32">
           <div className="mb-10 text-center">
-            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-300/80">
+            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-700/80">
               THE FINDBACK JOURNEY
             </span>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-navy-900 sm:text-4xl">
               One simple path from lost to returned
             </h2>
 
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-slate-400">
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-slate-600">
               Every step is designed to make the recovery process easier,
               clearer, and safer.
             </p>
           </div>
 
-          <div className="relative rounded-[1.75rem] border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_25px_80px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:p-9">
+          <div className="relative rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:p-9">
             {/* Connecting line */}
             <div className="absolute left-[8%] right-[8%] top-[68px] hidden h-px bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent lg:block" />
 
@@ -392,16 +392,16 @@ export default function HowItWorksPage() {
                     className="group relative flex flex-col items-center text-center"
                   >
                     <div className="relative z-10">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.09] bg-[#070B14] text-cyan-300 shadow-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:border-cyan-300/20 group-hover:bg-cyan-300/[0.05]">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-cyan-700 shadow-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:border-cyan-300 group-hover:bg-cyan-50">
                         <Icon size={20} strokeWidth={1.8} />
                       </div>
 
-                      <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full border border-[#070B14] bg-cyan-300 px-1 text-[9px] font-bold text-[#061019]">
+                      <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full border border-cyan-300 bg-cyan-300 px-1 text-[9px] font-bold text-[#061019]">
                         {index + 1}
                       </span>
                     </div>
 
-                    <span className="mt-4 text-sm font-medium text-slate-300">
+                    <span className="mt-4 text-sm font-medium text-slate-700">
                       {item.title}
                     </span>
 
@@ -420,43 +420,43 @@ export default function HowItWorksPage() {
         ========================================================== */}
         <section className="mt-24 lg:mt-36">
           <div className="mb-10 text-center">
-            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-300/80">
+            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-700/80">
               SMART MATCHING
             </span>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-navy-900 sm:text-4xl lg:text-5xl">
               Watch a possible match come together
             </h2>
 
-            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-slate-400">
+            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-slate-600">
               FindBack compares useful report details to help people discover
               possible connections.
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-gradient-to-br from-cyan-400/[0.055] via-white/[0.02] to-transparent p-5 shadow-[0_30px_100px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
+          <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-cyan-400/[0.055] via-white/60 to-transparent p-5 shadow-[0_30px_100px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
             {/* Ambient glow */}
             <div className="pointer-events-none absolute left-1/2 top-[-120px] h-72 w-96 -translate-x-1/2 rounded-full bg-cyan-400/[0.055] blur-[100px]" />
 
             <div className="relative grid items-center gap-5 lg:grid-cols-[1fr_auto_1fr]">
 
               {/* Lost card */}
-              <div className="group rounded-[1.5rem] border border-red-300/[0.1] bg-[#070B14]/75 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1 hover:border-red-300/[0.18]">
+              <div className="group rounded-[1.5rem] border border-red-200 bg-white/90 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1 hover:border-red-300">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full border border-red-300/[0.1] bg-red-300/[0.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-red-200/90">
+                  <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-red-700">
                     Lost report
                   </span>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-300/[0.05]">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
                     <Search
                       size={15}
                       strokeWidth={1.8}
-                      className="text-red-200/90"
+                      className="text-red-700"
                     />
                   </div>
                 </div>
 
-                <h3 className="mt-6 font-display text-2xl font-semibold tracking-tight text-white">
+                <h3 className="mt-6 font-display text-2xl font-semibold tracking-tight text-navy-900">
                   Black Wallet
                 </h3>
 
@@ -475,12 +475,12 @@ export default function HowItWorksPage() {
                     return (
                       <div
                         key={text as string}
-                        className="flex items-center gap-3 text-sm text-slate-300/75"
+                        className="flex items-center gap-3 text-sm text-slate-700/75"
                       >
                         <ItemIcon
                           size={15}
                           strokeWidth={1.8}
-                          className="text-cyan-300/80"
+                          className="text-cyan-700/80"
                         />
                         {text as string}
                       </div>
@@ -491,36 +491,36 @@ export default function HowItWorksPage() {
 
               {/* Match center */}
               <div className="relative flex flex-col items-center justify-center">
-                <div className="relative flex h-20 w-20 items-center justify-center rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-300 shadow-[0_0_50px_rgba(34,211,238,0.12)]">
-                  <div className="absolute inset-[-8px] rounded-[1.7rem] border border-cyan-300/[0.08]" />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-[1.5rem] border border-cyan-300/20 bg-cyan-50 text-cyan-700 shadow-[0_0_50px_rgba(34,211,238,0.12)]">
+                  <div className="absolute inset-[-8px] rounded-[1.7rem] border border-cyan-200" />
 
                   <Sparkles size={27} strokeWidth={1.6} />
 
-                  <div className="absolute inset-0 animate-ping rounded-[1.5rem] border border-cyan-300/[0.06]" />
+                  <div className="absolute inset-0 animate-ping rounded-[1.5rem] border border-cyan-200" />
                 </div>
 
-                <span className="mt-4 rounded-full border border-cyan-300/[0.08] bg-cyan-300/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-200">
+                <span className="mt-4 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-600">
                   Possible match
                 </span>
               </div>
 
               {/* Found card */}
-              <div className="group rounded-[1.5rem] border border-emerald-300/[0.1] bg-[#070B14]/75 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1 hover:border-emerald-300/[0.18]">
+              <div className="group rounded-[1.5rem] border border-emerald-200 bg-white/90 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1 hover:border-emerald-300">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full border border-emerald-300/[0.1] bg-emerald-300/[0.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200/90">
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
                     Found report
                   </span>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-300/[0.05]">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
                     <CheckCircle
                       size={15}
                       strokeWidth={1.8}
-                      className="text-emerald-200/90"
+                      className="text-emerald-700"
                     />
                   </div>
                 </div>
 
-                <h3 className="mt-6 font-display text-2xl font-semibold tracking-tight text-white">
+                <h3 className="mt-6 font-display text-2xl font-semibold tracking-tight text-navy-900">
                   Black Leather Wallet
                 </h3>
 
@@ -539,15 +539,15 @@ export default function HowItWorksPage() {
                     return (
                       <div
                         key={text as string}
-                        className="flex items-center gap-3 text-sm text-slate-300/75"
+                        className="flex items-center gap-3 text-sm text-slate-700/75"
                       >
                         <ItemIcon
                           size={15}
                           strokeWidth={1.8}
                           className={
                             text === "Similar description"
-                              ? "text-emerald-300"
-                              : "text-cyan-300/80"
+                              ? "text-emerald-700"
+                              : "text-cyan-700/80"
                           }
                         />
                         {text as string}
@@ -559,16 +559,16 @@ export default function HowItWorksPage() {
             </div>
 
             {/* Match score */}
-            <div className="relative mx-auto mt-7 max-w-lg rounded-[1.5rem] border border-white/[0.07] bg-white/[0.025] p-5 sm:p-6">
+            <div className="relative mx-auto mt-7 max-w-lg rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <CircleDot
                     size={14}
-                    className="text-cyan-300"
+                    className="text-cyan-700"
                     strokeWidth={1.8}
                   />
 
-                  <span className="font-medium text-slate-300">
+                  <span className="font-medium text-slate-700">
                     Possible match
                   </span>
                 </div>
@@ -578,14 +578,14 @@ export default function HowItWorksPage() {
                     Match confidence
                   </div>
 
-                  <div className="mt-0.5 font-display text-2xl font-semibold text-cyan-300">
+                  <div className="mt-0.5 font-display text-2xl font-semibold text-cyan-700">
                     92%
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                <div className="h-full w-[92%] rounded-full bg-gradient-to-r from-cyan-500 via-sky-400 to-cyan-300" />
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
+                <div className="h-full w-[92%] rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-cyan-600" />
               </div>
 
               <div className="mt-5 flex flex-wrap justify-center gap-2">
@@ -597,9 +597,9 @@ export default function HowItWorksPage() {
                 ].map((item) => (
                   <span
                     key={item}
-                    className="flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-[#070B14] px-3 py-1.5 text-[11px] text-slate-400"
+                    className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-600"
                   >
-                    <Check size={11} className="text-emerald-300" />
+                    <Check size={11} className="text-emerald-700" />
                     {item}
                   </span>
                 ))}
@@ -607,11 +607,11 @@ export default function HowItWorksPage() {
             </div>
 
             {/* Flow */}
-            <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-slate-400">
+            <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-slate-600">
               <span className="flex items-center gap-2">
                 <MessageCircle
                   size={14}
-                  className="text-cyan-300"
+                  className="text-cyan-700"
                   strokeWidth={1.8}
                 />
                 Verify details
@@ -625,7 +625,7 @@ export default function HowItWorksPage() {
               <span className="flex items-center gap-2">
                 <MapPin
                   size={14}
-                  className="text-cyan-300"
+                  className="text-cyan-700"
                   strokeWidth={1.8}
                 />
                 Meet safely
@@ -639,7 +639,7 @@ export default function HowItWorksPage() {
               <span className="flex items-center gap-2">
                 <CheckCircle
                   size={14}
-                  className="text-emerald-300"
+                  className="text-emerald-700"
                   strokeWidth={1.8}
                 />
                 Item returned
@@ -658,22 +658,22 @@ export default function HowItWorksPage() {
         ========================================================== */}
         <section className="relative mx-auto mt-24 max-w-6xl lg:mt-36">
           <div className="mb-14 text-center">
-            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-300/80">
+            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-700/80">
               HOW IT WORKS
             </span>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-navy-900 sm:text-4xl lg:text-5xl">
               Six simple steps
             </h2>
 
-            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-slate-400">
+            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-slate-600">
               From the moment you report an item to the moment it finds its
               way home.
             </p>
           </div>
 
           {/* Timeline */}
-          <div className="absolute bottom-20 left-[25px] top-44 hidden w-px bg-gradient-to-b from-cyan-300/25 via-cyan-300/10 to-transparent md:block lg:left-1/2 lg:-translate-x-1/2" />
+          <div className="absolute bottom-20 left-[25px] top-44 hidden w-px bg-gradient-to-b from-cyan-300 via-cyan-200 to-transparent md:block lg:left-1/2 lg:-translate-x-1/2" />
 
           <div className="space-y-6 md:space-y-10 lg:space-y-16">
             {steps.map((step, index) => {
@@ -694,38 +694,38 @@ export default function HowItWorksPage() {
                     }
                   >
                     <div
-                      className={`relative overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-white/[0.035] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:border-white/[0.14] hover:bg-white/[0.045] hover:shadow-[0_25px_80px_rgba(0,0,0,0.22)] sm:p-7 ${
+                      className={`relative overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:border-slate-300 hover:bg-slate-100 hover:shadow-[0_25px_80px_rgba(0,0,0,0.22)] sm:p-7 ${
                         !isLeft ? "md:text-left" : "md:text-right"
                       }`}
                     >
                       {/* Soft decorative glow */}
-                      <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-cyan-300/[0.025] blur-3xl transition-all duration-500 group-hover:bg-cyan-300/[0.055]" />
+                      <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-cyan-50/60 blur-3xl transition-all duration-500 group-hover:bg-cyan-300/[0.055]" />
 
                       <div
                         className={`relative flex items-start gap-4 ${
                           isLeft ? "md:flex-row-reverse" : ""
                         }`}
                       >
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/[0.1] bg-cyan-300/[0.05] text-cyan-300 transition-all duration-300 group-hover:scale-105 group-hover:border-cyan-300/[0.18]">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-200 bg-cyan-50 text-cyan-700 transition-all duration-300 group-hover:scale-105 group-hover:border-cyan-300/[0.18]">
                           <Icon size={23} strokeWidth={1.7} />
                         </div>
 
                         <div className="flex-1">
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300/75">
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-700/75">
                             {step.label}
                           </span>
 
-                          <h3 className="mt-1.5 font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                          <h3 className="mt-1.5 font-display text-xl font-semibold tracking-tight text-navy-900 sm:text-2xl">
                             {step.title}
                           </h3>
                         </div>
 
-                        <span className="hidden font-display text-5xl font-semibold leading-none text-white/[0.035] sm:block">
+                        <span className="hidden font-display text-5xl font-semibold leading-none text-navy-900/[0.035] sm:block">
                           {step.number}
                         </span>
                       </div>
 
-                      <p className="relative mt-5 text-[15px] leading-7 text-slate-300/75 sm:text-base">
+                      <p className="relative mt-5 text-[15px] leading-7 text-slate-700/75 sm:text-base">
                         {step.description}
                       </p>
 
@@ -738,9 +738,9 @@ export default function HowItWorksPage() {
                           Step {index + 1} of {steps.length}
                         </span>
 
-                        <span className="h-px w-7 bg-white/[0.08]" />
+                        <span className="h-px w-7 bg-slate-200" />
 
-                        <span className="text-cyan-300/60">
+                        <span className="text-cyan-700/60">
                           FindBack
                         </span>
                       </div>
@@ -749,7 +749,7 @@ export default function HowItWorksPage() {
 
                   {/* Center node */}
                   <div className="absolute left-0 top-8 hidden md:relative md:col-start-2 md:row-start-1 md:flex md:justify-center">
-                    <div className="relative flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/[0.12] bg-[#070B14] shadow-[0_0_35px_rgba(34,211,238,0.08)]">
+                    <div className="relative flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/[0.12] bg-white shadow-[0_0_35px_rgba(34,211,238,0.08)]">
                       <div className="h-2.5 w-2.5 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.6)] transition-transform duration-300 group-hover:scale-150" />
                     </div>
                   </div>
@@ -764,15 +764,15 @@ export default function HowItWorksPage() {
         ========================================================== */}
         <section className="mt-24 lg:mt-36">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-300/80">
+            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-700/80">
               WHY FINDBACK?
             </span>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-navy-900 sm:text-4xl lg:text-5xl">
               Built around real people
             </h2>
 
-            <p className="mt-4 text-[15px] leading-7 text-slate-400">
+            <p className="mt-4 text-[15px] leading-7 text-slate-600">
               The tools you need to find, communicate, verify, and safely
               return lost belongings.
             </p>
@@ -785,21 +785,21 @@ export default function HowItWorksPage() {
               return (
                 <div
                   key={feature.title}
-                  className="group relative overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-white/[0.035] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.14)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:border-white/[0.14] hover:bg-white/[0.045] hover:shadow-[0_25px_80px_rgba(0,0,0,0.2)]"
+                  className="group relative overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.14)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:border-slate-300 hover:bg-slate-100 hover:shadow-[0_25px_80px_rgba(0,0,0,0.2)]"
                 >
-                  <span className="absolute right-5 top-5 font-display text-4xl font-semibold text-white/[0.035]">
+                  <span className="absolute right-5 top-5 font-display text-4xl font-semibold text-navy-900/[0.035]">
                     {feature.number}
                   </span>
 
-                  <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/[0.1] bg-cyan-300/[0.05] text-cyan-300 transition-all duration-300 group-hover:scale-105 group-hover:bg-cyan-300/[0.08]">
+                  <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-200 bg-cyan-50 text-cyan-700 transition-all duration-300 group-hover:scale-105 group-hover:bg-cyan-300/[0.08]">
                     <Icon size={21} strokeWidth={1.7} />
                   </div>
 
-                  <h3 className="relative mt-6 font-display text-lg font-semibold tracking-tight text-white">
+                  <h3 className="relative mt-6 font-display text-lg font-semibold tracking-tight text-navy-900">
                     {feature.title}
                   </h3>
 
-                  <p className="relative mt-2 text-[15px] leading-6 text-slate-300/70">
+                  <p className="relative mt-2 text-[15px] leading-6 text-slate-700/70">
                     {feature.description}
                   </p>
 
@@ -814,33 +814,33 @@ export default function HowItWorksPage() {
             SAFETY
         ========================================================== */}
         <section className="mt-24 lg:mt-36">
-          <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/[0.1] bg-gradient-to-br from-amber-300/[0.045] via-white/[0.02] to-transparent p-6 shadow-[0_30px_90px_rgba(0,0,0,0.2)] sm:p-9 lg:p-10">
-            <div className="pointer-events-none absolute right-[-100px] top-[-100px] h-72 w-72 rounded-full bg-amber-300/[0.04] blur-[110px]" />
+          <div className="relative overflow-hidden rounded-[2rem] border border-amber-200 bg-gradient-to-br from-amber-50 via-white/60 to-transparent p-6 shadow-[0_30px_90px_rgba(0,0,0,0.2)] sm:p-9 lg:p-10">
+            <div className="pointer-events-none absolute right-[-100px] top-[-100px] h-72 w-72 rounded-full bg-amber-100/40 blur-[110px]" />
 
             <div className="relative grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
               <div>
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-300/[0.12] bg-amber-300/[0.06] text-amber-200">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-700">
                   <ShieldCheck size={25} strokeWidth={1.7} />
                 </div>
 
-                <span className="mt-6 block text-xs font-semibold tracking-[0.18em] text-amber-200/80">
+                <span className="mt-6 block text-xs font-semibold tracking-[0.18em] text-amber-700/80">
                   SAFETY FIRST
                 </span>
 
-                <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl">
+                <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-navy-900 sm:text-4xl">
                   Keep every handover safe.
                 </h2>
 
-                <p className="mt-4 max-w-md text-[15px] leading-7 text-slate-300/75">
+                <p className="mt-4 max-w-md text-[15px] leading-7 text-slate-700/75">
                   Finding an item is important, but your safety comes first.
                   Follow these simple guidelines before completing a return.
                 </p>
 
-                <div className="mt-6 flex items-center gap-2 text-sm text-slate-400">
+                <div className="mt-6 flex items-center gap-2 text-sm text-slate-600">
                   <Star
                     size={14}
                     strokeWidth={1.8}
-                    className="text-amber-200"
+                    className="text-amber-700"
                   />
                   Your safety matters more than any item.
                 </div>
@@ -853,19 +853,19 @@ export default function HowItWorksPage() {
                   return (
                     <div
                       key={tip.title}
-                      className="group rounded-2xl border border-white/[0.07] bg-black/10 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-300/[0.14] hover:bg-white/[0.025]"
+                      className="group rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-300 hover:bg-slate-50"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/[0.08] bg-cyan-300/[0.04] text-cyan-300">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-200 bg-cyan-300/[0.04] text-cyan-700">
                           <Icon size={17} strokeWidth={1.7} />
                         </div>
 
                         <div>
-                          <h3 className="text-sm font-semibold text-white">
+                          <h3 className="text-sm font-semibold text-navy-900">
                             {tip.title}
                           </h3>
 
-                          <p className="mt-1.5 text-[13px] leading-5 text-slate-300/65">
+                          <p className="mt-1.5 text-[13px] leading-5 text-slate-700/65">
                             {tip.description}
                           </p>
                         </div>
@@ -876,10 +876,10 @@ export default function HowItWorksPage() {
               </div>
             </div>
 
-            <div className="relative mt-7 flex items-start gap-2 border-t border-white/[0.06] pt-5 text-[13px] leading-6 text-slate-400 sm:items-center">
+            <div className="relative mt-7 flex items-start gap-2 border-t border-slate-200 pt-5 text-[13px] leading-6 text-slate-600 sm:items-center">
               <AlertTriangle
                 size={14}
-                className="mt-1 shrink-0 text-amber-300 sm:mt-0"
+                className="mt-1 shrink-0 text-amber-700 sm:mt-0"
               />
 
               <span>
@@ -895,15 +895,15 @@ export default function HowItWorksPage() {
         ========================================================== */}
         <section className="mx-auto mt-24 max-w-4xl lg:mt-36">
           <div className="text-center">
-            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-300/80">
+            <span className="text-xs font-semibold tracking-[0.18em] text-cyan-700/80">
               QUESTIONS?
             </span>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.025em] text-navy-900 sm:text-4xl lg:text-5xl">
               Everything you need to know
             </h2>
 
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-slate-400">
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-slate-600">
               A few answers to common questions before you get started.
             </p>
           </div>
@@ -912,10 +912,10 @@ export default function HowItWorksPage() {
             {faqs.map((faq, index) => (
               <details
                 key={faq.question}
-                className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] shadow-[0_10px_40px_rgba(0,0,0,0.1)] transition-all duration-300 open:border-cyan-300/[0.14] open:bg-cyan-300/[0.025] hover:border-white/[0.13]"
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.1)] transition-all duration-300 open:border-cyan-300 open:bg-cyan-50/60 hover:border-slate-300"
               >
-                <summary className="flex cursor-pointer list-none items-center gap-4 p-5 text-[15px] font-semibold leading-6 text-white sm:p-6">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-cyan-300/[0.08] bg-cyan-300/[0.05] text-[10px] font-semibold text-cyan-300">
+                <summary className="flex cursor-pointer list-none items-center gap-4 p-5 text-[15px] font-semibold leading-6 text-navy-900 sm:p-6">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-cyan-200 bg-cyan-50 text-[10px] font-semibold text-cyan-700">
                     {String(index + 1).padStart(2, "0")}
                   </span>
 
@@ -924,11 +924,11 @@ export default function HowItWorksPage() {
                   <ChevronDown
                     size={18}
                     strokeWidth={1.8}
-                    className="shrink-0 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open:text-cyan-300"
+                    className="shrink-0 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open:text-cyan-700"
                   />
                 </summary>
 
-                <div className="border-t border-white/[0.06] px-5 pb-6 pt-4 pl-16 text-[15px] leading-7 text-slate-300/70 sm:px-6 sm:pl-[4.5rem]">
+                <div className="border-t border-slate-200 px-5 pb-6 pt-4 pl-16 text-[15px] leading-7 text-slate-700/70 sm:px-6 sm:pl-[4.5rem]">
                   {faq.answer}
                 </div>
               </details>
@@ -939,31 +939,31 @@ export default function HowItWorksPage() {
         {/* =========================================================
             FINAL CTA
         ========================================================== */}
-        <section className="relative mt-24 overflow-hidden rounded-[2rem] border border-white/[0.09] bg-gradient-to-br from-cyan-400/[0.07] via-white/[0.025] to-transparent p-8 text-center shadow-[0_30px_100px_rgba(0,0,0,0.25)] sm:p-12 lg:mt-36 lg:p-16">
+        <section className="relative mt-24 overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-cyan-400/[0.07] via-white/70 to-transparent p-8 text-center shadow-[0_30px_100px_rgba(0,0,0,0.25)] sm:p-12 lg:mt-36 lg:p-16">
           {/* Ambient glow */}
           <div className="pointer-events-none absolute left-1/2 top-[-120px] h-72 w-[500px] -translate-x-1/2 rounded-full bg-cyan-400/[0.055] blur-[110px]" />
 
           {/* Decorative corners */}
-          <div className="pointer-events-none absolute left-6 top-6 h-16 w-16 rounded-tl-2xl border-l border-t border-cyan-300/[0.1]" />
+          <div className="pointer-events-none absolute left-6 top-6 h-16 w-16 rounded-tl-2xl border-l border-t border-cyan-200" />
 
-          <div className="pointer-events-none absolute bottom-6 right-6 h-16 w-16 rounded-br-2xl border-b border-r border-cyan-300/[0.1]" />
+          <div className="pointer-events-none absolute bottom-6 right-6 h-16 w-16 rounded-br-2xl border-b border-r border-cyan-200" />
 
           <div className="relative">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-300/[0.14] bg-cyan-300/[0.06] text-cyan-300 shadow-[0_0_40px_rgba(34,211,238,0.08)]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-200 bg-cyan-50 text-cyan-700 shadow-[0_0_40px_rgba(34,211,238,0.08)]">
               <HeartHandshake size={28} strokeWidth={1.7} />
             </div>
 
-            <span className="mt-6 block text-xs font-semibold tracking-[0.18em] text-cyan-300/80">
+            <span className="mt-6 block text-xs font-semibold tracking-[0.18em] text-cyan-700/80">
               READY WHEN YOU ARE
             </span>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-navy-900 sm:text-4xl lg:text-5xl">
               Help something find its way home.
             </h2>
 
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-slate-300/75 sm:text-base">
-              Search community reports for something you've lost, or report
-              an item you've found and help reunite it with its owner.
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-slate-700/75 sm:text-base">
+              Search community reports for something you&apos;ve lost, or report
+              an item you&apos;ve found and help reunite it with its owner.
             </p>
 
             <div className="mt-9 grid gap-3 sm:mx-auto sm:max-w-xl sm:grid-cols-2">
@@ -981,9 +981,9 @@ export default function HowItWorksPage() {
 
               <Link
                 href="/report/lost"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.11] bg-white/[0.045] px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-white/[0.07]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-slate-50 px-6 py-3.5 text-sm font-semibold text-navy-900 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100"
               >
-                <ClipboardList size={17} className="text-cyan-300" />
+                <ClipboardList size={17} className="text-cyan-700" />
                 Report an Item
               </Link>
             </div>
@@ -997,7 +997,7 @@ export default function HowItWorksPage() {
           <ShieldCheck
             size={14}
             strokeWidth={1.8}
-            className="text-cyan-300/80"
+            className="text-cyan-700/80"
           />
 
           Always prioritize your safety when meeting to return an item.

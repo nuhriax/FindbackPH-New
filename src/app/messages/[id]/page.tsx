@@ -184,7 +184,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
     return (
       <div className="py-16 lg:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <p className="text-slate-400">Loading conversation…</p>
+          <p className="text-slate-600">Loading conversation…</p>
         </div>
       </div>
     );
@@ -203,22 +203,22 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 flex items-center gap-4">
-          <Link href="/messages" className="text-slate-400 hover:text-white">
+          <Link href="/messages" className="rounded-lg p-1.5 text-slate-600 transition-colors hover:bg-blue-50 hover:text-navy-900">
             <ArrowLeft size={20} />
           </Link>
           <Link
             href={itemHref}
-            className="text-sm text-slate-400 hover:text-white"
+            className="text-sm font-medium text-blue-600 hover:underline"
           >
             Item: {itemTitle}
           </Link>
         </div>
 
-        <div className="card flex h-[600px] sm:h-[700px] flex-col">
+        <div className="card flex h-[600px] sm:h-[700px] flex-col overflow-hidden">
           {/* Messages list */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto bg-gradient-to-b from-ice-50/60 to-white/40 p-6">
             {messages.length === 0 ? (
-              <p className="pt-8 text-center text-sm text-slate-500">
+              <p className="pt-8 text-center text-sm text-slate-600">
                 No messages yet. Start the conversation below.
               </p>
             ) : (
@@ -228,14 +228,14 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
                   return (
                     <div
                       key={msg.id}
-                      className={`max-w-[75%] rounded-xl px-4 py-2.5 ${
+                      className={`max-w-[75%] rounded-2xl px-4 py-2.5 shadow-sm ${
                         isOwn
-                          ? "ml-auto bg-electric-500 text-white"
-                          : "bg-navy-900 text-slate-200"
+                          ? "ml-auto rounded-br-md bg-gradient-to-b from-electric-500 to-electric-600 text-white"
+                          : "rounded-bl-md border border-slate-200/70 bg-white text-navy-900"
                       }`}
                     >
-                      <p className="text-sm">{msg.body}</p>
-                      <span className="text-xs opacity-60">
+                      <p className="text-sm leading-relaxed">{msg.body}</p>
+                      <span className={`mt-1 block text-xs ${isOwn ? "text-white/75" : "text-slate-500"}`}>
                         {new Date(msg.created_at).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -250,21 +250,21 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
           </div>
 
           {/* Message input */}
-          <div className="border-t border-white/10 p-4">
+          <div className="border-t border-slate-200/70 bg-white/80 p-4 backdrop-blur">
             <form action={handleSendMessage} className="flex items-center gap-2">
               <input
                 name="body"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder={`Message ${displayName}...`}
-                className="placeholder:text-slate-500 focus:border-electric-400/70 flex-1 rounded-xl border border-white/10 bg-navy-900 px-4 py-2.5 text-sm text-slate-100"
+                className="input !py-2.5"
                 maxLength={2000}
                 required
               />
               <button
                 type="submit"
                 disabled={isPending || !newMessage.trim()}
-                className="rounded-xl bg-electric-500 p-2.5 text-white transition-colors hover:bg-electric-400 disabled:opacity-50"
+                className="btn-primary !px-3.5 !py-2.5"
                 aria-label="Send message"
               >
                 <Send size={18} />

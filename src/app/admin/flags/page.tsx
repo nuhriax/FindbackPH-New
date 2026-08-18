@@ -35,21 +35,21 @@ export default async function AdminFlagsPage() {
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="font-display text-3xl font-bold text-white">Report Flags</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Report Flags</h1>
           <Link href="/admin" className="btn-ghost">
             Back
           </Link>
         </div>
 
         <div className="mt-4 flex gap-2">
-          <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs text-red-300">
+          <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-medium text-red-700 ring-1 ring-red-200">
             {flags?.filter((f) => f.status === "pending").length ?? 0} pending
           </span>
         </div>
 
         {!flags || flags.length === 0 ? (
           <div className="mt-8 card p-8 text-center">
-            <p className="text-slate-400">No flags to review. You're all caught up.</p>
+            <p className="text-navy-700">No flags to review. You&apos;re all caught up.</p>
           </div>
         ) : (
           <div className="mt-8 space-y-3">
@@ -65,30 +65,30 @@ export default async function AdminFlagsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-navy-900">
                           {REASON_LABELS[flag.reason] ?? flag.reason}
                         </span>
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs ${
                             flag.status === "pending"
-                              ? "bg-amber-500/15 text-amber-300"
-                              : "bg-emerald-500/15 text-emerald-300"
+                              ? "bg-amber-100 text-amber-800 ring-1 ring-amber-200"
+                              : "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200"
                           }`}
                         >
                           {flag.status}
                         </span>
                       </div>
-                      <p className="mt-1 text-sm text-slate-400">
+                      <p className="mt-1 text-sm text-slate-600">
                         Reported by{" "}
-                        <span className="text-slate-300">
+                        <span className="text-slate-700">
                           @{reporter?.username ?? "unknown"}
                         </span>{" "}
                         · {format(new Date(flag.created_at), "MMM d, yyyy h:mm a")}
                       </p>
                       {flag.details && (
-                        <p className="mt-2 text-sm text-slate-300">{flag.details}</p>
+                        <p className="mt-2 text-sm text-slate-700">{flag.details}</p>
                       )}
-                      <Link href={href} className="mt-2 inline-block text-xs text-electric-400 hover:underline">
+                      <Link href={href} className="mt-2 inline-block text-xs text-blue-600 hover:underline">
                         View {flag.item_type === "lost_item" ? "lost" : "found"} report →
                       </Link>
                     </div>
@@ -96,16 +96,22 @@ export default async function AdminFlagsPage() {
                     {flag.status === "pending" && (
                       <div className="flex gap-2">
                         <form
-                          action={reviewFlagAction.bind(null, flag.id, "reviewed")}
+                          action={async () => {
+                            "use server";
+                            await reviewFlagAction(flag.id, "reviewed");
+                          }}
                         >
                           <button type="submit" className="btn-secondary !py-2 text-xs">
                             Mark reviewed
                           </button>
                         </form>
                         <form
-                          action={reviewFlagAction.bind(null, flag.id, "dismissed")}
+                          action={async () => {
+                            "use server";
+                            await reviewFlagAction(flag.id, "dismissed");
+                          }}
                         >
-                          <button type="submit" className="btn-ghost !text-slate-400">
+                          <button type="submit" className="btn-ghost !text-slate-700">
                             Dismiss
                           </button>
                         </form>
@@ -121,3 +127,6 @@ export default async function AdminFlagsPage() {
     </div>
   );
 }
+
+
+

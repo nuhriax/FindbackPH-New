@@ -61,10 +61,10 @@ export default async function AdminDashboardPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold text-white">Admin Dashboard</h1>
-        <p className="mt-2 text-sm text-slate-400">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Admin Dashboard</h1>
+        <p className="mt-2 text-sm text-slate-600">
           Overview of FindBack PH activity.{" "}
-          <span className="text-electric-300">{profile.role}</span>
+          <span className="font-medium text-blue-600">{profile.role}</span>
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -72,24 +72,24 @@ export default async function AdminDashboardPage() {
             <Link
               key={stat.label}
               href={stat.href}
-              className="card p-5 transition-colors hover:border-electric-500/40"
+              className="card card-hover p-5"
             >
-              <p className="text-sm text-slate-400">{stat.label}</p>
-              <p className="mt-1 font-display text-3xl font-bold text-white">
+              <p className="text-sm text-slate-600">{stat.label}</p>
+              <p className="mt-1 font-display text-3xl font-bold text-navy-900">
                 {stat.value.toLocaleString()}
               </p>
-              <p className="mt-2 flex items-center gap-1 text-xs text-electric-400">
+              <p className="mt-2 flex items-center gap-1 text-xs font-medium text-blue-600">
                 View <ArrowRight size={12} />
               </p>
             </Link>
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-white/10 bg-navy-900/60 p-6">
-          <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-white">
-            <LayoutDashboard size={20} className="text-electric-400" /> Admin tools
+        <div className="card mt-10 p-6">
+          <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-navy-900">
+            <LayoutDashboard size={20} className="text-blue-600" /> Admin tools
           </h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
             Real statistics from the database. Only admins and moderators can see
             this section.
           </p>

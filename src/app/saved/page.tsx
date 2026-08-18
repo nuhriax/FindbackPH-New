@@ -22,14 +22,14 @@ export default async function SavedItemsPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold text-white">Saved Items</h1>
-        <p className="mt-1 text-sm text-slate-400">Items you've saved for later.</p>
+        <h1 className="font-display text-3xl font-bold text-navy-900">Saved Items</h1>
+        <p className="mt-1 text-sm text-slate-700">Items you&apos;ve saved for later.</p>
 
         {!savedItems || savedItems.length === 0 ? (
           <div className="mt-8 card p-8 text-center">
-            <Bookmark size={48} className="mx-auto mb-4 text-slate-600" />
-            <p className="text-slate-400">You haven't saved any items yet.</p>
-            <p className="mt-2 text-sm text-slate-500">
+            <Bookmark size={48} className="mx-auto mb-4 text-slate-700" />
+            <p className="text-slate-700">You haven&apos;t saved any items yet.</p>
+            <p className="mt-2 text-sm text-slate-700">
               Save items to keep track of reports as you browse.
             </p>
             <div className="mt-4">
@@ -41,34 +41,41 @@ export default async function SavedItemsPage() {
         ) : (
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {savedItems.map((saved) => {
-              const item = saved.lost_items || saved.found_items;
-              const isLost = !!saved.lost_items;
+              const lostItem = saved.lost_items?.[0];
+              const foundItem = saved.found_items?.[0];
+              const item = lostItem ?? foundItem ?? null;
+              const isLost = !!lostItem;
               const href = isLost ? `/lost/${saved.lost_item_id}` : `/found/${saved.found_item_id}`;
-              const statusColor = item?.status === "recovered" ? "text-emerald-400" : "text-amber-400";
+              const statusColor = item?.status === "recovered" ? "text-emerald-700" : "text-amber-700";
 
               return (
                 <div key={saved.id} className="card p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex-1">
                       <Link href={href} className="group">
-                        <h3 className="font-display text-lg font-semibold text-white group-hover:text-electric-400 transition-colors">
+                        <h3 className="font-display text-lg font-semibold text-navy-900 group-hover:text-blue-600 transition-colors">
                           {item?.title ?? "Unknown item"}
                         </h3>
                       </Link>
-                      <p className="mt-1 text-sm text-slate-400 line-clamp-2">
+                      <p className="mt-1 text-sm text-slate-700 line-clamp-2">
                         {item?.description ?? "No description"}
                       </p>
-                      <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
+                      <div className="mt-2 flex items-center gap-4 text-xs text-slate-700">
                         <span className={`capitalize ${statusColor}`}>{item?.status ?? "active"}</span>
                         <span>{item?.city}, {item?.province}</span>
                       </div>
                     </div>
-                    <form action={unsaveItemAction}>
+                    <form
+                      action={async (formData: FormData) => {
+                        "use server";
+                        await unsaveItemAction(formData);
+                      }}
+                    >
                       <input type="hidden" name="savedItemId" value={saved.id} />
                       <button
                         type="submit"
                         aria-label="Remove from saved"
-                        className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.06] hover:text-red-400"
+                        className="rounded-lg p-1 text-slate-700 hover:bg-slate-100 hover:text-red-600"
                         title="Remove from saved"
                       >
                         <BookmarkX size={18} />
@@ -84,3 +91,4 @@ export default async function SavedItemsPage() {
     </div>
   );
 }
+

@@ -49,8 +49,8 @@ export function SaveButton({
         disabled={isPending}
         className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-all duration-200 ${
           isSaved
-            ? "border-electric-500/40 bg-electric-500/10 text-electric-300"
-            : "border-white/10 bg-white/[0.04] text-slate-200 hover:bg-white/[0.08]"
+            ? "border-electric-400/60 bg-electric-50 text-electric-700"
+            : "border-slate-200 bg-white/75 text-navy-900 shadow-sm hover:border-blue-300 hover:bg-blue-50/50"
         }`}
       >
         <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { loginAction } from "@/lib/actions/auth";
+import { AuthShell } from "@/components/ui/auth-shell";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -17,20 +18,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-12">
-      <h1 className="font-display text-2xl font-semibold">Welcome back</h1>
-      <p className="mt-1 text-sm text-slate-400">Log in to your FindBack PH account.</p>
-
-      <form action={handleSubmit} className="mt-6 space-y-4">
+    <AuthShell title="Welcome back" subtitle="Log in to your FindBack PH account.">
+      <form action={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm text-slate-300">Email</label>
+          <label htmlFor="email" className="label">Email</label>
           <input id="email" name="email" type="email" required className="input" />
         </div>
 
         <div>
           <div className="mb-1 flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm text-slate-300">Password</label>
-            <Link href="/forgot-password" className="text-xs text-electric-400 hover:underline">
+            <label htmlFor="password" className="label !mb-0">Password</label>
+            <Link href="/forgot-password" className="text-xs font-medium text-blue-600 hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -44,10 +42,10 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-400">
+      <p className="mt-6 text-center text-sm text-slate-600">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-electric-400 hover:underline">Create one</Link>
+        <Link href="/register" className="font-medium text-blue-600 hover:underline">Create one</Link>
       </p>
-    </div>
+    </AuthShell>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { Search, Bell, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
@@ -26,8 +27,14 @@ function getInitials(profile: Profile | null) {
 }
 
 export function Navbar({ user, profile }: { user: User | null; profile: Profile | null }) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const isActive = (href: string) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -43,7 +50,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
       className={clsx(
         "sticky top-0 z-50 w-full transition-all duration-300",
         scrolled
-          ? "border-b border-white/10 bg-[#070b17]/85 shadow-[0_10px_40px_-20px_rgba(2,6,23,0.9)] backdrop-blur-xl"
+          ? "border-b border-slate-200/70 bg-white/80 shadow-[0_10px_40px_-22px_rgba(20,34,79,0.35)] backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       )}
     >
@@ -51,22 +58,51 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
         <Logo />
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.href);
+            const isLost = link.href === "/lost";
+            const isFound = link.href === "/found";
+
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={clsx(
+                  "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? isLost
+                      ? "bg-indigo-50 text-indigo-700"
+                      : isFound
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-blue-50 text-blue-700"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-blue-700"
+                )}
+              >
+                {link.label}
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className={clsx(
+                      "absolute inset-x-2 -bottom-px h-0.5 rounded-full",
+                      isLost
+                        ? "bg-indigo-400/70"
+                        : isFound
+                          ? "bg-emerald-400/70"
+                          : "bg-blue-500/70"
+                    )}
+                  />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-1 lg:flex">
           <Link
             href="/search"
             aria-label="Search"
-            className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
           >
             <Search size={18} />
           </Link>
@@ -76,42 +112,42 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
               <Link
                 href="/notifications"
                 aria-label="Notifications"
-                className="relative rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="relative rounded-lg p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
               >
                 <Bell size={18} />
-                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-electric-400" />
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-500" />
               </Link>
               <Link
                 href="/messages"
                 aria-label="Messages"
-                className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
               >
                 <MessageCircle size={18} />
               </Link>
               <Link
                 href="/saved"
                 aria-label="Saved items"
-                className="rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
               >
                 <Bookmark size={18} />
               </Link>
               <Link
                 href="/dashboard"
-                className="group ml-1 flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] py-1.5 pl-1.5 pr-3 transition-colors hover:border-white/20 hover:bg-white/[0.08]"
+                className="group ml-1 flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white/70 py-1.5 pl-1.5 pr-3 shadow-sm transition-colors hover:border-blue-200 hover:bg-white"
                 title={firstName}
               >
                 {profile?.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-lg object-cover" />
                 ) : (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-semibold text-white">
                     {getInitials(profile)}
                   </span>
                 )}
-                <span className="hidden max-w-[9rem] truncate text-sm font-medium text-slate-100 xl:block">
+                <span className="hidden max-w-[9rem] truncate text-sm font-medium text-navy-900 xl:block">
                   {profile?.username ?? user.email}
                 </span>
-                <span className="hidden text-[10px] font-medium uppercase tracking-wide text-electric-300 xl:block">
+                <span className="hidden text-[10px] font-medium uppercase tracking-wide text-blue-600 xl:block">
                   Signed in
                 </span>
               </Link>
@@ -119,7 +155,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                 <button
                   type="submit"
                   aria-label="Log out"
-                  className="ml-1 rounded-lg p-2 text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                  className="ml-1 rounded-lg p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
                 >
                   <LogOut size={18} />
                 </button>
@@ -140,7 +176,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
         {/* Mobile toggle */}
         <div className="flex items-center gap-2 lg:hidden">
           {user ? (
-            <Link href="/dashboard" aria-label="Dashboard" className="rounded-lg p-2 text-slate-300 hover:text-white">
+            <Link href="/dashboard" aria-label="Dashboard" className="rounded-lg p-2 text-slate-500 hover:text-blue-700">
               <LayoutDashboard size={20} />
             </Link>
           ) : null}
@@ -148,7 +184,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="rounded-lg p-2 text-slate-200 transition-colors hover:bg-white/[0.06]"
+            className="rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-50"
           >
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -158,30 +194,46 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
       {/* Mobile menu */}
       <div
         className={clsx(
-          "overflow-hidden border-t border-white/10 bg-[#070b17]/95 backdrop-blur-xl transition-[max-height,opacity] duration-300 lg:hidden",
+          "overflow-hidden border-t border-slate-200/70 bg-white/95 backdrop-blur-xl transition-[max-height,opacity] duration-300 lg:hidden",
           open ? "max-h-[40rem] opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-200 transition-colors hover:bg-white/[0.06] hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div className="mt-2 flex flex-col gap-2 border-t border-white/10 pt-4">
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.href);
+            const isLost = link.href === "/lost";
+            const isFound = link.href === "/found";
+
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={clsx(
+                  "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  active
+                    ? isLost
+                      ? "bg-indigo-50 text-indigo-700"
+                      : isFound
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-blue-50 text-blue-700"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-blue-700"
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <div className="mt-2 flex flex-col gap-2 border-t border-slate-200/80 pt-4">
             {user ? (
               <>
                 <div className="flex items-center gap-2.5 px-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-semibold text-white">
                     {getInitials(profile)}
                   </span>
-                  <span className="text-sm text-slate-200">{firstName}</span>
-                  <span className="text-[10px] font-medium uppercase tracking-wide text-electric-300">Signed in</span>
+                  <span className="text-sm text-navy-900">{firstName}</span>
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-blue-600">Signed in</span>
                 </div>
                 <Link href="/dashboard" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                   Dashboard
@@ -196,7 +248,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                   Saved Items
                 </Link>
                 <form action={logoutAction}>
-                  <button type="submit" className="btn-ghost w-full justify-start text-slate-300">
+                  <button type="submit" className="btn-ghost w-full justify-start text-slate-500">
                     <LogOut size={16} /> Log out
                   </button>
                 </form>
@@ -217,4 +269,3 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
     </header>
   );
 }
-

@@ -15,7 +15,7 @@ export function ImageGallery({
 
   if (!images || images.length === 0) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-2xl border border-white/5 bg-navy-900 text-sm text-slate-500">
+      <div className="flex aspect-video w-full items-center justify-center rounded-2xl border border-slate-200/70 bg-ice-50 text-sm text-slate-500">
         No photos were uploaded for this report.
       </div>
     );
@@ -25,7 +25,7 @@ export function ImageGallery({
 
   return (
     <div>
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-900">
+      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-200/70 bg-ice-50">
         <Image
           src={current.url}
           alt={current.alt || alt}
@@ -47,7 +47,7 @@ export function ImageGallery({
                 "relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border transition-all",
                 i === active
                   ? "border-electric-500/70 ring-1 ring-electric-500/50"
-                  : "border-white/10 opacity-60 hover:opacity-100"
+                  : "border-slate-200 opacity-60 hover:opacity-100"
               )}
             >
               <Image

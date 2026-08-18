@@ -156,7 +156,7 @@ function Eyebrow({
         className="h-px w-8 bg-sky-400 sm:w-10"
       />
 
-      <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-sky-300">
+      <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-sky-600">
         {children}
       </span>
 
@@ -184,7 +184,7 @@ function CTALink({
   trailingIcon?: LucideIcon;
 }) {
   const base =
-    "group inline-flex items-center justify-center gap-3 rounded-full px-7 py-3.5 text-sm font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:ring-offset-2 focus:ring-offset-[#071018]";
+    "group inline-flex items-center justify-center gap-3 rounded-full px-7 py-3.5 text-sm font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:ring-offset-2 focus:ring-offset-white";
 
   const variantClass =
     variant === "primary"
@@ -195,9 +195,9 @@ function CTALink({
           "hover:shadow-[0_18px_50px_rgba(56,189,248,0.28)]",
         ].join(" ")
       : [
-          "border border-white/10 text-white",
+          "border border-slate-300 text-navy-900",
           "hover:-translate-y-0.5 hover:border-sky-400/30",
-          "hover:bg-white/[0.04]",
+          "hover:bg-slate-50",
         ].join(" ");
 
   return (
@@ -222,7 +222,7 @@ function CTALink({
 
 export default function AboutPage() {
   return (
-    <main className="relative overflow-hidden bg-[#071018] text-white selection:bg-sky-400/20 selection:text-sky-100">
+    <main className="relative overflow-hidden  text-navy-900 selection:bg-sky-400/20 selection:text-sky-950">
       {/* =========================================================
           BACKGROUND
       ========================================================= */}
@@ -242,13 +242,13 @@ export default function AboutPage() {
             className="h-full w-full"
             style={{
               backgroundImage:
-                "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
+                "linear-gradient(rgba(148,163,184,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.5) 1px, transparent 1px)",
               backgroundSize: "80px 80px",
             }}
           />
         </div>
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,transparent_0%,rgba(7,16,24,.38)_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,transparent_0%,rgba(241,245,249,.6)_72%)]" />
       </div>
 
       {/* =========================================================
@@ -262,18 +262,18 @@ export default function AboutPage() {
             <div>
               <Eyebrow index="001">About FindBack PH</Eyebrow>
 
-              <h1 className="mt-8 max-w-5xl font-display text-[3.5rem] font-semibold leading-[0.92] tracking-[-0.055em] text-white sm:text-6xl lg:text-[6.8rem]">
+              <h1 className="mt-8 max-w-5xl font-display text-[3.5rem] font-semibold leading-[0.92] tracking-[-0.055em] text-navy-900 sm:text-6xl lg:text-[6.8rem]">
                 Lost things
-                <span className="block text-white/30">
+                <span className="block text-navy-900/30">
                   have stories.
                 </span>
 
-                <span className="block bg-gradient-to-r from-sky-200 via-sky-400 to-cyan-300 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 bg-clip-text text-transparent">
                   Help them continue.
                 </span>
               </h1>
 
-              <p className="mt-10 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl sm:leading-9">
+              <p className="mt-10 max-w-2xl text-lg leading-8 text-slate-700 sm:text-xl sm:leading-9">
                 FindBack PH helps people across the Philippines reconnect
                 with the belongings that matter to them — through a simpler,
                 safer, community-powered way to find what was lost.
@@ -293,7 +293,7 @@ export default function AboutPage() {
                 </CTALink>
               </div>
 
-              <div className="mt-12 flex items-center gap-3 text-sm text-slate-500">
+              <div className="mt-12 flex items-center gap-3 text-sm text-slate-700">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.6)]" />
 
                 <span>
@@ -334,7 +334,7 @@ export default function AboutPage() {
                   <HeartHandshake
                     size={34}
                     strokeWidth={1.5}
-                    className="text-sky-300"
+                    className="text-sky-600"
                   />
                 </div>
               </div>
@@ -392,7 +392,7 @@ export default function AboutPage() {
                   Built around people
                 </p>
 
-                <p className="mt-2 text-sm leading-6 text-slate-400">
+                <p className="mt-2 text-sm leading-6 text-slate-600">
                   One connection can be enough to bring something important
                   home.
                 </p>
@@ -406,7 +406,7 @@ export default function AboutPage() {
           BENEFITS
       ========================================================= */}
 
-      <section className="border-y border-white/[0.06]">
+      <section className="border-y border-slate-200">
         <div className="mx-auto grid max-w-7xl md:grid-cols-3">
           {benefits.map((item, index) => {
             const Icon = item.icon;
@@ -415,9 +415,9 @@ export default function AboutPage() {
               <article
                 key={item.number}
                 className={[
-                  "group p-8 transition-colors duration-500 hover:bg-white/[0.025] sm:p-10 lg:p-12",
+                  "group p-8 transition-colors duration-500 hover:bg-slate-50 sm:p-10 lg:p-12",
                   index !== 0
-                    ? "border-t border-white/[0.06] md:border-l md:border-t-0"
+                    ? "border-t border-slate-200 md:border-l md:border-t-0"
                     : "",
                 ].join(" ")}
               >
@@ -430,15 +430,15 @@ export default function AboutPage() {
                     aria-hidden="true"
                     size={20}
                     strokeWidth={1.5}
-                    className="text-slate-600 transition-colors duration-300 group-hover:text-sky-300"
+                    className="text-slate-600 transition-colors duration-300 group-hover:text-sky-600"
                   />
                 </div>
 
-                <h3 className="mt-10 font-display text-2xl font-semibold tracking-[-0.02em] text-white">
+                <h3 className="mt-10 font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900">
                   {item.title}
                 </h3>
 
-                <p className="mt-3 max-w-sm text-sm leading-7 text-slate-400">
+                <p className="mt-3 max-w-sm text-sm leading-7 text-slate-600">
                   {item.text}
                 </p>
 
@@ -462,12 +462,12 @@ export default function AboutPage() {
                 <div className="flex items-center gap-3">
                   <span className="h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,.65)]" />
 
-                  <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-slate-500">
+                  <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-slate-700">
                     Our story
                   </span>
                 </div>
 
-                <div className="mt-8 border-l border-white/[0.07] pl-5">
+                <div className="mt-8 border-l border-slate-200 pl-5">
                   <p className="text-xs leading-6 text-slate-700">
                     WHY
                     <br />
@@ -482,7 +482,7 @@ export default function AboutPage() {
             <div>
               <Eyebrow>Why we exist</Eyebrow>
 
-              <h2 className="mt-7 max-w-4xl font-display text-4xl font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
+              <h2 className="mt-7 max-w-4xl font-display text-4xl font-semibold leading-[0.98] tracking-[-0.045em] text-navy-900 sm:text-5xl lg:text-6xl">
                 Sometimes a small item carries a{" "}
                 <span className="text-sky-400">
                   big story.
@@ -490,7 +490,7 @@ export default function AboutPage() {
               </h2>
 
               <div className="mt-16 grid gap-14 lg:grid-cols-[1fr_0.8fr]">
-                <div className="space-y-7 text-base leading-8 text-slate-400 sm:text-lg">
+                <div className="space-y-7 text-base leading-8 text-slate-600 sm:text-lg">
                   <p>
                     A lost phone can hold years of memories. An ID can be
                     essential for everyday life. A wallet can contain things
@@ -503,16 +503,16 @@ export default function AboutPage() {
                     start.
                   </p>
 
-                  <p className="text-white">
+                  <p className="text-navy-900">
                     FindBack PH exists to make that first step easier.
                   </p>
                 </div>
 
-                <ul className="border-l border-white/[0.08] pl-7">
+                <ul className="border-l border-slate-200 pl-7">
                   {storyChecklist.map((item, index) => (
                     <li
                       key={item}
-                      className="group flex gap-4 border-b border-white/[0.06] py-5 first:pt-0 last:border-b-0"
+                      className="group flex gap-4 border-b border-slate-200 py-5 first:pt-0 last:border-b-0"
                     >
                       <span className="font-mono text-[10px] text-sky-400">
                         0{index + 1}
@@ -525,7 +525,7 @@ export default function AboutPage() {
                           className="mt-1 shrink-0 text-sky-400 transition-transform duration-300 group-hover:scale-110"
                         />
 
-                        <span className="text-sm leading-6 text-slate-300">
+                        <span className="text-sm leading-6 text-slate-700">
                           {item}
                         </span>
                       </div>
@@ -545,11 +545,11 @@ export default function AboutPage() {
                     aria-hidden="true"
                     size={25}
                     strokeWidth={1.5}
-                    className="mt-1 shrink-0 text-sky-300"
+                    className="mt-1 shrink-0 text-sky-600"
                   />
 
-                  <p className="max-w-4xl font-display text-2xl font-medium leading-9 tracking-[-0.02em] text-white sm:text-3xl sm:leading-10">
-                    “The goal isn't just to find things. It's to help people
+                  <p className="max-w-4xl font-display text-2xl font-medium leading-9 tracking-[-0.02em] text-navy-900 sm:text-3xl sm:leading-10">
+                    “The goal isn&apos;t just to find things. It&apos;s to help people
                     find their way back to something that matters.”
                   </p>
                 </div>
@@ -563,19 +563,19 @@ export default function AboutPage() {
           HOW IT WORKS
       ========================================================= */}
 
-      <section className="relative border-y border-white/[0.06] px-5 py-32 sm:px-6 lg:py-44">
+      <section className="relative border-y border-slate-200 px-5 py-32 sm:px-6 lg:py-44">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-16 lg:grid-cols-[0.4fr_1fr]">
             <div>
               <Eyebrow>The process</Eyebrow>
 
-              <h2 className="mt-7 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
+              <h2 className="mt-7 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-navy-900 sm:text-5xl lg:text-6xl">
                 From lost
                 <br />
                 to found.
               </h2>
 
-              <p className="mt-7 max-w-sm text-base leading-7 text-slate-400">
+              <p className="mt-7 max-w-sm text-base leading-7 text-slate-600">
                 Simple by design. Every step brings people a little closer
                 to a successful return.
               </p>
@@ -588,7 +588,7 @@ export default function AboutPage() {
                 return (
                   <article
                     key={step.number}
-                    className="group grid gap-6 border-t border-white/[0.07] py-10 sm:grid-cols-[80px_1fr] lg:grid-cols-[100px_1fr]"
+                    className="group grid gap-6 border-t border-slate-200 py-10 sm:grid-cols-[80px_1fr] lg:grid-cols-[100px_1fr]"
                   >
                     <div>
                       <span className="font-mono text-sm text-sky-400">
@@ -605,12 +605,12 @@ export default function AboutPage() {
                           className="text-sky-400 transition-transform duration-300 group-hover:scale-110"
                         />
 
-                        <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-white transition-colors duration-300 group-hover:text-sky-200 sm:text-3xl">
+                        <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900 transition-colors duration-300 group-hover:text-sky-600 sm:text-3xl">
                           {step.title}
                         </h3>
                       </div>
 
-                      <p className="mt-4 text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
+                      <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
                         {step.description}
                       </p>
                     </div>
@@ -642,30 +642,30 @@ export default function AboutPage() {
               </span>
             </div>
 
-            <h2 className="mt-8 font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] text-white sm:text-6xl lg:text-[6.5rem]">
+            <h2 className="mt-8 font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] text-navy-900 sm:text-6xl lg:text-[6.5rem]">
               Make
-              <span className="text-white/30"> helping </span>
+              <span className="text-navy-900/30"> helping </span>
               each other
               <span className="text-sky-400"> easier.</span>
             </h2>
 
             <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_0.65fr]">
-              <p className="max-w-3xl text-xl leading-9 text-slate-300">
+              <p className="max-w-3xl text-xl leading-9 text-slate-700">
                 FindBack PH exists to make lost-and-found easier, safer,
                 and more accessible for communities across the Philippines.
               </p>
 
-              <div className="border-l border-white/[0.08] pl-6">
-                <p className="text-sm leading-7 text-slate-400">
+              <div className="border-l border-slate-200 pl-6">
+                <p className="text-sm leading-7 text-slate-600">
                   We believe technology should make good intentions easier
-                  to act on — whether you're searching for something you've
-                  lost or trying to return something you've found.
+                  to act on — whether you&apos;re searching for something you&apos;ve
+                  lost or trying to return something you&apos;ve found.
                 </p>
 
                 <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-3">
                   {missionValues.map((item) => (
                     <li key={item}>
-                      <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500 transition-colors hover:text-sky-300">
+                      <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-700 transition-colors hover:text-sky-600">
                         {item}
                       </span>
                     </li>
@@ -681,17 +681,17 @@ export default function AboutPage() {
           VALUES
       ========================================================= */}
 
-      <section className="border-y border-white/[0.06] px-5 py-32 sm:px-6 lg:py-40">
+      <section className="border-y border-slate-200 px-5 py-32 sm:px-6 lg:py-40">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-14 lg:grid-cols-[0.42fr_1fr]">
             <div>
               <Eyebrow>What we believe</Eyebrow>
 
-              <h2 className="mt-7 max-w-md font-display text-4xl font-semibold leading-[0.98] tracking-[-0.04em] text-white sm:text-5xl">
+              <h2 className="mt-7 max-w-md font-display text-4xl font-semibold leading-[0.98] tracking-[-0.04em] text-navy-900 sm:text-5xl">
                 People are at the center.
               </h2>
 
-              <p className="mt-6 max-w-sm text-base leading-7 text-slate-500">
+              <p className="mt-6 max-w-sm text-base leading-7 text-slate-700">
                 The technology matters, but the people behind every lost
                 and found story matter more.
               </p>
@@ -704,7 +704,7 @@ export default function AboutPage() {
                 return (
                   <article
                     key={value.number}
-                    className="group border-t border-white/[0.07] py-9 first:pt-0"
+                    className="group border-t border-slate-200 py-9 first:pt-0"
                   >
                     <div className="grid gap-5 sm:grid-cols-[60px_1fr_auto]">
                       <span className="font-mono text-xs text-sky-400">
@@ -717,15 +717,15 @@ export default function AboutPage() {
                             aria-hidden="true"
                             size={19}
                             strokeWidth={1.5}
-                            className="text-slate-600 transition-colors duration-300 group-hover:text-sky-300"
+                            className="text-slate-600 transition-colors duration-300 group-hover:text-sky-600"
                           />
 
-                          <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-white transition-colors duration-300 group-hover:text-sky-200">
+                          <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900 transition-colors duration-300 group-hover:text-sky-600">
                             {value.title}
                           </h3>
                         </div>
 
-                        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">
+                        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
                           {value.description}
                         </p>
                       </div>
@@ -733,7 +733,7 @@ export default function AboutPage() {
                       <ArrowRight
                         aria-hidden="true"
                         size={18}
-                        className="hidden text-slate-700 transition-all duration-300 group-hover:translate-x-1 group-hover:text-sky-300 sm:block"
+                        className="hidden text-slate-700 transition-all duration-300 group-hover:translate-x-1 group-hover:text-sky-600 sm:block"
                       />
                     </div>
                   </article>
@@ -754,7 +754,7 @@ export default function AboutPage() {
             {/* VISUAL */}
             <div
               aria-hidden="true"
-              className="relative min-h-[450px] overflow-hidden rounded-3xl border border-white/[0.07] bg-white/[0.015]"
+              className="relative min-h-[450px] overflow-hidden rounded-3xl border border-slate-200 bg-slate-50"
             >
               {/* Grid */}
               <div className="absolute inset-0 opacity-[0.08]">
@@ -799,7 +799,7 @@ export default function AboutPage() {
                 <Globe2
                   size={28}
                   strokeWidth={1}
-                  className="text-sky-300/50"
+                  className="text-sky-500/50"
                 />
               </div>
 
@@ -809,7 +809,7 @@ export default function AboutPage() {
                   Built for the Philippines
                 </p>
 
-                <p className="mt-3 font-display text-2xl font-semibold leading-tight text-white">
+                <p className="mt-3 font-display text-2xl font-semibold leading-tight text-navy-900">
                   Local connections can create nationwide impact.
                 </p>
               </div>
@@ -819,7 +819,7 @@ export default function AboutPage() {
             <div>
               <Eyebrow>Built for PH</Eyebrow>
 
-              <h2 className="mt-7 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
+              <h2 className="mt-7 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-navy-900 sm:text-5xl lg:text-6xl">
                 One shared
                 <br />
                 <span className="text-sky-400">
@@ -827,7 +827,7 @@ export default function AboutPage() {
                 </span>
               </h2>
 
-              <p className="mt-7 max-w-xl text-lg leading-8 text-slate-400">
+              <p className="mt-7 max-w-xl text-lg leading-8 text-slate-600">
                 FindBack PH is designed around the way real communities
                 connect — reducing friction, encouraging responsible
                 communication, and making it easier to return lost
@@ -835,68 +835,68 @@ export default function AboutPage() {
               </p>
 
               <ul className="mt-10">
-                <li className="group flex gap-5 border-t border-white/[0.07] py-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-400/[0.06]">
+                <li className="group flex gap-5 border-t border-slate-200 py-6">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-50">
                     <MapPin
                       aria-hidden="true"
                       size={18}
                       strokeWidth={1.5}
-                      className="text-slate-500 transition-colors group-hover:text-sky-300"
+                      className="text-slate-700 transition-colors group-hover:text-sky-600"
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-white">
+                    <h3 className="font-semibold text-navy-900">
                       Made for local communities
                     </h3>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                    <p className="mt-2 text-sm leading-6 text-slate-700">
                       Connect lost and found reports with people in
                       communities across Luzon, Visayas, and Mindanao.
                     </p>
                   </div>
                 </li>
 
-                <li className="group flex gap-5 border-t border-white/[0.07] py-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-400/[0.06]">
+                <li className="group flex gap-5 border-t border-slate-200 py-6">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-50">
                     <Fingerprint
                       aria-hidden="true"
                       size={18}
                       strokeWidth={1.5}
-                      className="text-slate-500 transition-colors group-hover:text-sky-300"
+                      className="text-slate-700 transition-colors group-hover:text-sky-600"
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-white">
+                    <h3 className="font-semibold text-navy-900">
                       Privacy conscious
                     </h3>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                    <p className="mt-2 text-sm leading-6 text-slate-700">
                       Helping someone should not require exposing more
                       personal information than necessary.
                     </p>
                   </div>
                 </li>
 
-                <li className="group flex gap-5 border-y border-white/[0.07] py-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-400/[0.06]">
+                <li className="group flex gap-5 border-y border-slate-200 py-6">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-50">
                     <HeartHandshake
                       aria-hidden="true"
                       size={18}
                       strokeWidth={1.5}
-                      className="text-slate-500 transition-colors group-hover:text-sky-300"
+                      className="text-slate-700 transition-colors group-hover:text-sky-600"
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-white">
+                    <h3 className="font-semibold text-navy-900">
                       Built around kindness
                     </h3>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                    <p className="mt-2 text-sm leading-6 text-slate-700">
                       A simple act of returning something can make a
-                      meaningful difference in someone's day.
+                      meaningful difference in someone&apos;s day.
                     </p>
                   </div>
                 </li>
@@ -910,14 +910,14 @@ export default function AboutPage() {
           FINAL CTA
       ========================================================= */}
 
-      <section className="relative border-t border-white/[0.06] px-5 py-32 sm:px-6 lg:py-48">
+      <section className="relative border-t border-slate-200 px-5 py-32 sm:px-6 lg:py-48">
         <div className="mx-auto max-w-5xl text-center">
           {/* Icon */}
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-sky-400/20 bg-sky-400/[0.06] shadow-[0_0_50px_rgba(56,189,248,.08)]">
             <HeartHandshake
               size={27}
               strokeWidth={1.5}
-              className="text-sky-300"
+              className="text-sky-600"
             />
           </div>
 
@@ -925,15 +925,15 @@ export default function AboutPage() {
             Be part of the connection
           </p>
 
-          <h2 className="mx-auto mt-6 max-w-4xl font-display text-5xl font-semibold leading-[0.95] tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
+          <h2 className="mx-auto mt-6 max-w-4xl font-display text-5xl font-semibold leading-[0.95] tracking-[-0.05em] text-navy-900 sm:text-6xl lg:text-7xl">
             What you found
             <span className="block text-sky-400">
               might mean everything to someone.
             </span>
           </h2>
 
-          <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
-            Search existing reports, report something you've lost, or help
+          <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+            Search existing reports, report something you&apos;ve lost, or help
             someone in your community get an important belonging back.
           </p>
 
@@ -993,7 +993,7 @@ export default function AboutPage() {
           </div>
 
           {/* Footer line */}
-          <div className="mt-16 border-t border-white/[0.06] pt-6">
+          <div className="mt-16 border-t border-slate-200 pt-6">
             <div className="flex flex-col items-center justify-between gap-3 text-[9px] uppercase tracking-[0.22em] text-slate-700 sm:flex-row">
               <span>
                 FINDBACK PH / COMMUNITY FIRST

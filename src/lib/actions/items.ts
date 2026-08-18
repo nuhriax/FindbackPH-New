@@ -231,9 +231,8 @@ export async function uploadItemImagesAction(
     }
 
     uploads.push({
-      ...(itemType === "lost_item"
-        ? { lost_item_id: itemId }
-        : { found_item_id: itemId }),
+      lost_item_id: itemType === "lost_item" ? itemId : null,
+      found_item_id: itemType === "found_item" ? itemId : null,
       storage_path: fileName,
       position: index,
     });

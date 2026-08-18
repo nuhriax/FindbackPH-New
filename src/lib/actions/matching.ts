@@ -137,7 +137,6 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
         found_item_id: m.found_item_id,
         score: m.score,
       })),
-      { count: "none" }
     );
 
     // Note: ignore duplicate key conflicts

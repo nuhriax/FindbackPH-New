@@ -11,9 +11,12 @@ export default async function MessagesPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold text-white">Messages</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Messages</h1>
+        <p className="mt-2 text-sm text-slate-600">
+          Private conversations about lost and found items.
+        </p>
 
-        <Suspense fallback={<p className="mt-4 text-slate-400">Loading conversations…</p>}>
+        <Suspense fallback={<p className="mt-4 text-slate-600">Loading conversations…</p>}>
           <ConversationsList />
         </Suspense>
       </div>
@@ -55,12 +58,12 @@ async function ConversationsList() {
 
   if (conversations.length === 0) {
     return (
-      <div className="mt-8 card p-8 text-center">
-        <p className="text-slate-400">You don't have any messages yet.</p>
-        <p className="mt-2 text-sm text-slate-500">
+      <div className="mt-8 card p-10 text-center">
+        <p className="font-display text-lg font-semibold text-navy-900">No messages yet</p>
+        <p className="mt-2 text-sm text-slate-600">
           Start a conversation by searching for a lost or found item.
         </p>
-        <div className="mt-4">
+        <div className="mt-5">
           <Link href="/search" className="btn-primary">
             Search Reports
           </Link>
@@ -92,20 +95,20 @@ async function ConversationsList() {
           <Link
             key={convo.id}
             href={`/messages/${convo.id}`}
-            className="card flex items-center gap-4 p-4 hover:border-electric-500/30 transition-colors"
+            className="card flex items-center gap-4 p-4 transition-colors hover:border-electric-400/40 hover:shadow-card-hover"
           >
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-sm font-semibold text-white">
               {other?.username?.[0]?.toUpperCase() ?? "U"}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="font-medium text-white">
+                <span className="font-medium text-navy-900">
                   {other?.first_name ? `${other.first_name} ${other.last_name}` : other?.username ?? "Someone"}
                 </span>
                 <span className="text-xs text-slate-500">{itemTitle}</span>
               </div>
               {lastMsg ? (
-                <p className="truncate text-sm text-slate-400">
+                <p className="truncate text-sm text-slate-600">
                   {lastMsg.sender_id === user.id ? "You: " : ""}{lastMsg.body}
                 </p>
               ) : (

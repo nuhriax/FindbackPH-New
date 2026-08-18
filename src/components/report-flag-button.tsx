@@ -49,7 +49,7 @@ export function ReportFlagButton({
 
   if (done) {
     return (
-      <p className="text-sm text-emerald-300">
+      <p className="text-sm text-emerald-700">
         Thank you. Your report has been submitted for review.
       </p>
     );
@@ -59,7 +59,7 @@ export function ReportFlagButton({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 text-xs text-slate-500 transition-colors hover:text-red-400"
+        className="inline-flex items-center gap-2 text-xs text-slate-600 transition-colors hover:text-red-600"
       >
         <Flag size={14} /> Report this item
       </button>
@@ -69,11 +69,11 @@ export function ReportFlagButton({
   return (
     <form action={handleSubmit} className="card mt-3 space-y-3 p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-white">Report this item</h3>
+        <h3 className="text-sm font-medium text-navy-900">Report this item</h3>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-lg p-1 text-slate-400 hover:text-white"
+          className="rounded-lg p-1 text-slate-500 hover:text-navy-900"
           aria-label="Close"
         >
           <X size={16} />

@@ -71,7 +71,7 @@ export function ImageUpload({
   return (
     <div>
       <div
-        className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/15 bg-navy-900/50 p-6 text-center transition-colors hover:border-electric-500/40"
+        className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-white/70 p-6 text-center transition-colors hover:border-electric-400/70 hover:bg-blue-50/40"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -82,7 +82,7 @@ export function ImageUpload({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="text-sm font-medium text-electric-400 hover:underline"
+          className="text-sm font-medium text-blue-600 hover:underline"
         >
           Click to upload photos
         </button>
@@ -108,7 +108,7 @@ export function ImageUpload({
       {images.length > 0 && (
         <div className="mt-3 grid grid-cols-4 gap-2">
           {images.map((img, i) => (
-            <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-white/10">
+            <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-slate-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.preview}

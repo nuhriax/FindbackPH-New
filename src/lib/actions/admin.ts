@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { ItemStatus } from "@/types/database";
 
 export type ActionResult = { error: string } | { error?: undefined };
 
@@ -33,7 +34,7 @@ export async function isAdminUser(): Promise<boolean> {
 export async function updateReportStatusAction(
   itemType: "lost_item" | "found_item",
   itemId: string,
-  status: string
+  status: ItemStatus
 ): Promise<ActionResult> {
   const authorized = await isAdminUser();
   if (!authorized) {

@@ -21,21 +21,26 @@ export default function ReportLostPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-2xl font-semibold">Report a lost item</h1>
-      <p className="mt-1 text-sm text-slate-400">
-        Add as much detail as you can — it helps us find a match faster.
-      </p>
+    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
+      <div className="text-center">
+        <span className="eyebrow">Lost something?</span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+          Report a lost item
+        </h1>
+        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+          Add as much detail as you can — it helps us find a match faster.
+        </p>
+      </div>
 
-      <form action={handleSubmit} className="mt-6 space-y-4">
+      <form action={handleSubmit} className="card mt-8 space-y-5 p-6 sm:p-8">
         <div>
-          <label htmlFor="title" className="mb-1 block text-sm text-slate-300">Item name</label>
+          <label htmlFor="title" className="label">Item name</label>
           <input id="title" name="title" required placeholder="e.g. Black iPhone 15 Pro" className="input" />
         </div>
 
         <div>
-          <label htmlFor="category" className="mb-1 block text-sm text-slate-300">Category</label>
-          <select id="category" name="category" required className="input">
+          <label htmlFor="category" className="label">Category</label>
+          <select id="category" name="category" required className="select">
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
             ))}
@@ -43,50 +48,50 @@ export default function ReportLostPage() {
         </div>
 
         <div>
-          <label htmlFor="description" className="mb-1 block text-sm text-slate-300">Description</label>
+          <label htmlFor="description" className="label">Description</label>
           <textarea id="description" name="description" required rows={4} className="input" />
         </div>
 
         <div>
-          <label htmlFor="distinguishingFeatures" className="mb-1 block text-sm text-slate-300">
-            Distinguishing features <span className="text-slate-500">(optional)</span>
+          <label htmlFor="distinguishingFeatures" className="label">
+            Distinguishing features <span className="font-normal text-slate-500">(optional)</span>
           </label>
           <textarea id="distinguishingFeatures" name="distinguishingFeatures" rows={2} className="input" />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="dateLost" className="mb-1 block text-sm text-slate-300">Date lost</label>
+            <label htmlFor="dateLost" className="label">Date lost</label>
             <input id="dateLost" name="dateLost" type="date" required className="input" />
           </div>
           <div>
-            <label htmlFor="rewardAmount" className="mb-1 block text-sm text-slate-300">
-              Reward, ₱ <span className="text-slate-500">(optional)</span>
+            <label htmlFor="rewardAmount" className="label">
+              Reward, ₱ <span className="font-normal text-slate-500">(optional)</span>
             </label>
             <input id="rewardAmount" name="rewardAmount" type="number" min={0} className="input" />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="city" className="mb-1 block text-sm text-slate-300">City</label>
+            <label htmlFor="city" className="label">City</label>
             <input id="city" name="city" required className="input" />
           </div>
           <div>
-            <label htmlFor="province" className="mb-1 block text-sm text-slate-300">Province</label>
+            <label htmlFor="province" className="label">Province</label>
             <input id="province" name="province" required className="input" />
           </div>
         </div>
 
         <div>
-          <label htmlFor="approximateLocation" className="mb-1 block text-sm text-slate-300">
-            Approximate location <span className="text-slate-500">(optional — avoid exact addresses)</span>
+          <label htmlFor="approximateLocation" className="label">
+            Approximate location <span className="font-normal text-slate-500">(optional — avoid exact addresses)</span>
           </label>
           <input id="approximateLocation" name="approximateLocation" placeholder="e.g. Near SM North EDSA" className="input" />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-slate-300">Photos</label>
+          <label className="label">Photos</label>
           <ImageUpload onChange={setImages} />
         </div>
 

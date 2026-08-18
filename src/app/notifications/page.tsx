@@ -25,8 +25,8 @@ export default async function NotificationsPage() {
     return (
       <div className="py-16 lg:py-24">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-3xl font-bold text-white">Notifications</h1>
-          <p className="mt-4 text-slate-400">Something went wrong. Please try again.</p>
+          <h1 className="font-display text-3xl font-bold text-navy-900">Notifications</h1>
+          <p className="mt-4 text-slate-600">Something went wrong. Please try again.</p>
         </div>
       </div>
     );
@@ -35,13 +35,13 @@ export default async function NotificationsPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold text-white">Notifications</h1>
+        <h1 className="font-display text-3xl font-bold text-navy-900">Notifications</h1>
 
         {!notifications || notifications.length === 0 ? (
           <div className="mt-8 card p-8 text-center">
-            <p className="text-slate-400">You have no notifications yet.</p>
-            <p className="mt-2 text-sm text-slate-500">
-              We'll notify you when there are updates to your reports.
+            <p className="text-slate-600">You have no notifications yet.</p>
+            <p className="mt-2 text-sm text-slate-700">
+              We&apos;ll notify you when there are updates to your reports.
             </p>
             <div className="mt-4">
               <Link href="/dashboard" className="btn-primary">
@@ -60,9 +60,9 @@ export default async function NotificationsPage() {
                 }`}
               >
                 <div className="flex-1">
-                  <h3 className="font-medium text-white">{n.title}</h3>
-                  <p className="mt-1 text-sm text-slate-300">{n.message}</p>
-                  <span className="text-xs text-slate-500">
+                  <h3 className="font-medium text-navy-900">{n.title}</h3>
+                  <p className="mt-1 text-sm text-slate-600">{n.message}</p>
+                  <span className="text-xs text-slate-700">
                     {new Date(n.created_at).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
