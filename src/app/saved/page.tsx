@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUserSavedItems, unsaveItemAction } from "@/lib/actions/items";
-import { BookmarkX, Bookmark } from "lucide-react";
+import { BookmarkX, Bookmark, MapPin } from "lucide-react";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
@@ -22,49 +22,43 @@ export default async function SavedItemsPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold text-navy-900">Saved Items</h1>
-        <p className="mt-1 text-sm text-slate-700">Items you&apos;ve saved for later.</p>
+        <span className="section-eyebrow">Your saved reports</span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Saved Items</h1>
+        <p className="mt-2 text-sm text-slate-500">Items you&apos;ve bookmarked for later.</p>
 
         {!savedItems || savedItems.length === 0 ? (
-          <div className="mt-8 card p-8 text-center">
-            <Bookmark size={48} className="mx-auto mb-4 text-slate-700" />
-            <p className="text-slate-700">You haven&apos;t saved any items yet.</p>
-            <p className="mt-2 text-sm text-slate-700">
-              Save items to keep track of reports as you browse.
+          <div className="mt-8 rounded-card border border-slate-200/70 bg-white/70 p-12 text-center shadow-soft backdrop-blur-md">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50 text-blue-600">
+              <Bookmark size={24} />
+            </div>
+            <h2 className="mt-5 font-display text-lg font-semibold text-navy-900">No saved items yet</h2>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-600">
+              Save items to keep track of reports as you browse. They&apos;ll appear here.
             </p>
-            <div className="mt-4">
+            <div className="mt-6">
               <Link href="/search" className="btn-primary">
                 Search Reports
               </Link>
             </div>
           </div>
         ) : (
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {savedItems.map((saved) => {
               const lostItem = saved.lost_items?.[0];
               const foundItem = saved.found_items?.[0];
               const item = lostItem ?? foundItem ?? null;
               const isLost = !!lostItem;
               const href = isLost ? `/lost/${saved.lost_item_id}` : `/found/${saved.found_item_id}`;
-              const statusColor = item?.status === "recovered" ? "text-emerald-700" : "text-amber-700";
+              const statusColor = item?.status === "recovered" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700";
 
               return (
-                <div key={saved.id} className="card p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1">
-                      <Link href={href} className="group">
-                        <h3 className="font-display text-lg font-semibold text-navy-900 group-hover:text-blue-600 transition-colors">
-                          {item?.title ?? "Unknown item"}
-                        </h3>
-                      </Link>
-                      <p className="mt-1 text-sm text-slate-700 line-clamp-2">
-                        {item?.description ?? "No description"}
-                      </p>
-                      <div className="mt-2 flex items-center gap-4 text-xs text-slate-700">
-                        <span className={`capitalize ${statusColor}`}>{item?.status ?? "active"}</span>
-                        <span>{item?.city}, {item?.province}</span>
-                      </div>
-                    </div>
+                <div key={saved.id} className="card card-hover group flex flex-col p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <Link href={href} className="flex-1">
+                      <h3 className="font-display text-lg font-semibold text-navy-900 transition-colors group-hover:text-blue-600">
+                        {item?.title ?? "Unknown item"}
+                      </h3>
+                    </Link>
                     <form
                       action={async (formData: FormData) => {
                         "use server";
@@ -75,12 +69,27 @@ export default async function SavedItemsPage() {
                       <button
                         type="submit"
                         aria-label="Remove from saved"
-                        className="rounded-lg p-1 text-slate-700 hover:bg-slate-100 hover:text-red-600"
+                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Remove from saved"
                       >
                         <BookmarkX size={18} />
                       </button>
                     </form>
+                  </div>
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">
+                    {item?.description ?? "No description"}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+                    <MapPin size={13} className="text-blue-500" />
+                    <span>{item?.city}, {item?.province}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                    <span className={`rounded-full border px-2.5 py-0.5 text-xs capitalize ${statusColor}`}>
+                      {item?.status ?? "active"}
+                    </span>
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                      {isLost ? "Lost" : "Found"}
+                    </span>
                   </div>
                 </div>
               );

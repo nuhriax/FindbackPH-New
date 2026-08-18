@@ -4,10 +4,11 @@ export default function TermsPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold text-navy-900 sm:text-4xl">
+        <span className="section-eyebrow">Legal &amp; transparency</span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
           Terms of Service
         </h1>
-        <p className="mt-3 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-slate-500">
           Last updated: August 2025
         </p>
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { AmbientGlow, GridBackground, LightStreak } from "./background-system";
 
 /**
  * Reusable luminous atmospheric background — the "Layer 1 — Atmosphere"
@@ -12,6 +13,9 @@ import { cn } from "@/lib/utils";
  * The base soft-white/icy gradient lives on `body` in globals.css; this adds
  * the gentle drifting depth + flowing light so every page shares the same
  * luminous identity.
+ *
+ * The drifting fields and light trails are composed from the shared primitives
+ * in `./background-system` so there is a single source of truth.
  */
 export function BackgroundEffects({ className }: { className?: string }) {
   const reduced = useMemo(
@@ -47,16 +51,19 @@ export function BackgroundEffects({ className }: { className?: string }) {
       aria-hidden="true"
       className={cn("pointer-events-none fixed inset-0 -z-10 overflow-hidden", className)}
     >
+      {/* Extremely subtle technical grid, shared across the whole site */}
+      <GridBackground />
+
       {/* Drifting color fields */}
-      <div className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-ice-200/50 blur-3xl animate-glow-drift" />
-      <div className="absolute right-[-12rem] top-[-6rem] h-[30rem] w-[30rem] rounded-full bg-lavender-200/45 blur-3xl animate-glow-drift [animation-delay:-8s]" />
-      <div className="absolute bottom-[-14rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-sky-100/50 blur-3xl animate-glow-drift [animation-delay:-16s]" />
-      <div className="absolute left-1/2 top-1/2 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-ice-100/40 blur-3xl animate-glow-drift [animation-delay:-4s]" />
+      <AmbientGlow tone="blue" className="-left-40 -top-40 h-[34rem] w-[34rem]" />
+      <AmbientGlow tone="lavender" className="right-[-12rem] top-[-6rem] h-[30rem] w-[30rem]" delay={-8} />
+      <AmbientGlow tone="cyan" className="bottom-[-14rem] left-1/3 h-[32rem] w-[32rem]" delay={-16} />
+      <AmbientGlow tone="ice" className="left-1/2 top-1/2 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2" delay={-4} />
 
       {/* Flowing light trails */}
-      <div className="absolute left-[8%] top-[18%] h-px w-64 rotate-[-18deg] bg-gradient-to-r from-transparent via-electric-200/70 to-transparent blur-[1px] animate-float-slow" />
-      <div className="absolute right-[10%] top-[34%] h-px w-72 rotate-[14deg] bg-gradient-to-r from-transparent via-lavender-200/70 to-transparent blur-[1px] animate-float-slow [animation-delay:-9s]" />
-      <div className="absolute bottom-[14%] left-[22%] h-px w-56 rotate-[10deg] bg-gradient-to-r from-transparent via-cyan-200/60 to-transparent blur-[1px] animate-float-slow [animation-delay:-14s]" />
+      <LightStreak tone="blue" className="left-[8%] top-[18%] rotate-[-18deg]" />
+      <LightStreak tone="lavender" className="right-[10%] top-[34%] rotate-[14deg]" delay={-9} />
+      <LightStreak tone="cyan" className="bottom-[14%] left-[22%] rotate-[10deg]" delay={-14} />
 
       {/* Rising light particles */}
       {!reduced &&
@@ -76,3 +83,4 @@ export function BackgroundEffects({ className }: { className?: string }) {
     </div>
   );
 }
+

@@ -35,7 +35,10 @@ export default async function AdminFlagsPage() {
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Report Flags</h1>
+          <div>
+            <span className="section-eyebrow">Community reports</span>
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Report Flags</h1>
+          </div>
           <Link href="/admin" className="btn-ghost">
             Back
           </Link>

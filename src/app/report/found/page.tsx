@@ -20,22 +20,34 @@ export default function ReportFoundPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <div className="text-center">
-        <span className="eyebrow">Found something?</span>
-        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
-          Report a found item
-        </h1>
-        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
-          Thank you for helping return this item to its owner.
-        </p>
-      </div>
-
-      <form action={handleSubmit} className="card mt-8 space-y-5 p-6 sm:p-8">
-        <div>
-          <label htmlFor="title" className="label">Item name</label>
-          <input id="title" name="title" required placeholder="e.g. Silver house keys" className="input" />
+    <div className="py-16 lg:py-24">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+        <div className="text-center">
+          <span className="eyebrow !border-emerald-200 !bg-emerald-50 !text-emerald-700">Found something?</span>
+          <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+            Report a found item
+          </h1>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+            Thank you for helping return this item to its owner. Every report brings
+            something one step closer to home.
+          </p>
         </div>
+
+        {/* Progress hint */}
+        <div className="mt-8 flex items-center gap-2">
+          <div className="h-1 flex-1 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400" />
+          <div className="h-1 flex-1 rounded-full bg-emerald-100" />
+          <div className="h-1 flex-1 rounded-full bg-emerald-100" />
+        </div>
+        <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">
+          Step 1 of 3 — Tell us about the item
+        </p>
+
+        <form action={handleSubmit} className="card mt-6 space-y-5 p-6 sm:p-8">
+          <div>
+            <label htmlFor="title" className="label">Item name</label>
+            <input id="title" name="title" required placeholder="e.g. Silver house keys" className="input" />
+          </div>
 
         <div>
           <label htmlFor="category" className="label">Category</label>
@@ -99,6 +111,7 @@ export default function ReportFoundPage() {
           {isPending ? "Submitting…" : "Submit report"}
         </button>
       </form>
+      </div>
     </div>
   );
 }

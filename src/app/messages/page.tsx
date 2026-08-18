@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getUserConversations, type ConversationData, deleteConversationAction, markMessagesRead } from "@/lib/actions/messaging";
 import { formatDistanceToNow } from "date-fns";
+import { MessageCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -11,12 +12,19 @@ export default async function MessagesPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Messages</h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <span className="section-eyebrow">Private conversations</span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Messages</h1>
+        <p className="mt-2 text-sm text-slate-500">
           Private conversations about lost and found items.
         </p>
 
-        <Suspense fallback={<p className="mt-4 text-slate-600">Loading conversations…</p>}>
+        <Suspense fallback={
+          <div className="mt-8 space-y-2.5">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="skeleton h-16 w-full" />
+            ))}
+          </div>
+        }>
           <ConversationsList />
         </Suspense>
       </div>
@@ -58,12 +66,15 @@ async function ConversationsList() {
 
   if (conversations.length === 0) {
     return (
-      <div className="mt-8 card p-10 text-center">
-        <p className="font-display text-lg font-semibold text-navy-900">No messages yet</p>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="mt-8 rounded-card border border-slate-200/70 bg-white/70 p-12 text-center shadow-soft backdrop-blur-md">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50 text-blue-600">
+          <MessageCircle size={24} />
+        </div>
+        <h2 className="mt-5 font-display text-lg font-semibold text-navy-900">No messages yet</h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-600">
           Start a conversation by searching for a lost or found item.
         </p>
-        <div className="mt-5">
+        <div className="mt-6">
           <Link href="/search" className="btn-primary">
             Search Reports
           </Link>

@@ -21,22 +21,34 @@ export default function ReportLostPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <div className="text-center">
-        <span className="eyebrow">Lost something?</span>
-        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
-          Report a lost item
-        </h1>
-        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
-          Add as much detail as you can — it helps us find a match faster.
-        </p>
-      </div>
-
-      <form action={handleSubmit} className="card mt-8 space-y-5 p-6 sm:p-8">
-        <div>
-          <label htmlFor="title" className="label">Item name</label>
-          <input id="title" name="title" required placeholder="e.g. Black iPhone 15 Pro" className="input" />
+    <div className="py-16 lg:py-24">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+        <div className="text-center">
+          <span className="eyebrow">Lost something?</span>
+          <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+            Report a lost item
+          </h1>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+            Add as much detail as you can — it helps us find a match faster.
+            Only share the item&apos;s details publicly; keep personal info private.
+          </p>
         </div>
+
+        {/* Progress hint */}
+        <div className="mt-8 flex items-center gap-2">
+          <div className="h-1 flex-1 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
+          <div className="h-1 flex-1 rounded-full bg-blue-100" />
+          <div className="h-1 flex-1 rounded-full bg-blue-100" />
+        </div>
+        <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">
+          Step 1 of 3 — Tell us about the item
+        </p>
+
+        <form action={handleSubmit} className="card mt-6 space-y-5 p-6 sm:p-8">
+          <div>
+            <label htmlFor="title" className="label">Item name</label>
+            <input id="title" name="title" required placeholder="e.g. Black iPhone 15 Pro" className="input" />
+          </div>
 
         <div>
           <label htmlFor="category" className="label">Category</label>
@@ -101,6 +113,7 @@ export default function ReportLostPage() {
           {isPending ? "Submitting…" : "Submit report"}
         </button>
       </form>
+      </div>
     </div>
   );
 }

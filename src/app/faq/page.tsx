@@ -48,40 +48,40 @@ export default function FAQPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">
+        <div className="mb-12 text-center">
+          <span className="section-eyebrow !justify-center !gap-0 before:hidden">Help center</span>
+          <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
             Frequently Asked Questions
           </h1>
-          <p className="mt-3 text-lg text-slate-600">
+          <p className="mx-auto mt-3 max-w-xl text-base text-slate-600">
             Find answers to common questions about FindBack PH.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, i) => (
             <details
               key={i}
-              className="group card p-5 [&[open>_svg]:rotate-180]"
+              className="group rounded-card border border-slate-200/70 bg-white/70 p-5 shadow-soft backdrop-blur-md transition-colors open:border-blue-200/80 hover:border-blue-200/60"
             >
-              <summary className="flex cursor-pointer items-center justify-between gap-4 text-lg font-medium text-navy-900">
+              <summary className="flex cursor-pointer items-center justify-between gap-4 font-medium text-navy-900">
                 <span>{faq.q}</span>
-                <ChevronDown
-                  size={20}
-                  className="flex-shrink-0 text-slate-600 transition-transform duration-300 group-open:rotate-180"
-                />
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-transform duration-300 group-open:rotate-180">
+                  <ChevronDown size={16} />
+                </span>
               </summary>
-              <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {faq.a}
               </p>
             </details>
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 rounded-card border border-slate-200/70 bg-white/70 p-6 text-center shadow-soft backdrop-blur-md">
           <p className="text-slate-600">Still have questions?</p>
           <Link
             href="/contact"
-            className="text-blue-600 hover:underline"
+            className="mt-1 inline-block font-medium text-blue-600 hover:underline"
           >
             Contact us
           </Link>

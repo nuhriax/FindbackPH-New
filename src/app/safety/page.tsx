@@ -423,7 +423,7 @@ export default function SafetyPage() {
                 The safest recovery
 
                 <span className="text-slate-600">
-                  {" "}is the one you don't rush.
+                  {" "}is the one you don&apos;t rush.
                 </span>
 
               </h2>
@@ -547,7 +547,7 @@ export default function SafetyPage() {
                 <p className="mt-7 max-w-md text-sm leading-7 text-slate-500">
                   Before meeting someone, verify the details, choose your
                   location carefully, and make sure someone you trust knows
-                  where you're going.
+                  where you&apos;re going.
                 </p>
 
                 <div className="mt-9 flex items-center gap-3 text-xs text-slate-600">
@@ -639,7 +639,7 @@ export default function SafetyPage() {
                 />
 
                 <span className="text-sm leading-6 text-slate-500">
-                  Tell a friend or family member where you're going and
+                  Tell a friend or family member where you&apos;re going and
                   when you expect to be back.
                 </span>
 
@@ -870,8 +870,8 @@ export default function SafetyPage() {
               </h2>
 
               <p className="mt-8 max-w-md text-sm leading-7 text-slate-500">
-                Don't reveal every detail from your report. Let the person
-                describe information that wasn't publicly visible.
+                Don&apos;t reveal every detail from your report. Let the person
+                describe information that wasn&apos;t publicly visible.
               </p>
 
             </div>
@@ -1070,7 +1070,7 @@ export default function SafetyPage() {
 
             <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-slate-500">
               You can pause a conversation, ask more questions, cancel a
-              meetup, leave a situation, or report something that doesn't
+              meetup, leave a situation, or report something that doesn&apos;t
               feel right.
             </p>
 
@@ -1261,13 +1261,13 @@ export default function SafetyPage() {
               The item can wait.
 
               <span className="block text-emerald-600">
-                Your safety can't.
+                Your safety can&apos;t.
               </span>
 
             </h2>
 
             <p className="mx-auto mt-9 max-w-xl text-base leading-8 text-slate-500">
-              If something doesn't feel right, you don't owe anyone a
+              If something doesn&apos;t feel right, you don&apos;t owe anyone a
               meetup, an explanation, or your personal information.
             </p>
 
@@ -1298,7 +1298,7 @@ export default function SafetyPage() {
                 className="text-emerald-600/70"
               />
 
-              Safety is everyone's responsibility
+              Safety is everyone&apos;s responsibility
 
             </div>
 

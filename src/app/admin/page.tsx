@@ -61,8 +61,9 @@ export default async function AdminDashboardPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Admin Dashboard</h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <span className="section-eyebrow">Admin workspace</span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Admin Dashboard</h1>
+        <p className="mt-2 text-sm text-slate-500">
           Overview of FindBack PH activity.{" "}
           <span className="font-medium text-blue-600">{profile.role}</span>
         </p>

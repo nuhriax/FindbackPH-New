@@ -3,7 +3,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 import { CATEGORY_LABELS } from "@/lib/validation";
-import { Sparkles, Bookmark } from "lucide-react";
+import {
+  Sparkles,
+  Bookmark,
+  PackageSearch,
+  PackageCheck,
+  PackageX,
+  HeartHandshake,
+} from "lucide-react";
 
 type DashboardMatch = {
   id: string;
@@ -74,40 +81,51 @@ export default async function DashboardPage() {
   const undismissedMatches = (matches ?? []).filter((m: any) => !m.dismissed);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-2xl font-medium">Dashboard</h1>
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      {/* Header */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div>
+          <span className="section-eyebrow">Your FindBack workspace</span>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy-900 sm:text-4xl">
+            Dashboard
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
+            Track your reports, review potential matches, and pick up where you left off.
+          </p>
+        </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <div className="card p-5">
-          <p className="text-sm text-slate-600">Active lost reports</p>
-          <p className="mt-1 font-display text-2xl">{activeLost}</p>
-        </div>
-        <div className="card p-5">
-          <p className="text-sm text-slate-600">Active found reports</p>
-          <p className="mt-1 font-display text-2xl">{activeFound}</p>
-        </div>
-        <div className="card p-5">
-          <p className="text-sm text-slate-600">Items recovered</p>
-          <p className="mt-1 font-display text-2xl">{recovered}</p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/report/lost" className="btn-secondary">
+            <PackageSearch size={16} />
+            Report lost
+          </Link>
+          <Link href="/report/found" className="btn-primary">
+            <HeartHandshake size={16} />
+            Report found
+          </Link>
         </div>
       </div>
 
+      {/* Stat tiles */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <StatTile icon={PackageX} tone="indigo" label="Active lost reports" value={activeLost} />
+        <StatTile icon={PackageCheck} tone="emerald" label="Active found reports" value={activeFound} />
+        <StatTile icon={HeartHandshake} tone="blue" label="Items recovered" value={recovered} />
+      </div>
+
       {/* ---------------- POSSIBLE MATCHES ---------------- */}
-      <div className="mt-10">
-        <div className="flex items-center gap-2">
-          <Sparkles size={18} className="text-blue-600" />
-          <h2 className="font-display text-lg font-medium">Possible Matches</h2>
-        </div>
+      <section className="mt-10">
+        <SectionHeader icon={Sparkles} title="Possible Matches" />
         <div className="card mt-3 divide-y divide-slate-200">
           {undismissedMatches.length > 0 ? (
             undismissedMatches.map((match: any) => {
               const found = match.found_items?.[0];
               return (
-                <div key={match.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+                <div key={match.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-white/70">
                   <div>
                     <p className="text-sm text-slate-600">
                       A found report may match one of your lost items in{" "}
-                      <span className="text-navy-900">{found?.city}</span>, {found?.province}.
+                      <span className="font-medium text-navy-900">{found?.city}</span>, {found?.province}.
                     </p>
                     <p className="mt-0.5 text-xs text-slate-500">
                       Found: {found?.title} ·{" "}
@@ -126,19 +144,11 @@ export default async function DashboardPage() {
             </p>
           )}
         </div>
-      </div>
+      </section>
 
       {/* ---------------- SAVED ITEMS ---------------- */}
-      <div className="mt-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bookmark size={18} className="text-blue-600" />
-            <h2 className="font-display text-lg font-medium">Saved Items</h2>
-          </div>
-          <Link href="/saved" className="text-sm text-blue-600 hover:underline">
-            View all
-          </Link>
-        </div>
+      <section className="mt-10">
+        <SectionHeader icon={Bookmark} title="Saved Items" actionHref="/saved" actionLabel="View all" />
         <div className="card mt-3 divide-y divide-slate-200">
           {savedItems && savedItems.length > 0 ? (
             savedItems.map((saved: any) => {
@@ -146,11 +156,13 @@ export default async function DashboardPage() {
               const isLost = !!saved.lost_items;
               const href = isLost ? `/lost/${saved.lost_item_id}` : `/found/${saved.found_item_id}`;
               return (
-                <Link key={saved.id} href={href} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50">
-                  <p className="font-medium">{item?.title ?? "Saved item"}</p>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs capitalize text-slate-700">
-                    {item?.status ?? "active"}
-                  </span>
+                <Link
+                  key={saved.id}
+                  href={href}
+                  className="flex items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-white/70"
+                >
+                  <p className="font-medium text-navy-900">{item?.title ?? "Saved item"}</p>
+                  <StatusPill status={item?.status ?? "active"} />
                 </Link>
               );
             })
@@ -158,70 +170,163 @@ export default async function DashboardPage() {
             <p className="px-5 py-6 text-sm text-slate-500">You haven&apos;t saved any reports yet.</p>
           )}
         </div>
-      </div>
+      </section>
 
-      <div className="mt-10 flex items-center justify-between">
-        <h2 className="font-medium">My lost reports</h2>
-        <Link href="/report/lost" className="text-sm text-blue-600 hover:underline">
-          + Report lost item
-        </Link>
-      </div>
-      <div className="card mt-3 divide-y divide-slate-200">
-        {lostItems && lostItems.length > 0 ? (
-          lostItems.map((item) => (
-            <Link
-              key={item.id}
-              href={`/lost/${item.id}`}
-              className="flex items-center justify-between px-5 py-3 hover:bg-slate-50"
-            >
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-xs text-slate-500">
-                  {CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS]} · Lost{" "}
-                  {format(new Date(item.date_lost), "MMM d, yyyy")}
-                </p>
-              </div>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs capitalize text-slate-700">
-                {item.status}
-              </span>
-            </Link>
-          ))
-        ) : (
-          <p className="px-5 py-6 text-sm text-slate-500">You haven&apos;t reported any lost items yet.</p>
-        )}
-      </div>
+      {/* ---------------- MY LOST REPORTS ---------------- */}
+      <section className="mt-10">
+        <SectionHeader icon={PackageX} title="My lost reports" actionHref="/report/lost" actionLabel="Report lost item" />
+        <div className="card mt-3 divide-y divide-slate-200">
+          {lostItems && lostItems.length > 0 ? (
+            lostItems.map((item) => (
+              <RowItem
+                key={item.id}
+                href={`/lost/${item.id}`}
+                title={item.title}
+                sublabel={`${CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS]} · Lost ${format(
+                  new Date(item.date_lost),
+                  "MMM d, yyyy"
+                )}`}
+                status={item.status}
+              />
+            ))
+          ) : (
+            <p className="px-5 py-6 text-sm text-slate-500">You haven&apos;t reported any lost items yet.</p>
+          )}
+        </div>
+      </section>
 
-      <div className="mt-10 flex items-center justify-between">
-        <h2 className="font-medium">My found reports</h2>
-        <Link href="/report/found" className="text-sm text-blue-600 hover:underline">
-          + Report found item
-        </Link>
-      </div>
-      <div className="card mt-3 divide-y divide-slate-200">
-        {foundItems && foundItems.length > 0 ? (
-          foundItems.map((item) => (
-            <Link
-              key={item.id}
-              href={`/found/${item.id}`}
-              className="flex items-center justify-between px-5 py-3 hover:bg-slate-50"
-            >
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-xs text-slate-500">
-                  {CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS]} · Found{" "}
-                  {format(new Date(item.date_found), "MMM d, yyyy")}
-                </p>
-              </div>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs capitalize text-slate-700">
-                {item.status}
-              </span>
-            </Link>
-          ))
-        ) : (
-          <p className="px-5 py-6 text-sm text-slate-500">You haven&apos;t reported any found items yet.</p>
-        )}
+      {/* ---------------- MY FOUND REPORTS ---------------- */}
+      <section className="mt-10">
+        <SectionHeader icon={PackageCheck} title="My found reports" actionHref="/report/found" actionLabel="Report found item" />
+        <div className="card mt-3 divide-y divide-slate-200">
+          {foundItems && foundItems.length > 0 ? (
+            foundItems.map((item) => (
+              <RowItem
+                key={item.id}
+                href={`/found/${item.id}`}
+                title={item.title}
+                sublabel={`${CATEGORY_LABELS[item.category as keyof typeof CATEGORY_LABELS]} · Found ${format(
+                  new Date(item.date_found),
+                  "MMM d, yyyy"
+                )}`}
+                status={item.status}
+              />
+            ))
+          ) : (
+            <p className="px-5 py-6 text-sm text-slate-500">You haven&apos;t reported any found items yet.</p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ============================================================================
+   Dashboard sub-components
+   ============================================================================ */
+
+const STAT_TONES = {
+  indigo: "border-indigo-200 bg-indigo-50 text-indigo-600",
+  emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
+  blue: "border-blue-200 bg-blue-50 text-blue-600",
+} as const;
+
+function StatTile({
+  icon: Icon,
+  tone,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ size?: number | string; className?: string }>;
+  tone: keyof typeof STAT_TONES;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="card relative overflow-hidden p-5">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-8 -top-12 h-28 w-28 rounded-full bg-blue-100/50 blur-2xl"
+      />
+      <div className="relative flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm text-slate-600">{label}</p>
+          <p className="mt-1.5 font-display text-3xl font-semibold tabular-nums text-navy-900">{value}</p>
+        </div>
+        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${STAT_TONES[tone]}`}>
+          <Icon size={18} />
+        </span>
       </div>
     </div>
+  );
+}
+
+function SectionHeader({
+  icon: Icon,
+  title,
+  actionHref,
+  actionLabel,
+}: {
+  icon: React.ComponentType<{ size?: number | string; className?: string }>;
+  title: string;
+  actionHref?: string;
+  actionLabel?: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-600">
+          <Icon size={16} />
+        </span>
+        <h2 className="font-display text-lg font-semibold text-navy-900">{title}</h2>
+      </div>
+      {actionHref && actionLabel ? (
+        <Link href={actionHref} className="btn-ghost !py-1.5 text-xs">
+          {actionLabel}
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+function RowItem({
+  href,
+  title,
+  sublabel,
+  status,
+}: {
+  href: string;
+  title: string;
+  sublabel: string;
+  status: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-white/70"
+    >
+      <div>
+        <p className="font-medium text-navy-900">{title}</p>
+        <p className="text-xs text-slate-500">{sublabel}</p>
+      </div>
+      <StatusPill status={status} />
+    </Link>
+  );
+}
+
+const STATUS_TONES: Record<string, string> = {
+  active: "border-blue-200 bg-blue-50 text-blue-700",
+  recovered: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  pending: "border-amber-200 bg-amber-50 text-amber-700",
+  closed: "border-slate-200 bg-slate-100 text-slate-600",
+};
+
+function StatusPill({ status }: { status: string }) {
+  const tone = STATUS_TONES[status] ?? "border-slate-200 bg-slate-100 text-slate-700";
+  return (
+    <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs capitalize ${tone}`}>
+      {status}
+    </span>
   );
 }
 
