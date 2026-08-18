@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { reportFlagAction } from "@/lib/actions/items";
-import { Flag, X } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
+import { CheckCircle2, Flag, X } from "lucide-react";
 
-const REASONS = [
-  "Scam",
-  "Fake report",
-  "Harassment",
-  "Suspicious behavior",
-  "Inappropriate content",
-  "Wrong information",
-  "Other",
+// Values must match the report_flags.reason enum in the database.
+const REASONS: { label: string; value: string }[] = [
+  { label: "Scam", value: "scam" },
+  { label: "Fake listing", value: "fake_report" },
+  { label: "Harassment", value: "harassment" },
+  { label: "Suspicious activity", value: "suspicious_behavior" },
+  { label: "Inappropriate content", value: "inappropriate_content" },
+  { label: "Wrong information", value: "wrong_information" },
+  { label: "Other", value: "other" },
 ];
 
 export function ReportFlagButton({
@@ -27,6 +29,18 @@ export function ReportFlagButton({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { toast } = useToast();
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    closeRef.current?.focus();
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   function handleSubmit(formData: FormData) {
     formData.set("itemType", itemType);
@@ -39,67 +53,117 @@ export function ReportFlagButton({
           router.push("/login");
           return;
         }
+        if (result.error === "You have already reported this item") {
+          setOpen(false);
+          setDone(true);
+          toast("info", "You've already reported this listing. Our team will review it.");
+          return;
+        }
         setError(result.error);
       } else {
         setOpen(false);
         setDone(true);
+        toast("success", "Thank you. This listing has been reported for review.");
       }
     });
   }
 
   if (done) {
     return (
-      <p className="text-sm text-emerald-700">
-        Thank you. Your report has been submitted for review.
+      <p className="flex items-center gap-2 text-sm text-emerald-700">
+        <CheckCircle2 size={16} aria-hidden="true" />
+        Reported. Our team will review this listing.
       </p>
     );
   }
 
-  if (!open) {
-    return (
+  return (
+    <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 text-xs text-slate-600 transition-colors hover:text-red-600"
+        className="inline-flex items-center gap-2 text-xs font-medium text-slate-600 transition-colors hover:text-red-600"
       >
-        <Flag size={14} /> Report this item
+        <Flag size={14} aria-hidden="true" />
+        Report this listing
       </button>
-    );
-  }
 
-  return (
-    <form action={handleSubmit} className="card mt-3 space-y-3 p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-navy-900">Report this item</h3>
-        <button
-          type="button"
+      {open && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-navy-900/40 p-4 backdrop-blur-sm"
           onClick={() => setOpen(false)}
-          className="rounded-lg p-1 text-slate-500 hover:text-navy-900"
-          aria-label="Close"
+          role="presentation"
         >
-          <X size={16} />
-        </button>
-      </div>
-      <select name="reason" required className="input" defaultValue="">
-        <option value="" disabled>
-          Select a reason…
-        </option>
-        {REASONS.map((r) => (
-          <option key={r} value={r.toLowerCase().replace(/ /g, "_")}>
-            {r}
-          </option>
-        ))}
-      </select>
-      <textarea
-        name="details"
-        rows={3}
-        placeholder="Optional details…"
-        className="input"
-        maxLength={1000}
-      />
-      {error && <p className="field-error">{error}</p>}
-      <button type="submit" disabled={isPending} className="btn-secondary w-full !py-2 text-sm">
-        {isPending ? "Submitting…" : "Submit report"}
-      </button>
-    </form>
+          <form
+            action={handleSubmit}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Report this listing"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-card border border-slate-200/70 bg-white p-6 shadow-soft fade-in"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="font-display text-lg font-semibold text-navy-900">Report this listing</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  Help keep FindBack PH safe. Our moderation team will review your report.
+                </p>
+              </div>
+              <button
+                ref={closeRef}
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-navy-900"
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <div>
+                <label htmlFor="flag-reason" className="label">Reason</label>
+                <select id="flag-reason" name="reason" required className="input" defaultValue="">
+                  <option value="" disabled>
+                    Select a reason…
+                  </option>
+                  {REASONS.map((r) => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="flag-details" className="label">Details (optional)</label>
+                <textarea
+                  id="flag-details"
+                  name="details"
+                  rows={4}
+                  placeholder="Add anything that will help our reviewers…"
+                  className="input resize-y"
+                  maxLength={1000}
+                />
+              </div>
+
+              {error && <p className="field-error" role="alert">{error}</p>}
+            </div>
+
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button type="submit" disabled={isPending} className="btn-primary">
+                {isPending ? "Submitting…" : "Submit report"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   );
 }

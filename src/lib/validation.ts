@@ -95,7 +95,33 @@ export const saveItemSchema = z.object({
 
 export type SaveItemInput = z.infer<typeof saveItemSchema>;
 
-// --- Phase 9: Report Flags ---
+// --- Profile ---
+export const profileSchema = z.object({
+  firstName: z.string().min(1, "First name is required").max(60),
+  lastName: z.string().min(1, "Last name is required").max(60),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(30)
+    .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
+  location: z.string().max(120, "Location is too long").optional(),
+  bio: z.string().max(500, "Bio is too long (max 500 characters)").optional(),
+  avatarUrl: z.string().url("Enter a valid image URL").max(500).optional().or(z.literal("")),
+});
+
+export type ProfileInput = z.infer<typeof profileSchema>;
+
+
+export const contactSchema = z.object({
+  name: z.string().min(1, "Your name is required").max(80),
+  email: z.string().email("Enter a valid email address").max(160),
+  subject: z.string().min(1, "Subject is required").max(120),
+  message: z.string().min(10, "Please add a bit more detail (10+ characters)").max(3000),
+});
+
+export type ContactInput = z.infer<typeof contactSchema>;
+
+
 export const reportFlagSchema = z.object({
   itemType: z.enum(["lost_item", "found_item"]),
   itemId: z.string().uuid(),

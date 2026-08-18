@@ -18,12 +18,25 @@ export type Profile = {
   first_name: string;
   last_name: string;
   avatar_url: string | null;
+  location: string | null;
+  bio: string | null;
   role: UserRole;
   successful_returns: number;
   is_suspended: boolean;
   is_banned: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  user_id: string | null;
+  status: "new" | "read";
+  created_at: string;
 };
 
 export type LostItem = {
@@ -203,6 +216,12 @@ export interface Database {
         Row: ReportFlag;
         Insert: Omit<ReportFlag, "id" | "status" | "created_at" | "reviewed_at" | "reviewed_by">;
         Update: Partial<ReportFlag>;
+        Relationships: [];
+      };
+      contact_messages: {
+        Row: ContactMessage;
+        Insert: Omit<ContactMessage, "id" | "created_at" | "status"> & { status?: "new" | "read" };
+        Update: Partial<ContactMessage>;
         Relationships: [];
       };
       audit_logs: {

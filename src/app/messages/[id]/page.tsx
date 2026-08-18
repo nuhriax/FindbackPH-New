@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,7 +47,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const conversationId = params.id;
 // MARKER_SPLIT
@@ -137,7 +137,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
     };
 
     fetchData();
-  }, [conversationId]);
+  }, [conversationId, supabase, router]);
 
   // Real-time subscription to new messages
   useEffect(() => {

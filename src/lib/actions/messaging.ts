@@ -326,3 +326,19 @@ export async function deleteConversationAction(conversationId: string): Promise<
   revalidatePath("/messages");
   return {};
 }
+/**
+ * Marks every notification for the current user as read.
+ */
+export async function markAllNotificationsRead(): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  await supabase.from("notifications").update({ read: true }).eq("user_id", user.id);
+
+  revalidatePath("/notifications");
+  revalidatePath("/dashboard/notifications");
+}

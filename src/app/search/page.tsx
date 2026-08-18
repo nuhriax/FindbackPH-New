@@ -21,6 +21,7 @@ type SearchPageProps = {
     q?: string;
     city?: string;
     category?: string;
+    type?: string;
   };
 };
 
@@ -42,6 +43,9 @@ export default async function SearchPage({
   const q = searchParams.q?.trim() || "";
   const city = searchParams.city?.trim() || "";
   const category = searchParams.category?.trim() || "";
+  const type = ["lost", "found"].includes(searchParams.type ?? "")
+    ? searchParams.type!
+    : "";
 
   const activeCategory = CATEGORIES.includes(category as any)
     ? category
@@ -91,8 +95,8 @@ export default async function SearchPage({
     foundQuery,
   ]);
 
-  const lostItems = (lostRes.data ?? []) as SearchItem[];
-  const foundItems = (foundRes.data ?? []) as SearchItem[];
+  const lostItems = ((type === "found" ? [] : lostRes.data) ?? []) as SearchItem[];
+  const foundItems = ((type === "lost" ? [] : foundRes.data) ?? []) as SearchItem[];
 
   const error = lostRes.error || foundRes.error;
 
@@ -255,6 +259,37 @@ export default async function SearchPage({
       ================================================================= */}
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+        {/* Lost / Found toggle */}
+        <div className="flex flex-wrap items-center gap-2 pb-8">
+          {[
+            { label: "All", value: "" },
+            { label: "Lost", value: "lost" },
+            { label: "Found", value: "found" },
+          ].map((opt) => {
+            const params = new URLSearchParams();
+            if (q) params.set("q", q);
+            if (city) params.set("city", city);
+            if (category) params.set("category", category);
+            if (opt.value) params.set("type", opt.value);
+            const href = `/search${params.toString() ? `?${params.toString()}` : ""}`;
+            const active = type === opt.value;
+            return (
+              <Link
+                key={opt.label}
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={
+                  active
+                    ? "rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700"
+                    : "rounded-full border border-transparent px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-white/70 hover:text-blue-700"
+                }
+              >
+                {opt.label}
+              </Link>
+            );
+          })}
+        </div>
+
         {error ? (
           <SearchError />
         ) : (
@@ -399,7 +434,7 @@ function SearchGroup({
         {items.map((item) => (
           <ItemCard
             key={item.id}
-            href={`${hrefPrefix}/${item.id}`}
+            href={`/search/${item.id}`}
             title={item.title}
             category={item.category}
             city={item.city}

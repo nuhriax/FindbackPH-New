@@ -1,31 +1,34 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+
 import {
   ArrowRight,
+  Check,
   CheckCircle2,
+  Fingerprint,
+  Globe2,
+  HandHeart,
   HeartHandshake,
   LockKeyhole,
   MapPin,
   MessageCircle,
+  Plus,
   Search,
   ShieldCheck,
   Sparkles,
   Users,
-  Globe2,
-  HandHeart,
-  Fingerprint,
-  Plus,
 } from "lucide-react";
 
 // =============================================================
 // TYPES
 // =============================================================
 
-interface NumberedItem {
+interface Benefit {
   icon: LucideIcon;
   number: string;
   title: string;
-  description: string;
+  text: string;
 }
 
 interface Step {
@@ -35,11 +38,11 @@ interface Step {
   description: string;
 }
 
-interface Benefit {
+interface Value {
   icon: LucideIcon;
   number: string;
   title: string;
-  text: string;
+  description: string;
 }
 
 interface NetworkNode {
@@ -57,18 +60,18 @@ const benefits: Benefit[] = [
     icon: Search,
     number: "01",
     title: "Find what matters",
-    text: "Search reports from people who have lost or found belongings around their communities.",
+    text: "Search reports from people who have lost or found belongings within their communities.",
   },
   {
     icon: ShieldCheck,
     number: "02",
-    title: "Connect safely",
-    text: "Communicate with others without unnecessarily exposing your personal contact information.",
+    title: "Connect with care",
+    text: "Communicate with others through a more thoughtful and privacy-conscious experience.",
   },
   {
     icon: HeartHandshake,
     number: "03",
-    title: "Give it back",
+    title: "Bring it home",
     text: "Turn a simple discovery into a safe and meaningful return to its rightful owner.",
   },
 ];
@@ -79,45 +82,45 @@ const steps: Step[] = [
     icon: Search,
     title: "Search",
     description:
-      "Look through existing lost and found reports to see if someone's report matches what you're looking for.",
+      "Browse existing lost and found reports to see whether something matches what you're looking for.",
   },
   {
     number: "02",
     icon: MessageCircle,
     title: "Connect",
     description:
-      "When you find a possible match, communicate with the other person through a safer, more private experience.",
+      "Found a possible match? Start a conversation and communicate without unnecessarily exposing private details.",
   },
   {
     number: "03",
     icon: HeartHandshake,
     title: "Reconnect",
     description:
-      "Work together to verify the item and arrange a safe return to the person it belongs to.",
+      "Verify the item together and arrange a safe, practical way to return it to its rightful owner.",
   },
 ];
 
-const values: NumberedItem[] = [
+const values: Value[] = [
   {
     icon: Users,
     number: "01",
     title: "Community powered",
     description:
-      "Every report gives someone another opportunity to recover something important.",
+      "Every report creates another opportunity for someone to recover something important.",
   },
   {
     icon: LockKeyhole,
     number: "02",
     title: "Privacy conscious",
     description:
-      "Helping someone should not require giving away more personal information than necessary.",
+      "Helping someone should not require sharing more personal information than necessary.",
   },
   {
     icon: HeartHandshake,
     number: "03",
     title: "Built on kindness",
     description:
-      "A simple act of returning something can make a meaningful difference in someone's day.",
+      "A small act of returning something can make a surprisingly meaningful difference.",
   },
 ];
 
@@ -128,88 +131,116 @@ const storyChecklist = [
   "Help communities reconnect",
 ];
 
-const missionValues = ["Community", "Trust", "Safety", "Kindness"];
+const missionValues = [
+  "Community",
+  "Trust",
+  "Safety",
+  "Kindness",
+];
 
 const networkNodes: NetworkNode[] = [
-  { x: "left-[16%]", y: "top-[28%]", label: "LUZON" },
-  { x: "left-[42%]", y: "top-[43%]", label: "METRO MANILA" },
-  { x: "right-[18%]", y: "top-[31%]", label: "COMMUNITY" },
-  { x: "left-[34%]", y: "bottom-[22%]", label: "VISAYAS" },
-  { x: "right-[23%]", y: "bottom-[25%]", label: "MINDANAO" },
+  {
+    x: "left-[13%]",
+    y: "top-[28%]",
+    label: "LUZON",
+  },
+  {
+    x: "left-[43%]",
+    y: "top-[43%]",
+    label: "METRO MANILA",
+  },
+  {
+    x: "right-[15%]",
+    y: "top-[28%]",
+    label: "COMMUNITY",
+  },
+  {
+    x: "left-[30%]",
+    y: "bottom-[22%]",
+    label: "VISAYAS",
+  },
+  {
+    x: "right-[20%]",
+    y: "bottom-[20%]",
+    label: "MINDANAO",
+  },
 ];
 
 // =============================================================
-// SHARED UI
+// SHARED COMPONENTS
 // =============================================================
 
 function Eyebrow({
   children,
-  index,
+  number,
 }: {
-  children: React.ReactNode;
-  index?: string;
+  children: ReactNode;
+  number?: string;
 }) {
   return (
     <div className="flex items-center gap-3">
       <span
         aria-hidden="true"
-        className="h-px w-8 bg-sky-400 sm:w-10"
+        className="h-px w-7 bg-sky-500 sm:w-9"
       />
 
-      <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-sky-600">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.26em] text-sky-600">
         {children}
       </span>
 
-      {index && (
-        <span
-          aria-hidden="true"
-          className="text-[10px] text-slate-600"
-        >
-          / {index}
+      {number && (
+        <span className="font-mono text-[9px] tracking-[0.15em] text-slate-400">
+          / {number}
         </span>
       )}
     </div>
   );
 }
 
-function CTALink({
+function ButtonLink({
   href,
-  variant = "primary",
   children,
-  trailingIcon: TrailingIcon = ArrowRight,
+  variant = "primary",
+  icon: Icon = ArrowRight,
 }: {
   href: string;
+  children: ReactNode;
   variant?: "primary" | "secondary";
-  children: React.ReactNode;
-  trailingIcon?: LucideIcon;
+  icon?: LucideIcon;
 }) {
-  const base =
-    "group inline-flex items-center justify-center gap-3 rounded-full px-7 py-3.5 text-sm font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:ring-offset-2 focus:ring-offset-white";
-
-  const variantClass =
+  const styles =
     variant === "primary"
       ? [
-          "bg-sky-400 text-slate-950",
-          "shadow-[0_12px_40px_rgba(56,189,248,0.18)]",
-          "hover:-translate-y-0.5 hover:bg-sky-300",
-          "hover:shadow-[0_18px_50px_rgba(56,189,248,0.28)]",
+          "bg-slate-950 text-white",
+          "shadow-[0_15px_40px_rgba(15,23,42,0.12)]",
+          "hover:-translate-y-0.5",
+          "hover:bg-slate-800",
+          "hover:shadow-[0_20px_50px_rgba(15,23,42,0.18)]",
         ].join(" ")
       : [
-          "border border-slate-300 text-navy-900",
-          "hover:-translate-y-0.5 hover:border-sky-400/30",
-          "hover:bg-slate-50",
+          "border border-slate-200 bg-white text-slate-950",
+          "hover:-translate-y-0.5",
+          "hover:border-sky-300",
+          "hover:bg-sky-50/50",
         ].join(" ");
 
   return (
     <Link
       href={href}
-      className={`${base} ${variantClass}`}
+      className={[
+        "group inline-flex items-center justify-center gap-3 rounded-full",
+        "px-6 py-3.5 text-sm font-semibold",
+        "transition-all duration-300",
+        "focus:outline-none focus:ring-2 focus:ring-sky-400/40 focus:ring-offset-2",
+        styles,
+      ].join(" ")}
     >
       {children}
 
-      <TrailingIcon
+      <Icon
         aria-hidden="true"
         size={16}
+        strokeWidth={1.8}
         className="transition-transform duration-300 group-hover:translate-x-1"
       />
     </Link>
@@ -222,49 +253,51 @@ function CTALink({
 
 export default function AboutPage() {
   return (
-    <main className="relative overflow-hidden  text-navy-900 selection:bg-sky-400/20 selection:text-sky-950">
+    <main className="relative overflow-hidden bg-[#fafbfc] text-slate-950 selection:bg-sky-100 selection:text-sky-950">
+
       {/* =========================================================
-          BACKGROUND
+          GLOBAL BACKGROUND
       ========================================================= */}
 
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-20 overflow-hidden"
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute left-1/2 top-[-320px] h-[700px] w-[900px] -translate-x-1/2 rounded-full bg-sky-400/[0.06] blur-[160px]" />
+        <div className="absolute left-1/2 top-[-420px] h-[850px] w-[1100px] -translate-x-1/2 rounded-full bg-sky-200/20 blur-[150px]" />
 
-        <div className="absolute -left-[350px] top-[45%] h-[650px] w-[650px] rounded-full bg-sky-400/[0.018] blur-[160px]" />
+        <div className="absolute -left-[500px] top-[35%] h-[700px] w-[700px] rounded-full bg-sky-100/30 blur-[150px]" />
 
-        <div className="absolute -right-[350px] top-[72%] h-[650px] w-[650px] rounded-full bg-cyan-400/[0.015] blur-[160px]" />
+        <div className="absolute -right-[450px] top-[70%] h-[700px] w-[700px] rounded-full bg-cyan-100/20 blur-[150px]" />
 
-        <div className="absolute inset-0 opacity-[0.025]">
-          <div
-            className="h-full w-full"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(148,163,184,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.5) 1px, transparent 1px)",
-              backgroundSize: "80px 80px",
-            }}
-          />
-        </div>
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(15,23,42,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,.5) 1px, transparent 1px)",
+            backgroundSize: "90px 90px",
+          }}
+        />
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,transparent_0%,rgba(241,245,249,.6)_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,transparent_0%,rgba(248,250,252,.65)_70%)]" />
       </div>
 
       {/* =========================================================
           HERO
       ========================================================= */}
 
-      <section className="relative px-5 pb-28 pt-24 sm:px-6 lg:pb-40 lg:pt-36">
+      <section className="relative px-5 pb-28 pt-24 sm:px-6 lg:pb-36 lg:pt-32">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="grid items-center gap-20 lg:grid-cols-[1.05fr_.95fr]">
+
             {/* LEFT */}
             <div>
-              <Eyebrow index="001">About FindBack PH</Eyebrow>
+              <Eyebrow number="001">
+                About FindBack PH
+              </Eyebrow>
 
-              <h1 className="mt-8 max-w-5xl font-display text-[3.5rem] font-semibold leading-[0.92] tracking-[-0.055em] text-navy-900 sm:text-6xl lg:text-[6.8rem]">
+              <h1 className="mt-8 max-w-5xl text-[3.5rem] font-semibold leading-[0.94] tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-[6.1rem]">
                 Lost things
-                <span className="block text-navy-900/30">
+                <span className="block text-slate-300">
                   have stories.
                 </span>
 
@@ -273,30 +306,33 @@ export default function AboutPage() {
                 </span>
               </h1>
 
-              <p className="mt-10 max-w-2xl text-lg leading-8 text-slate-700 sm:text-xl sm:leading-9">
+              <p className="mt-9 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg sm:leading-8">
                 FindBack PH helps people across the Philippines reconnect
-                with the belongings that matter to them — through a simpler,
-                safer, community-powered way to find what was lost.
+                with belongings that matter — through a simpler, safer,
+                community-powered way to find what was lost.
               </p>
 
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                <CTALink href="/search">
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <ButtonLink href="/search">
                   Find an Item
-                </CTALink>
+                </ButtonLink>
 
-                <CTALink
+                <ButtonLink
                   href="/report/lost"
                   variant="secondary"
-                  trailingIcon={Plus}
+                  icon={Plus}
                 >
                   Report Something Lost
-                </CTALink>
+                </ButtonLink>
               </div>
 
-              <div className="mt-12 flex items-center gap-3 text-sm text-slate-700">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.6)]" />
+              <div className="mt-10 flex items-center gap-3">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/50" />
+                  <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
 
-                <span>
+                <span className="text-xs font-medium tracking-wide text-slate-500">
                   Helping communities reconnect across the Philippines
                 </span>
               </div>
@@ -307,8 +343,7 @@ export default function AboutPage() {
               aria-hidden="true"
               className="relative hidden min-h-[500px] lg:block"
             >
-              {/* Coordinates */}
-              <div className="absolute right-0 top-0 text-right font-mono text-[9px] leading-5 tracking-[0.2em] text-slate-700">
+              <div className="absolute right-0 top-0 text-right font-mono text-[9px] leading-6 tracking-[0.2em] text-slate-400">
                 FIND
                 <br />
                 CONNECT
@@ -316,83 +351,86 @@ export default function AboutPage() {
                 RETURN
               </div>
 
-              {/* Rings */}
-              <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-400/[0.06]" />
+              {/* Outer rings */}
+              <div className="absolute left-1/2 top-1/2 h-[450px] w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-200/80" />
 
-              <div className="absolute left-1/2 top-1/2 h-[310px] w-[310px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-400/[0.08]" />
+              <div className="absolute left-1/2 top-1/2 h-[335px] w-[335px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-200/70" />
 
-              <div className="absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-400/[0.11]" />
+              <div className="absolute left-1/2 top-1/2 h-[220px] w-[220px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-200/80" />
 
-              {/* Rotating line */}
-              <div className="absolute left-1/2 top-1/2 h-[210px] w-px origin-bottom -translate-x-1/2 -translate-y-full bg-gradient-to-t from-sky-400/70 to-transparent motion-safe:animate-[spin_8s_linear_infinite]" />
+              {/* Rotating beam */}
+              <div className="absolute left-1/2 top-1/2 h-[225px] w-px origin-bottom -translate-x-1/2 -translate-y-full bg-gradient-to-t from-sky-500/60 to-transparent motion-safe:animate-[spin_10s_linear_infinite]" />
+
+              {/* Center glow */}
+              <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-300/20 blur-3xl" />
 
               {/* Center */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className="absolute -inset-12 rounded-full bg-sky-400/[0.08] blur-3xl motion-safe:animate-pulse" />
-
-                <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-sky-300/20 bg-sky-400/[0.07] shadow-[0_0_80px_rgba(56,189,248,0.16)]">
+                <div className="flex h-28 w-28 items-center justify-center rounded-full border border-sky-200 bg-white shadow-[0_20px_80px_rgba(14,165,233,.15)]">
                   <HeartHandshake
-                    size={34}
-                    strokeWidth={1.5}
-                    className="text-sky-600"
+                    size={38}
+                    strokeWidth={1.4}
+                    className="text-sky-500"
                   />
                 </div>
               </div>
 
-              {/* Decorative nodes */}
-              <div className="absolute left-[10%] top-[32%]">
+              {/* Connection lines */}
+              <div className="absolute left-[13%] top-[35%] h-px w-[34%] rotate-[13deg] bg-gradient-to-r from-transparent via-sky-400/30 to-transparent" />
+
+              <div className="absolute right-[13%] top-[33%] h-px w-[31%] -rotate-[20deg] bg-gradient-to-r from-transparent via-sky-400/30 to-transparent" />
+
+              <div className="absolute bottom-[27%] left-[22%] h-px w-[53%] rotate-[24deg] bg-gradient-to-r from-transparent via-sky-400/25 to-transparent" />
+
+              {/* Lost */}
+              <div className="absolute left-[7%] top-[29%]">
                 <div className="flex items-center gap-3">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inset-0 rounded-full bg-sky-400/50 motion-safe:animate-ping" />
-                    <span className="relative h-2 w-2 rounded-full bg-sky-400" />
+                  <span className="relative h-2 w-2">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-sky-400/40" />
+                    <span className="relative block h-2 w-2 rounded-full bg-sky-400" />
                   </span>
 
-                  <span className="text-[9px] font-medium tracking-[0.18em] text-slate-600">
+                  <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-500">
                     LOST REPORT
                   </span>
                 </div>
               </div>
 
-              <div className="absolute right-[10%] top-[25%]">
+              {/* Match */}
+              <div className="absolute right-[6%] top-[23%]">
                 <div className="flex items-center gap-3">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inset-0 rounded-full bg-sky-400/50 motion-safe:animate-ping" />
-                    <span className="relative h-2 w-2 rounded-full bg-sky-400" />
+                  <span className="relative h-2 w-2">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-sky-400/40" />
+                    <span className="relative block h-2 w-2 rounded-full bg-sky-400" />
                   </span>
 
-                  <span className="text-[9px] font-medium tracking-[0.18em] text-slate-600">
+                  <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-500">
                     POSSIBLE MATCH
                   </span>
                 </div>
               </div>
 
-              <div className="absolute bottom-[22%] right-[12%]">
+              {/* Return */}
+              <div className="absolute bottom-[18%] right-[8%]">
                 <div className="flex items-center gap-3">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inset-0 rounded-full bg-emerald-400/50 motion-safe:animate-ping" />
-                    <span className="relative h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="relative h-2 w-2">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/40" />
+                    <span className="relative block h-2 w-2 rounded-full bg-emerald-500" />
                   </span>
 
-                  <span className="text-[9px] font-medium tracking-[0.18em] text-slate-600">
+                  <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-500">
                     RETURN
                   </span>
                 </div>
               </div>
 
-              {/* Connecting lines */}
-              <div className="absolute left-[15%] top-[37%] h-px w-[32%] rotate-[13deg] bg-gradient-to-r from-transparent via-sky-400/30 to-transparent" />
-
-              <div className="absolute right-[16%] top-[34%] h-px w-[28%] -rotate-[20deg] bg-gradient-to-r from-transparent via-sky-400/30 to-transparent" />
-
-              <div className="absolute bottom-[28%] left-[22%] h-px w-[52%] rotate-[25deg] bg-gradient-to-r from-transparent via-sky-400/20 to-transparent" />
-
-              {/* Bottom label */}
-              <div className="absolute bottom-2 left-0 max-w-[220px] border-l border-sky-400/20 pl-5">
-                <p className="text-[9px] uppercase tracking-[0.22em] text-slate-600">
+              {/* Bottom description */}
+              <div className="absolute bottom-0 left-0 max-w-[250px] border-l border-sky-200 pl-5">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-sky-500">
                   Built around people
                 </p>
 
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-slate-500">
                   One connection can be enough to bring something important
                   home.
                 </p>
@@ -406,7 +444,7 @@ export default function AboutPage() {
           BENEFITS
       ========================================================= */}
 
-      <section className="border-y border-slate-200">
+      <section className="border-y border-slate-200 bg-white/70">
         <div className="mx-auto grid max-w-7xl md:grid-cols-3">
           {benefits.map((item, index) => {
             const Icon = item.icon;
@@ -415,34 +453,36 @@ export default function AboutPage() {
               <article
                 key={item.number}
                 className={[
-                  "group p-8 transition-colors duration-500 hover:bg-slate-50 sm:p-10 lg:p-12",
+                  "group p-8 transition-all duration-500 hover:bg-white sm:p-10 lg:p-12",
                   index !== 0
                     ? "border-t border-slate-200 md:border-l md:border-t-0"
                     : "",
                 ].join(" ")}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] tracking-wider text-sky-400">
+                  <span className="font-mono text-[10px] tracking-[0.15em] text-sky-500">
                     {item.number}
                   </span>
 
-                  <Icon
-                    aria-hidden="true"
-                    size={20}
-                    strokeWidth={1.5}
-                    className="text-slate-600 transition-colors duration-300 group-hover:text-sky-600"
-                  />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:border-sky-200 group-hover:bg-sky-50">
+                    <Icon
+                      aria-hidden="true"
+                      size={18}
+                      strokeWidth={1.5}
+                      className="text-slate-500 transition-colors group-hover:text-sky-500"
+                    />
+                  </div>
                 </div>
 
-                <h3 className="mt-10 font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900">
+                <h3 className="mt-9 text-2xl font-semibold tracking-[-0.025em] text-slate-950">
                   {item.title}
                 </h3>
 
-                <p className="mt-3 max-w-sm text-sm leading-7 text-slate-600">
+                <p className="mt-3 max-w-sm text-sm leading-7 text-slate-500">
                   {item.text}
                 </p>
 
-                <div className="mt-8 h-px w-8 bg-sky-400/30 transition-all duration-500 group-hover:w-16 group-hover:bg-sky-400/60" />
+                <div className="mt-8 h-px w-8 bg-sky-400/40 transition-all duration-500 group-hover:w-16 group-hover:bg-sky-500" />
               </article>
             );
           })}
@@ -453,22 +493,23 @@ export default function AboutPage() {
           STORY
       ========================================================= */}
 
-      <section className="relative px-5 py-32 sm:px-6 lg:py-44">
+      <section className="relative px-5 py-28 sm:px-6 lg:py-40">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-16 lg:grid-cols-[0.28fr_1fr]">
-            {/* SIDE LABEL */}
-            <aside className="hidden lg:block">
-              <div className="sticky top-32">
-                <div className="flex items-center gap-3">
-                  <span className="h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,.65)]" />
+          <div className="grid gap-16 lg:grid-cols-[.27fr_1fr]">
 
-                  <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-slate-700">
+            {/* SIDE */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-28">
+                <div className="flex items-center gap-3">
+                  <span className="h-2 w-2 rounded-full bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,.4)]" />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
                     Our story
                   </span>
                 </div>
 
                 <div className="mt-8 border-l border-slate-200 pl-5">
-                  <p className="text-xs leading-6 text-slate-700">
+                  <p className="text-[10px] font-medium leading-6 tracking-[0.15em] text-slate-400">
                     WHY
                     <br />
                     FINDBACK
@@ -479,17 +520,20 @@ export default function AboutPage() {
               </div>
             </aside>
 
+            {/* CONTENT */}
             <div>
-              <Eyebrow>Why we exist</Eyebrow>
+              <Eyebrow number="002">
+                Why we exist
+              </Eyebrow>
 
-              <h2 className="mt-7 max-w-4xl font-display text-4xl font-semibold leading-[0.98] tracking-[-0.045em] text-navy-900 sm:text-5xl lg:text-6xl">
+              <h2 className="mt-7 max-w-4xl text-4xl font-semibold leading-[1] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.5rem]">
                 Sometimes a small item carries a{" "}
-                <span className="text-sky-400">
+                <span className="text-sky-500">
                   big story.
                 </span>
               </h2>
 
-              <div className="mt-16 grid gap-14 lg:grid-cols-[1fr_0.8fr]">
+              <div className="mt-16 grid gap-14 lg:grid-cols-[1fr_.8fr]">
                 <div className="space-y-7 text-base leading-8 text-slate-600 sm:text-lg">
                   <p>
                     A lost phone can hold years of memories. An ID can be
@@ -503,7 +547,7 @@ export default function AboutPage() {
                     start.
                   </p>
 
-                  <p className="text-navy-900">
+                  <p className="font-medium text-slate-950">
                     FindBack PH exists to make that first step easier.
                   </p>
                 </div>
@@ -514,7 +558,7 @@ export default function AboutPage() {
                       key={item}
                       className="group flex gap-4 border-b border-slate-200 py-5 first:pt-0 last:border-b-0"
                     >
-                      <span className="font-mono text-[10px] text-sky-400">
+                      <span className="font-mono text-[10px] text-sky-500">
                         0{index + 1}
                       </span>
 
@@ -522,10 +566,10 @@ export default function AboutPage() {
                         <CheckCircle2
                           aria-hidden="true"
                           size={16}
-                          className="mt-1 shrink-0 text-sky-400 transition-transform duration-300 group-hover:scale-110"
+                          className="mt-1 shrink-0 text-sky-500 transition-transform group-hover:scale-110"
                         />
 
-                        <span className="text-sm leading-6 text-slate-700">
+                        <span className="text-sm leading-6 text-slate-600">
                           {item}
                         </span>
                       </div>
@@ -534,21 +578,19 @@ export default function AboutPage() {
                 </ul>
               </div>
 
-              <blockquote className="relative mt-20 border-y border-sky-400/15 py-12 sm:py-14">
-                <div
-                  aria-hidden="true"
-                  className="absolute left-0 top-0 h-px w-20 bg-sky-400"
-                />
+              {/* Quote */}
+              <blockquote className="relative mt-20 border-y border-slate-200 py-12 sm:py-14">
+                <div className="absolute left-0 top-0 h-px w-16 bg-sky-500" />
 
                 <div className="flex gap-5">
                   <HeartHandshake
                     aria-hidden="true"
                     size={25}
-                    strokeWidth={1.5}
-                    className="mt-1 shrink-0 text-sky-600"
+                    strokeWidth={1.4}
+                    className="mt-1 shrink-0 text-sky-500"
                   />
 
-                  <p className="max-w-4xl font-display text-2xl font-medium leading-9 tracking-[-0.02em] text-navy-900 sm:text-3xl sm:leading-10">
+                  <p className="max-w-4xl text-2xl font-medium leading-9 tracking-[-0.025em] text-slate-950 sm:text-3xl sm:leading-10">
                     “The goal isn&apos;t just to find things. It&apos;s to help people
                     find their way back to something that matters.”
                   </p>
@@ -563,19 +605,22 @@ export default function AboutPage() {
           HOW IT WORKS
       ========================================================= */}
 
-      <section className="relative border-y border-slate-200 px-5 py-32 sm:px-6 lg:py-44">
+      <section className="border-y border-slate-200 bg-white/60 px-5 py-28 sm:px-6 lg:py-40">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-16 lg:grid-cols-[0.4fr_1fr]">
-            <div>
-              <Eyebrow>The process</Eyebrow>
+          <div className="grid gap-16 lg:grid-cols-[.4fr_1fr]">
 
-              <h2 className="mt-7 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-navy-900 sm:text-5xl lg:text-6xl">
+            <div>
+              <Eyebrow number="003">
+                The process
+              </Eyebrow>
+
+              <h2 className="mt-7 text-4xl font-semibold leading-[.96] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.5rem]">
                 From lost
                 <br />
                 to found.
               </h2>
 
-              <p className="mt-7 max-w-sm text-base leading-7 text-slate-600">
+              <p className="mt-7 max-w-sm text-base leading-7 text-slate-500">
                 Simple by design. Every step brings people a little closer
                 to a successful return.
               </p>
@@ -591,26 +636,28 @@ export default function AboutPage() {
                     className="group grid gap-6 border-t border-slate-200 py-10 sm:grid-cols-[80px_1fr] lg:grid-cols-[100px_1fr]"
                   >
                     <div>
-                      <span className="font-mono text-sm text-sky-400">
+                      <span className="font-mono text-xs text-sky-500">
                         {step.number}
                       </span>
                     </div>
 
                     <div className="max-w-2xl">
                       <div className="flex items-center gap-4">
-                        <Icon
-                          aria-hidden="true"
-                          size={20}
-                          strokeWidth={1.5}
-                          className="text-sky-400 transition-transform duration-300 group-hover:scale-110"
-                        />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm">
+                          <Icon
+                            aria-hidden="true"
+                            size={18}
+                            strokeWidth={1.5}
+                            className="text-sky-500 transition-transform group-hover:scale-110"
+                          />
+                        </div>
 
-                        <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900 transition-colors duration-300 group-hover:text-sky-600 sm:text-3xl">
+                        <h3 className="text-2xl font-semibold tracking-[-0.025em] text-slate-950 transition-colors group-hover:text-sky-600 sm:text-3xl">
                           {step.title}
                         </h3>
                       </div>
 
-                      <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                      <p className="mt-5 text-base leading-8 text-slate-500 sm:text-lg">
                         {step.description}
                       </p>
                     </div>
@@ -626,37 +673,41 @@ export default function AboutPage() {
           MISSION
       ========================================================= */}
 
-      <section className="px-5 py-32 sm:px-6 lg:py-48">
+      <section className="px-5 py-28 sm:px-6 lg:py-44">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-5xl">
             <div className="flex items-center gap-3">
               <Sparkles
                 aria-hidden="true"
-                size={17}
+                size={16}
                 strokeWidth={1.5}
-                className="text-sky-400"
+                className="text-sky-500"
               />
 
-              <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-400">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-600">
                 Our mission
               </span>
             </div>
 
-            <h2 className="mt-8 font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] text-navy-900 sm:text-6xl lg:text-[6.5rem]">
+            <h2 className="mt-8 text-5xl font-semibold leading-[.95] tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-[6.1rem]">
               Make
-              <span className="text-navy-900/30"> helping </span>
+              <span className="text-slate-300">
+                {" "}helping{" "}
+              </span>
               each other
-              <span className="text-sky-400"> easier.</span>
+              <span className="text-sky-500">
+                {" "}easier.
+              </span>
             </h2>
 
-            <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_0.65fr]">
-              <p className="max-w-3xl text-xl leading-9 text-slate-700">
+            <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_.65fr]">
+              <p className="max-w-3xl text-xl leading-9 text-slate-600">
                 FindBack PH exists to make lost-and-found easier, safer,
                 and more accessible for communities across the Philippines.
               </p>
 
               <div className="border-l border-slate-200 pl-6">
-                <p className="text-sm leading-7 text-slate-600">
+                <p className="text-sm leading-7 text-slate-500">
                   We believe technology should make good intentions easier
                   to act on — whether you&apos;re searching for something you&apos;ve
                   lost or trying to return something you&apos;ve found.
@@ -665,7 +716,7 @@ export default function AboutPage() {
                 <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-3">
                   {missionValues.map((item) => (
                     <li key={item}>
-                      <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-700 transition-colors hover:text-sky-600">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.17em] text-slate-500 transition-colors hover:text-sky-600">
                         {item}
                       </span>
                     </li>
@@ -681,17 +732,20 @@ export default function AboutPage() {
           VALUES
       ========================================================= */}
 
-      <section className="border-y border-slate-200 px-5 py-32 sm:px-6 lg:py-40">
+      <section className="border-y border-slate-200 bg-white/60 px-5 py-28 sm:px-6 lg:py-40">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-14 lg:grid-cols-[0.42fr_1fr]">
-            <div>
-              <Eyebrow>What we believe</Eyebrow>
+          <div className="grid gap-14 lg:grid-cols-[.42fr_1fr]">
 
-              <h2 className="mt-7 max-w-md font-display text-4xl font-semibold leading-[0.98] tracking-[-0.04em] text-navy-900 sm:text-5xl">
+            <div>
+              <Eyebrow number="004">
+                What we believe
+              </Eyebrow>
+
+              <h2 className="mt-7 max-w-md text-4xl font-semibold leading-[.98] tracking-[-0.05em] text-slate-950 sm:text-5xl">
                 People are at the center.
               </h2>
 
-              <p className="mt-6 max-w-sm text-base leading-7 text-slate-700">
+              <p className="mt-6 max-w-sm text-base leading-7 text-slate-500">
                 The technology matters, but the people behind every lost
                 and found story matter more.
               </p>
@@ -707,7 +761,7 @@ export default function AboutPage() {
                     className="group border-t border-slate-200 py-9 first:pt-0"
                   >
                     <div className="grid gap-5 sm:grid-cols-[60px_1fr_auto]">
-                      <span className="font-mono text-xs text-sky-400">
+                      <span className="font-mono text-xs text-sky-500">
                         {value.number}
                       </span>
 
@@ -717,15 +771,15 @@ export default function AboutPage() {
                             aria-hidden="true"
                             size={19}
                             strokeWidth={1.5}
-                            className="text-slate-600 transition-colors duration-300 group-hover:text-sky-600"
+                            className="text-slate-400 transition-colors group-hover:text-sky-500"
                           />
 
-                          <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900 transition-colors duration-300 group-hover:text-sky-600">
+                          <h3 className="text-2xl font-semibold tracking-[-0.025em] text-slate-950 transition-colors group-hover:text-sky-600">
                             {value.title}
                           </h3>
                         </div>
 
-                        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+                        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">
                           {value.description}
                         </p>
                       </div>
@@ -733,7 +787,7 @@ export default function AboutPage() {
                       <ArrowRight
                         aria-hidden="true"
                         size={18}
-                        className="hidden text-slate-700 transition-all duration-300 group-hover:translate-x-1 group-hover:text-sky-600 sm:block"
+                        className="hidden text-slate-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-sky-500 sm:block"
                       />
                     </div>
                   </article>
@@ -748,30 +802,29 @@ export default function AboutPage() {
           PHILIPPINES
       ========================================================= */}
 
-      <section className="relative px-5 py-32 sm:px-6 lg:py-44">
+      <section className="relative px-5 py-28 sm:px-6 lg:py-40">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-16 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <div className="grid items-center gap-16 lg:grid-cols-[1fr_.9fr]">
+
             {/* VISUAL */}
             <div
               aria-hidden="true"
-              className="relative min-h-[450px] overflow-hidden rounded-3xl border border-slate-200 bg-slate-50"
+              className="relative min-h-[450px] overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_100px_rgba(15,23,42,.05)]"
             >
               {/* Grid */}
-              <div className="absolute inset-0 opacity-[0.08]">
-                <div
-                  className="h-full w-full"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle, rgba(56,189,248,.8) 1px, transparent 1px)",
-                    backgroundSize: "28px 28px",
-                  }}
-                />
-              </div>
+              <div
+                className="absolute inset-0 opacity-[0.07]"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, rgba(14,165,233,.9) 1px, transparent 1px)",
+                  backgroundSize: "30px 30px",
+                }}
+              />
 
-              {/* Soft glow */}
-              <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-400/[0.06] blur-3xl" />
+              {/* Glow */}
+              <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-200/30 blur-3xl" />
 
-              {/* Connection lines */}
+              {/* Lines */}
               <div className="absolute left-[10%] top-[35%] h-px w-[75%] rotate-[12deg] bg-sky-400/15" />
 
               <div className="absolute left-[18%] top-[58%] h-px w-[68%] -rotate-[16deg] bg-sky-400/15" />
@@ -784,11 +837,11 @@ export default function AboutPage() {
                   key={node.label}
                   className={`absolute ${node.x} ${node.y} group`}
                 >
-                  <div className="absolute -inset-4 rounded-full bg-sky-400/10 blur-xl transition-all duration-500 group-hover:bg-sky-400/20" />
+                  <div className="absolute -inset-5 rounded-full bg-sky-400/10 blur-xl transition-all duration-500 group-hover:bg-sky-400/20" />
 
-                  <div className="relative h-3 w-3 rounded-full border border-sky-300/50 bg-sky-400 shadow-[0_0_20px_rgba(56,189,248,.5)]" />
+                  <div className="relative h-3 w-3 rounded-full border border-sky-300 bg-sky-400 shadow-[0_0_20px_rgba(14,165,233,.35)]" />
 
-                  <span className="absolute left-5 top-[-5px] whitespace-nowrap text-[8px] tracking-[0.16em] text-slate-600">
+                  <span className="absolute left-5 top-[-5px] whitespace-nowrap text-[8px] font-medium tracking-[0.16em] text-slate-400">
                     {node.label}
                   </span>
                 </div>
@@ -797,19 +850,19 @@ export default function AboutPage() {
               {/* Globe */}
               <div className="absolute right-7 top-7">
                 <Globe2
-                  size={28}
+                  size={27}
                   strokeWidth={1}
-                  className="text-sky-500/50"
+                  className="text-sky-500/40"
                 />
               </div>
 
-              {/* Label */}
+              {/* Bottom label */}
               <div className="absolute bottom-8 left-8 max-w-xs">
-                <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-sky-400">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-sky-500">
                   Built for the Philippines
                 </p>
 
-                <p className="mt-3 font-display text-2xl font-semibold leading-tight text-navy-900">
+                <p className="mt-3 text-2xl font-semibold leading-tight tracking-[-0.03em] text-slate-950">
                   Local connections can create nationwide impact.
                 </p>
               </div>
@@ -817,17 +870,19 @@ export default function AboutPage() {
 
             {/* CONTENT */}
             <div>
-              <Eyebrow>Built for PH</Eyebrow>
+              <Eyebrow number="005">
+                Built for PH
+              </Eyebrow>
 
-              <h2 className="mt-7 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.045em] text-navy-900 sm:text-5xl lg:text-6xl">
+              <h2 className="mt-7 text-4xl font-semibold leading-[.95] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.5rem]">
                 One shared
                 <br />
-                <span className="text-sky-400">
+                <span className="text-sky-500">
                   community.
                 </span>
               </h2>
 
-              <p className="mt-7 max-w-xl text-lg leading-8 text-slate-600">
+              <p className="mt-7 max-w-xl text-lg leading-8 text-slate-500">
                 FindBack PH is designed around the way real communities
                 connect — reducing friction, encouraging responsible
                 communication, and making it easier to return lost
@@ -836,21 +891,21 @@ export default function AboutPage() {
 
               <ul className="mt-10">
                 <li className="group flex gap-5 border-t border-slate-200 py-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-50">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white transition-all duration-300 group-hover:border-sky-200 group-hover:bg-sky-50">
                     <MapPin
                       aria-hidden="true"
                       size={18}
                       strokeWidth={1.5}
-                      className="text-slate-700 transition-colors group-hover:text-sky-600"
+                      className="text-slate-500 transition-colors group-hover:text-sky-500"
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-navy-900">
+                    <h3 className="font-semibold text-slate-950">
                       Made for local communities
                     </h3>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-700">
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
                       Connect lost and found reports with people in
                       communities across Luzon, Visayas, and Mindanao.
                     </p>
@@ -858,21 +913,21 @@ export default function AboutPage() {
                 </li>
 
                 <li className="group flex gap-5 border-t border-slate-200 py-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-50">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white transition-all duration-300 group-hover:border-sky-200 group-hover:bg-sky-50">
                     <Fingerprint
                       aria-hidden="true"
                       size={18}
                       strokeWidth={1.5}
-                      className="text-slate-700 transition-colors group-hover:text-sky-600"
+                      className="text-slate-500 transition-colors group-hover:text-sky-500"
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-navy-900">
+                    <h3 className="font-semibold text-slate-950">
                       Privacy conscious
                     </h3>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-700">
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
                       Helping someone should not require exposing more
                       personal information than necessary.
                     </p>
@@ -880,21 +935,21 @@ export default function AboutPage() {
                 </li>
 
                 <li className="group flex gap-5 border-y border-slate-200 py-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 transition-all duration-300 group-hover:border-sky-400/30 group-hover:bg-sky-50">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white transition-all duration-300 group-hover:border-sky-200 group-hover:bg-sky-50">
                     <HeartHandshake
                       aria-hidden="true"
                       size={18}
                       strokeWidth={1.5}
-                      className="text-slate-700 transition-colors group-hover:text-sky-600"
+                      className="text-slate-500 transition-colors group-hover:text-sky-500"
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-navy-900">
+                    <h3 className="font-semibold text-slate-950">
                       Built around kindness
                     </h3>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-700">
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
                       A simple act of returning something can make a
                       meaningful difference in someone&apos;s day.
                     </p>
@@ -907,100 +962,179 @@ export default function AboutPage() {
       </section>
 
       {/* =========================================================
+          SAFETY / REPORT SECTION
+          Inspired by the screenshot you provided
+      ========================================================= */}
+
+      <section className="border-t border-slate-200 bg-white px-5 py-20 sm:px-6 lg:py-28">
+        <div className="mx-auto max-w-7xl space-y-6">
+
+          {/* Report suspicious activity */}
+          <div className="group flex flex-col gap-8 border-y border-rose-100 py-10 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-50">
+                <ShieldCheck
+                  size={19}
+                  strokeWidth={1.5}
+                  className="text-rose-500"
+                />
+              </div>
+
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-rose-500">
+                  Help protect the community
+                </p>
+
+                <h3 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-slate-950">
+                  See something suspicious?
+                </h3>
+
+                <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
+                  Report scams, fake listings, harassment, impersonation,
+                  or other unsafe behavior through the available reporting
+                  tools.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/report"
+              className="group inline-flex shrink-0 items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-rose-500 transition-colors hover:text-rose-600"
+            >
+              Report suspicious activity
+
+              <ArrowRight
+                size={15}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+          </div>
+
+          {/* Immediate danger */}
+          <div className="rounded-[1.75rem] border border-slate-200 bg-[#fbfcfd] p-7 shadow-[0_15px_50px_rgba(15,23,42,.035)] sm:p-9">
+            <div className="flex items-start gap-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100">
+                <MessageCircle
+                  size={19}
+                  strokeWidth={1.5}
+                  className="text-slate-600"
+                />
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-slate-950">
+                  In immediate danger?
+                </h3>
+
+                <p className="mt-2 max-w-4xl text-sm leading-7 text-slate-500">
+                  Prioritize your safety. Leave if possible and contact
+                  appropriate local emergency services or authorities.
+                  FindBack PH is not a replacement for emergency services.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
           FINAL CTA
       ========================================================= */}
 
-      <section className="relative border-t border-slate-200 px-5 py-32 sm:px-6 lg:py-48">
+      <section className="relative border-t border-slate-200 px-5 py-28 sm:px-6 lg:py-40">
         <div className="mx-auto max-w-5xl text-center">
-          {/* Icon */}
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-sky-400/20 bg-sky-400/[0.06] shadow-[0_0_50px_rgba(56,189,248,.08)]">
+
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-sky-200 bg-white shadow-[0_15px_50px_rgba(14,165,233,.1)]">
             <HeartHandshake
               size={27}
-              strokeWidth={1.5}
-              className="text-sky-600"
+              strokeWidth={1.4}
+              className="text-sky-500"
             />
           </div>
 
-          <p className="mt-10 text-[11px] font-medium uppercase tracking-[0.25em] text-sky-400">
+          <p className="mt-9 text-[10px] font-semibold uppercase tracking-[0.26em] text-sky-600">
             Be part of the connection
           </p>
 
-          <h2 className="mx-auto mt-6 max-w-4xl font-display text-5xl font-semibold leading-[0.95] tracking-[-0.05em] text-navy-900 sm:text-6xl lg:text-7xl">
+          <h2 className="mx-auto mt-6 max-w-4xl text-5xl font-semibold leading-[.95] tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-[5.8rem]">
             What you found
-            <span className="block text-sky-400">
+            <span className="block text-sky-500">
               might mean everything to someone.
             </span>
           </h2>
 
-          <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+          <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-slate-500 sm:text-lg">
             Search existing reports, report something you&apos;ve lost, or help
             someone in your community get an important belonging back.
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-            <CTALink href="/search">
+            <ButtonLink href="/search">
               Search Reports
-            </CTALink>
+            </ButtonLink>
 
-            <CTALink
+            <ButtonLink
               href="/report/lost"
               variant="secondary"
-              trailingIcon={Plus}
+              icon={Plus}
             >
               Report an Item
-            </CTALink>
+            </ButtonLink>
           </div>
 
-          {/* Trust badges */}
+          {/* Trust */}
           <div className="mt-14 flex flex-wrap items-center justify-center gap-x-7 gap-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-slate-600">
-              <ShieldCheck
-                size={14}
-                className="text-emerald-400"
-              />
-              Safety
-            </div>
+            {[
+              {
+                icon: ShieldCheck,
+                label: "Safety",
+                color: "text-emerald-500",
+              },
+              {
+                icon: Fingerprint,
+                label: "Privacy",
+                color: "text-sky-500",
+              },
+              {
+                icon: Users,
+                label: "Community",
+                color: "text-sky-500",
+              },
+              {
+                icon: HandHeart,
+                label: "Kindness",
+                color: "text-sky-500",
+              },
+            ].map(({ icon: Icon, label, color }, index, array) => (
+              <div
+                key={label}
+                className="flex items-center gap-7"
+              >
+                <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  <Icon
+                    size={14}
+                    className={color}
+                    strokeWidth={1.6}
+                  />
+                  {label}
+                </div>
 
-            <span className="h-1 w-1 rounded-full bg-slate-700" />
-
-            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-slate-600">
-              <Fingerprint
-                size={14}
-                className="text-sky-400"
-              />
-              Privacy
-            </div>
-
-            <span className="h-1 w-1 rounded-full bg-slate-700" />
-
-            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-slate-600">
-              <Users
-                size={14}
-                className="text-sky-400"
-              />
-              Community
-            </div>
-
-            <span className="h-1 w-1 rounded-full bg-slate-700" />
-
-            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-slate-600">
-              <HandHeart
-                size={14}
-                className="text-sky-400"
-              />
-              Kindness
-            </div>
+                {index < array.length - 1 && (
+                  <span className="h-1 w-1 rounded-full bg-slate-300" />
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* Footer line */}
+          {/* Footer */}
           <div className="mt-16 border-t border-slate-200 pt-6">
-            <div className="flex flex-col items-center justify-between gap-3 text-[9px] uppercase tracking-[0.22em] text-slate-700 sm:flex-row">
+            <div className="flex flex-col items-center justify-between gap-3 text-[9px] font-medium uppercase tracking-[0.22em] text-slate-400 sm:flex-row">
               <span>
                 FINDBACK PH / COMMUNITY FIRST
               </span>
 
               <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.5)]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,.4)]" />
                 Helping people reconnect
               </span>
             </div>

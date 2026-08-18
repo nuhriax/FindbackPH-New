@@ -125,8 +125,6 @@ export function SearchBox({ className }: { className?: string }) {
               onFocus={() => setFocused(true)}
               placeholder="What did you lose?"
               aria-label="Search item"
-              aria-expanded={focused}
-              aria-controls="home-search-suggestions"
               autoComplete="off"
               spellCheck={false}
               className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"

@@ -12,10 +12,10 @@ import { Logo } from "@/components/logo";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Lost Items", href: "/lost" },
-  { label: "Found Items", href: "/found" },
+  { label: "Search", href: "/search" },
+  { label: "Report Lost", href: "/report/lost" },
+  { label: "Report Found", href: "/report/found" },
   { label: "How It Works", href: "/how-it-works" },
-  { label: "Safety", href: "/safety" },
   { label: "About", href: "/about" },
 ];
 
@@ -254,6 +254,12 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                   </Link>
                   <Link href="/saved" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                     Saved Items
+                  </Link>
+                  <Link href="/dashboard/profile" onClick={() => setOpen(false)} className="btn-ghost justify-start">
+                    Profile
+                  </Link>
+                  <Link href="/dashboard/settings" onClick={() => setOpen(false)} className="btn-ghost justify-start">
+                    Settings
                   </Link>
                   <form action={logoutAction}>
                     <button type="submit" className="btn-ghost w-full justify-start text-slate-500">

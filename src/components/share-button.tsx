@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Share2, Check } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
+import { Share2 } from "lucide-react";
 
 export function ShareButton({ title }: { title: string }) {
-  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   async function handleShare() {
     const url = window.location.href;
@@ -25,10 +25,9 @@ export function ShareButton({ title }: { title: string }) {
     // Fallback: copy link
     try {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast("success", "Report link copied.");
     } catch {
-      // clipboard unavailable
+      toast("error", "Couldn't copy the link. Please try again.");
     }
   }
 
@@ -37,8 +36,8 @@ export function ShareButton({ title }: { title: string }) {
       onClick={handleShare}
       className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/75 px-4 py-2 text-sm font-medium text-navy-900 shadow-sm transition-colors hover:border-blue-300 hover:bg-blue-50/50"
     >
-      {copied ? <Check size={16} className="text-emerald-400" /> : <Share2 size={16} />}
-      {copied ? "Link copied" : "Share"}
+      <Share2 size={16} aria-hidden="true" />
+      Share
     </button>
   );
 }

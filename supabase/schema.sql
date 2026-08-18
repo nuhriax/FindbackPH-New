@@ -527,3 +527,41 @@ drop trigger if exists on_new_message_notify on public.messages;
 create trigger on_new_message_notify
   after insert on public.messages
   for each row execute procedure public.notify_on_new_message();
+
+-- ============================================================================
+-- PROFILE EXTENSIONS (location + bio) — optional profile fields
+-- ============================================================================
+alter table public.profiles add column if not exists location text;
+alter table public.profiles add column if not exists bio text;
+
+-- ============================================================================
+-- CONTACT MESSAGES — user / visitor enquiries
+-- ============================================================================
+create table if not exists public.contact_messages (
+  id uuid primary key default uuid_generate_v4(),
+  name text not null,
+  email text not null,
+  subject text not null,
+  message text not null,
+  user_id uuid references public.profiles(id) on delete set null,
+  status text not null default 'new',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists contact_messages_status_idx on public.contact_messages (status, created_at);
+create index if not exists contact_messages_user_idx on public.contact_messages (user_id);
+
+alter table public.contact_messages enable row level security;
+
+-- Anyone (signed in or not) may submit an enquiry.
+create policy "Allow public insert on contact_messages"
+  on public.contact_messages for insert
+  with check (true);
+
+-- Only admins / moderators can view enquiries (no private data leaks publicly).
+create policy "Admins can read contact_messages"
+  on public.contact_messages for select
+  using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin', 'moderator'))
+  );
+

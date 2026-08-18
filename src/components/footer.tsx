@@ -2,14 +2,19 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 
 const EXPLORE = [
+  { label: "Search", href: "/search" },
   { label: "Lost Items", href: "/lost" },
   { label: "Found Items", href: "/found" },
+  { label: "Report Lost", href: "/report/lost" },
+  { label: "Report Found", href: "/report/found" },
   { label: "How It Works", href: "/how-it-works" },
 ];
 
 const INFORMATION = [
-  { label: "Safety", href: "/safety" },
   { label: "About", href: "/about" },
+  { label: "Safety", href: "/safety" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
 ];

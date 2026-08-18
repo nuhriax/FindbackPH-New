@@ -1,24 +1,49 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { registerAction } from "@/lib/actions/auth";
 import { AuthShell } from "@/components/ui/auth-shell";
+import { useSearchParams } from "next/navigation";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const registeredParam = searchParams.get("registered") === "true";
+  const [registered, setRegistered] = useState(false);
+
+  // Show success message on first render if registered via query param
+  useEffect(() => {
+    if (registeredParam) {
+      setRegistered(true);
+    }
+  }, [registeredParam]);
 
   async function handleSubmit(formData: FormData) {
     setError(null);
     startTransition(async () => {
       const result = await registerAction(formData);
-      if (result?.error) setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+      } else if (registeredParam === false) {
+        // Redirect to login with registered=true to show success message
+        const sp = new URLSearchParams();
+        sp.set("registered", "true");
+        const url = `/login?${sp.toString()}`;
+        window.location.href = url;
+      }
     });
   }
 
   return (
-    <AuthShell title="Create your account" subtitle="Join FindBack PH to report and search for items.">
+    <AuthShell title="Create your account" subtitle="Join FindBack PH to report and search for items">
+      {registered && (
+        <div className="mt-6 p-4 bg-green-100 rounded-md text-green-800 text-center">
+          <p className="font-medium">Account created successfully!</p>
+          <p>Please log in to continue.</p>
+        </div>
+      )}
       <form action={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>

@@ -34,6 +34,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: "That username is already taken" };
   }
 
+  // Sign up the user - without emailRedirectTo so we can create profile and
+  // redirect to login immediately. User will need to confirm email later
+  // to fully activate account, but can attempt login right away.
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -43,6 +46,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
         last_name: parsed.data.lastName,
         username: parsed.data.username,
       },
+      // Note: We omit emailRedirectTo to allow immediate redirect.
+      // User will need to confirm email via the magic link sent to their email.
+      // However, they can still attempt to log in with their credentials.
     },
   });
 
@@ -52,7 +58,33 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: error.message };
   }
 
-  redirect("/dashboard");
+  // Create profile entry for the newly signed up user.
+  // We get the user from the auth session after signUp.
+  const { data: { session} } = await supabase.auth.getSession();
+
+  if (session?.user) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .insert({
+        id: session.user.id,
+        username: parsed.data.username,
+        first_name: parsed.data.firstName,
+        last_name: parsed.data.lastName,
+        role: "user" as const,
+        is_suspended: false,
+        is_banned: false,
+        successful_returns: 0,
+      });
+
+    if (profileError) {
+      console.error("Profile creation error:", profileError);
+      // Profile creation failure doesn't block the user from seeing
+      // the register success page, but login may be limited.
+    }
+  }
+
+  // Redirect to login with a success indicator
+  redirect("/login?registered=true");
 }
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {
