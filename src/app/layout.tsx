@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
+import "./auth.css";
+import { SiteChrome } from "@/components/site-chrome";
 import { BackgroundEffects } from "@/components/ui/background-effects";
 import { ToastProvider } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/server";
@@ -53,11 +53,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable}`}>
       <body className="flex min-h-screen flex-col font-sans text-navy-900 antialiased">
+        {/* Apply the saved auth theme before first paint to avoid a dark-mode flash.
+            Sets an attribute on <html>; CSS + useTheme read it (no hydration clash). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('fb-auth-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-auth-theme',t||'light');}catch(e){document.documentElement.setAttribute('data-auth-theme','light');}})();`,
+          }}
+        />
         <BackgroundEffects />
         <ToastProvider>
-          <Navbar user={user} profile={profile} />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <SiteChrome user={user} profile={profile}>
+            <main className="flex-1">{children}</main>
+          </SiteChrome>
         </ToastProvider>
       </body>
     </html>

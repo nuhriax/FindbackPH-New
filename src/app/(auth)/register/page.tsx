@@ -1,93 +1,149 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AtSign, Lock, Mail, TriangleAlert, User, UserRound } from "lucide-react";
 import { registerAction } from "@/lib/actions/auth";
-import { AuthShell } from "@/components/ui/auth-shell";
-import { useSearchParams } from "next/navigation";
+import { AuthField } from "@/components/auth/form-field";
+import { PasswordStrength } from "@/components/auth/password-strength";
+import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
+import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const searchParams = useSearchParams();
-  const registeredParam = searchParams.get("registered") === "true";
-  const [registered, setRegistered] = useState(false);
-
-  // Show success message on first render if registered via query param
-  useEffect(() => {
-    if (registeredParam) {
-      setRegistered(true);
-    }
-  }, [registeredParam]);
+  const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [shake, setShake] = useState(false);
+  const [password, setPassword] = useState("");
+  const timerRef = useRef<number | null>(null);
+  const submittingRef = useRef(false);
+  const [, startTransition] = useTransition();
+  const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setError(null);
+    setStatus("loading");
     startTransition(async () => {
       const result = await registerAction(formData);
       if (result?.error) {
+        submittingRef.current = false;
         setError(result.error);
-      } else if (registeredParam === false) {
-        // Redirect to login with registered=true to show success message
-        const sp = new URLSearchParams();
-        sp.set("registered", "true");
-        const url = `/login?${sp.toString()}`;
-        window.location.href = url;
+        setStatus("idle");
+        setShake(true);
+        if (timerRef.current) window.clearTimeout(timerRef.current);
+        timerRef.current = window.setTimeout(() => setShake(false), 550);
+      } else {
+        setStatus("success");
+        timerRef.current = window.setTimeout(() => {
+          router.push("/login?registered=true");
+          router.refresh();
+        }, 900);
       }
     });
   }
 
   return (
-    <AuthShell title="Create your account" subtitle="Join FindBack PH to report and search for items">
-      {registered && (
-        <div className="mt-6 p-4 bg-green-100 rounded-md text-green-800 text-center">
-          <p className="font-medium">Account created successfully!</p>
-          <p>Please log in to continue.</p>
+    <div className={cn("auth-form", shake && "auth-shake")}>
+      <h1 className="auth-title">Create your account</h1>
+      <p className="auth-subtitle">Join FindBack PH and help things find their way home.</p>
+
+      <form action={handleSubmit} className="auth-form-body" noValidate>
+        <div className="auth-grid-2">
+          <AuthField
+            label="First name"
+            name="firstName"
+            icon={User}
+            autoComplete="given-name"
+            placeholder="Juan"
+            autoFocus
+          />
+          <AuthField
+            label="Last name"
+            name="lastName"
+            icon={UserRound}
+            autoComplete="family-name"
+            placeholder="Dela Cruz"
+          />
         </div>
-      )}
-      <form action={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label htmlFor="firstName" className="label">First name</label>
-            <input id="firstName" name="firstName" required className="input" />
-          </div>
-          <div>
-            <label htmlFor="lastName" className="label">Last name</label>
-            <input id="lastName" name="lastName" required className="input" />
-          </div>
-        </div>
+
+        <AuthField
+          label="Username"
+          name="username"
+          icon={AtSign}
+          autoComplete="username"
+          placeholder="juan.dc"
+        />
+
+        <AuthField
+          label="Email"
+          name="email"
+          type="email"
+          icon={Mail}
+          autoComplete="email"
+          placeholder="you@example.com"
+        />
 
         <div>
-          <label htmlFor="username" className="label">Username</label>
-          <input id="username" name="username" required className="input" />
+          <AuthField
+            label="Password"
+            name="password"
+            type="password"
+            icon={Lock}
+            autoComplete="new-password"
+            value={password}
+            onChange={setPassword}
+          />
+          {password && <PasswordStrength password={password} />}
         </div>
 
-        <div>
-          <label htmlFor="email" className="label">Email</label>
-          <input id="email" name="email" type="email" required className="input" />
+        <AuthField
+          label="Confirm password"
+          name="confirmPassword"
+          type="password"
+          icon={Lock}
+          autoComplete="new-password"
+        />
+
+        {error && (
+          <p className="auth-error-block" role="alert">
+            <TriangleAlert size={16} aria-hidden="true" />
+            <span>{error}</span>
+          </p>
+        )}
+
+        <div className="auth-check" style={{ fontSize: "0.8rem" }}>
+          <input id="terms" type="checkbox" name="terms" required aria-required="true" />
+          <span className="auth-check-text">
+            <label htmlFor="terms" className="auth-check-label">
+              I agree to the{" "}
+            </label>
+            <Link href="/privacy" className="auth-link" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </Link>{" "}
+            and{" "}
+            <Link href="/terms" className="auth-link" target="_blank" rel="noopener noreferrer">
+              Terms of Service
+            </Link>
+          </span>
         </div>
 
-        <div>
-          <label htmlFor="password" className="label">Password</label>
-          <input id="password" name="password" type="password" required className="input" />
-          <p className="mt-1 text-xs text-slate-500">At least 8 characters, one uppercase letter, one number.</p>
-        </div>
-
-        <div>
-          <label htmlFor="confirmPassword" className="label">Confirm password</label>
-          <input id="confirmPassword" name="confirmPassword" type="password" required className="input" />
-        </div>
-
-        {error && <p className="field-error" role="alert">{error}</p>}
-
-        <button type="submit" disabled={isPending} className="btn-primary w-full">
-          {isPending ? "Creating account…" : "Create account"}
-        </button>
+        <SubmitButton status={status}>
+          {status === "success"
+            ? "Account created!"
+            : status === "loading"
+              ? "Creating account…"
+              : "Create account"}
+        </SubmitButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-600">
+      <p className="auth-alt">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-blue-600 hover:underline">Log in</Link>
+        <Link href="/login" className="auth-link">
+          Log in
+        </Link>
       </p>
-    </AuthShell>
+    </div>
   );
 }

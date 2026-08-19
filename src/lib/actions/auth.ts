@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { loginSchema, registerSchema } from "@/lib/validation";
 import { redirect } from "next/navigation";
 
-export type ActionResult = { error: string } | { error?: undefined };
+export type ActionResult = { error?: string; ok?: true };
 
 export async function registerAction(formData: FormData): Promise<ActionResult> {
   const raw = {
@@ -84,7 +84,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
   }
 
   // Redirect to login with a success indicator
-  redirect("/login?registered=true");
+  return { ok: true };
 }
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {
@@ -105,7 +105,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     return { error: "Incorrect email or password" };
   }
 
-  redirect("/dashboard");
+  return { ok: true };
 }
 
 export async function logoutAction() {

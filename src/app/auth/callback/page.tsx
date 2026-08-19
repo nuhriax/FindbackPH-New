@@ -1,33 +1,34 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSupabaseClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
-export function CallbackPage() {
+/**
+ * OAuth / email-confirmation callback. Checks the session after Supabase
+ * redirects back to this route and routes the user to the right place.
+ */
+export default function CallbackPage() {
+  const router = useRouter();
+
   useEffect(() => {
-    const supa = useSupabaseClient();
+    const supabase = createClient();
+    let cancelled = false;
 
-    // Check if the user has confirmed their email by attempting to get session
-    // If the session exists and user is confirmed, we can proceed
-    supa.auth.getSession().then(({ data, error }) => {
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (cancelled) return;
       if (data.session && !error) {
-        // User has a session - check if email is confirmed
-        // If not confirmed, redirect back to login with a message
-        // If confirmed, redirect to dashboard
-        const { user } = data.session;
-        if (user) {
-          // Check user metadata or try to access profiles
-          // For now, just redirect to dashboard - the session should work
-          // if the email was already confirmed or if we're allowing auto-login
-          window.location.href = "/dashboard";
-        }
+        router.replace("/dashboard");
+        router.refresh();
       } else {
-        // No session or error - redirect to login
-        window.location.href = "/login";
+        router.replace("/login");
       }
     });
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   return null;
 }

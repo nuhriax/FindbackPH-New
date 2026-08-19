@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AmbientGlow, GridBackground, LightStreak } from "./background-system";
 
@@ -18,22 +18,20 @@ import { AmbientGlow, GridBackground, LightStreak } from "./background-system";
  * in `./background-system` so there is a single source of truth.
  */
 export function BackgroundEffects({ className }: { className?: string }) {
-  const reduced = useMemo(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    []
-  );
+  // Start with `false` so the initial client render matches the server
+  // (where `window` is undefined and particles are always rendered).
+  // The real value is populated in the effect below — any post-hydration
+  // state change is handled gracefully by React without a hydration error.
+  const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
-    if (reduced || typeof window === "undefined") return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => {
-      /* Re-render not needed — animation is pure CSS and already gated below */
-    };
+    setReduced(reduce.matches);
+
+    const onChange = () => setReduced(reduce.matches);
     reduce.addEventListener("change", onChange);
     return () => reduce.removeEventListener("change", onChange);
-  }, [reduced]);
+  }, []);
 
   const particles = useMemo(() => {
     const seed = [18, 34, 52, 71, 90, 108, 126, 145, 162, 181];
