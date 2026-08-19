@@ -2,11 +2,10 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { foundItemSchema, lostItemSchema } from "@/lib/validation";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { runMatchingForLostItem } from "@/lib/actions/matching";
 
-export type ActionResult = { error: string } | { error?: undefined };
+export type ActionResult = { error?: string; itemId?: string };
 
 export async function createLostItemAction(formData: FormData): Promise<ActionResult> {
   const supabase = createClient();
@@ -70,7 +69,7 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
   }
 
   revalidatePath("/lost");
-  redirect(`/lost/${inserted.id}`);
+  return { itemId: inserted.id };
 }
 
 export async function createFoundItemAction(formData: FormData): Promise<ActionResult> {
@@ -128,7 +127,7 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
   }
 
   revalidatePath("/found");
-  redirect(`/found/${inserted.id}`);
+  return { itemId: inserted.id };
 }
 
 export async function markLostItemRecoveredAction(itemId: string): Promise<ActionResult> {

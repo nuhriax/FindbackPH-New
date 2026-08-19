@@ -1,15 +1,24 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { Suspense, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Mail, TriangleAlert } from "lucide-react";
 import { loginAction } from "@/lib/actions/auth";
 import { AuthField } from "@/components/auth/form-field";
 import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
+import { SocialAuthButtons } from "@/components/auth/social-auth";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
+  );
+}
+
+function LoginInner() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [shake, setShake] = useState(false);
@@ -57,8 +66,10 @@ export default function LoginPage() {
         </div>
       )}
 
-      <h1 className="auth-title">Welcome back</h1>
-      <p className="auth-subtitle">Log in to reconnect with the things that matter.</p>
+      <h1 className="auth-title">Welcome Back</h1>
+      <p className="auth-subtitle">Sign in to your account</p>
+
+      <SocialAuthButtons />
 
       <form action={handleSubmit} className="auth-form-body" noValidate>
         <AuthField
@@ -97,7 +108,7 @@ export default function LoginPage() {
         )}
 
         <SubmitButton status={status}>
-          {status === "success" ? "Welcome back!" : status === "loading" ? "Signing in…" : "Sign in"}
+          {status === "success" ? "Welcome back!" : status === "loading" ? "Signing in…" : "Sign in with Email"}
         </SubmitButton>
       </form>
 

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "./auth.css";
-import { SiteChrome } from "@/components/site-chrome";
 import { BackgroundEffects } from "@/components/ui/background-effects";
 import { ToastProvider } from "@/components/ui/toast";
-import { createClient } from "@/lib/supabase/server";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-pjs",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://findback.ph"),
@@ -38,21 +39,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let profile = null;
-  if (user) {
-    const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-    profile = data;
-  }
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${plusJakarta.variable}`}>
       <body className="flex min-h-screen flex-col font-sans text-navy-900 antialiased">
+        {/* Skip link for keyboard / screen-reader users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-navy-900 focus:shadow-xl"
+        >
+          Skip to main content
+        </a>
         {/* Apply the saved auth theme before first paint to avoid a dark-mode flash.
             Sets an attribute on <html>; CSS + useTheme read it (no hydration clash). */}
         <script
@@ -61,11 +58,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
         <BackgroundEffects />
-        <ToastProvider>
-          <SiteChrome user={user} profile={profile}>
-            <main className="flex-1">{children}</main>
-          </SiteChrome>
-        </ToastProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "FindBack PH",
+              url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://findback.ph",
+              description:
+                "FindBack PH connects people who lost something with people who found it — safely, quickly, and locally.",
+            }),
+          }}
+        />
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
+import { InPageNav } from "@/components/in-page-nav";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 
 type HomeExperienceStats = {
@@ -91,13 +92,13 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
       title: "group-hover:text-indigo-600",
     },
     {
-      bg: "bg-cyan-50",
-      text: "text-cyan-600",
-      hoverBg: "group-hover:bg-cyan-600",
+      bg: "bg-electric-50",
+      text: "text-electric-600",
+      hoverBg: "group-hover:bg-electric-600",
       hoverText: "group-hover:text-white",
-      glow: "bg-cyan-400/20",
-      line: "group-hover:bg-cyan-500",
-      title: "group-hover:text-cyan-600",
+      glow: "bg-electric-400/20",
+      line: "group-hover:bg-electric-500",
+      title: "group-hover:text-electric-600",
     },
     {
       bg: "bg-emerald-50",
@@ -111,7 +112,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
   ];
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f8faff] text-[#101828]">
+        <main className="min-h-screen overflow-hidden bg-[#fbf6ef] text-[#2e2417]">
       {/* =========================================================
           GLOBAL BACKGROUND
       ========================================================= */}
@@ -121,18 +122,18 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
         <div className="absolute right-[-12%] top-[5%] h-[650px] w-[650px] rounded-full bg-indigo-200/25 blur-[140px]" />
 
-        <div className="absolute bottom-[-15%] left-[25%] h-[500px] w-[500px] rounded-full bg-cyan-100/40 blur-[120px]" />
+        <div className="absolute bottom-[-15%] left-[25%] h-[500px] w-[500px] rounded-full bg-electric-100/40 blur-[120px]" />
 
         <div
           className="absolute inset-0 opacity-[0.28]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(99,102,241,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.055) 1px, transparent 1px)",
+              "linear-gradient(rgba(76,107,203,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(76,107,203,.055) 1px, transparent 1px)",
             backgroundSize: "64px 64px",
           }}
         />
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_15%,#f8faff_85%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_15%,#fbf6ef_85%)]" />
       </div>
 
       {/* =========================================================
@@ -144,11 +145,11 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
         aria-labelledby="hero-heading"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[8%] top-[20%] h-2 w-2 animate-pulse rounded-full bg-blue-500 shadow-[0_0_25px_7px_rgba(59,130,246,.22)]" />
+          <div className="absolute left-[8%] top-[20%] h-2 w-2 animate-pulse rounded-full bg-blue-500 shadow-[0_0_25px_7px_rgba(37,119,231,.22)]" />
 
-          <div className="absolute right-[14%] top-[23%] h-2 w-2 animate-pulse rounded-full bg-indigo-400 shadow-[0_0_25px_7px_rgba(99,102,241,.2)] [animation-delay:1s]" />
+          <div className="absolute right-[14%] top-[23%] h-2 w-2 animate-pulse rounded-full bg-indigo-400 shadow-[0_0_25px_7px_rgba(76,107,203,.2)] [animation-delay:1s]" />
 
-          <div className="absolute bottom-[25%] left-[22%] h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_20px_5px_rgba(34,211,238,.18)] [animation-delay:2s]" />
+          <div className="absolute bottom-[25%] left-[22%] h-1.5 w-1.5 animate-pulse rounded-full bg-electric-400 shadow-[0_0_20px_5px_rgba(34,211,238,.18)] [animation-delay:2s]" />
 
           <div className="absolute right-[30%] top-[40%] h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400 [animation-delay:1.5s]" />
         </div>
@@ -159,7 +160,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
             <div className="relative z-10">
               <Reveal delay={30}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/75 px-4 py-2 text-xs font-semibold text-blue-700 shadow-[0_8px_30px_rgba(37,99,235,.07)] backdrop-blur-xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/75 px-4 py-2 text-xs font-semibold text-blue-700 shadow-[0_8px_30px_rgba(15,123,122,.07)] backdrop-blur-xl">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-60" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
@@ -174,7 +175,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
               <Reveal delay={80}>
                 <h1
                   id="hero-heading"
-                  className="mt-7 max-w-3xl font-display text-[3.5rem] font-bold leading-[.94] tracking-[-0.055em] text-[#111827] sm:text-6xl md:text-7xl lg:text-[5.8rem]"
+                  className="mt-7 max-w-3xl font-display text-[3.5rem] font-bold leading-[.94] tracking-[-0.055em] text-[#2e2417] sm:text-6xl md:text-7xl lg:text-[5.8rem]"
                 >
                   Lost something?
                   <br />
@@ -198,7 +199,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/report/lost"
-                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_35px_rgba(37,99,235,.22)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(37,99,235,.3)]"
+                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_35px_rgba(15,123,122,.22)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(15,123,122,.3)]"
                   >
                     I Lost Something
 
@@ -234,7 +235,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                   <form
                     action="/search"
                     method="GET"
-                    className="group rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_15px_45px_rgba(15,23,42,.08)] transition duration-300 focus-within:border-blue-300 focus-within:shadow-[0_20px_55px_rgba(37,99,235,.12)]"
+                    className="group rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_15px_45px_rgba(15,23,42,.08)] transition duration-300 focus-within:border-blue-300 focus-within:shadow-[0_20px_55px_rgba(15,123,122,.12)]"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-xl px-3">
@@ -271,7 +272,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
                       <button
                         type="submit"
-                        className="flex min-h-[54px] items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,.2)] transition hover:bg-blue-700 active:scale-[.98]"
+                        className="flex min-h-[54px] items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(15,123,122,.2)] transition hover:bg-blue-700 active:scale-[.98]"
                       >
                         Search
                         <ArrowRight size={16} />
@@ -328,12 +329,12 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                       <div className="h-7 w-7 rounded-full bg-blue-50" />
                     </div>
 
-                    <div className="relative min-h-[390px] overflow-hidden bg-[#f5f8ff]">
+                                        <div className="relative min-h-[390px] overflow-hidden bg-[#fbf6ef]">
                       <div
                         className="absolute inset-0 opacity-60"
                         style={{
                           backgroundImage:
-                            "linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px)",
+                            "linear-gradient(rgba(37,119,231,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(37,119,231,.07) 1px, transparent 1px)",
                           backgroundSize: "42px 42px",
                         }}
                       />
@@ -476,6 +477,19 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
           </div>
         </div>
       </section>
+
+      {/* =========================================================
+          ON THIS PAGE — sticky in-page index
+      ========================================================= */}
+      <InPageNav
+        className="mx-auto mb-6 max-w-7xl px-4 sm:px-6 lg:px-8"
+        items={[
+          { id: "categories-heading", label: "Categories" },
+          { id: "how-heading", label: "How it works" },
+          { id: "safety-heading", label: "Safety" },
+          { id: "cta-heading", label: "Get started" },
+        ]}
+      />
 
       {/* =========================================================
           TRUST STRIP
@@ -621,19 +635,19 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
             <Reveal delay={150}>
               <div className="group relative overflow-hidden px-2 py-10 sm:px-6 lg:px-8">
-                <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-cyan-100/70 blur-3xl transition group-hover:scale-125" />
+                <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-electric-100/70 blur-3xl transition group-hover:scale-125" />
 
                 <div className="relative">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
                     <CheckCircle2
                       size={14}
-                      className="text-cyan-500"
+                      className="text-electric-500"
                     />
                     Successfully returned
                   </div>
 
                   <div className="mt-3 flex items-end gap-3">
-                    <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text font-display text-5xl font-bold tracking-tight text-transparent sm:text-6xl">
+                    <span className="bg-gradient-to-r from-emerald-500 to-electric-500 bg-clip-text font-display text-5xl font-bold tracking-tight text-transparent sm:text-6xl">
                       {recovered.toLocaleString()}
                     </span>
 
@@ -643,7 +657,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                   </div>
 
                   <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full w-[82%] animate-pulse rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 [animation-delay:.8s]" />
+                    <div className="h-full w-[82%] animate-pulse rounded-full bg-gradient-to-r from-emerald-400 to-electric-400 [animation-delay:.8s]" />
                   </div>
                 </div>
               </div>
@@ -684,7 +698,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
               <Reveal delay={80}>
                 <Link
                   href="/report/lost"
-                  className="group relative block overflow-hidden rounded-[28px] border border-slate-200 bg-[#f7f9ff] p-7 transition duration-500 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_25px_60px_rgba(37,99,235,.1)]"
+                                    className="group relative block overflow-hidden rounded-[28px] border border-slate-200 bg-blue-50 p-7 transition duration-500 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_25px_60px_rgba(15,123,122,.1)]"
                 >
                   <div className="absolute right-[-35px] top-[-35px] h-36 w-36 rounded-full bg-blue-100 opacity-70 blur-2xl transition group-hover:bg-blue-200" />
 
@@ -729,7 +743,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
               <Reveal delay={140}>
                 <Link
                   href="/report/found"
-                  className="group relative block overflow-hidden rounded-[28px] border border-slate-200 bg-[#f8fcfa] p-7 transition duration-500 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_25px_60px_rgba(16,185,129,.1)]"
+                                    className="group relative block overflow-hidden rounded-[28px] border border-slate-200 bg-emerald-50 p-7 transition duration-500 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_25px_60px_rgba(31,196,136,.1)]"
                 >
                   <div className="absolute right-[-35px] top-[-35px] h-36 w-36 rounded-full bg-emerald-100 opacity-70 blur-2xl transition group-hover:bg-emerald-200" />
 
@@ -778,7 +792,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
       ========================================================= */}
 
       <section
-        className="relative overflow-hidden border-y border-slate-200 bg-[#f7f9ff] py-20 sm:py-24 lg:py-28"
+                className="relative overflow-hidden border-y border-slate-200 bg-[#fbf6ef] py-20 sm:py-24 lg:py-28"
         aria-labelledby="categories-heading"
       >
         {/* Background atmosphere */}
@@ -792,7 +806,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
             className="absolute inset-0 opacity-[0.22]"
             style={{
               backgroundImage:
-                "linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px)",
+                "linear-gradient(rgba(37,119,231,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(37,119,231,.06) 1px, transparent 1px)",
               backgroundSize: "56px 56px",
             }}
           />
@@ -814,7 +828,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
                 <h2
                   id="categories-heading"
-                  className="font-display text-4xl font-bold tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl"
+                  className="scroll-mt-28 font-display text-4xl font-bold tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl"
                 >
                   What are you
                   <span className="block text-slate-300">
@@ -927,15 +941,15 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
             <div className="mt-5 flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f7f9ff] bg-blue-100 text-blue-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fbf6ef] bg-blue-100 text-blue-600">
                     <Search size={13} />
                   </div>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f7f9ff] bg-emerald-100 text-emerald-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fbf6ef] bg-emerald-100 text-emerald-600">
                     <HeartHandshake size={13} />
                   </div>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f7f9ff] bg-indigo-100 text-indigo-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fbf6ef] bg-indigo-100 text-indigo-600">
                     <MapPin size={13} />
                   </div>
                 </div>
@@ -979,7 +993,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
                 <h2
                   id="how-heading"
-                  className="mt-4 max-w-xl font-display text-4xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-5xl"
+                  className="mt-4 max-w-xl scroll-mt-28 font-display text-4xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-5xl"
                 >
                   From lost
                   <br />
@@ -1072,7 +1086,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
       ========================================================= */}
 
       <section
-        className="relative overflow-hidden bg-[#f5f9ff] py-20"
+                className="relative overflow-hidden bg-[#fbf6ef] py-20"
         aria-labelledby="safety-heading"
       >
         <div className="absolute left-1/2 top-1/2 h-[400px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-100/60 blur-[120px]" />
@@ -1089,7 +1103,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                   <div className="flex flex-wrap items-center gap-3">
                     <h2
                       id="safety-heading"
-                      className="font-display text-xl font-bold text-slate-950"
+                      className="scroll-mt-28 font-display text-xl font-bold text-slate-950"
                     >
                       Your safety comes first.
                     </h2>
@@ -1208,12 +1222,12 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
             <h2
               id="cta-heading"
-              className="mt-7 font-display text-4xl font-bold leading-tight tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl"
+              className="mt-7 scroll-mt-28 font-display text-4xl font-bold leading-tight tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl"
             >
               Lost it?
               <br />
 
-              <span className="bg-gradient-to-r from-blue-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-300 via-electric-300 to-indigo-300 bg-clip-text text-transparent">
                 Found it?
               </span>
             </h2>
@@ -1313,3 +1327,4 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
     </main>
   );
 }
+

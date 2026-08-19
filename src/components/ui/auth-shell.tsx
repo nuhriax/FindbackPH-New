@@ -1,40 +1,268 @@
-import { Logo } from "@/components/logo";
+﻿import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 
-/**
- * Shared luminous auth layout — white floating surface above the global
- * atmospheric background, so /login, /register, /forgot-password and
- * /reset-password all share the same FindBack PH visual identity.
- */
+interface AuthShellProps {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
 export function AuthShell({
   title,
   subtitle,
   children,
   className,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+}: AuthShellProps) {
   return (
-    <div className="flex min-h-[82vh] items-center justify-center px-4 py-14">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center">
-          <div className="rounded-2xl border border-blue-100 bg-white/80 p-3 shadow-glow">
-            <Logo />
+    <div className="relative flex min-h-[82vh] items-center justify-center px-4 py-14 sm:px-6">
+      <div className="relative w-full max-w-[430px]">
+
+        {/* ================================================================
+            AMBIENT HALO
+        ================================================================= */}
+
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            left-1/2
+            top-16
+            h-48
+            w-48
+            -translate-x-1/2
+            rounded-full
+            bg-blue-400/10
+            blur-[80px]
+          "
+        />
+
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            -right-20
+            top-32
+            h-32
+            w-32
+            rounded-full
+                        bg-electric-400/[0.07]
+            blur-[70px]
+          "
+        />
+
+        {/* ================================================================
+            LOGO
+        ================================================================= */}
+
+        <div className="relative flex justify-center">
+          <div className="relative">
+
+            {/* Outer glow */}
+            <div
+              aria-hidden="true"
+              className="
+                absolute
+                inset-[-18px]
+                rounded-[28px]
+                bg-blue-400/10
+                blur-2xl
+              "
+            />
+
+            {/* Logo container */}
+            <div
+              className="
+                relative
+                flex
+                h-[72px]
+                w-[72px]
+                items-center
+                justify-center
+                rounded-[22px]
+
+                border
+                border-white/80
+
+                bg-gradient-to-br
+                from-white
+                via-white/95
+                to-blue-50/90
+
+                shadow-[0_18px_50px_rgba(15,123,122,0.14)]
+
+                ring-1
+                ring-blue-100/60
+
+                backdrop-blur-xl
+              "
+            >
+              <Logo />
+            </div>
+
+            {/* Tiny light accent */}
+            <span
+              aria-hidden="true"
+              className="
+                absolute
+                -right-1
+                -top-1
+                h-2.5
+                w-2.5
+                rounded-full
+                bg-blue-400
+                shadow-[0_0_12px_rgba(15,123,122,0.55)]
+              "
+            />
           </div>
         </div>
 
+        {/* ================================================================
+            AUTH CARD
+        ================================================================= */}
+
         <div
           className={cn(
-            "mt-6 rounded-card border border-slate-200/70 bg-white/85 p-7 shadow-soft backdrop-blur-xl sm:p-8",
+            `
+              relative
+              mt-8
+              overflow-hidden
+              rounded-[28px]
+
+              border
+              border-white/80
+
+              bg-white/[0.78]
+
+              p-6
+              sm:p-8
+
+              shadow-[0_24px_80px_rgba(15,23,42,0.08)]
+              shadow-blue-100/20
+
+              backdrop-blur-2xl
+
+              ring-1
+              ring-slate-200/40
+
+              transition-all
+              duration-500
+            `,
             className
           )}
         >
-          <h1 className="font-display text-2xl font-bold tracking-tight text-navy-900">{title}</h1>
-          <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{subtitle}</p>
-          <div className="mt-6">{children}</div>
+          {/* ============================================================
+              PREMIUM TOP LIGHT
+          ============================================================= */}
+
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              inset-x-0
+              top-0
+              h-px
+              bg-gradient-to-r
+              from-transparent
+              via-blue-300/70
+              to-transparent
+            "
+          />
+
+          {/* ============================================================
+              INTERNAL RADIAL LIGHT
+          ============================================================= */}
+
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              -right-24
+              -top-24
+              h-56
+              w-56
+              rounded-full
+              bg-blue-300/[0.07]
+              blur-3xl
+            "
+          />
+
+          <div
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              -bottom-28
+              -left-24
+              h-52
+              w-52
+              rounded-full
+                          bg-electric-300/[0.045]
+              blur-3xl
+            "
+          />
+
+          {/* ============================================================
+              CONTENT
+          ============================================================= */}
+
+          <div className="relative">
+            <div className="mb-7">
+              <h1
+                className="
+                  font-display
+                  text-[1.75rem]
+                  font-semibold
+                  leading-tight
+                  tracking-[-0.025em]
+                  text-navy-950
+                  sm:text-[1.9rem]
+                "
+              >
+                {title}
+              </h1>
+
+              <p
+                className="
+                  mt-2.5
+                  max-w-[36rem]
+                  text-[0.925rem]
+                  leading-6
+                  text-slate-500
+                "
+              >
+                {subtitle}
+              </p>
+            </div>
+
+            {/* Form content */}
+            <div>{children}</div>
+          </div>
+        </div>
+
+        {/* ================================================================
+            TRUST / ATMOSPHERIC FOOTER
+        ================================================================= */}
+
+        <div className="mt-5 flex items-center justify-center gap-2">
+          <span
+            aria-hidden="true"
+            className="
+              h-1.5
+              w-1.5
+              rounded-full
+              bg-emerald-400
+              shadow-[0_0_8px_rgba(52,211,153,0.55)]
+            "
+          />
+
+          <span className="text-[11px] font-medium tracking-wide text-slate-400">
+            Secure &amp; private
+          </span>
         </div>
       </div>
     </div>

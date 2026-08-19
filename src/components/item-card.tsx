@@ -34,7 +34,7 @@ export function ItemCard({
   return (
     <Link
       href={href}
-      className="group relative flex h-full flex-col overflow-hidden rounded-card border border-slate-200/70 bg-white/80 shadow-soft backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-card-hover"
+      className="group relative flex h-full flex-col overflow-hidden rounded-card border border-slate-200/70 bg-white/85 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-navy-200 hover:bg-white hover:shadow-card-hover"
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
@@ -48,7 +48,7 @@ export function ItemCard({
             unoptimized
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-ice-50 via-slate-50 to-ice-100 text-slate-400 [&_svg]:h-7 [&_svg]:w-7">
+          <div className="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-sunrise-50 via-ice-50 to-lavender-50 text-slate-400 [&_svg]:h-7 [&_svg]:w-7">
             {CATEGORY_ICONS[category]}
             <span className="text-[11px] text-slate-400">No photo yet</span>
           </div>
@@ -57,7 +57,7 @@ export function ItemCard({
         {/* Status badge */}
         <span
           className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-md ${
-            kind === "lost" ? "bg-indigo-100/90 text-indigo-700" : "bg-emerald-100/90 text-emerald-700"
+            kind === "lost" ? "bg-sunrise-100/90 text-sunrise-700" : "bg-emerald-100/90 text-emerald-700"
           }`}
         >
           {kind === "lost" ? "Lost" : "Found"}
@@ -72,7 +72,7 @@ export function ItemCard({
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-4">
-        <h3 className="truncate font-medium text-navy-900 transition-colors duration-200 group-hover:text-blue-700">
+        <h3 className="truncate font-medium text-navy-900 transition-colors duration-200 group-hover:text-navy-800">
           {title}
         </h3>
 
@@ -86,8 +86,9 @@ export function ItemCard({
             <span className="flex min-w-0 items-center gap-1.5">
               <MapPin aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">
-                {cityLabel}
-                {provinceLabel ? `, ${provinceLabel}` : ""}
+                {cityLabel || provinceLabel
+                  ? `${cityLabel}${provinceLabel ? `, ${provinceLabel}` : ""}`
+                  : "Location unavailable"}
               </span>
             </span>
 
@@ -99,7 +100,7 @@ export function ItemCard({
 
           {/* View details */}
           <div className="mt-3 flex items-center justify-between border-t border-slate-200/70 pt-3">
-            <span className="text-xs font-medium text-slate-600 transition-colors group-hover:text-blue-700">
+            <span className="text-xs font-medium text-slate-600 transition-colors group-hover:text-navy-800">
               View details
             </span>
             <ArrowRight

@@ -12,17 +12,17 @@ const CATEGORY_ACCENTS: Record<
   ItemCategory,
   { icon: string; glow: string }
 > = {
-  phones: { icon: "text-sky-600", glow: "bg-sky-500/15" },
+    phones: { icon: "text-electric-600", glow: "bg-electric-500/15" },
   wallets: { icon: "text-amber-600", glow: "bg-amber-500/15" },
-  ids: { icon: "text-violet-600", glow: "bg-violet-500/15" },
+  ids: { icon: "text-indigo-600", glow: "bg-indigo-500/15" },
   bags: { icon: "text-blue-600", glow: "bg-blue-500/15" },
-  keys: { icon: "text-lime-600", glow: "bg-lime-500/15" },
-  jewelry: { icon: "text-fuchsia-600", glow: "bg-fuchsia-500/15" },
-  electronics: { icon: "text-cyan-600", glow: "bg-cyan-500/15" },
+  keys: { icon: "text-electric-600", glow: "bg-electric-500/15" },
+  jewelry: { icon: "text-indigo-600", glow: "bg-indigo-500/15" },
+  electronics: { icon: "text-electric-600", glow: "bg-electric-500/15" },
   documents: { icon: "text-indigo-600", glow: "bg-indigo-500/15" },
-  clothing: { icon: "text-rose-600", glow: "bg-rose-500/15" },
-  pets: { icon: "text-orange-600", glow: "bg-orange-500/15" },
-  school_items: { icon: "text-teal-600", glow: "bg-teal-500/15" },
+  clothing: { icon: "text-electric-600", glow: "bg-electric-500/15" },
+  pets: { icon: "text-sunrise-600", glow: "bg-sunrise-500/15" },
+  school_items: { icon: "text-electric-600", glow: "bg-electric-500/15" },
   other: { icon: "text-slate-600", glow: "bg-slate-400/20" },
 };
 

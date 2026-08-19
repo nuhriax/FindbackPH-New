@@ -25,18 +25,18 @@ import { cn } from "@/lib/utils";
 export type GlowTone = "blue" | "lavender" | "cyan" | "indigo" | "ice";
 
 const GLOW_BG: Record<GlowTone, string> = {
-  blue: "bg-electric-300/40",
+  blue: "bg-electric-400/25",
   lavender: "bg-lavender-200/50",
-  cyan: "bg-cyan-200/45",
-  indigo: "bg-indigo-200/50",
+  cyan: "bg-sky-200/45",
+  indigo: "bg-blue-200/50",
   ice: "bg-ice-100/55",
 };
 
 const STREAK_BG: Record<GlowTone, string> = {
-  blue: "via-electric-200/70",
-  lavender: "via-lavender-200/70",
-  cyan: "via-cyan-200/60",
-  indigo: "via-indigo-200/70",
+  blue: "via-electric-300/60",
+  lavender: "via-lavender-200/60",
+  cyan: "via-sky-200/60",
+  indigo: "via-blue-200/60",
   ice: "via-ice-200/70",
 };
 
@@ -117,7 +117,7 @@ export function LightStreak({
     <div
       aria-hidden="true"
       className={cn(
-        "absolute h-px w-72 bg-gradient-to-r from-transparent via-electric-200/70 to-transparent blur-[1px] animate-float-slow",
+        "absolute h-px w-72 bg-gradient-to-r from-transparent via-electric-300/60 to-transparent blur-[1px] animate-float-slow",
         className
       )}
       style={{ animationDelay: `${delay}s`, ...style }}

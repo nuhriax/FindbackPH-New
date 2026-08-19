@@ -23,14 +23,14 @@ const COLORS: Record<ActivityKind, string> = {
   lost: "text-blue-300",
   found: "text-emerald-300",
   match: "text-indigo-300",
-  returned: "text-cyan-300",
+  returned: "text-emerald-300",
   near: "text-amber-300",
 };
 const CHIP: Record<ActivityKind, string> = {
   lost: "bg-blue-500/10",
   found: "bg-emerald-500/10",
   match: "bg-indigo-500/10",
-  returned: "bg-cyan-500/10",
+  returned: "bg-emerald-500/10",
   near: "bg-amber-500/10",
 };
 

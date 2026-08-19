@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -7,23 +7,37 @@
     color-scheme: light;
 
     /* --- Design tokens -------------------------------------------------- */
-    --background: 248 250 255; /* soft off-white */
-    --foreground: 20 34 79; /* deep navy */
-    --primary: 37 99 235; /* blue-600 */
-    --primary-hover: 29 78 216; /* blue-700 */
-    --primary-soft: 219 234 254; /* blue-100 */
-    --accent: 99 102 241; /* indigo-500 */
-    --muted: 100 116 139; /* slate-500 */
-    --border: 226 232 240; /* slate-200 */
+    --background: 251 246 239; /* warm sand */
+    --foreground: 46 36 23; /* warm espresso text */
+    --primary: 15 123 122; /* Philippine-sea teal */
+        --primary-hover: 12 98 98; /* deeper teal */
+        --primary-soft: 234 247 245; /* pale teal */
+    --accent: 255 116 24; /* sunset coral */
+    --muted: 104 90 74; /* warm secondary text */
+    --border: 236 222 203; /* warm sand border */
     --card: 255 255 255;
     --radius-card: 1.25rem;
     --radius-button: 0.75rem;
 
     /* --- Enhanced: luminous glow accents -------------------------------- */
-    --glow-soft: 219 234 254; /* blue-100 soft */
-    --glow-medium: 167 139 250; /* violet-200 medium */
-    --glow-bright: 59 130 246; /* blue-600 bright */
-    --glow-warm: 251 191 36; /* yellow-400 warm */
+    --glow-soft: 234 247 245; /* teal-50 */
+    --glow-medium: 124 201 198; /* teal-300 */
+    --glow-bright: 15 123 122; /* brand teal */
+    --glow-warm: 255 116 24; /* sunset coral */
+
+    /* --- Typography ------------------------------------------------ */
+    /* One font family site-wide. `--font-mono` is mapped to the same Plus
+       Jakarta Sans font (Next.js sets `--font-pjs` on <html>) so counters and
+       labels render identically on every page instead of a browser monospace. */
+    --font-mono: var(--font-pjs);
+
+    /* --- Consistent text color roles --------------------------------- */
+    /* One single site-wide font color (Warm Espresso #2E2417) so every page,
+       component and caption renders the exact same text shade. */
+    --text-heading: #2e2417; /* warm espresso */
+    --text-body: #2e2417;
+    --text-muted: #2e2417;
+    --text-faint: #2e2417;
   }
 
   * {
@@ -35,14 +49,16 @@
   }
 
   body {
-    background-color: #f7faff;
+    background-color: #fbf6ef;
     background-image:
-      radial-gradient(1100px 720px at 12% -8%, rgba(147, 197, 253, 0.28), transparent 62%),
-      radial-gradient(900px 640px at 92% 4%, rgba(196, 181, 253, 0.22), transparent 56%),
-      radial-gradient(820px 720px at 55% 118%, rgba(125, 211, 252, 0.26), transparent 62%);
+      radial-gradient(1200px 820px at 50% -4%, rgba(255, 255, 255, 1), transparent 62%),
+      radial-gradient(980px 760px at 6% 2%, rgba(250, 243, 231, 0.9), transparent 58%),
+      radial-gradient(900px 740px at 95% 6%, rgba(246, 234, 214, 0.85), transparent 56%),
+      radial-gradient(1000px 820px at 102% 108%, rgba(247, 220, 196, 0.6), transparent 62%),
+            radial-gradient(1000px 720px at -4% 104%, rgba(230, 210, 178, 0.35), transparent 62%);
     background-attachment: fixed;
-    color: #14224f;
-    font-family: var(--font-inter), system-ui, sans-serif;
+    color: #2e2417;
+    font-family: var(--font-pjs), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: clip;
@@ -51,14 +67,23 @@
   h1,
   h2,
   h3,
-  h4 {
+  h4,
+  h5,
+  h6 {
     @apply font-display;
     letter-spacing: -0.02em;
+    /* Consistent brand-navy headings site-wide. */
+    color: var(--text-heading);
+  }
+
+  /* Consistent body copy color unless a page overrides it explicitly. */
+  p {
+    color: var(--text-body);
   }
 
   ::selection {
-    background: rgba(59, 130, 246, 0.28);
-    color: #14224f;
+    background: rgba(15, 123, 122, 0.22);
+    color: #2e2417;
   }
 
   * {
@@ -109,7 +134,7 @@
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:border-blue-200/90 hover:bg-white/90 hover:shadow-card-hover;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:border-navy-200/90 hover:bg-white/90 hover:shadow-card-hover;
   }
 
   .glass {
@@ -120,27 +145,28 @@
     @apply rounded-2xl border border-slate-200/60 bg-white/60 shadow-soft backdrop-blur-md;
   }
 
+  /* Full-page wrapper: gives every route a restrained, consistent entrance. */
   /* --- Button system ---------------------------------------------------- */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-button bg-gradient-to-b from-blue-500 to-blue-600 px-5 py-2.5
-      font-medium text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.6)] transition-all duration-200
-      hover:-translate-y-px hover:from-blue-400 hover:to-blue-500 hover:shadow-[0_14px_36px_-10px_rgba(37,99,235,0.72)]
+    @apply inline-flex items-center justify-center gap-2 rounded-button bg-gradient-to-b from-electric-500 to-electric-600 px-5 py-2.5
+      font-semibold text-white shadow-[0_10px_30px_-10px_rgba(15,123,122,0.5)] transition-all duration-200
+      hover:-translate-y-px hover:from-electric-400 hover:to-electric-500 hover:shadow-[0_14px_36px_-10px_rgba(15,123,122,0.6)]
       active:translate-y-0 disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-button border border-slate-200 bg-white/75
-      px-5 py-2.5 font-medium text-navy-900 shadow-sm backdrop-blur transition-all duration-200
+      px-5 py-2.5 font-semibold text-navy-900 shadow-sm backdrop-blur transition-all duration-200
       hover:-translate-y-px hover:border-slate-300 hover:bg-white hover:shadow-soft active:translate-y-0;
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-button px-4 py-2 text-sm font-medium text-slate-600
-      transition-colors hover:bg-blue-50 hover:text-blue-700;
+      transition-colors hover:bg-navy-50 hover:text-navy-800;
   }
 
   .btn-destructive {
-    @apply inline-flex items-center justify-center gap-2 rounded-button bg-red-500 px-5 py-2.5 font-medium text-white
+    @apply inline-flex items-center justify-center gap-2 rounded-button bg-red-500 px-5 py-2.5 font-semibold text-white
       shadow-[0_10px_28px_-12px_rgba(239,68,68,0.7)] transition-all duration-200 hover:-translate-y-px hover:bg-red-400
       active:translate-y-0 disabled:pointer-events-none disabled:opacity-50;
   }
@@ -148,12 +174,12 @@
   /* --- Form system ------------------------------------------------------- */
   .input {
     @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-navy-900 shadow-sm
-      placeholder:text-slate-400 transition-all focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10;
+      placeholder:text-slate-400 transition-all focus:border-electric-400 focus:bg-white focus:ring-4 focus:ring-electric-500/10;
   }
 
   .select {
     @apply w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 pr-9 text-sm
-      text-navy-900 shadow-sm transition-all focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10;
+      text-navy-900 shadow-sm transition-all focus:border-electric-400 focus:ring-4 focus:ring-electric-500/10;
   }
 
   .label {
@@ -166,12 +192,12 @@
 
   /* --- Accents ----------------------------------------------------------- */
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-electric-600 via-sky-500 to-electric-400 bg-clip-text text-transparent;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50
-      px-3.5 py-1.5 text-xs font-medium tracking-wide text-blue-700;
+    @apply inline-flex items-center gap-2 rounded-full border border-electric-200 bg-electric-50
+      px-3.5 py-1.5 text-xs font-medium tracking-wide text-electric-700;
   }
 
   .chip {
@@ -187,7 +213,7 @@
     background-size: 56px 56px;
   }
 
-  /* Extremely subtle technical grid for the luminous background — faded at the
+  /* Extremely subtle technical grid for the luminous background â€” faded at the
      edges via the mask applied by the GridBackground component. */
   .bg-grid-soft {
     background-image:
@@ -204,12 +230,12 @@
 
   /* Subtle uppercase label that sits above section titles. */
   .section-eyebrow {
-    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-600;
+    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-electric-600;
   }
 
   .section-eyebrow::before {
     content: "";
-    @apply h-px w-6 bg-gradient-to-r from-transparent to-blue-400;
+    @apply h-px w-6 bg-gradient-to-r from-transparent to-electric-400;
   }
 
   /* --- Skeleton ----------------------------------------------------------- */
@@ -252,6 +278,21 @@
   to {
     stroke-dashoffset: -11;
   }
+}
+
+/* Flowing dotted "connection / network" lines used by the site-wide
+   futuristic background (BackgroundEffects â†’ BackdropArt). The dash pattern
+   is 1 + 9 = 10 units, so a -30 dashoffset shift loops seamlessly. */
+@keyframes fb-dash {
+  to {
+    stroke-dashoffset: -30;
+  }
+}
+.fb-dotflow {
+  animation: fb-dash 18s linear infinite;
+}
+.fb-dotflow-slow {
+  animation: fb-dash 30s linear infinite;
 }
 
 /* Pulsing city markers on the map */
@@ -338,4 +379,47 @@
   }
 }
 
+/* ===========================================================================
+   UNIFIED SITE-WIDE FONT COLOR
+   Every page now renders text in one single color — the brand Deep Navy
+   #12347B. The neutral slate/navy utility shades are all remapped to it so
+   headings, paragraphs, captions, muted notes and labels read identically
+   across the whole site.
+
+   Semantic accents are deliberately preserved (per the brand hierarchy):
+     • blue / electric   → actions, links, active nav, focus (brand)
+     • orange (sunrise)  → “lost” status
+     • green (emerald)   → “found” / returned status
+     • white             → text on colored buttons / badges / avatars
+
+   These rules are declared last so they win the cascade over Tailwind's
+   generated utilities without needing !important.
+   =========================================================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #2e2417;
+}
+
+p {
+  color: #2e2417;
+}
+
+.text-navy-700,
+.text-navy-800,
+.text-navy-900,
+.text-slate-100,
+.text-slate-200,
+.text-slate-300,
+.text-slate-400,
+.text-slate-500,
+.text-slate-600,
+.text-slate-700,
+.text-slate-800,
+.text-slate-900 {
+  color: #2e2417;
+}
 

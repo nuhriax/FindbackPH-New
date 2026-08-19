@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -110,14 +110,14 @@ export function SearchBox({ className }: { className?: string }) {
           submit(q, city);
         }}
         className={cn(
-          "rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_15px_45px_rgba(15,23,42,.08)]",
-          "transition-all duration-300 focus-within:border-blue-300 focus-within:shadow-[0_20px_55px_rgba(37,99,235,.14)]",
+          "rounded-[22px] border border-slate-200/80 bg-white p-2 shadow-[0_15px_45px_rgba(20,34,79,.08)]",
+          "transition-all duration-300 focus-within:border-electric-300 focus-within:shadow-[0_20px_55px_rgba(15,123,122,.12)]",
           focused && "scale-[1.015]"
         )}
       >
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-xl px-3">
-            <Search size={19} className="shrink-0 text-blue-500" />
+            <Search size={19} className="shrink-0 text-electric-500" />
             <input
               type="text"
               value={q}
@@ -147,7 +147,7 @@ export function SearchBox({ className }: { className?: string }) {
             />
             <button
               type="submit"
-              className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,.25)] transition-all duration-300 hover:from-blue-500 hover:to-indigo-500 hover:shadow-[0_12px_28px_rgba(37,99,235,.35)] active:scale-[.97]"
+              className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-electric-500 to-electric-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(15,123,122,.3)] transition-all duration-300 hover:from-electric-400 hover:to-electric-500 hover:shadow-[0_12px_28px_rgba(15,123,122,.4)] active:scale-[.97]"
             >
               <span className="sm:hidden">Search</span>
               <ArrowRight

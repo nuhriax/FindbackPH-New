@@ -1,21 +1,26 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { Search, Bell, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark } from "lucide-react";
+import { Search, Bell, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark, ChevronDown } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
 import { Logo } from "@/components/logo";
 
-const NAV_LINKS = [
+// Primary actions stay in the top bar; secondary info pages live under "More"
+// so the navbar doesn't overflow or bury the main CTAs.
+const PRIMARY_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Search", href: "/search" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
+];
+
+const MORE_LINKS = [
   { label: "How It Works", href: "/how-it-works" },
+  { label: "Safety", href: "/safety" },
   { label: "About", href: "/about" },
 ];
 
@@ -30,6 +35,8 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   const isActive = (href: string) =>
     href === "/"
@@ -42,6 +49,23 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close the "More" dropdown on outside click or Escape.
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   const firstName = profile?.first_name ?? user?.user_metadata?.full_name ?? "FindBack";
 
@@ -56,19 +80,17 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
         {/* Floating pill shell */}
         <div
           className={clsx(
-            "mx-auto flex h-14 items-center justify-between gap-3 rounded-full border px-3 transition-all duration-300 sm:px-4",
+            "mx-auto flex h-14 items-center justify-between gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
             scrolled
-              ? "border-white/70 bg-white/80 shadow-[0_16px_46px_-22px_rgba(20,34,79,0.45)] backdrop-blur-2xl"
-              : "border-white/60 bg-white/60 shadow-[0_10px_36px_-24px_rgba(20,34,79,0.35)] backdrop-blur-xl"
+              ? "border-ice-200/80 bg-white/90 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
+              : "border-white/80 bg-white/85 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-xl"
           )}
         >
           <Logo />
 
           <nav className="hidden items-center gap-0.5 lg:flex">
-            {NAV_LINKS.map((link) => {
+            {PRIMARY_LINKS.map((link) => {
               const active = isActive(link.href);
-              const isLost = link.href === "/lost";
-              const isFound = link.href === "/found";
 
               return (
                 <Link
@@ -77,33 +99,73 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                   aria-current={active ? "page" : undefined}
                   className={clsx(
                     "relative rounded-full px-3.5 py-2 text-sm font-medium transition-all duration-200",
-                    active ? "text-blue-700" : "text-slate-600 hover:bg-white/70 hover:text-blue-700"
+                    active ? "text-navy-800" : "text-slate-600 hover:bg-white/70 hover:text-navy-800"
                   )}
                 >
                   {link.label}
                   {active && (
                     <span
                       aria-hidden="true"
-                      className={clsx(
-                        "absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-gradient-to-r",
-                        isLost
-                          ? "from-indigo-400 to-indigo-300"
-                          : isFound
-                            ? "from-emerald-400 to-emerald-300"
-                            : "from-blue-500 to-cyan-400"
-                      )}
+                      className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-gradient-to-r from-electric-500 to-electric-400"
                     />
                   )}
                 </Link>
               );
             })}
+
+            {/* More dropdown */}
+            <div ref={moreRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={moreOpen}
+                className="flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-white/70 hover:text-navy-800"
+              >
+                More
+                <ChevronDown
+                  size={14}
+                  className={clsx("transition-transform duration-200", moreOpen && "rotate-180")}
+                />
+              </button>
+
+              <div
+                className={clsx(
+                  "absolute left-0 top-full mt-2 w-52 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-[0_20px_50px_-20px_rgba(20,34,79,0.4)] backdrop-blur-2xl transition-[opacity,transform] duration-200",
+                  moreOpen
+                    ? "pointer-events-auto translate-y-0 opacity-100"
+                    : "pointer-events-none -translate-y-1 opacity-0"
+                )}
+              >
+                {MORE_LINKS.map((link) => {
+                  const active = isActive(link.href);
+
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      onClick={() => setMoreOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={clsx(
+                        "block rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors",
+                        active
+                          ? "bg-electric-50 text-electric-700"
+                          : "text-slate-600 hover:bg-navy-50 hover:text-navy-800"
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </nav>
 
           <div className="hidden items-center gap-0.5 lg:flex">
             <Link
               href="/search"
               aria-label="Search"
-              className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
             >
               <Search size={18} />
             </Link>
@@ -113,35 +175,35 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                 <Link
                   href="/notifications"
                   aria-label="Notifications"
-                  className="relative rounded-full p-2.5 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                  className="relative rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
                 >
                   <Bell size={18} />
-                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-500" />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-sunrise-500" />
                 </Link>
                 <Link
                   href="/messages"
                   aria-label="Messages"
-                  className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                  className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
                 >
                   <MessageCircle size={18} />
                 </Link>
                 <Link
                   href="/saved"
                   aria-label="Saved items"
-                  className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                  className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
                 >
                   <Bookmark size={18} />
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="group ml-1 flex items-center gap-2.5 rounded-full border border-white/80 bg-white/80 py-1 pl-1 pr-3 shadow-sm transition-colors hover:border-blue-200"
+                  className="group ml-1 flex items-center gap-2.5 rounded-full border border-white/80 bg-white/80 py-1 pl-1 pr-3 shadow-sm transition-colors hover:border-navy-200"
                   title={firstName}
                 >
                   {profile?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
                   ) : (
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-semibold text-white">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
                       {getInitials(profile)}
                     </span>
                   )}
@@ -153,7 +215,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                   <button
                     type="submit"
                     aria-label="Log out"
-                    className="ml-0.5 rounded-full p-2.5 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                    className="ml-0.5 rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
                   >
                     <LogOut size={18} />
                   </button>
@@ -163,13 +225,13 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
               <>
                 <Link
                   href="/login"
-                  className="rounded-full px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-blue-700"
+                  className="rounded-full px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-navy-800"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/register"
-                  className="ml-1 inline-flex items-center rounded-full bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white shadow-[0_8px_24px_-10px_rgba(37,99,235,0.65)] transition-all duration-200 hover:-translate-y-px hover:from-blue-400 hover:to-blue-500"
+                  className="ml-1 inline-flex items-center rounded-full bg-gradient-to-b from-electric-500 to-electric-600 px-4 py-2 text-sm font-medium text-white shadow-[0_8px_24px_-10px_rgba(15,123,122,0.65)] transition-all duration-200 hover:-translate-y-px hover:from-electric-400 hover:to-electric-500"
                 >
                   Create account
                 </Link>
@@ -183,7 +245,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
               <Link
                 href="/dashboard"
                 aria-label="Dashboard"
-                className="rounded-full p-2 text-slate-600 hover:text-blue-700"
+                className="rounded-full p-2 text-slate-600 hover:text-navy-800"
               >
                 <LayoutDashboard size={20} />
               </Link>
@@ -199,7 +261,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
           </div>
         </div>
 
-        {/* Mobile menu — floating panel below the pill */}
+        {/* Mobile menu â€” floating panel below the pill */}
         <div
           className={clsx(
             "mt-2 overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-[0_24px_60px_-28px_rgba(20,34,79,0.5)] backdrop-blur-2xl transition-[max-height,opacity] duration-300 lg:hidden",
@@ -207,7 +269,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
           )}
         >
           <nav className="flex flex-col gap-1 px-3 py-4">
-            {NAV_LINKS.map((link) => {
+            {PRIMARY_LINKS.map((link) => {
               const active = isActive(link.href);
               const isLost = link.href === "/lost";
               const isFound = link.href === "/found";
@@ -222,11 +284,34 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
                     "rounded-full px-4 py-2.5 text-sm font-medium transition-colors",
                     active
                       ? isLost
-                        ? "bg-indigo-50 text-indigo-700"
+                        ? "bg-sunrise-50 text-sunrise-700"
                         : isFound
                           ? "bg-emerald-50 text-emerald-700"
-                          : "bg-blue-50 text-blue-700"
-                      : "text-slate-700 hover:bg-blue-50 hover:text-blue-700"
+                          : "bg-electric-50 text-electric-700"
+                      : "text-slate-700 hover:bg-navy-50 hover:text-navy-800"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <div className="px-4 pt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              Learn more
+            </div>
+            {MORE_LINKS.map((link) => {
+              const active = isActive(link.href);
+
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={clsx(
+                    "rounded-full px-4 py-2.5 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-electric-50 text-electric-700"
+                      : "text-slate-700 hover:bg-navy-50 hover:text-navy-800"
                   )}
                 >
                   {link.label}
@@ -237,11 +322,11 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
               {user ? (
                 <>
                   <div className="flex items-center gap-2.5 px-4">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-semibold text-white">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
                       {getInitials(profile)}
                     </span>
                     <span className="text-sm text-navy-900">{firstName}</span>
-                    <span className="text-[10px] font-medium uppercase tracking-wide text-blue-600">Signed in</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-navy-700">Signed in</span>
                   </div>
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                     Dashboard

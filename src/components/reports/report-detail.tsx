@@ -213,7 +213,7 @@ export function ReportDetail({
                       <span
                         className={
                           m.kind === "lost"
-                            ? "rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700"
+                            ? "rounded-full border border-sunrise-200 bg-sunrise-50 px-2 py-0.5 text-[11px] font-medium text-sunrise-700"
                             : "rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700"
                         }
                       >

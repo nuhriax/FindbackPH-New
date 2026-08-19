@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PackageSearch, Plus } from "lucide-react";
+import { CommunityMotif } from "@/components/ui/community-motif";
 import { ACCENT, type Accent } from "./accents";
 
 /**
@@ -38,7 +39,9 @@ export function ListingEmptyState({
         </span>
       </div>
 
-      <h2 className="mt-4 text-base font-semibold text-navy-900">{title}</h2>
+      <CommunityMotif className="mt-6 h-5 w-20 opacity-70" />
+
+      <h2 className="mt-3 text-base font-semibold text-navy-900">{title}</h2>
 
       <p className="mt-1 max-w-sm text-xs leading-5 text-slate-500">
         {description}

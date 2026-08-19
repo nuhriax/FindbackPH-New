@@ -95,8 +95,8 @@ export function TrustSection({ className }: { className?: string }) {
             )}
             aria-label="Safer Handover card"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 mb-4">
-              <ShieldCheck size={20} className="text-cyan-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-electric-500/10 mb-4">
+              <ShieldCheck size={20} className="text-electric-400" />
             </div>
             <h3 className="font-medium text-white mb-2">Safer Handover</h3>
             <p className="text-slate-400 text-sm leading-relaxed">

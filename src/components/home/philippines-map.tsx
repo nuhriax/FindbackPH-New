@@ -1,4 +1,4 @@
-import { useId } from "react";
+﻿import { useId } from "react";
 import { cn } from "@/lib/utils";
 import {
   PH_CITIES,
@@ -8,16 +8,8 @@ import {
   type PhCity,
 } from "./home-data";
 
-export type MapMarkerKind = "lost" | "found";
-
 export type PhilippinesMapProps = {
   className?: string;
-  /** City names (from PH_CITIES) to mark with a dot. */
-  cities?: string[];
-  /** Show city name labels next to the dots. */
-  showLabels?: boolean;
-  /** Color specific city dots as lost (blue) or found (emerald). */
-  markers?: { city: string; kind: MapMarkerKind }[];
   /** Animated connection lines between city pairs. */
   lines?: { from: string; to: string }[];
   /** Muted rendering for secondary usage. */
@@ -26,9 +18,6 @@ export type PhilippinesMapProps = {
 
 export function PhilippinesMap({
   className,
-  cities = [],
-  showLabels = false,
-  markers = [],
   lines = [],
   muted = false,
 }: PhilippinesMapProps) {
@@ -39,8 +28,6 @@ export function PhilippinesMap({
   const cityOf = (name: string): PhCity | undefined =>
     PH_CITIES.find((c) => c.name === name);
 
-  const markerOf = (city: string) => markers.find((m) => m.city === city);
-
   return (
     <svg
       viewBox={PH_VIEWBOX}
@@ -50,18 +37,18 @@ export function PhilippinesMap({
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#DBEAFE" />
-          <stop offset="100%" stopColor="#C7D2FE" />
+          <stop offset="0%" stopColor="#EAF1FE" />
+          <stop offset="100%" stopColor="#DCEBFF" />
         </linearGradient>
         <linearGradient id={lineId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#3B82F6" />
-          <stop offset="100%" stopColor="#6366F1" />
+          <stop offset="0%" stopColor="#0c6262" />
+          <stop offset="100%" stopColor="#46abaa" />
         </linearGradient>
       </defs>
 
       <g
         fill={`url(#${gradId})`}
-        stroke="#93C5FD"
+        stroke="#C6D8F2"
         strokeWidth={1.5}
         strokeLinejoin="round"
       >
@@ -91,40 +78,6 @@ export function PhilippinesMap({
             className="ph-conn-line"
             opacity={muted ? 0.45 : 0.6}
           />
-        );
-      })}
-
-      {cities.map((name) => {
-        const c = cityOf(name);
-        if (!c) return null;
-        const marker = markerOf(name);
-        const color = marker?.kind === "found" ? "#10B981" : "#2563EB";
-
-        return (
-          <g key={`city-${name}`}>
-            {!muted && (
-              <circle
-                cx={c.x}
-                cy={c.y}
-                r={9}
-                fill={color}
-                opacity={0.16}
-                className="ph-ping"
-              />
-            )}
-            <circle cx={c.x} cy={c.y} r={3.6} fill={color} stroke="#FFFFFF" strokeWidth={1.5} />
-            {showLabels && (
-              <text
-                x={c.x + 9}
-                y={c.y + 4}
-                fontSize="13"
-                fontWeight={600}
-                fill={muted ? "#94A3B8" : "#475569"}
-              >
-                {name}
-              </text>
-            )}
-          </g>
         );
       })}
     </svg>

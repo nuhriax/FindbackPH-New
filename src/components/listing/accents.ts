@@ -19,15 +19,15 @@ export type AccentClasses = {
  */
 export const ACCENT: Record<Accent, AccentClasses> = {
   lost: {
-    text: "text-indigo-700",
-    textStrong: "text-indigo-600",
-    border: "border-indigo-200/80",
-    bgSoft: "bg-indigo-50/80",
-    button: "bg-indigo-500",
-    buttonHover: "hover:bg-indigo-400",
-    focus: "focus:border-indigo-400 focus:ring-indigo-500/20",
-    hoverText: "group-hover:text-indigo-700",
-    glow: "bg-indigo-500/10",
+    text: "text-sunrise-700",
+    textStrong: "text-sunrise-600",
+    border: "border-sunrise-200/80",
+    bgSoft: "bg-sunrise-50/80",
+    button: "bg-sunrise-500",
+    buttonHover: "hover:bg-sunrise-400",
+    focus: "focus:border-sunrise-400 focus:ring-sunrise-500/20",
+    hoverText: "group-hover:text-sunrise-700",
+    glow: "bg-sunrise-500/10",
   },
   found: {
     text: "text-emerald-700",

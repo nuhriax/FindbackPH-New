@@ -21,8 +21,8 @@ const KIND_STYLES: Record<
   match: { icon: Sparkles, text: "text-indigo-600", chip: "bg-indigo-50" },
   returned: {
     icon: HeartHandshake,
-    text: "text-cyan-600",
-    chip: "bg-cyan-50",
+    text: "text-emerald-600",
+    chip: "bg-emerald-50",
   },
   near: { icon: MapPin, text: "text-amber-600", chip: "bg-amber-50" },
 };

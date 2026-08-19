@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4E93F1"/>
+      <stop offset="1" stop-color="#1769E0"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#g)"/>
+  <!-- house -->
+  <g fill="#ffffff">
+    <path d="M32 14l16 12.5H43V50H36V36H28V50H21V26.5H16z"/>
+  </g>
+  <!-- path back to the door -->
+  <g fill="none" stroke="#FFE0B3" stroke-width="3" stroke-linecap="round">
+    <path d="M44 44h10"/>
+  </g>
+</svg>
