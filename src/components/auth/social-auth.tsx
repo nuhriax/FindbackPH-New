@@ -43,11 +43,11 @@ const LABELS: Record<Provider, string> = {
 };
 
 /**
- * "Continue with Google / Facebook" buttons for the login page.
+ * "Continue with Google / Facebook" buttons for the auth pages.
  * Uses the existing browser Supabase client; providers must be enabled in the
  * Supabase dashboard. Errors surface inline rather than breaking the form.
  */
-export function SocialAuthButtons() {
+export function SocialAuthButtons({ next = "/dashboard" }: { next?: string }) {
   const [active, setActive] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,9 +57,10 @@ export function SocialAuthButtons() {
     setError(null);
     try {
       const supabase = createClient();
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: { redirectTo },
       });
       if (error) setError(error.message);
     } catch {

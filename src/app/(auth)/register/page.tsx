@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AtSign, Lock, Mail, TriangleAlert, User, UserRound } from "lucide-react";
 import { registerAction } from "@/lib/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import { AuthField } from "@/components/auth/form-field";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
+import { SocialAuthButtons } from "@/components/auth/social-auth";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
@@ -19,6 +21,17 @@ export default function RegisterPage() {
   const submittingRef = useRef(false);
   const [, startTransition] = useTransition();
   const router = useRouter();
+
+  // If the user is already signed in, skip the registration form.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace("/dashboard");
+        router.refresh();
+      }
+    });
+  }, [router]);
 
   async function handleSubmit(formData: FormData) {
     if (submittingRef.current) return;
@@ -37,7 +50,14 @@ export default function RegisterPage() {
       } else {
         setStatus("success");
         timerRef.current = window.setTimeout(() => {
-          router.push("/login?registered=true");
+          // When email confirmation is off in Supabase, registration already
+          // establishes a session — go straight to the dashboard. Otherwise we
+          // send the user to log in (they must confirm their email first).
+          if (result?.autoSignIn) {
+            router.push("/dashboard");
+          } else {
+            router.push("/login?registered=true");
+          }
           router.refresh();
         }, 900);
       }
@@ -48,6 +68,8 @@ export default function RegisterPage() {
     <div className={cn("auth-form", shake && "auth-shake")}>
       <h1 className="auth-title">Create your account</h1>
       <p className="auth-subtitle">Join FindBack PH and help things find their way home.</p>
+
+      <SocialAuthButtons />
 
       <form action={handleSubmit} className="auth-form-body" noValidate>
         <div className="auth-grid-2">

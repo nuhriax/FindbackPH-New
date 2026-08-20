@@ -1,10 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { loginSchema, registerSchema } from "@/lib/validation";
 import { redirect } from "next/navigation";
 
-export type ActionResult = { error?: string; ok?: true };
+export type ActionResult = { error?: string; ok?: true; autoSignIn?: boolean };
 
 export async function registerAction(formData: FormData): Promise<ActionResult> {
   const raw = {
@@ -34,10 +34,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: "That username is already taken" };
   }
 
-  // Sign up the user - without emailRedirectTo so we can create profile and
-  // redirect to login immediately. User will need to confirm email later
-  // to fully activate account, but can attempt login right away.
-  const { error } = await supabase.auth.signUp({
+  // Sign up the user. Metadata travels with the auth user so the
+  // `handle_new_user` trigger (see supabase/schema.sql) can fill the profile row.
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
@@ -46,9 +45,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
         last_name: parsed.data.lastName,
         username: parsed.data.username,
       },
-      // Note: We omit emailRedirectTo to allow immediate redirect.
-      // User will need to confirm email via the magic link sent to their email.
-      // However, they can still attempt to log in with their credentials.
     },
   });
 
@@ -58,33 +54,43 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: error.message };
   }
 
-  // Create profile entry for the newly signed up user.
-  // We get the user from the auth session after signUp.
-  const { data: { session} } = await supabase.auth.getSession();
-
-  if (session?.user) {
-    const { error: profileError } = await supabase
+  // Guarantee a complete profile row. The signup trigger normally creates this,
+  // but we upsert it here (service-role, RLS-bypassing) so registration always
+  // results in a usable profile — regardless of confirmation settings or whether
+  // the trigger fired yet. `onConflict: "id"` keeps it idempotent with the trigger.
+  if (data.user?.id) {
+    const service = createServiceRoleClient();
+    const { error: profileError } = await service
       .from("profiles")
-      .insert({
-        id: session.user.id,
-        username: parsed.data.username,
-        first_name: parsed.data.firstName,
-        last_name: parsed.data.lastName,
-        role: "user" as const,
-        is_suspended: false,
-        is_banned: false,
-        successful_returns: 0,
-      });
+      .upsert(
+        {
+          id: data.user.id,
+          username: parsed.data.username,
+          first_name: parsed.data.firstName,
+          last_name: parsed.data.lastName,
+        },
+        { onConflict: "id" }
+      );
 
     if (profileError) {
-      console.error("Profile creation error:", profileError);
-      // Profile creation failure doesn't block the user from seeing
-      // the register success page, but login may be limited.
+      console.error("Profile upsert error:", profileError);
     }
   }
 
-  // Redirect to login with a success indicator
-  return { ok: true };
+  // If email confirmation is disabled for this project (e.g. local dev), signUp
+  // creates an auth session. Signing back in with the same credentials makes that
+  // session valid server-side so the UI can route straight to the dashboard.
+  let autoSignIn = false;
+  if (data.user?.id) {
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
+    autoSignIn = !signInError;
+  }
+
+  // Redirect to login with a success indicator (or dashboard when auto-signed-in)
+  return { ok: true, autoSignIn };
 }
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {
@@ -102,6 +108,13 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
+    // Give people a direct path when the dashboard "require email confirmation"
+    // is on, otherwise fall back to a generic "bad credentials" message.
+    if (error.code === "email_not_confirmed") {
+      return {
+        error: "Your email hasn't been confirmed yet. Check your inbox (and spam) for the confirmation link we sent.",
+      };
+    }
     return { error: "Incorrect email or password" };
   }
 

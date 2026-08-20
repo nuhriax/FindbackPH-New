@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useRef, useState, useTransition } from "react";
+import { Suspense, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Mail, TriangleAlert } from "lucide-react";
 import { loginAction } from "@/lib/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import { AuthField } from "@/components/auth/form-field";
 import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
 import { SocialAuthButtons } from "@/components/auth/social-auth";
@@ -28,6 +29,22 @@ function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered") === "true";
+  // Respect the protected-page redirect the middleware set (e.g. /dashboard),
+  // falling back to the dashboard. Reject external/open redirects.
+  const rawNext = searchParams.get("next");
+  const next = rawNext?.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
+
+  // If a session already exists (e.g. the user just visited a protected page and
+  // was bounced here, or is returning while still logged in) skip the form.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace(next);
+        router.refresh();
+      }
+    });
+  }, [router, next]);
 
   async function handleSubmit(formData: FormData) {
     if (submittingRef.current) return;
@@ -46,7 +63,7 @@ function LoginInner() {
       } else {
         setStatus("success");
         timerRef.current = window.setTimeout(() => {
-          router.push("/dashboard");
+          router.push(next);
           router.refresh();
         }, 900);
       }
@@ -69,7 +86,7 @@ function LoginInner() {
       <h1 className="auth-title">Welcome Back</h1>
       <p className="auth-subtitle">Sign in to your account</p>
 
-      <SocialAuthButtons />
+      <SocialAuthButtons next={next} />
 
       <form action={handleSubmit} className="auth-form-body" noValidate>
         <AuthField
