@@ -1,5 +1,8 @@
 ﻿import Link from "next/link";
 import { InPageNav } from "@/components/in-page-nav";
+import { SplitText } from "@/components/effects/split-text";
+import { Aurora } from "@/components/effects/aurora";
+import { MotionReveal } from "@/components/effects/motion-reveal";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -291,7 +294,10 @@ export default async function AboutPage() {
           HERO
       ========================================================= */}
 
-      <section className="relative px-5 pb-28 pt-24 sm:px-6 lg:pb-36 lg:pt-32">
+            <section className="relative px-5 pb-28 pt-24 sm:px-6 lg:pb-36 lg:pt-32">
+        {/* Subtle aurora light drifting behind the hero copy — mirrors the
+            ShaderGradient-style field on the home / safety / contact pages. */}
+        <Aurora opacity={0.32} blur={74} />
         <div className="mx-auto max-w-7xl">
           <div className="grid items-center gap-20 lg:grid-cols-[1.05fr_.95fr]">
 
@@ -301,15 +307,22 @@ export default async function AboutPage() {
                 About FindBack PH
               </Eyebrow>
 
-              <h1 className="mt-8 max-w-5xl text-[3.5rem] font-semibold leading-[0.94] tracking-[-0.06em] text-navy-900 sm:text-6xl lg:text-[6.1rem]">
-                Lost things
-                <span className="block text-slate-300">
-                  have stories.
-                </span>
-
-                <span className="block bg-gradient-to-r from-blue-600 via-blue-500 to-electric-500 bg-clip-text text-transparent">
-                  Help them continue.
-                </span>
+                            <h1 className="mt-8 max-w-5xl text-[3.5rem] font-semibold leading-[0.94] tracking-[-0.06em] text-navy-900 sm:text-6xl lg:text-[6.1rem]">
+                <MotionReveal delay={60}>
+                  <SplitText
+                  segments={[
+                    { text: "Lost things " },
+                    { text: "have stories.", className: "text-slate-300", break: true },
+                    {
+                      text: "Help them continue.",
+                      className:
+                        "bg-gradient-to-r from-blue-600 via-blue-500 to-electric-500 bg-clip-text text-transparent",
+                      single: true,
+                      break: true,
+                    },
+                  ]}
+                                />
+                </MotionReveal>
               </h1>
 
               <p className="mt-9 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg sm:leading-8">

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
@@ -70,7 +71,10 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
   const firstName = profile?.first_name ?? user?.user_metadata?.full_name ?? "FindBack";
 
   return (
-    <header
+    <motion.header
+      initial={{ opacity: 0, y: -14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className={clsx(
         "sticky top-0 z-50 w-full transition-all duration-300",
         scrolled ? "pt-2" : "pt-3 sm:pt-4"
@@ -366,6 +370,6 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
           </nav>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }

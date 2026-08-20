@@ -1,5 +1,8 @@
 ﻿import Link from "next/link";
 import { InPageNav } from "@/components/in-page-nav";
+import { SplitText } from "@/components/effects/split-text";
+import { Aurora } from "@/components/effects/aurora";
+import { MotionReveal } from "@/components/effects/motion-reveal";
 import {
   ClipboardList,
   Search,
@@ -247,7 +250,10 @@ export default function HowItWorksPage() {
         {/* =========================================================
             HERO
         ========================================================== */}
-        <section className="relative mx-auto max-w-5xl pt-4 text-center lg:pt-8">
+                <section className="relative mx-auto max-w-5xl pt-4 text-center lg:pt-8">
+          {/* Gentle aurora light drifting behind the journey headline — mirrors
+              the ShaderGradient-style field on the home / safety / contact / about pages. */}
+          <Aurora opacity={0.28} blur={76} />
 
           {/* Decorative left icon */}
           <div className="pointer-events-none absolute -left-4 top-20 hidden lg:block">
@@ -269,15 +275,23 @@ export default function HowItWorksPage() {
             A simpler way to reunite lost belongings
           </div>
 
-          {/* Heading */}
+                    {/* Heading */}
+          <MotionReveal delay={60}>
           <h1 className="font-display text-[3.4rem] font-semibold leading-[0.98] tracking-[-0.045em] text-navy-900 sm:text-6xl lg:text-[6.5rem]">
-            From lost
-            <br />
-            to{" "}
-            <span className="bg-gradient-to-r from-electric-600 via-sky-500 to-electric-500 bg-clip-text text-transparent">
-              found.
-            </span>
+            <SplitText
+              segments={[
+                { text: "From lost" },
+                { text: "to ", break: true },
+                {
+                  text: "found.",
+                  single: true,
+                  className:
+                    "bg-gradient-to-r from-electric-600 via-sky-500 to-electric-500 bg-clip-text text-transparent",
+                },
+              ]}
+                        />
           </h1>
+          </MotionReveal>
 
           {/* Description */}
           <p className="mx-auto mt-7 max-w-2xl text-[15px] leading-7 text-slate-700/80 sm:text-lg sm:leading-8">

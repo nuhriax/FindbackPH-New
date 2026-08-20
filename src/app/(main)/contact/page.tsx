@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { ArrowRight, CheckCircle2, Clock, Mail, ShieldCheck } from "lucide-react";
 import { submitContactAction } from "@/lib/actions/contact";
+import { MotionReveal } from "@/components/effects/motion-reveal";
+import { Aurora } from "@/components/effects/aurora";
 
 export default function ContactPage() {
   const [error, setError] = useState<string | null>(null);
@@ -23,25 +25,33 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen">
-      <section className="border-b border-slate-200/70">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <span className="section-eyebrow">We&apos;re here to help</span>
-            <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl">
-              Contact FindBack PH
-            </h1>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-600">
-              Questions, feedback, or a partnership idea? Send us a note and we&apos;ll get
-              back to you — usually within one business day.
-            </p>
+      <section className="relative overflow-hidden border-b border-slate-200/70">
+        {/* Living aurora light drifting behind the contact header */}
+        <Aurora opacity={0.3} blur={70} />
+        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+          <div className="relative mx-auto max-w-3xl text-center">
+            <MotionReveal>
+              <span className="section-eyebrow">We&apos;re here to help</span>
+            </MotionReveal>
+            <MotionReveal delay={70}>
+              <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl">
+                Contact FindBack PH
+              </h1>
+            </MotionReveal>
+            <MotionReveal delay={140}>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-600">
+                Questions, feedback, or a partnership idea? Send us a note and we&apos;ll get
+                back to you — usually within one business day.
+              </p>
+            </MotionReveal>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.4fr]">
+        <div className="grid items-stretch gap-8 lg:grid-cols-[0.9fr_1.4fr]">
           {/* Info column */}
-          <div className="space-y-4">
+          <MotionReveal className="space-y-4">
             <div className="card p-6">
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600">
@@ -84,7 +94,7 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </MotionReveal>
 
           {/* Form column */}
           <div className="card p-6 sm:p-8">

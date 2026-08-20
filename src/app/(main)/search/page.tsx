@@ -36,70 +36,125 @@ type SearchItem = {
   created_at: string | null;
 };
 
+const SEARCH_LIMIT = 30;
+
+function normalizeQuery(
+  value: string | undefined,
+  maxLength = 80,
+): string {
+  return (value ?? "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+/** Escape LIKE wildcards so user input is matched literally. */
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (m) => `\\${m}`);
+}
+
+/** Wrap a value for PostgREST `.or()` so commas/quotes can't break parsing. */
+function orLiteral(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+/**
+ * Fetch a single table for the search page. Runs each table independently so
+ * that if one fails (e.g. a missing column or an unparseable query) the other
+ * still renders — the page is never blank.
+ */
+async function searchTable(
+  supabase: ReturnType<typeof createClient>,
+  table: "lost_items" | "found_items",
+  filters: { q: string; category: string; city: string },
+): Promise<{ data: SearchItem[] | null; error: unknown }> {
+  const { q, category, city } = filters;
+
+  try {
+    let query: any = supabase
+      .from(table as any)
+      .select("id, title, category, city, province, description, created_at")
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(SEARCH_LIMIT);
+
+    if (category) {
+      query = query.eq("category", category);
+    }
+
+    if (city) {
+      query = query.ilike("city", `%${escapeLike(city)}%`);
+    }
+
+    if (!q) {
+      const res = await query;
+      return { data: (res.data as SearchItem[]) ?? null, error: res.error };
+    }
+
+    // Prefer Postgres full-text search. If the query can't be parsed or the
+    // search column is missing in the deployed DB, fall back to a LIKE search so
+    // users always get results instead of a blank page.
+    const fts = await query.textSearch("search_vector", q, {
+      type: "websearch",
+    });
+    if (!fts.error) {
+      return { data: (fts.data as SearchItem[]) ?? null, error: fts.error };
+    }
+
+    const pattern = `%${escapeLike(q)}%`;
+    const like = await query.or(
+      [
+        `title.ilike.${orLiteral(pattern)}`,
+        `description.ilike.${orLiteral(pattern)}`,
+        `category.ilike.${orLiteral(pattern)}`,
+        `city.ilike.${orLiteral(pattern)}`,
+        `province.ilike.${orLiteral(pattern)}`,
+      ].join(",")
+    );
+    return { data: (like.data as SearchItem[]) ?? null, error: like.error };
+  } catch (err) {
+    // Never let a thrown (rather than returned) exception blank the page.
+    return { data: null, error: err };
+  }
+}
 export default async function SearchPage({
   searchParams,
 }: SearchPageProps) {
   const supabase = createClient();
 
-  const q = searchParams.q?.trim() || "";
-  const city = searchParams.city?.trim() || "";
-  const category = searchParams.category?.trim() || "";
-  const type = ["lost", "found"].includes(searchParams.type ?? "")
-    ? searchParams.type!
+  const q = normalizeQuery(searchParams.q);
+  const city = normalizeQuery(searchParams.city, 50);
+  const category = normalizeQuery(searchParams.category, 50);
+  const type = ["lost", "found"].includes((searchParams.type ?? "").trim())
+    ? (searchParams.type ?? "").trim()
     : "";
 
   const activeCategory = CATEGORIES.includes(category as any)
     ? category
     : "";
 
-  function applyFilters(query: any) {
-    if (q) {
-      query = query.textSearch("search_vector", q, {
-        type: "websearch",
-      });
-    }
-
-    if (activeCategory) {
-      query = query.eq("category", activeCategory);
-    }
-
-    if (city) {
-      query = query.ilike("city", `%${city}%`);
-    }
-
-    return query;
-  }
-
-  let lostQuery = supabase
-    .from("lost_items")
-    .select(
-      "id, title, category, city, province, description, created_at"
-    )
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(30);
-
-  let foundQuery = supabase
-    .from("found_items")
-    .select(
-      "id, title, category, city, province, description, created_at"
-    )
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(30);
-
-  lostQuery = applyFilters(lostQuery);
-  foundQuery = applyFilters(foundQuery);
-
-  const [lostRes, foundRes] = await Promise.all([
-    lostQuery,
-    foundQuery,
+  // Query both tables independently — one failing should never blank the page.
+  const [lostResult, foundResult] = await Promise.all([
+    searchTable(supabase, "lost_items", {
+      q,
+      category: activeCategory,
+      city,
+    }),
+    searchTable(supabase, "found_items", {
+      q,
+      category: activeCategory,
+      city,
+    }),
   ]);
 
-  const lostItems = ((type === "found" ? [] : lostRes.data) ?? []) as SearchItem[];
-  const foundItems = ((type === "lost" ? [] : foundRes.data) ?? []) as SearchItem[];
+  const lostItems = (type === "found" ? [] : (lostResult.data ?? [])) as SearchItem[];
+  const foundItems = (type === "lost" ? [] : (foundResult.data ?? [])) as SearchItem[];
 
-  const error = lostRes.error || foundRes.error;
+  // Only show the full error screen when BOTH sources fail.
+  const error = lostResult.error && foundResult.error
+    ? lostResult.error
+    : null;
 
   const totalResults = lostItems.length + foundItems.length;
 
@@ -116,16 +171,16 @@ export default async function SearchPage({
           HEADER
       ================================================================= */}
 
-      <section className="border-b border-slate-200/70">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-          <div className="mx-auto max-w-3xl">
+      <section className="border-b border-slate-200/70 bg-white/25">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <div className="mx-auto max-w-4xl">
             <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700">
+              <span className="inline-flex items-center gap-2 rounded-full border border-electric-200 bg-electric-50 px-3 py-1.5 text-xs font-semibold text-electric-700 shadow-sm">
                 <Search size={13} />
                 FindBack PH Search
               </span>
 
-              <h1 className="mt-5 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl lg:text-5xl">
+              <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
                 Find a lost or found item
               </h1>
 
@@ -141,11 +196,11 @@ export default async function SearchPage({
             <form
               action="/search"
               method="GET"
-              className="mt-8 rounded-2xl border border-slate-200/70 bg-white/90 p-2 shadow-soft ring-1 ring-slate-200/40 backdrop-blur-xl"
+              className="mt-6 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl"
             >
               <div className="grid gap-2 lg:grid-cols-[1.4fr_1fr_0.8fr_auto]">
                 {/* Item */}
-                <div className="flex min-h-[48px] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-blue-300 focus-within:bg-white">
+                <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-electric-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-electric-100">
                   <Search
                     size={17}
                     className="shrink-0 text-blue-500"
@@ -162,7 +217,7 @@ export default async function SearchPage({
                 </div>
 
                 {/* Location */}
-                <div className="flex min-h-[48px] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-blue-300 focus-within:bg-white">
+                <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-electric-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-electric-100">
                   <span className="text-sm text-slate-500">
                     @
                   </span>
@@ -188,7 +243,7 @@ export default async function SearchPage({
                     name="category"
                     defaultValue={activeCategory}
                     aria-label="Filter by category"
-                    className="h-[48px] w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-blue-300"
+                    className="h-[52px] w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-electric-300 focus:bg-white focus:ring-2 focus:ring-electric-100"
                   >
                     <option value="">All categories</option>
 
@@ -206,7 +261,7 @@ export default async function SearchPage({
                 {/* Search */}
                 <button
                   type="submit"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-electric-500 px-6 text-sm font-semibold text-white transition hover:bg-electric-400 active:scale-[0.98]"
+                  className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl bg-electric-500 px-7 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(15,123,114,0.8)] transition hover:bg-electric-400 active:scale-[0.98]"
                 >
                   <Search size={16} />
                   Search
@@ -259,9 +314,9 @@ export default async function SearchPage({
           RESULTS
       ================================================================= */}
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         {/* Lost / Found toggle */}
-        <div className="flex flex-wrap items-center gap-2 pb-8">
+        <div className="mb-7 flex w-fit flex-wrap items-center gap-1 rounded-xl border border-slate-200/80 bg-white/75 p-1.5 shadow-sm backdrop-blur">
           {[
             { label: "All", value: "" },
             { label: "Lost", value: "lost" },
@@ -281,8 +336,8 @@ export default async function SearchPage({
                 aria-current={active ? "page" : undefined}
                 className={
                   active
-                    ? "rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700"
-                    : "rounded-full border border-transparent px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-white/70 hover:text-blue-700"
+                    ? "rounded-lg bg-electric-500 px-4 py-2 text-sm font-semibold text-white shadow-sm"
+                    : "rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-electric-50 hover:text-electric-700"
                 }
               >
                 {opt.label}
@@ -296,9 +351,9 @@ export default async function SearchPage({
         ) : (
           <>
             {/* Results summary */}
-            <div role="status" aria-live="polite" className="flex flex-col gap-3 border-b border-slate-200/70 pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div role="status" aria-live="polite" className="flex flex-col gap-3 border-b border-slate-200/70 pb-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-electric-700">
                   Search results
                 </p>
 
@@ -341,7 +396,7 @@ export default async function SearchPage({
             {!hasResults ? (
               <EmptySearch hasFilters={hasSearch} />
             ) : (
-              <div className="space-y-14">
+              <div className="space-y-12 pt-7">
                 {/* ========================================================
                     FOUND ITEMS
                 ========================================================= */}
@@ -431,19 +486,23 @@ function SearchGroup({
         </Link>
       </div>
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 flex flex-wrap justify-center gap-5">
         {items.map((item) => (
-          <ItemCard
+          <div
             key={item.id}
-            href={`/search/${item.id}`}
-            title={item.title}
-            category={item.category}
-            city={item.city}
-            province={item.province}
-            reported={formatRelative(item.created_at)}
-            description={item.description}
-            kind={kind}
-          />
+            className="w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+          >
+            <ItemCard
+              href={`/search/${item.id}`}
+              title={item.title}
+              category={item.category}
+              city={item.city}
+              province={item.province}
+              reported={formatRelative(item.created_at)}
+              description={item.description}
+              kind={kind}
+            />
+          </div>
         ))}
       </div>
 

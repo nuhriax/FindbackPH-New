@@ -24,7 +24,14 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   return (
     <SiteChrome user={user} profile={profile}>
-      <main id="main-content" className="flex-1 scroll-mt-24">{children}</main>
+      {/*
+        Keep page content above the fixed decorative background.  Without a
+        stacking level here, the background's `z-0` layer can paint over the
+        unpositioned search heading, filters, and result summary.
+      */}
+      <main id="main-content" className="relative z-10 flex-1 scroll-mt-24">
+        {children}
+      </main>
     </SiteChrome>
   );
 }

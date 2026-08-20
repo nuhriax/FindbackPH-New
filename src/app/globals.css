@@ -268,6 +268,11 @@
 .fade-in {
   animation: fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+/* Pulsing "live" status dot used by the live ticker and status dots across the
+   site (LiveActivity, hero-visual, about/safety "live" pills, etc.). */
+.animate-ping {
+  animation: ring-ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
 
 /* Animated connection lines on the Philippines map */
 .ph-conn-line {
@@ -378,6 +383,259 @@
     transform: translateX(100%);
   }
 }
+/* =========================================================
+   FINDBACK SAFETY PAGE MOTION
+========================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---------------------------------------------------------
+   Scroll reveal
+--------------------------------------------------------- */
+
+.safety-reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition:
+    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.safety-reveal-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ---------------------------------------------------------
+   Ambient background
+--------------------------------------------------------- */
+
+@keyframes safetyAmbient {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: translate3d(20px, -18px, 0) scale(1.06);
+    opacity: 0.8;
+  }
+}
+
+.safety-ambient {
+  animation: safetyAmbient 10s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.safety-ambient-blue {
+  animation-duration: 11s;
+}
+
+.safety-ambient-green {
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+
+/* ---------------------------------------------------------
+   Dashboard floating motion
+--------------------------------------------------------- */
+
+@keyframes safetyDashboardFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+.safety-dashboard-float {
+  animation: safetyDashboardFloat 7s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ---------------------------------------------------------
+   Dashboard glow
+--------------------------------------------------------- */
+
+@keyframes safetyDashboardGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.03);
+  }
+}
+
+.safety-dashboard-glow {
+  animation: safetyDashboardGlow 7s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------
+   Progress bar
+--------------------------------------------------------- */
+
+@keyframes safetyProgress {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 78%;
+  }
+}
+
+.safety-progress {
+  animation: safetyProgress 1.4s cubic-bezier(0.22, 1, 0.36, 1)
+    500ms both;
+}
+
+/* ---------------------------------------------------------
+   Status pulse
+--------------------------------------------------------- */
+
+@keyframes safetyStatusPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+}
+
+.safety-status-pulse {
+  animation: safetyStatusPulse 2.4s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------
+   Privacy glow
+--------------------------------------------------------- */
+
+@keyframes safetyPrivacyGlow {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.safety-privacy-glow {
+  animation: safetyPrivacyGlow 5s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------
+   Final section glow
+--------------------------------------------------------- */
+
+@keyframes safetyFinalGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+.safety-final-glow {
+  animation: safetyFinalGlow 8s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------
+   Final rings
+--------------------------------------------------------- */
+
+@keyframes safetyRingOne {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+}
+
+@keyframes safetyRingTwo {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.025);
+  }
+}
+
+.safety-ring-one {
+  animation: safetyRingOne 7s ease-in-out infinite;
+}
+
+.safety-ring-two {
+  animation: safetyRingTwo 9s ease-in-out infinite reverse;
+}
+
+/* ---------------------------------------------------------
+   Reduced motion
+--------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .safety-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------
+   Mobile adjustments
+--------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .safety-dashboard-float {
+    animation-duration: 9s;
+  }
+
+  .safety-ambient {
+    filter: blur(100px);
+  }
+}
 
 /* ===========================================================================
    UNIFIED SITE-WIDE FONT COLOR
@@ -423,3 +681,12 @@ p {
   color: #2e2417;
 }
 
+/* ===========================================================================
+   ShinyText sheen sweep (used by the ShinyText effect component).
+   Moves a clipped background-position across the text. The global reduced-motion
+   rule below pauses every `animation`, so spectacle users get a static shine.
+   =========================================================================== */
+@keyframes shine-x {
+  0% { background-position: 140% 0; }
+  100% { background-position: -140% 0; }
+}
