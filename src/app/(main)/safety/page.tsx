@@ -317,7 +317,7 @@ function StatusBadge({
 
 export default function SafetyPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#fbf7f0] text-slate-900">
+    <main className="relative min-h-screen overflow-hidden text-[#2e2417]">
 
       {/* =====================================================
           GLOBAL ANIMATION + ATMOSPHERE
@@ -454,23 +454,25 @@ export default function SafetyPage() {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
       >
-        <div className="safety-float-slow absolute left-[45%] top-[-18rem] h-[40rem] w-[40rem] rounded-full bg-blue-400/[0.055] blur-[150px]" />
+        {/* Main ambient glow */}
+        <div className="safety-float-slow absolute left-[45%] top-[-18rem] h-[40rem] w-[40rem] rounded-full bg-emerald-300/[0.07] blur-[150px]" />
 
-        <div className="safety-float absolute -left-48 top-[35%] h-[34rem] w-[34rem] rounded-full bg-emerald-300/[0.06] blur-[140px]" />
+        <div className="safety-float absolute -left-48 top-[35%] h-[34rem] w-[34rem] rounded-full bg-teal-400/[0.05] blur-[140px]" />
 
-        <div className="safety-float-slow absolute -right-48 top-[68%] h-[36rem] w-[36rem] rounded-full bg-blue-300/[0.045] blur-[140px]" />
+        <div className="safety-float-slow absolute -right-48 top-[68%] h-[36rem] w-[36rem] rounded-full bg-emerald-200/[0.06] blur-[140px]" />
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(248,250,252,.15)_55%,rgba(226,232,240,.4)_100%)]" />
-
-        {/* subtle background grid */}
+        {/* subtle background grid — uses the warm espresso tone and a soft
+            vertical mask so the grid fades out naturally without hard edges */}
         <div
           className="absolute inset-0 opacity-[0.018]"
           style={{
             backgroundImage:
-              "linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)",
+              "linear-gradient(rgba(46,36,23,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(46,36,23,.6) 1px, transparent 1px)",
             backgroundSize: "80px 80px",
+            maskImage:
+              "linear-gradient(to bottom, black, transparent 70%)",
           }}
         />
       </div>
@@ -519,6 +521,10 @@ export default function SafetyPage() {
         ====================================================== */}
 
         <section className="relative py-20 sm:py-28 lg:py-32">
+
+          {/* Gentle aurora light drifting behind the hero — mirrors the
+              ShaderGradient-style field used across the other pages. */}
+          <Aurora opacity={0.26} blur={72} />
 
           <div className="grid items-center gap-16 lg:grid-cols-[.9fr_1.1fr]">
 
