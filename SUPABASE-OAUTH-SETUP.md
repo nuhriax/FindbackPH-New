@@ -33,16 +33,35 @@ from the environment variables `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`
 1. Go to <https://developers.facebook.com> → sign in → **My Apps → Create App**.
 2. Use case: **Authenticate and request data from users** → **Facebook Login for Business** → Next.
 3. App name: `findback-ph` → Create.
-4. Open the app → **Facebook Login** product (left menu) → **Settings**.
-5. Under **Valid OAuth redirect URIs**, paste:
+4. Open the app → **Settings → Basic** and set **both** of these (this is what
+   fixes *"The domain of this URL isn't included in the app's domains"*):
+   - **App Domains:** add the **root** domain that your Supabase callback host is a
+     subdomain of. Facebook's App Domains field only accepts the base domain, not
+     a subdomain you own for yourself — so enter:
+     ```
+     supabase.co
+     ```
+     (Your callback host is `llmxwvclxiiwczcnbsrt.supabase.co`, which Facebook only
+     recognizes as "inside the app's domains" once its parent `supabase.co` is listed.)
+   - **Site URL:** `http://localhost:3000` (or your live Vercel origin for production).
+   - Save Changes.
+5. Open **Facebook Login** product (left menu) → **Settings**, and under
+   **Valid OAuth redirect URIs**, paste the full callback (mind the exact host) and Save:
    ```
    https://llmxwvclxiiwczcnbsrt.supabase.co/auth/v1/callback
    ```
-   Save.
+   Also make sure **Client OAuth Login** is **enabled** (it is on by default).
 6. Copy the **App ID** and **App Secret**
    (App Dashboard → **Settings → Basic** → "App secret" → **Show**).
-7. For testing, set **App Mode** to **Live**, or add yourself as a
-   **test user** in the **Roles → Test users** page.
+7. For testing, set **App Mode** to **Live** (or add yourself as a **test user**
+   in **Roles → Test users**).
+
+> 🟢 **If you still see *"The domain of this URL isn't included in the app's
+> domains"*** after adding App Domains + the redirect URI, clear your browser
+> cookies and retry, and make sure **App Mode is Live** (Development mode adds
+> stricter checks) and **Client OAuth Login** is on. The domain in **App Domains**
+> must be the parent of the redirect host — `supabase.co` for the `...supabase.co`
+> callback (not `localhost`, and not the app site).
 
 > Facebook Login works for your own account right away. Publishing/Live access
 > for all users may require app review, but you can test instantly as yourself.

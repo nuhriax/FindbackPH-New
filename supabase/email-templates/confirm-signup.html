@@ -1,0 +1,136 @@
+<!--
+  FindBack PH — Confirm signup email
+  --------------------------------
+  Subject (paste into the dashboard's Subject field): Confirm your email · FindBack PH
+
+  INSTALL: Supabase Dashboard > Authentication > Email Templates > "Confirm signup"
+  Copy everything from <!DOCTYPE html> to </html> into the HTML box (Enable it first).
+  Keep the Liquid placeholders {{ .ConfirmationURL }} / {{ .Email }} as-is — Supabase
+  fills them per recipient. The button + fallback link point at the same confirmation
+  URL, so your existing confirmation flow keeps working.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>Confirm your email · FindBack PH</title>
+    <!-- Responsive: widen to full width on small screens, keep rounded card on desktop -->
+    <style type="text/css">
+      body { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+      @media only screen and (max-width: 620px) {
+        .container { width: 100% !important; }
+        .card { width: 100% !important; padding: 28px 22px !important; }
+        .brand-title { font-size: 22px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0;padding:0;background-color:#FBF6EF;">
+    <!-- Hidden preheader shown below the subject line in most clients -->
+    <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+      Confirm your email to activate your account and start bringing what's lost back home.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FBF6EF">
+      <tr>
+        <td align="center" style="padding:28px 12px;">
+          <table class="container" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+                 style="width:100%;max-width:600px;margin:0 auto;">
+
+            <!-- Brand header (text wordmark, reliable in every email client) -->
+            <tr>
+              <td align="center" style="padding:0 0 20px 0;">
+                <div style="font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;">
+                  <span style="font-size:22px;font-weight:700;color:#2E2417;letter-spacing:-0.02em;">FindBack&nbsp;</span>
+                  <span style="font-size:22px;font-weight:800;color:#0F7B72;letter-spacing:-0.02em;">PH</span>
+                  <div style="font-size:12px;font-weight:400;color:#6B5636;margin-top:3px;">
+                    Bring what&apos;s lost back home.
+                  </div>
+                </div>
+              </td>
+            </tr>
+<!-- Main card -->
+            <tr>
+              <td align="center">
+                <table class="card" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                       style="width:100%;max-width:600px;background-color:#FFFFFF;border:1px solid #EFE0CF;border-radius:20px;overflow:hidden;">
+                  <!-- Teal accent bar -->
+                  <tr>
+                    <td height="6" bgcolor="#0F7B72" style="font-size:0;line-height:0;height:6px;">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:32px 34px;">
+
+                      <!-- Eyebrow -->
+                      <div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:12px;font-weight:600;color:#20948F;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">
+                        Welcome to FindBack PH
+                      </div>
+
+                      <!-- Title -->
+                      <h1 style="margin:0 0 14px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:24px;font-weight:700;color:#2E2417;letter-spacing:-0.02em;">
+                        Confirm your email
+                      </h1>
+
+                      <!-- Body copy -->
+                      <p style="margin:0 0 14px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:15px;line-height:1.6;color:#2E2417;">
+                        Thanks for joining the community that helps lost things find their way home
+                        across the Philippines. To activate your account, please confirm your email
+                        address by tapping the button below.
+                      </p>
+<!-- Bulletproof CTA button -->
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:22px 0;">
+                        <tr>
+                          <td align="center" bgcolor="#0F7B72" style="background-color:#0F7B72;border-radius:12px;">
+                            <a href="{{ .ConfirmationURL }}" target="_blank"
+                               style="display:inline-block;min-width:200px;padding:14px 28px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:12px;">
+                              Confirm email
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- Fallback link (in case the button is stripped) -->
+                      <p style="margin:0 0 14px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;line-height:1.6;color:#2E2417;">
+                        If the button doesn&apos;t work on your device, copy and paste this link into
+                        your browser:
+                      </p>
+                      <p style="margin:0 0 24px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;line-height:1.5;word-break:break-all;">
+                        <a href="{{ .ConfirmationURL }}" target="_blank"
+                           style="color:#0C6262;text-decoration:underline;">{{ .ConfirmationURL }}</a>
+                      </p>
+
+                      <!-- Divider -->
+                      <div style="height:1px;background-color:#EFE0CF;margin:0 0 20px 0;"></div>
+
+                      <!-- Small print -->
+                      <p style="margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;line-height:1.6;color:#6B5636;">
+                        This link expires in a few hours. If you didn&apos;t create a FindBack PH
+                        account, you can safely ignore this email — no further action is needed.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+<!-- Footer -->
+            <tr>
+              <td align="center" style="padding:20px 12px 0 12px;">
+                <p style="margin:0 0 4px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;font-weight:700;color:#2E2417;">
+                  FindBack&nbsp;<span style="color:#0F7B72;">PH</span>
+                </p>
+                <p style="margin:0 0 4px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:12px;color:#6B5636;">
+                  Findback Support &middot; findback.support@gmail.com
+                </p>
+                <p style="margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:12px;color:#6B5636;">
+                  &copy; 2026 FindBack PH &middot; Bring what&apos;s lost back home.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -45,13 +45,31 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
         last_name: parsed.data.lastName,
         username: parsed.data.username,
       },
+      // Route the email-confirmation link through this app's PKCE callback page
+      // (the same handler already used by OAuth + password reset) so signup
+      // confirmation keeps working regardless of the dashboard's redirect
+      // defaults. Only set when NEXT_PUBLIC_SITE_URL exists — if it's missing,
+      // the value is undefined and Supabase falls back to its dashboard default,
+      // so this stays a no-op and never breaks existing auth.
+      emailRedirectTo: process.env.NEXT_PUBLIC_SITE_URL
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+        : undefined,
     },
   });
 
   if (error) {
-    // Supabase already returns a safe, user-facing message for signup errors
-    // (e.g. "User already registered") — pass it through, never expose internals.
-    return { error: error.message };
+    // Supabase returns an error when it cannot send the confirmation email
+    // (bad/missing SMTP credentials, or a sender that Gmail doesn't allow).
+    // Show a message that tells the user it's a server-side email problem,
+    // otherwise pass through Supabase's generic signup message.
+    const message = error?.message ?? error?.toString?.() ?? "";
+    if (/confirmation email|email send|smtp/i.test(message)) {
+      return {
+        error:
+          "We couldn't send the confirmation email — the server's email sending (SMTP) isn't working. Check Supabase > Project Settings > Auth > SMTP and confirm the Gmail app password is real (no spaces) and the sender email is allowed, then try again.",
+      };
+    }
+    return { error: message };
   }
 
   // Guarantee a complete profile row. The signup trigger normally creates this,

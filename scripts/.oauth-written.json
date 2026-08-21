@@ -1,0 +1,5 @@
+{
+  "callback": "https://llmxwvclxiiwczcnbsrt.supabase.co/auth/v1/callback",
+  "google": "<set (72 chars)>",
+  "facebook": "<set (16 chars)>"
+}

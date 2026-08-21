@@ -565,3 +565,52 @@ create policy "Admins can read contact_messages"
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin', 'moderator'))
   );
 
+-- ============================================================================
+-- REALTIME REPLICATION
+-- ----------------------------------------------------------------------------
+-- The front-end uses Supabase Realtime (postgres_changes subscriptions) to
+-- auto-refresh the homepage report grid and the live message threads whenever
+-- something changes in the database. For those subscriptions to actually fire,
+-- the tables must be members of the default `supabase_realtime` publication.
+-- By default NO table is replicated, so without this block you won't get any
+-- live updates even though the React components are subscribed.
+--
+-- Tables added here:
+--   lost_items / found_items  -> live homepage recent-reports grid (+ item pages)
+--   messages                  -> live chat threads
+--   conversations            -> conversation list ordering / preview
+--   notifications            -> (reusable) for a future live notification badge
+--
+-- Safe to re-run: membership is checked before adding, so running this whole
+-- schema.sql again (or just this block) will not error out.
+-- ============================================================================
+
+-- Helper: add a table to the Realtime publication if it exists and isn't a
+-- member yet. Deleted at the end so it doesn't linger in the schema.
+create or replace function public.enable_realtime(_table text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (
+       select 1
+       from pg_publication_tables
+       where pubname = 'supabase_realtime'
+         and schemaname = 'public'
+         and tablename = _table
+     ) then
+    execute format('alter publication supabase_realtime add table public.%I', _table);
+  end if;
+end;
+$$;
+
+select public.enable_realtime('lost_items');
+select public.enable_realtime('found_items');
+select public.enable_realtime('messages');
+select public.enable_realtime('conversations');
+select public.enable_realtime('notifications');
+
+drop function if exists public.enable_realtime(text);
