@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUserSavedItems, unsaveItemAction } from "@/lib/actions/items";
-import { BookmarkX, Bookmark, MapPin } from "lucide-react";
+import { getUserSavedItems } from "@/lib/actions/items";
+import { Bookmark, MapPin } from "lucide-react";
+import { CATEGORY_LABELS } from "@/lib/validation";
+import { RemoveSavedButton } from "@/components/saved/remove-saved-button";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +25,14 @@ export default async function SavedItemsPage() {
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <span className="section-eyebrow">Your saved reports</span>
-        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Saved Items</h1>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Saved Items</h1>
+          {savedItems.length > 0 && (
+            <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+              {savedItems.length} saved
+            </span>
+          )}
+        </div>
         <p className="mt-2 text-sm text-slate-500">Items you&apos;ve bookmarked for later.</p>
 
         {!savedItems || savedItems.length === 0 ? (
@@ -59,22 +68,7 @@ export default async function SavedItemsPage() {
                         {item?.title ?? "Unknown item"}
                       </h3>
                     </Link>
-                    <form
-                      action={async (formData: FormData) => {
-                        "use server";
-                        await unsaveItemAction(formData);
-                      }}
-                    >
-                      <input type="hidden" name="savedItemId" value={saved.id} />
-                      <button
-                        type="submit"
-                        aria-label="Remove from saved"
-                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                        title="Remove from saved"
-                      >
-                        <BookmarkX size={18} />
-                      </button>
-                    </form>
+                    <RemoveSavedButton savedId={saved.id} title={item?.title ?? "Unknown item"} />
                   </div>
                   <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">
                     {item?.description ?? "No description"}
@@ -83,10 +77,15 @@ export default async function SavedItemsPage() {
                     <MapPin size={13} className="text-blue-500" />
                     <span>{item?.city}, {item?.province}</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span className={`rounded-full border px-2.5 py-0.5 text-xs capitalize ${statusColor}`}>
-                      {item?.status ?? "active"}
-                    </span>
+                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full border px-2.5 py-0.5 text-xs capitalize ${statusColor}`}>
+                        {item?.status ?? "active"}
+                      </span>
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs text-slate-600">
+                        {CATEGORY_LABELS[(item?.category as keyof typeof CATEGORY_LABELS)] ?? "Other"}
+                      </span>
+                    </div>
                     <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
                       {isLost ? "Lost" : "Found"}
                     </span>

@@ -566,6 +566,58 @@ create policy "Admins can read contact_messages"
   );
 
 -- ============================================================================
+-- AVATAR STORAGE POLICIES — profile photos
+-- ----------------------------------------------------------------------------
+-- The front-end uploads profile photos to the public "avatars" Storage bucket
+-- (see src/lib/actions/profile.ts). The bucket is created here (as PUBLIC) so
+-- you don't need to click through the Storage UI — just run this file in the
+-- SQL Editor. These policies let anyone read avatars (so they render on
+-- reports/conversations) while each signed-in user can only INSERT / UPDATE /
+-- DELETE their own file, which the app stores at the path "<user_id>.<ext>".
+-- ----------------------------------------------------------------------------
+-- Create the public "avatars" bucket. Safe to re-run (ignores if it exists).
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+-- Note: storage.objects is owned by the `storage` schema. When running the
+-- whole schema.sql via the SQL editor as a project owner it works, but these
+-- statements must be run against the "storage" schema (they are NOT inside the
+-- `public` schema), so this block runs standalone at the end.
+drop policy if exists "Public avatar read" on storage.objects;
+create policy "Public avatar read"
+  on storage.objects for select
+  to public
+  using (bucket_id = 'avatars');
+
+drop policy if exists "Avatar insert own" on storage.objects;
+create policy "Avatar insert own"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+drop policy if exists "Avatar update own" on storage.objects;
+create policy "Avatar update own"
+  on storage.objects for update
+  to authenticated
+  using (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+drop policy if exists "Avatar delete own" on storage.objects;
+create policy "Avatar delete own"
+  on storage.objects for delete
+  to authenticated
+  using (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- ============================================================================
 -- REALTIME REPLICATION
 -- ----------------------------------------------------------------------------
 -- The front-end uses Supabase Realtime (postgres_changes subscriptions) to

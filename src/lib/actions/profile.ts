@@ -2,9 +2,89 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { profileSchema } from "@/lib/validation";
+import { getAvatarPublicUrl } from "@/lib/storage";
 import { revalidatePath } from "next/cache";
 
 export type ActionResult = { error: string } | { error?: undefined };
+
+const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const AVATAR_MAX_SIZE = 4 * 1024 * 1024; // 4 MB
+
+/**
+ * Uploads a profile photo for the signed-in user to the "avatars" bucket and
+ * returns its public URL. Re-uploading overwrites the same path so a user
+ * never accumulates dangling avatar files.
+ */
+export async function uploadAvatarAction(formData: FormData): Promise<{ avatarUrl?: string; error?: string }> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in to upload a photo" };
+  }
+
+  const file = formData.get("avatar") as File | null;
+  if (!file || file.size === 0) {
+    return { error: "Choose a photo to upload" };
+  }
+
+  if (!AVATAR_TYPES.includes(file.type)) {
+    return { error: "Only image files (JPEG, PNG, WebP, GIF) are allowed" };
+  }
+  if (file.size > AVATAR_MAX_SIZE) {
+    return { error: "Photo must be smaller than 4 MB" };
+  }
+
+  const ext = (file.name.split(".").pop()?.toLowerCase() ?? "jpg").replace(/[^a-z0-9]/g, "");
+  const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
+  const fileName = `${user.id}.${safeExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(fileName, file, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: file.type,
+    });
+
+  if (uploadError) {
+    console.error("Avatar upload error:", uploadError);
+    return { error: "Could not upload your photo. Please try again." };
+  }
+
+  return { avatarUrl: getAvatarPublicUrl(fileName) };
+}
+
+/**
+ * Removes the signed-in user's stored avatar file and clears the reference.
+ */
+export async function removeAvatarAction(): Promise<ActionResult> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in" };
+  }
+
+  // Delete any stored file for this user. Do this first so a failure doesn't
+  // leave a broken reference.
+  await supabase.storage.from("avatars").remove([`${user.id}.jpg`, `${user.id}.jpeg`, `${user.id}.png`, `${user.id}.webp`, `${user.id}.gif`]);
+
+  const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
+
+  if (error) {
+    console.error("Avatar remove error:", error);
+    return { error: "Could not remove your photo. Please try again." };
+  }
+
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard");
+  return {};
+}
 
 /**
  * Updates the signed-in user's public profile. Derives the target id from the

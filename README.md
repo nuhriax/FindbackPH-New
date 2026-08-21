@@ -19,7 +19,11 @@ Not yet built (Phase 4+, per the phased plan): matching engine, messaging, notif
 1. Create a project at supabase.com (region: Singapore, closest to PH).
 2. In **SQL Editor**, paste and run the entire contents of `supabase/schema.sql`.
 3. In **Storage**, create a public bucket named `item-images` (used starting in the image-upload phase).
-4. Copy your keys from **Project Settings → API**.
+4. In **Storage**, create a public bucket named `avatars` (used for profile photos). New users can only upload their own photo, so add an RLS/storage policy that allows `INSERT` and `UPDATE` on objects in `avatars` for `auth.uid()` and public `SELECT` (so photos render everywhere). Example policies:
+   - `SELECT` → `bucket_id = 'avatars'` (public read)
+   - `INSERT` → `bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text`
+   - `UPDATE`/`DELETE` → `bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text`
+5. Copy your keys from **Project Settings → API**.
 
 ### 2. Environment variables
 ```bash

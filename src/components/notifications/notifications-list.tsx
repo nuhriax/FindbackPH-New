@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import { Bell, HeartHandshake, PackageCheck, ShieldAlert } from "lucide-react";
 import { markNotificationRead, markAllNotificationsRead } from "@/lib/actions/messaging";
 import { useToast } from "@/components/ui/toast";
@@ -14,12 +15,37 @@ function notificationIcon(type: string) {
   return { Icon: Bell, cls: "border-indigo-200 bg-indigo-50 text-indigo-600" };
 }
 
+const FILTERS = [
+  { key: "all", label: "All" },
+  { key: "match", label: "Matches" },
+  { key: "message", label: "Messages" },
+  { key: "update", label: "Updates" },
+] as const;
+type FilterKey = (typeof FILTERS)[number]["key"];
+
+function isMatch(type: string) {
+  return type === "possible_match";
+}
+function isMessage(type: string) {
+  return type === "new_message";
+}
+function matchesFilter(type: string, filter: FilterKey) {
+  if (filter === "all") return true;
+  if (filter === "match") return isMatch(type);
+  if (filter === "message") return isMessage(type);
+  return !isMatch(type) && !isMessage(type);
+}
+
 export function NotificationsList({ initial }: { initial: Notification[] }) {
   const [items, setItems] = useState(initial);
   const [isPending, startTransition] = useTransition();
+  const [filter, setFilter] = useState<FilterKey>("all");
   const { toast } = useToast();
 
   const unreadCount = items.filter((n) => !n.read).length;
+  const filtered = items.filter((n) => matchesFilter(n.type, filter));
+  const filteredUnread = filtered.filter((n) => !n.read).length;
+  const hasOthers = filtered.length === 0 && items.length > 0;
 
   function markRead(id: string) {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
@@ -53,9 +79,27 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
 
   return (
     <div>
+      {/* Filter tabs */}
+      <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        {FILTERS.map((f) => (
+          <button
+            key={f.key}
+            type="button"
+            onClick={() => setFilter(f.key)}
+            className={
+              filter === f.key
+                ? "rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-sm font-medium text-blue-700"
+                : "rounded-full border border-transparent px-3.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-white/70 hover:text-blue-700"
+            }
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-slate-500">
-          {unreadCount > 0 ? `${unreadCount} unread` : "No unread notifications"}
+          {filteredUnread > 0 ? `${filteredUnread} unread` : "No unread notifications"}
         </p>
         <button
           type="button"
@@ -67,42 +111,47 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
         </button>
       </div>
 
-      <div className="space-y-2.5">
-        {items.map((n) => {
-          const { Icon, cls } = notificationIcon(n.type);
-          const isRead = !!n.read;
-          return (
-            <Link
-              key={n.id}
-              href={n.link ?? "/dashboard"}
-              onClick={() => {
-                if (!isRead) markRead(n.id);
-              }}
-              className={`card flex items-start gap-4 p-4 transition-all duration-200 hover:-translate-y-px hover:shadow-card-hover ${
-                isRead ? "opacity-70" : "border-blue-200/80"
-              }`}
-            >
-              <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${cls}`}>
-                <Icon size={18} aria-hidden="true" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-medium text-navy-900">{n.title}</h3>
-                  {!isRead && <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />}
-                </div>
-                <p className="mt-1 text-sm text-slate-600">{n.message}</p>
-                <span className="mt-1.5 inline-block text-xs text-slate-500">
-                  {new Date(n.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+      {hasOthers ? (
+        <div className="rounded-card border border-slate-200/70 bg-white/70 p-10 text-center shadow-soft backdrop-blur-md">
+          <h3 className="font-display text-base font-semibold text-navy-900">Nothing in this category</h3>
+          <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-slate-600">
+            No notifications of this type yet. Try another filter, or check back later.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {filtered.map((n) => {
+            const { Icon, cls } = notificationIcon(n.type);
+            const isRead = !!n.read;
+            return (
+              <Link
+                key={n.id}
+                href={n.link ?? "/dashboard"}
+                onClick={() => {
+                  if (!isRead) markRead(n.id);
+                }}
+                className={`card flex items-start gap-4 p-4 transition-all duration-200 hover:-translate-y-px hover:shadow-card-hover ${
+                  isRead ? "opacity-70" : "border-blue-200/80"
+                }`}
+              >
+                <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${cls}`}>
+                  <Icon size={18} aria-hidden="true" />
                 </span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-medium text-navy-900">{n.title}</h3>
+                    {!isRead && <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />}
+                  </div>
+                  <p className="mt-1 text-sm text-slate-600">{n.message}</p>
+                  <span className="mt-1.5 inline-block text-xs text-slate-500">
+                    {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -12,21 +12,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/login");
   }
 
-  let isAdmin = false;
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, first_name, last_name, username, avatar_url")
     .eq("id", user.id)
     .single();
 
-  if (profile) {
-    isAdmin = profile.role === "admin" || profile.role === "moderator";
-  }
+  const isAdmin = profile ? profile.role === "admin" || profile.role === "moderator" : false;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
-      <DashboardNav isAdmin={isAdmin} />
-      <div className="mt-8">{children}</div>
+    <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-5 sm:px-6 sm:pt-6">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
+        <aside className="lg:sticky lg:top-6 lg:w-60 lg:shrink-0">
+          <DashboardNav isAdmin={isAdmin} profile={profile} />
+        </aside>
+        <div className="min-w-0 flex-1 pb-10">{children}</div>
+      </div>
     </div>
   );
 }

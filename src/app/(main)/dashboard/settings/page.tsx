@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { AlertTriangle, CheckCircle2, KeyRound, ShieldCheck, Trash2 } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { AlertTriangle, Bell, CheckCircle2, KeyRound, Mail, ShieldCheck, Trash2 } from "lucide-react";
 import { changePasswordAction, deleteAccountAction } from "@/lib/actions/settings";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
   return (
@@ -16,7 +17,9 @@ export default function SettingsPage() {
       </p>
 
       <div className="mt-8 space-y-6">
+        <AccountDetailsCard />
         <ChangePasswordCard />
+        <NotificationsPrefsCard />
         <PrivacyCard />
         <DeleteAccountCard />
       </div>
@@ -84,6 +87,118 @@ function ChangePasswordCard() {
     </section>
   );
 }
+function AccountDetailsCard() {
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const run = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setEmail(user?.email ?? null);
+    };
+    run();
+  }, []);
+
+  return (
+    <section className="card p-6 sm:p-7">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600">
+          <Mail size={18} />
+        </span>
+        <div>
+          <h2 className="font-display text-base font-semibold text-navy-900">Account &amp; email</h2>
+          <p className="mt-0.5 text-sm text-slate-500">The email we use to sign you in and reach you.</p>
+          <div className="mt-4 rounded-xl border border-slate-200/70 bg-slate-50/60 px-4 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Email address</p>
+            <p className="mt-0.5 text-sm font-medium text-navy-900">{email ?? "Loading…"}</p>
+          </div>
+          <p className="mt-3 text-xs leading-5 text-slate-500">
+            To change your email, sign out and reset your password, or contact support. Your email is
+            never shown publicly on FindBack PH.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const PREF_KEY = "fb-notif-prefs";
+const PREF_DEFAULTS = { matches: true, messages: true, returned: true, digest: false };
+
+function NotificationsPrefsCard() {
+  const [prefs, setPrefs] = useState<typeof PREF_DEFAULTS>(() => {
+    if (typeof window === "undefined") return PREF_DEFAULTS;
+    try {
+      return { ...PREF_DEFAULTS, ...(JSON.parse(localStorage.getItem(PREF_KEY) ?? "{}") as Partial<typeof PREF_DEFAULTS>) };
+    } catch {
+      return PREF_DEFAULTS;
+    }
+  });
+
+  function toggle(key: keyof typeof PREF_DEFAULTS) {
+    setPrefs((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem(PREF_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  const ROWS: { key: keyof typeof PREF_DEFAULTS; title: string; desc: string }[] = [
+    { key: "matches", title: "Possible matches", desc: "When a found item may match one of your lost reports." },
+    { key: "messages", title: "Messages", desc: "When someone starts or replies to a conversation with you." },
+    { key: "returned", title: "Item returned", desc: "When a report you contacted is marked as returned." },
+    { key: "digest", title: "Weekly digest", desc: "A summary of activity every Monday morning." },
+  ];
+
+  return (
+    <section className="card p-6 sm:p-7">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-600">
+          <Bell size={18} />
+        </span>
+        <div>
+          <h2 className="font-display text-base font-semibold text-navy-900">Notification preferences</h2>
+          <p className="mt-0.5 text-sm text-slate-500">Choose which updates you want to receive.</p>
+        </div>
+      </div>
+
+      <div className="mt-5 divide-y divide-slate-100">
+        {ROWS.map((row) => (
+          <div key={row.key} className="flex items-center justify-between gap-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-navy-900">{row.title}</p>
+              <p className="text-xs text-slate-500">{row.desc}</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={prefs[row.key]}
+              aria-label={row.title}
+              onClick={() => toggle(row.key)}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                prefs[row.key] ? "bg-emerald-500" : "bg-slate-300"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  prefs[row.key] ? "translate-x-[22px]" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-2 text-xs text-slate-500">
+        These preferences are stored on this device. In-app notifications always appear on the
+        Notifications page.
+      </p>
+    </section>
+  );
+}
+
 function PrivacyCard() {
   return (
     <section className="card p-6 sm:p-7">

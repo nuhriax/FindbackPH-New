@@ -23,8 +23,11 @@ export async function ConversationsList() {
         .eq("id", otherId)
         .single();
 
+      const itemTable = convo.item_type === "lost_item" ? "lost_items" : "found_items";
+      const { data: item } = await supabase.from(itemTable).select("title").eq("id", convo.item_id).single();
+
       const lastMessage = (convo as any).messages?.[0];
-      return { ...convo, otherParticipant: profile, lastMessage };
+      return { ...convo, otherParticipant: profile, lastMessage, itemTitle: item?.title ?? null };
     })
   );
 
@@ -55,13 +58,6 @@ export async function ConversationsList() {
         const unreadCount =
           (convo as any).messages?.filter((m: any) => m.sender_id !== user.id && !m.read_by_receiver).length ?? 0;
 
-        let itemTitle = "Item";
-        if (convo.item_type === "lost_item") {
-          itemTitle = "Lost Item";
-        } else {
-          itemTitle = "Found Item";
-        }
-
         return (
           <Link
             key={convo.id}
@@ -76,8 +72,13 @@ export async function ConversationsList() {
                 <span className="font-medium text-navy-900">
                   {other?.first_name ? `${other.first_name} ${other.last_name}` : other?.username ?? "Someone"}
                 </span>
-                <span className="text-xs text-slate-500">{itemTitle}</span>
+                <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                  {convo.item_type === "lost_item" ? "Lost" : "Found"}
+                </span>
               </div>
+              {convo.itemTitle && (
+                <p className="mt-0.5 truncate text-xs font-medium text-blue-600">{convo.itemTitle}</p>
+              )}
               {lastMsg ? (
                 <p className="truncate text-sm text-slate-600">
                   {lastMsg.sender_id === user.id ? "You: " : ""}

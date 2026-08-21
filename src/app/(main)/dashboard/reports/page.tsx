@@ -88,6 +88,11 @@ export default async function MyReportsPage({
     }
   });
 
+  const totalReports = reports.length;
+  const activeCount = reports.filter((r) => r.status === "active" || r.status === "matched").length;
+  const recoveredCount = reports.filter((r) => r.status === "recovered").length;
+  const archivedCount = reports.filter((r) => r.status === "archived").length;
+
   return (
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -104,6 +109,14 @@ export default async function MyReportsPage({
           <Plus size={16} />
           New report
         </Link>
+      </div>
+
+      {/* Summary stats */}
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryTile label="Total reports" value={totalReports} tone="blue" />
+        <SummaryTile label="Active" value={activeCount} tone="sunrise" />
+        <SummaryTile label="Returned" value={recoveredCount} tone="emerald" />
+        <SummaryTile label="Archived" value={archivedCount} tone="slate" />
       </div>
 
       {/* Filters */}
@@ -127,16 +140,30 @@ export default async function MyReportsPage({
         ))}
       </div>
 
-      {/* List */}
+      {/* Table */}
       <div className="mt-6 overflow-hidden rounded-card border border-slate-200/70 bg-white/70 shadow-soft">
         {reports.length === 0 ? (
           <EmptyReports />
         ) : (
-          <ul className="divide-y divide-slate-100">
-            {reports.map((report) => (
-              <ReportListItem key={`${report.kind}-${report.id}`} report={report} />
-            ))}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="border-b border-slate-200/70 bg-slate-50/70">
+                <tr className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Report</th>
+                  <th className="hidden px-4 py-3 sm:table-cell">Location</th>
+                  <th className="hidden px-4 py-3 md:table-cell">Created</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {reports.map((report) => (
+                  <ReportRow key={`${report.kind}-${report.id}`} report={report} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
@@ -181,50 +208,52 @@ export default async function MyReportsPage({
     );
   }
 
-  function ReportListItem({ report }: { report: ReportRow }) {
+  function ReportRow({ report }: { report: ReportRow }) {
     const href = report.kind === "lost" ? `/lost/${report.id}` : `/found/${report.id}`;
     return (
-      <li className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center">
-        <div className="flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={
-                report.kind === "lost"
-                  ? "rounded-full border border-sunrise-200 bg-sunrise-50 px-2 py-0.5 text-xs font-medium text-sunrise-700"
-                  : "rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
-              }
-            >
-              {report.kind === "lost" ? "Lost" : "Found"}
-            </span>
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
-              {CATEGORY_LABELS[report.category as keyof typeof CATEGORY_LABELS] ?? report.category}
-            </span>
-            <StatusPill status={report.status} />
-          </div>
-          <Link
-            href={href}
-            className="mt-2 block font-display text-base font-semibold text-navy-900 hover:text-blue-700"
+      <tr className="align-middle transition-colors hover:bg-white/70">
+        <td className="px-4 py-3">
+          <span
+            className={
+              report.kind === "lost"
+                ? "inline-flex rounded-full border border-sunrise-200 bg-sunrise-50 px-2 py-0.5 text-[11px] font-semibold text-sunrise-700"
+                : "inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700"
+            }
           >
+            {report.kind === "lost" ? "Lost" : "Found"}
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <Link href={href} className="font-medium text-navy-900 hover:text-blue-700">
             {report.title}
           </Link>
-          <p className="mt-1 text-xs text-slate-500">
-            {[report.city, report.province].filter(Boolean).join(", ") || "Location not set"}
-            {report.created_at ? ` · ${formatDate(report.created_at)}` : ""}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Link href={href} className="btn-ghost !py-2 text-sm">
-            <Eye size={15} />
-            View
-          </Link>
-          <ReportActions
-            itemType={report.kind === "lost" ? "lost_item" : "found_item"}
-            itemId={report.id}
-            status={report.status}
-          />
-        </div>
-      </li>
+          <span className="mt-0.5 hidden text-xs text-slate-500 sm:block">
+            {CATEGORY_LABELS[report.category as keyof typeof CATEGORY_LABELS] ?? report.category}
+          </span>
+        </td>
+        <td className="hidden px-4 py-3 text-sm text-slate-600 sm:table-cell">
+          {[report.city, report.province].filter(Boolean).join(", ") || "—"}
+        </td>
+        <td className="hidden px-4 py-3 text-xs text-slate-500 md:table-cell">
+          {report.created_at ? formatDate(report.created_at) : "—"}
+        </td>
+        <td className="px-4 py-3">
+          <StatusPill status={report.status} />
+        </td>
+        <td className="px-4 py-3">
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            <Link href={href} className="btn-ghost !px-2.5 !py-1.5 text-xs">
+              <Eye size={14} />
+              View
+            </Link>
+            <ReportActions
+              itemType={report.kind === "lost" ? "lost_item" : "found_item"}
+              itemId={report.id}
+              status={report.status}
+            />
+          </div>
+        </td>
+      </tr>
     );
   }
 }
@@ -247,4 +276,33 @@ function StatusPill({ status }: { status: ItemStatus }) {
   const tone = STATUS_TONES[status] ?? "border-slate-200 bg-slate-100 text-slate-700";
   const label = status === "recovered" ? "Returned" : status;
   return <span className={`rounded-full border px-2 py-0.5 text-xs capitalize ${tone}`}>{label}</span>;
+}
+
+const SUMMARY_TONES: Record<string, string> = {
+  blue: "border-blue-200 bg-blue-50 text-blue-600",
+  sunrise: "border-sunrise-200 bg-sunrise-50 text-sunrise-600",
+  emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
+  slate: "border-slate-200 bg-slate-100 text-slate-600",
+};
+
+function SummaryTile({ label, value, tone }: { label: string; value: number; tone: keyof typeof SUMMARY_TONES }) {
+  return (
+    <div className="card flex items-center gap-3 p-4">
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${SUMMARY_TONES[tone]}`}>
+        <span className="font-display text-sm font-bold tabular-nums">{value}</span>
+      </span>
+      <div>
+        <p className="text-sm font-semibold text-navy-900">{label}</p>
+        <p className="text-xs text-slate-500">
+          {label === "Total reports"
+            ? "across lost & found"
+            : label === "Active"
+              ? "currently being matched"
+              : label === "Returned"
+                ? "successfully reunited"
+                : "stored for later"}
+        </p>
+      </div>
+    </div>
+  );
 }
