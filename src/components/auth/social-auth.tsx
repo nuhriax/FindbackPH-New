@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { TriangleAlert } from "lucide-react";
 
-type Provider = "google" | "facebook";
+type Provider = "google" | "facebook" | "apple";
 
 const LOGOS: Record<Provider, React.ReactNode> = {
   google: (
@@ -35,11 +35,20 @@ const LOGOS: Record<Provider, React.ReactNode> = {
       />
     </svg>
   ),
+  apple: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="#555555"
+        d="M17.05 2.5c-.08.7-.14 1.4-.2 2.1l-1.2 1.6-1.4 2.2-2.2 3.6-2.6 4.6-2.9 5.6-3 7-2.9 7-2.2 7.6-1.8 8.2-1.6 8.2-.8 8.4 0 8.6.4 8.6.6 8.8 1 9 1.2 9.6 2 10 2.2 10.4 2 10.8 3.3.1.2.21.23.22.23.23.24.25.26.27.28.29.291.3.31.32.33.34.35.36.37.38.39.4.41.42.43.44.45.46.47.48.49.5.51.52.53.54.55.56.57.58.59.6.61.62.63.64.65.66.67.68.69.7.71.72.73.74.75.76.77.78.798.8.81.82.83.84.85.86.87.88.89.9.91.92.93.94.95.96.97.98.991.1.01.11.21.31.41.51.61.71.81.92.12.22.32.42.52.62.72.82.93.13.23.33.43.53.63.73.83.94.14.24.34.44.54.64.74.84.95.15.25.35.45.55.65.75.85.96.16.26.36.46.56.66.76.86.97.17.27.37.47.57.67.77.87.98.18.28.38.48.58.68.78.88.99.19.29.39.49.59.69.79.89.99"
+      />
+    </svg>
+  ),
 };
 
 const LABELS: Record<Provider, string> = {
   google: "Continue with Google",
   facebook: "Continue with Facebook",
+  apple: "Continue with Apple",
 };
 
 /**
@@ -79,7 +88,7 @@ export function SocialAuthButtons({ next = "/dashboard" }: { next?: string }) {
         </p>
       )}
       <div className="auth-oauth">
-        {(["google", "facebook"] as const).map((provider) => (
+        {(["google", "facebook", "apple"] as const).map((provider) => (
           <button
             key={provider}
             type="button"

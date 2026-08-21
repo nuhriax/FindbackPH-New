@@ -22,7 +22,27 @@
  * (Account menu -> Access Tokens -> Generate new token)
  * -----------------------------------------------------------------------------
  */
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync } from "node:fs";
+
+/**
+ * Load a .env file (KEY=value lines, # for comments) into process.env
+ * without overwriting existing variables.
+ */
+function loadDotEnv(path) {
+  if (!existsSync(path)) return;
+  for (const rawLine of readFileSync(path, "utf8").split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    const val = line.slice(eq + 1).trim();
+    if (!(key in process.env)) process.env[key] = val;
+  }
+}
+
+loadDotEnv(".env.local");
 
 const config = {
   // ---- Your values go here ---------------------------------------------------
