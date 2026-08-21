@@ -52,18 +52,17 @@ from the environment variables `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`
 ---
 
 ## Step 3 — Turn on the providers in Supabase (AUTOMATED)
-You need a Supabase **Personal Access Token** (NOT the anon/service keys):
-1. <https://supabase.com/dashboard/account/tokens> → **Generate new token** → copy it.
-2. Open `scripts/configure-oauth.mjs` and paste in:
-   - `supabaseAccessToken`
-   - `googleClientId` / `googleClientSecret`
-   - `facebookAppId` / `facebookAppSecret`
-   (or set the matching `SUPABASE_ACCESS_TOKEN`, `GOOGLE_CLIENT_ID`, etc. env vars).
-3. Run it:
-   ```bash
-   node scripts/configure-oauth.mjs
-   ```
-4. It prints the redirect URI confirmation. Done — providers are **ENABLED**.
+The script reads Google / Facebook / Supabase values from `.env.local`
+(and from env vars `SUPABASE_ACCESS_TOKEN` / `GOOGLE_CLIENT_ID` / etc.).
+So your credentials just need to live in `.env.local`, then run:
+```bash
+node scripts/configure-oauth.mjs
+```
+It prints the redirect URI confirmation. Done — providers are **ENABLED**.
+
+> You need a valid Supabase **Personal Access Token** set as `SUPABASE_ACCESS_TOKEN`
+> for the script to authenticate: <https://supabase.com/dashboard/account/tokens>.
+> The anon/service keys won't work here — this is the management token only.
 
 ---
 
@@ -82,6 +81,37 @@ http://localhost:3000
 2. Click **"Continue with Google"** → sign in → you should land on the Dashboard.
 3. Click **"Continue with Facebook"** → same.
 4. Both work → your authentication is complete. 🎉
+
+---
+
+## Step 6 — Deploy to Vercel & set env vars there
+Your local `.env.local` does **not** reach Vercel — the public site reads vars from
+**Vercel's** Environment Variables. So after you deploy:
+
+1. In the Vercel dashboard, open your `findback-ph` project →
+   **Settings → Environment Variables** → add **each** of these with your real values:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY
+   NEXT_PUBLIC_SITE_URL
+   GOOGLE_CLIENT_ID
+   GOOGLE_CLIENT_SECRET
+   FACEBOOK_APP_ID
+   FACEBOOK_APP_SECRET
+   ```
+2. `NEXT_PUBLIC_SITE_URL` must be your **live** origin (e.g. `https://findback-ph.vercel.app`),
+   **not** `localhost`, or OAuth/email links will redirect to your PC.
+3. Rename the file `.env.example` → `.env` and fill the same values if you want a
+   portable copy — but the **deployed** copy of these vars is what matters for the live site.
+4. Redeploy (or trigger a new deploy from the **Deployments** tab) so the build picks
+   up the new env vars.
+5. Open `https://findback-ph.vercel.app/login` — if it loads instead of HTTP 500 and
+   the Google/Facebook buttons work, you're done. If it still 500s, a var is missing.
+
+> If you see **HTTP 500 on every page**, it is almost always a missing
+> `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel —
+> add both and redeploy.
 
 ---
 
