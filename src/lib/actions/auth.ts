@@ -48,11 +48,14 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
       // Route the email-confirmation link through this app's PKCE callback page
       // (the same handler already used by OAuth + password reset) so signup
       // confirmation keeps working regardless of the dashboard's redirect
-      // defaults. Only set when NEXT_PUBLIC_SITE_URL exists — if it's missing,
-      // the value is undefined and Supabase falls back to its dashboard default,
-      // so this stays a no-op and never breaks existing auth.
+      // defaults. The `signup=1` marker lets the callback tell a signup
+      // confirmation apart from a Google/Facebook OAuth login and route
+      // confirmed accounts to the dedicated "email verified" screen. Only set
+      // when NEXT_PUBLIC_SITE_URL exists — if it's missing, the value is
+      // undefined and Supabase falls back to its dashboard default, so this
+      // stays a no-op and never breaks existing auth.
       emailRedirectTo: process.env.NEXT_PUBLIC_SITE_URL
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?signup=1`
         : undefined,
     },
   });

@@ -13,6 +13,7 @@ const CHROME_FREE = new Set([
   "/forgot-password",
   "/reset-password",
   "/auth/callback",
+  "/verify-success",
 ]);
 
 /**

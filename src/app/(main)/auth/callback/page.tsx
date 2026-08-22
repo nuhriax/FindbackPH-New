@@ -41,7 +41,15 @@ function CallbackInner() {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (cancelled) return;
         if (!error) {
-          router.replace(target);
+          // Signup email-confirmation links carry `signup=1`, so confirmed
+          // accounts land on a dedicated "email verified" screen instead of
+          // being silently pushed to the dashboard. OAuth and password-reset
+          // flows never set this flag, so they keep the existing behavior.
+          if (searchParams.get("signup") === "1") {
+            router.replace("/verify-success");
+          } else {
+            router.replace(target);
+          }
           router.refresh();
         } else {
           router.replace("/login?error=callback");
