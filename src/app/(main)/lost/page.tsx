@@ -198,9 +198,9 @@ function buildPageHref({
    ========================================================================== */
 
 export const metadata = {
-  title: "Lost Items — Find What You Lost | FindBack PH",
+  title: { absolute: "Lost Items Philippines — Find What You Lost" },
   description:
-    "Browse active lost item reports from your community and take the next step to reunite with what went missing.",
+    "Browse active lost-item reports across the Philippines. Search by category and city, spot a possible match, and take the next step to reunite with what went missing.",
 };
 
 export default async function LostItemsPage({

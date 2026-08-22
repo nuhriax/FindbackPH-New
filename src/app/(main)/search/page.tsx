@@ -13,8 +13,9 @@ import {
 import { CommunityMotif } from "@/components/ui/community-motif";
 
 export const metadata = {
-  title: "Search — FindBack PH",
-  description: "Search lost and found reports on FindBack PH.",
+  title: "Search Lost & Found Items",
+  description:
+    "Search lost and found reports across the Philippines by keyword, category, and city to find a match for what you've lost or found.",
 };
 
 type SearchPageProps = {

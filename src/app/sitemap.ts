@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
  * Static sitemap for publicly crawlable routes.
  * The base URL is configurable so it works in any preview environment.
  */
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://findback.ph";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://findbackph.me";
 
 const now = new Date();
 

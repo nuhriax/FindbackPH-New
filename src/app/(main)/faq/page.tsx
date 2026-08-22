@@ -45,7 +45,7 @@ const faqs = [
 ];
 
 export const metadata = {
-  title: "FAQ — FindBack PH",
+  title: "FAQ — Lost & Found Questions Answered",
   description:
     "Answers to common questions about reporting, searching for, and safely returning lost and found items on FindBack PH.",
 };

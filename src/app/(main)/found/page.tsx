@@ -451,9 +451,9 @@ function imageMap(
    ========================================================================== */
 
 export const metadata = {
-  title: "Found Items — Help Return What Was Found | FindBack PH",
+  title: { absolute: "Found Items Philippines — Help Return Them" },
   description:
-    "Browse active found item reports from your community and help return something to its rightful owner.",
+    "Browse found-item reports across the Philippines and help return something to its rightful owner. Search by category and city, then connect safely.",
 };
 
 export default async function FoundItemsPage({

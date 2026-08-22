@@ -209,9 +209,9 @@ const stats = [
 ];
 
 export const metadata = {
-  title: "How It Works — FindBack PH",
+  title: { absolute: "How FindBack PH Works — 6 Simple Steps" },
   description:
-    "FindBack PH in six simple steps — report an item, search the community, find a possible match, connect privately, meet safely, and return it home.",
+    "Report an item, search the community, find a possible match, connect privately, meet safely, and bring it home. Learn how FindBack PH reunites lost and found items in six steps.",
 };
 
 export default function HowItWorksPage() {

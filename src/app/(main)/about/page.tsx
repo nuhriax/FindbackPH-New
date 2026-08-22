@@ -258,9 +258,9 @@ function ButtonLink({
 // =============================================================
 
 export const metadata = {
-  title: "About — FindBack PH",
+  title: { absolute: "About FindBack PH — Helping Things Come Home" },
   description:
-    "FindBack PH helps Philippine communities reconnect people with the things they lost — through smart matching, private messaging, and safe returns.",
+    "FindBack PH is a Philippine community platform that reconnects people with lost items through smart matching, private messaging, and safe returns.",
 };
 
 export default async function AboutPage() {

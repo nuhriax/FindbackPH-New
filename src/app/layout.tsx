@@ -12,17 +12,21 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://findback.ph"),
-  title: "FindBack PH — Lost & Found Philippines",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://findbackph.me"),
+  title: {
+    // Pages that don't export their own title get "<title> — FindBack PH".
+    default: "FindBack PH — Lost & Found Philippines",
+    template: "%s | FindBack PH",
+  },
   description:
-    "FindBack PH connects people who lost something with people who found it — safely, quickly, and locally.",
+    "FindBack PH is the Philippines' community lost-and-found platform. Report a lost or found item, search local reports, match safely, and reunite things with their owners.",
   applicationName: "FindBack PH",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "FindBack PH — Lost & Found Philippines",
-    description: "Lost something? Let's bring it back.",
+    description: "Lost something in the Philippines? FindBack PH helps you find it.",
     url: "/",
     siteName: "FindBack PH",
     locale: "en_PH",
@@ -31,18 +35,20 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "FindBack PH — Lost & Found Philippines",
-    description: "Lost something? Let's bring it back.",
+    description: "Lost something in the Philippines? FindBack PH helps you find it.",
   },
   robots: {
     index: true,
     follow: true,
   },
-  // Google Search Console site ownership. Renders a <meta name="google-site-verification">
-  // tag only when NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION is set (the "HTML tag" method).
-  // Without it, no verification tag is emitted — safe, and requires a redeploy
-  // (a git push) after adding the value for it to take effect.
+  // Search-engine site ownership. Renders verification <meta> tags only when the
+  // corresponding env vars are set (the "HTML tag" method), so nothing is emitted
+  // until a value is added. Adding a value requires a redeploy (a git push).
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+      : {}),
   },
 };
 
@@ -72,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "FindBack PH",
-              url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://findback.ph",
+              url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://findbackph.me",
               description:
                 "FindBack PH connects people who lost something with people who found it — safely, quickly, and locally.",
             }),

@@ -44,9 +44,11 @@ import type {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "FindBack PH — Reunite Lost & Found Items",
+  title: {
+    absolute: "FindBack PH — Philippines' Lost & Found Community",
+  },
   description:
-    "FindBack PH helps Philippine communities reunite with lost items and return found ones — search community reports, report an item, and bring things home safely.",
+    "Search and report lost or found items anywhere in the Philippines. Post what you lost or found, get matched with a possible owner, and reunite safely with FindBack PH.",
 };
 
 /* ============================================================================
