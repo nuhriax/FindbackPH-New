@@ -37,6 +37,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // Google Search Console site ownership. Renders a <meta name="google-site-verification">
+  // tag only when NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION is set (the "HTML tag" method).
+  // Without it, no verification tag is emitted — safe, and requires a redeploy
+  // (a git push) after adding the value for it to take effect.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
