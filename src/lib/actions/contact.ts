@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { contactSchema } from "@/lib/validation";
 
-export type ActionResult = { error: string } | { success: boolean } | { error?: undefined; success?: undefined };
+export type ActionResult = { error?: string; success?: boolean };
 
 /**
  * Persists a contact form submission. The submitter's id is stored (only if

@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { HeartHandshake, MapPin, ShieldCheck, Sparkles } from "lucide-react";
+import { Facebook, HeartHandshake, Instagram, Mail, MapPin, ShieldCheck, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const EXPLORE = [
@@ -20,9 +20,20 @@ const INFORMATION = [
   { label: "Terms", href: "/terms" },
 ];
 
+const SOCIALS = [
+  { icon: Facebook, label: "Facebook", href: "#" },
+  { icon: Instagram, label: "Instagram", href: "#" },
+  { icon: Mail, label: "Email", href: "mailto:findback.support@gmail.com" },
+];
+
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-ice-200/80 bg-white/70 text-navy-900 backdrop-blur-xl">
+    <footer className="relative overflow-hidden border-t border-ice-200/80 bg-gradient-to-b from-white via-white/80 to-ice-50/50 text-navy-900 backdrop-blur-xl">
+      {/* Soft top accent line */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-electric-300/60 to-transparent"
+      />
       {/* Faint illustrated map pattern behind the footer */}
       <div
         aria-hidden="true"
@@ -50,14 +61,27 @@ export function Footer() {
         className="pointer-events-none absolute -left-20 top-1/3 h-56 w-56 rounded-full bg-emerald-50/60 blur-[100px]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr]">
+      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1.3fr] md:items-start lg:gap-12">
           {/* Brand */}
           <div>
             <Logo variant="dark" />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
+              Helping Philippine communities reconnect people with the things
+              they&apos;ve lost — safely, quickly, and locally.
+            </p>
+          </div>
 
+          {/* Explore */}
+          <FooterColumn title="Explore" links={EXPLORE} />
+
+          {/* Information */}
+          <FooterColumn title="Information" links={INFORMATION} />
+
+          {/* Community / trust rail */}
+          <div className="flex flex-col items-start">
             {/* Community “path home” motif */}
-            <div aria-hidden="true" className="mt-8 h-12 w-36">
+            <div aria-hidden="true" className="h-9 w-32">
               <svg viewBox="0 0 160 48" fill="none" className="h-full w-full">
                 <circle cx="126" cy="13" r="6" fill="#F6E7BF" opacity="0.8" />
                 <path d="M0 40 C24 34 40 36 60 31 C84 27 100 34 118 30 C132 28 146 30 160 28 V48 H0 Z" fill="#BBE0C0" opacity="0.5" />
@@ -70,13 +94,9 @@ export function Footer() {
                 <path d="M133 25 q2 -3 5 0 q2 -3 5 0" stroke="#9FB6D8" strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.7" />
               </svg>
             </div>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-500">
-              Helping Philippine communities reconnect people with the things
-              they&apos;ve lost — safely, quickly, and locally.
-            </p>
 
             {/* Trust / security */}
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {[
                 { icon: ShieldCheck, label: "Verified Reports" },
                 { icon: HeartHandshake, label: "Community Driven" },
@@ -84,26 +104,38 @@ export function Footer() {
               ].map((b) => (
                 <span
                   key={b.label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-electric-100 bg-electric-50/70 px-2.5 py-1 text-[11px] font-medium text-electric-700"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-electric-100/80 bg-electric-50/60 px-2.5 py-1 text-[11px] font-medium text-electric-700"
                 >
                   <b.icon size={12} /> {b.label}
                 </span>
               ))}
             </div>
-          </div>
 
-          {/* Explore */}
-          <FooterColumn title="Explore" links={EXPLORE} />
-          {/* Information */}
-          <FooterColumn title="Information" links={INFORMATION} />
+            {/* Socials */}
+            <div className="mt-4 flex items-center gap-2.5">
+              {SOCIALS.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  aria-label={s.label}
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={s.href.startsWith("http") ? "noreferrer" : undefined}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-ice-200/80 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-electric-300 hover:bg-electric-500 hover:text-white hover:shadow-[0_8px_20px_-8px_rgba(15,123,122,0.6)]"
+                >
+                  <s.icon size={16} />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-ice-200/80 pt-6 sm:flex-row">
-          <p className="flex items-center gap-1.5 text-xs text-slate-400">
-            <MapPin size={12} className="text-electric-500" />
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-ice-200/70 pt-5 sm:flex-row">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+            <MapPin size={13} className="text-electric-500" />
             © {new Date().getFullYear()} FindBack PH
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="flex items-center gap-1.5 text-xs text-slate-400">
+            <HeartHandshake size={13} className="text-electric-400" />
             A safe and trusted community. Made to help things find their way home.
           </p>
         </div>
@@ -121,14 +153,20 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-navy-900">{title}</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          {title}
+        </h3>
+        <span className="mt-px h-px w-6 rounded-full bg-electric-300/70" />
+      </div>
       <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
           <li key={link.label}>
             <Link
               href={link.href}
-              className="text-sm text-slate-500 transition-colors hover:text-electric-600"
+              className="group inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-electric-600"
             >
+              <span className="h-1 w-1 rounded-full bg-electric-500 opacity-0 transition-opacity group-hover:opacity-100" />
               {link.label}
             </Link>
           </li>
@@ -137,4 +175,3 @@ function FooterColumn({
     </div>
   );
 }
-

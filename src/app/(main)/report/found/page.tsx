@@ -114,8 +114,7 @@ export default function ReportFoundPage() {
         </div>
 
         <form action={handleSubmit} className="card mt-6 p-6 sm:p-8">
-          {step === 1 && (
-            <div className="space-y-5">
+          <div className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="title" className="label">Item name</label>
                 <input id="title" name="title" required placeholder="e.g. Silver house keys" className="input" />
@@ -142,10 +141,8 @@ export default function ReportFoundPage() {
                 <textarea id="distinguishingFeatures" name="distinguishingFeatures" rows={2} className="input" />
               </div>
             </div>
-          )}
 
-          {step === 2 && (
-            <div className="space-y-5">
+          <div className={step === 2 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="dateFound" className="label">Date found</label>
                 <input id="dateFound" name="dateFound" type="date" required className="input" />
@@ -176,10 +173,8 @@ export default function ReportFoundPage() {
                 <input id="currentHoldingInfo" name="currentHoldingInfo" placeholder="e.g. Kept at barangay hall" className="input" />
               </div>
             </div>
-          )}
 
-          {step === 3 && (
-            <div className="space-y-5">
+          <div className={step === 3 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label className="label">Photos</label>
                 <ImageUpload onChange={setImages} />
@@ -198,7 +193,6 @@ export default function ReportFoundPage() {
                 </p>
               </div>
             </div>
-          )}
 
           {/* Navigation */}
           <div className="mt-5 flex items-center justify-between gap-3">

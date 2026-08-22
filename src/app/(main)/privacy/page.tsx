@@ -1,131 +1,170 @@
-import Link from "next/link";
+﻿import type { Metadata } from "next";
+import { LegalExplorer, type LegalSection } from "@/components/legal/legal-explorer";
 
-export const metadata = {
-  title: "Privacy Policy — FindBack PH",
+export const metadata: Metadata = {
+  title: "Privacy Policy - FindBack PH",
   description:
-    "How FindBack PH collects, uses, and protects your personal information while keeping your community safe.",
+    "Learn how FindBack PH collects, uses, and protects your personal information.",
 };
+
+const sections: LegalSection[] = [
+  {
+    id: "collection",
+    number: "01",
+    title: "Information we collect",
+    blocks: [
+      {
+        type: "p",
+        text: "Depending on how you use FindBack PH, we may collect information that you voluntarily provide or that is generated when you use the service.",
+      },
+      {
+        type: "list",
+        items: [
+          "Account information: your name, email address, username, and authentication-related information.",
+          "Reports: item titles, categories, descriptions, locations, dates, and photos you choose to upload.",
+          "Messages: messages and other information you send through conversations.",
+          "Technical information: limited device, browser, IP address, and diagnostic information where applicable.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "use",
+    number: "02",
+    title: "How we use information",
+    blocks: [
+      {
+        type: "p",
+        text: "We use your information to provide and maintain FindBack PH and to make the platform useful and safe.",
+      },
+      {
+        type: "list",
+        items: [
+          "Create and maintain your account.",
+          "Allow you to create and manage reports.",
+          "Help users discover potential matches.",
+          "Enable communication between users.",
+          "Send important account notifications.",
+          "Prevent abuse, fraud, and misuse.",
+          "Maintain and improve the service.",
+          "Comply with applicable legal obligations.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "public",
+    number: "03",
+    title: "Public information",
+    blocks: [
+      {
+        type: "p",
+        text: "FindBack PH is a community platform. Information you intentionally include in a public report may therefore be visible to other users.",
+      },
+      {
+        type: "callout",
+        tone: "amber",
+        title: "Please protect sensitive information",
+        text: "Do not include passwords, government IDs, bank information, home addresses, phone numbers, or other sensitive personal information in a public report unless it is genuinely necessary.",
+      },
+      {
+        type: "p",
+        text: "Your email address and private account information are not intended to be publicly displayed through your profile or reports.",
+      },
+    ],
+  },
+  {
+    id: "messages",
+    number: "04",
+    title: "Private messages",
+    blocks: [
+      { type: "p", text: "Messages sent through FindBack PH are intended to be private communications between the participants in a conversation. We store messages so conversations can function and remain available to participants." },
+      { type: "p", text: "We may process messages when reasonably necessary to investigate abuse, protect users, prevent fraud, or comply with legal requirements." },
+    ],
+  },
+  {
+    id: "sharing",
+    number: "05",
+    title: "Sharing information",
+    blocks: [
+      { type: "p", text: "We do not sell your personal information. We may, however, disclose information when reasonably necessary to provide the service or fulfill legal and security obligations." },
+      { type: "p", text: "This may include service providers that help with hosting, databases, storage, authentication, email, analytics, security, or other infrastructure." },
+      { type: "p", text: "We may also disclose information when required by law, legal process, or a valid government request, or when reasonably necessary to protect users or others." },
+    ],
+  },
+  {
+    id: "security",
+    number: "06",
+    title: "Security & retention",
+    blocks: [
+      { type: "p", text: "We use reasonable technical and organizational measures designed to protect personal information from unauthorized access, loss, misuse, alteration, or disclosure." },
+      { type: "p", text: "No online service can guarantee absolute security. You are responsible for keeping your password confidential and should contact us if you believe your account has been compromised." },
+      { type: "p", text: "We retain information for as long as reasonably necessary to provide the service, maintain security and business records, resolve disputes, enforce agreements, and comply with applicable legal obligations." },
+    ],
+  },
+  {
+    id: "choices",
+    number: "07",
+    title: "Your choices",
+    blocks: [
+      { type: "p", text: "You can edit or delete your reports where those features are available. You can also manage notification preferences through the settings provided by the service." },
+      { type: "p", text: "Depending on applicable law, you may request access, correction, updating, or deletion of certain personal information." },
+    ],
+  },
+  {
+    id: "photos",
+    number: "08",
+    title: "Photos & sensitive data",
+    blocks: [
+      { type: "p", text: "Photos can contain information you may not intend to publish, including documents, faces, addresses, license plates, or other identifying details." },
+      { type: "callout", tone: "slate", title: "Before uploading a photo", items: ["Check for government IDs or passports.", "Remove bank or payment information.", "Avoid showing passwords or private addresses.", "Blur sensitive information when possible."] },
+    ],
+  },
+  {
+    id: "cookies",
+    number: "09",
+    title: "Cookies & technology",
+    blocks: [
+      { type: "p", text: "FindBack PH may use cookies, local storage, or similar technologies to keep you signed in, remember preferences, maintain security, understand how the service is used, and improve functionality." },
+      { type: "p", text: "Some technologies may be necessary for the platform to function. Where required by applicable law, we will provide appropriate choices regarding non-essential technologies." },
+    ],
+  },
+  {
+    id: "children",
+    number: "10",
+    title: "Children's privacy",
+    blocks: [
+      { type: "p", text: "FindBack PH is not intended to knowingly collect children's personal information in circumstances where doing so would violate applicable law." },
+      { type: "p", text: "If you believe a child has provided personal information improperly, please contact us so we can review the situation and take appropriate action." },
+    ],
+  },
+  {
+    id: "changes",
+    number: "11",
+    title: "Changes to this policy",
+    blocks: [
+      { type: "p", text: "We may update this Privacy Policy when our service, practices, or legal obligations change. When we make changes, we will update this page." },
+      { type: "p", text: "Where appropriate, we may provide additional notice for significant changes." },
+    ],
+  },
+];
 
 export default function PrivacyPage() {
   return (
-    <div className="py-16 lg:py-24">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <span className="section-eyebrow">Legal &amp; transparency</span>
-        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
-          Privacy Policy
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Last updated: August 2025
-        </p>
-
-        <div className="prose mt-8 space-y-8">
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              What we collect
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              When you create an account, we collect your name, email address, and a
-              username. When you post a report, we collect the details you choose to
-              share about the item (title, category, description, location, and any
-              photos you upload). When you message another user, we store the messages
-              so you can reference the conversation.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              Why we collect it
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              We collect this information to keep you signed in, to allow you to report
-              and find items, and to let you communicate with the people connected to a
-              report. Your messages and profile are used solely to make the service
-              work.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              What we do not share
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              We never publicly show your email address or phone number. Your profile is
-              shown only by your chosen username. We do not sell your personal
-              information to third parties.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              How reports work
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              Reports you post (such as item title, description, and location) are
-              visible to other users so they can help identify matches. Do not include
-              sensitive personal information in a public report.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              How messaging works
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              Private messages are only visible to you and the other participant in the
-              conversation. Other users cannot read them. We do not expose your contact
-              details through messaging.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              Data storage & security
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              Your data is stored securely in a protected database. Access to your
-              account is protected by your password. We encourage you to use a strong,
-              unique password.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              Photos & sensitive information
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              When uploading photos of an item, avoid including sensitive documents such
-              as IDs, passports, bank cards, or addresses. We will remove obviously
-              sensitive images if reported.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              Your choices
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              You can edit or delete your reports from your dashboard at any time. You
-              can also stop receiving notification emails by adjusting your preferences.
-              If you would like to request deletion of your account data, contact us and
-              we will assist you.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl font-semibold text-navy-900">
-              Changes to this policy
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              We may update this policy as our service evolves. Continued use after
-              changes indicates acceptance. Read our{" "}
-              <Link href="/terms" className="text-blue-600 hover:underline">
-                Terms of Service
-              </Link>{" "}
-              for more about how FindBack PH works.
-            </p>
-          </section>
-        </div>
-      </div>
-    </div>
+    <LegalExplorer
+      eyebrow="Legal & transparency"
+      title="Privacy Policy"
+      subtitle="How FindBack PH collects, uses, and protects your personal information."
+      lastUpdated="Last updated: August 22, 2026"
+      sections={sections}
+      cta={{
+        title: "Have a privacy question?",
+        text: "Contact the FindBack PH team through the platform.",
+        actions: [
+          { label: "Read Terms of Service", href: "/terms" },
+          { label: "Contact us", href: "/contact", primary: true },
+        ],
+      }}
+    />
   );
 }

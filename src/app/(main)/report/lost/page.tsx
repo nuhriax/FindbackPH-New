@@ -114,8 +114,7 @@ export default function ReportLostPage() {
         </div>
 
         <form action={handleSubmit} className="card mt-6 p-6 sm:p-8">
-          {step === 1 && (
-            <div className="space-y-5">
+          <div className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="title" className="label">Item name</label>
                 <input id="title" name="title" required placeholder="e.g. Black iPhone 15 Pro" className="input" />
@@ -142,10 +141,8 @@ export default function ReportLostPage() {
                 <textarea id="distinguishingFeatures" name="distinguishingFeatures" rows={2} className="input" />
               </div>
             </div>
-          )}
 
-          {step === 2 && (
-            <div className="space-y-5">
+          <div className={step === 2 ? "space-y-5" : "space-y-5 hidden"}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="dateLost" className="label">Date lost</label>
@@ -177,10 +174,8 @@ export default function ReportLostPage() {
                 <input id="approximateLocation" name="approximateLocation" placeholder="e.g. Near SM North EDSA" className="input" />
               </div>
             </div>
-          )}
 
-          {step === 3 && (
-            <div className="space-y-5">
+          <div className={step === 3 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label className="label">Photos</label>
                 <ImageUpload onChange={setImages} />
@@ -199,7 +194,6 @@ export default function ReportLostPage() {
                 </p>
               </div>
             </div>
-          )}
 
           {/* Navigation */}
           <div className="mt-5 flex items-center justify-between gap-3">
