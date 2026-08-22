@@ -68,7 +68,7 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen">
       {/* Hero */}
       <section
         aria-labelledby="contact-heading"

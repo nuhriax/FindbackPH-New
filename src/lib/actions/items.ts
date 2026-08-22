@@ -34,6 +34,12 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  // Photos are required
+  const attachedImages = formData.getAll("images") as File[];
+  if (!attachedImages.some((f) => f && f.size > 0)) {
+    return { error: "Please add at least one photo before submitting." };
+  }
+
   const { data: inserted, error } = await supabase
     .from("lost_items")
     .insert({
@@ -97,6 +103,12 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
   const parsed = foundItemSchema.safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  // Photos are required
+  const attachedImages = formData.getAll("images") as File[];
+  if (!attachedImages.some((f) => f && f.size > 0)) {
+    return { error: "Please add at least one photo before submitting." };
   }
 
   const { data: inserted, error } = await supabase

@@ -15,6 +15,13 @@ export default function ReportLostPage() {
   const [step, setStep] = useState(1);
 
   async function handleSubmit(formData: FormData) {
+    // Never allow a premature submit (e.g. Enter key on an earlier step)
+    // or a submission without at least one photo.
+    if (step !== 3) return;
+    if (images.length === 0) {
+      setError("Please add at least one photo before submitting.");
+      return;
+    }
     // Attach selected images to the form data
     images.forEach((file) => formData.append("images", file));
     setError(null);
@@ -113,7 +120,17 @@ export default function ReportLostPage() {
           </p>
         </div>
 
-        <form action={handleSubmit} className="card mt-6 p-6 sm:p-8">
+        <form
+          action={handleSubmit}
+          onKeyDown={(e) => {
+            // Block Enter-to-submit from single-line inputs so users can't
+            // skip ahead of the multi-step wizard accidentally.
+            if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+              e.preventDefault();
+            }
+          }}
+          className="card mt-6 p-6 sm:p-8"
+        >
           <div className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="title" className="label">Item name</label>
@@ -131,7 +148,8 @@ export default function ReportLostPage() {
 
               <div>
                 <label htmlFor="description" className="label">Description</label>
-                <textarea id="description" name="description" required rows={4} className="input" />
+                <textarea id="description" name="description" required minLength={10} maxLength={2000} rows={4} className="input" />
+                <p className="mt-1 text-xs text-slate-500">At least 10 characters — include brand, color, and other details.</p>
               </div>
 
               <div>
@@ -177,7 +195,7 @@ export default function ReportLostPage() {
 
           <div className={step === 3 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
-                <label className="label">Photos</label>
+                <label className="label">Photos <span className="font-normal text-slate-500">(at least 1 required)</span></label>
                 <ImageUpload onChange={setImages} />
               </div>
 
