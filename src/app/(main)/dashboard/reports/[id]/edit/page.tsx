@@ -1,6 +1,11 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { EditReportForm, type EditableReport } from "@/components/reports/edit-report-form";
+import {
+  EditReportForm,
+  type EditableReport,
+  type EditPhoto,
+} from "@/components/reports/edit-report-form";
+import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +32,22 @@ export default async function EditReportPage({ params }: { params: { id: string 
 
   // Ownership enforced server-side — a non-owner simply never sees this page.
   if (item.reporter_id !== user.id) notFound();
+
+  // Existing photos so they can be removed inline while editing.
+  const imageCol = lost ? "lost_item_id" : "found_item_id";
+  const { data: images } = await supabase
+    .from("item_images")
+    .select("id, storage_path")
+    .eq(imageCol, params.id)
+    .order("position", { ascending: true });
+
+  const storedPaths = (images ?? []).map((img) => img.storage_path);
+  const signedUrls = await getSignedImageUrls(storedPaths);
+  const urlByPath = new Map(storedPaths.map((p, i) => [p, signedUrls[i]]));
+  const photos: EditPhoto[] = (images ?? []).map((img) => ({
+    id: img.id,
+    url: urlByPath.get(img.storage_path) ?? getImagePublicUrl(img.storage_path),
+  }));
 
   const dateVal =
     kind === "lost_item" ? (item.date_lost as string) : (item.date_found as string);
@@ -56,7 +77,7 @@ export default async function EditReportPage({ params }: { params: { id: string 
       </p>
 
       <div className="mt-8">
-        <EditReportForm kind={kind} item={editable} />
+        <EditReportForm kind={kind} item={editable} images={photos} />
       </div>
     </div>
   );

@@ -52,13 +52,23 @@ export const loginSchema = z.object({
 export type LoginInput = z.infer<typeof loginSchema>;
 
 const baseItemFields = {
-  title: z.string().min(3, "Title must be at least 3 characters").max(120),
+  // .trim() ensures whitespace-only input ("   ") is rejected, and stored
+  // values have no leading/trailing spaces.
+  title: z
+    .string()
+    .trim()
+    .min(3, "Item name must be at least 3 characters (spaces don't count)")
+    .max(120),
   category: z.enum(CATEGORIES),
-  description: z.string().min(10, "Add a bit more detail (10+ characters)").max(2000),
-  distinguishingFeatures: z.string().max(1000).optional(),
-  city: z.string().min(1, "City is required"),
-  province: z.string().min(1, "Province is required"),
-  approximateLocation: z.string().max(200).optional(),
+  description: z
+    .string()
+    .trim()
+    .min(10, "Add a bit more detail (10+ characters, spaces don't count)")
+    .max(2000),
+  distinguishingFeatures: z.string().trim().max(1000).optional(),
+  city: z.string().trim().min(1, "City is required"),
+  province: z.string().trim().min(1, "Province is required"),
+  approximateLocation: z.string().trim().max(200).optional(),
 };
 
 export const lostItemSchema = z.object({

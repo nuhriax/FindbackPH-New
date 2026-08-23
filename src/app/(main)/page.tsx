@@ -26,7 +26,7 @@ import { PaperNotes } from "@/components/ui/paper-notes";
 import { ItemCard } from "@/components/item-card";
 import { AnimatedNumber } from "@/components/home/animated-number";
 import { createClient } from "@/lib/supabase/server";
-import { getImagePublicUrl } from "@/lib/storage";
+import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import type {
   FoundItem,
   ItemCategory,
@@ -333,32 +333,30 @@ export default async function HomePage() {
           }),
     ]);
 
-  const lostImageMap = new Map<string, string>();
-  const foundImageMap = new Map<string, string>();
+  const lostRows = (lostImagesResult.data ?? []).filter(
+    (i) => i.lost_item_id && i.storage_path,
+  );
+  const foundRows = (foundImagesResult.data ?? []).filter(
+    (i) => i.found_item_id && i.storage_path,
+  );
 
-  for (const image of lostImagesResult.data ?? []) {
-    if (
-      image.lost_item_id &&
-      image.storage_path
-    ) {
-      lostImageMap.set(
-        image.lost_item_id,
-        getImagePublicUrl(image.storage_path)
-      );
-    }
-  }
+  const [lostSigned, foundSigned] = await Promise.all([
+    getSignedImageUrls(lostRows.map((i) => i.storage_path)),
+    getSignedImageUrls(foundRows.map((i) => i.storage_path)),
+  ]);
 
-  for (const image of foundImagesResult.data ?? []) {
-    if (
-      image.found_item_id &&
-      image.storage_path
-    ) {
-      foundImageMap.set(
-        image.found_item_id,
-        getImagePublicUrl(image.storage_path)
-      );
-    }
-  }
+  const lostImageMap = new Map(
+    lostRows.map((i, idx) => [
+      i.lost_item_id as string,
+      lostSigned[idx] ?? getImagePublicUrl(i.storage_path),
+    ]),
+  );
+  const foundImageMap = new Map(
+    foundRows.map((i, idx) => [
+      i.found_item_id as string,
+      foundSigned[idx] ?? getImagePublicUrl(i.storage_path),
+    ]),
+  );
 
   /* --------------------------------------------------------------------------
      RECENT REPORTS

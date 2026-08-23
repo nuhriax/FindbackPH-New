@@ -35,10 +35,13 @@ export function ListingCategories({
   accent,
   activeCategory,
   buildHref,
+  counts,
 }: {
   accent: Accent;
   activeCategory: string;
   buildHref: (category: string) => string;
+  /** Optional live per-category counts. When omitted, tiles stay neutral. */
+  counts?: Partial<Record<ItemCategory, number>>;
 }) {
   const a = ACCENT[accent];
 
@@ -60,6 +63,7 @@ export function ListingCategories({
         {CATEGORIES.map((itemCategory) => {
           const isActive = activeCategory === itemCategory;
           const categoryAccent = CATEGORY_ACCENTS[itemCategory];
+          const count = counts?.[itemCategory];
 
           return (
             <Link
@@ -103,7 +107,11 @@ export function ListingCategories({
                   isActive ? "text-slate-500" : "text-slate-400"
                 }`}
               >
-                0 reports
+                {count != null
+                  ? `${count.toLocaleString()} ${
+                      count === 1 ? "report" : "reports"
+                    }`
+                  : "Browse"}
               </span>
             </Link>
           );

@@ -618,6 +618,52 @@ create policy "Avatar delete own"
   );
 
 -- ============================================================================
+-- ITEM IMAGE STORAGE POLICIES — report photos
+-- ----------------------------------------------------------------------------
+-- Report photos are uploaded to the public "item-images" Storage bucket by the
+-- app (see /api/item-images). The bucket is created here (as PUBLIC) so it
+-- exists automatically when this file is run in the SQL Editor.
+--
+-- Policy notes:
+--   * Public SELECT lets report photos render anywhere on the site.
+--   * INSERT / UPDATE / DELETE are open to any authenticated user. Unlike the
+--     avatars bucket, uploaded paths ("lost_<id>.jpg", "found_<id>.png") do not
+--     contain the uploader's user id, so the bucket layer can't scope them down.
+--     Instead, the /api/item-images route handler performs the ownership check
+--     (it only uploads after confirming the signed-in user owns that report),
+--     and the app then records the file in public.item_images — whose RLS keeps
+--     every row tied to the correct lost/found item by trusted server code.
+-- ----------------------------------------------------------------------------
+-- Create the public "item-images" bucket. Safe to re-run (ignores if it exists).
+insert into storage.buckets (id, name, public)
+values ('item-images', 'item-images', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Public item image read" on storage.objects;
+create policy "Public item image read"
+  on storage.objects for select
+  to public
+  using (bucket_id = 'item-images');
+
+drop policy if exists "Authenticated can insert item images" on storage.objects;
+create policy "Authenticated can insert item images"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'item-images');
+
+drop policy if exists "Authenticated can update item images" on storage.objects;
+create policy "Authenticated can update item images"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'item-images');
+
+drop policy if exists "Authenticated can delete item images" on storage.objects;
+create policy "Authenticated can delete item images"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'item-images');
+
+-- ============================================================================
 -- REALTIME REPLICATION
 -- ----------------------------------------------------------------------------
 -- The front-end uses Supabase Realtime (postgres_changes subscriptions) to

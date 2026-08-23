@@ -12,14 +12,17 @@ import {
 import { submitContactAction } from "@/lib/actions/contact";
 import { MotionReveal } from "@/components/effects/motion-reveal";
 import { Aurora } from "@/components/effects/aurora";
+import Link from "next/link";
 
 const contactInfo = [
   {
     icon: Mail,
     title: "General enquiries",
     description: "FindBackph.support@gmail.com",
+    href: "mailto:FindBackph.support@gmail.com",
+    actionLabel: "Email us directly",
     iconClass:
-      "border-blue-200 bg-blue-50 text-blue-600",
+      "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 shadow-[0_8px_20px_-8px_rgba(37,99,235,0.35)]",
   },
   {
     icon: Clock,
@@ -27,7 +30,7 @@ const contactInfo = [
     description:
       "We reply to most messages within one business day, Mon–Fri, 9am–6pm PHT.",
     iconClass:
-      "border-violet-200 bg-violet-50 text-violet-600",
+      "border-violet-200 bg-gradient-to-br from-violet-50 to-violet-100 text-violet-600 shadow-[0_8px_20px_-8px_rgba(124,58,237,0.35)]",
   },
   {
     icon: ShieldCheck,
@@ -35,7 +38,7 @@ const contactInfo = [
     description:
       "We only use your details to respond to your message. We never sell or share your personal information.",
     iconClass:
-      "border-emerald-200 bg-emerald-50 text-emerald-600",
+      "border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 shadow-[0_8px_20px_-8px_rgba(16,185,129,0.35)]",
   },
 ];
 
@@ -43,6 +46,7 @@ export default function ContactPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [msgLen, setMsgLen] = useState(0);
 
   function handleSubmit(formData: FormData) {
     setError(null);
@@ -74,22 +78,42 @@ export default function ContactPage() {
         aria-labelledby="contact-heading"
         className="relative isolate overflow-hidden border-b border-slate-200/70"
       >
-        <Aurora opacity={0.3} blur={70} />
+        <Aurora opacity={0.35} blur={80} />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        {/* Decorative orbs */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-electric-400/15 blur-3xl"
+        />
+
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
             <MotionReveal>
-              <span className="section-eyebrow">
-                We&apos;re here to help
+              <span className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-white/70 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-blue-700 shadow-sm backdrop-blur">
+                <span
+                  aria-hidden="true"
+                  className="relative flex h-2 w-2"
+                >
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                We&apos;re here to help — online now
               </span>
             </MotionReveal>
 
             <MotionReveal delay={70}>
               <h1
                 id="contact-heading"
-                className="mt-4 font-display text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl lg:text-6xl"
+                className="mt-6 font-display text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl lg:text-6xl"
               >
-                Contact FindBack PH
+                Let&apos;s talk.{" "}
+                <span className="bg-gradient-to-r from-blue-600 via-electric-500 to-violet-500 bg-clip-text text-transparent">
+                  We reply fast.
+                </span>
               </h1>
             </MotionReveal>
 
@@ -98,6 +122,29 @@ export default function ContactPage() {
                 Questions, feedback, or a partnership idea? Send us a note and
                 we&apos;ll get back to you — usually within one business day.
               </p>
+            </MotionReveal>
+
+            <MotionReveal delay={210}>
+              <dl className="mx-auto mt-9 grid max-w-xl grid-cols-3 gap-3">
+                {[
+                  ["< 24h", "Average reply"],
+                  ["100%", "Private & secure"],
+                  ["PH-based", "Real humans"],
+                ].map(([value, label]) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-slate-200/70 bg-white/70 px-3 py-4 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <dt className="sr-only">{label}</dt>
+                    <dd className="font-display text-lg font-bold text-navy-900 sm:text-xl">
+                      {value}
+                    </dd>
+                    <dd className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                      {label}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </MotionReveal>
           </div>
         </div>
@@ -112,12 +159,19 @@ export default function ContactPage() {
           {/* Information */}
           <MotionReveal className="space-y-4">
             {contactInfo.map(
-              ({ icon: Icon, title, description, iconClass }) => (
-                <div key={title} className="card p-6">
-                  <div className="flex items-start gap-4">
+              ({ icon: Icon, title, description, href, actionLabel, iconClass }) => (
+                <div
+                  key={title}
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_20px_50px_-15px_rgba(15,23,42,0.15)]"
+                >
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-blue-100/60 to-transparent opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                  />
+                  <div className="relative flex items-start gap-4">
                     <span
                       aria-hidden="true"
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${iconClass}`}
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-transform duration-300 group-hover:scale-110 ${iconClass}`}
                     >
                       <Icon size={19} strokeWidth={2} />
                     </span>
@@ -128,9 +182,9 @@ export default function ContactPage() {
                       </h2>
 
                       <p className="mt-1.5 text-sm leading-6 text-slate-600">
-                        {title === "General enquiries" ? (
+                        {href ? (
                           <a
-                            href="mailto:hello@findback.ph"
+                            href={href}
                             className="font-medium text-blue-600 transition-colors hover:text-blue-700 hover:underline"
                           >
                             {description}
@@ -139,36 +193,91 @@ export default function ContactPage() {
                           description
                         )}
                       </p>
+
+                      {href && actionLabel && (
+                        <a
+                          href={href}
+                          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-1.5 text-xs font-semibold text-blue-700 transition-all duration-200 hover:border-blue-300 hover:bg-blue-100"
+                        >
+                          <Mail size={13} aria-hidden="true" />
+                          {actionLabel}
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
               )
             )}
+
+            {/* Quick answers */}
+            <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-6">
+              <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Need answers fast?
+              </h2>
+              <ul className="mt-3 space-y-2">
+                {[
+                  ["How matching works", "/faq"],
+                  ["Safety tips for meetups", "/safety"],
+                  ["Report a lost item", "/report/lost"],
+                ].map(([label, link]) => (
+                  <li key={link}>
+                    <Link
+                      href={link}
+                      className="group inline-flex items-center gap-2 text-sm font-medium text-navy-900 transition-colors hover:text-blue-700"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-[10px] text-slate-400 transition-colors group-hover:border-blue-300 group-hover:text-blue-600"
+                      >
+                        →
+                      </span>
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </MotionReveal>
 
           {/* Form */}
-          <div className="card overflow-hidden">
-            {success ? (
-              <SuccessState />
-            ) : (
-              <form
-                action={handleSubmit}
-                className="p-6 sm:p-8"
-                noValidate={false}
-              >
-                <div className="mb-7">
-                  <h2
-                    id="contact-form-heading"
-                    className="font-display text-xl font-bold text-navy-900"
-                  >
-                    Send us a message
-                  </h2>
+          <div className="relative">
+            <div
+              aria-hidden="true"
+              className="absolute -inset-1 rounded-[2rem] bg-gradient-to-br from-blue-400/25 via-transparent to-violet-400/25 opacity-60 blur-xl transition-opacity duration-500"
+            />
+            <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              {/* Form header strip */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-electric-400 to-violet-500" />
 
-                  <p className="mt-1.5 text-sm leading-6 text-slate-600">
-                    Tell us what&apos;s on your mind and our team will take it
-                    from there.
-                  </p>
-                </div>
+              {success ? (
+                <SuccessState />
+              ) : (
+                <form
+                  action={handleSubmit}
+                  className="p-6 sm:p-8"
+                  noValidate={false}
+                >
+                  <div className="mb-7 flex items-start gap-4">
+                    <span
+                      aria-hidden="true"
+                      className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 sm:flex"
+                    >
+                      <Mail size={20} strokeWidth={2} />
+                    </span>
+                    <div>
+                      <h2
+                        id="contact-form-heading"
+                        className="font-display text-xl font-bold text-navy-900"
+                      >
+                        Send us a message
+                      </h2>
+
+                      <p className="mt-1 text-sm leading-6 text-slate-600">
+                        Tell us what&apos;s on your mind and our team will take it
+                        from there.
+                      </p>
+                    </div>
+                  </div>
 
                 <div className="space-y-5">
                   <div className="grid gap-5 sm:grid-cols-2">
@@ -218,14 +327,28 @@ export default function ContactPage() {
                       placeholder="Tell us a little more…"
                       autoComplete="off"
                       aria-describedby="message-hint"
+                      onChange={(e) => setMsgLen(e.target.value.length)}
                     />
 
-                    <p
-                      id="message-hint"
-                      className="mt-1.5 text-xs text-slate-500"
-                    >
-                      Please include at least 10 characters.
-                    </p>
+                    <div className="mt-1.5 flex items-center justify-between gap-3">
+                      <p
+                        id="message-hint"
+                        className={`text-xs transition-colors ${
+                          msgLen > 0 && msgLen < 10
+                            ? "font-medium text-amber-600"
+                            : "text-slate-500"
+                        }`}
+                      >
+                        {msgLen === 0
+                          ? "Please include at least 10 characters."
+                          : msgLen < 10
+                            ? `${10 - msgLen} more character${10 - msgLen === 1 ? "" : "s"} to go…`
+                            : "Looks good!"}
+                      </p>
+                      <span className="shrink-0 text-[11px] tabular-nums text-slate-400">
+                        {msgLen}/3000
+                      </span>
+                    </div>
                   </div>
 
                   {error && (
@@ -275,8 +398,47 @@ export default function ContactPage() {
                 </div>
               </form>
             )}
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section aria-label="Report an item" className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
+        <MotionReveal>
+          <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-gradient-to-br from-navy-900 via-blue-950 to-violet-950 px-6 py-12 text-center shadow-[0_35px_100px_-25px_rgba(15,23,42,0.5)] sm:px-12">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-electric-400/20 blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-20 -right-10 h-64 w-64 rounded-full bg-violet-400/20 blur-3xl"
+            />
+            <h2 className="relative font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Lost or found something?
+            </h2>
+            <p className="relative mx-auto mt-3 max-w-xl text-sm leading-6 text-blue-100/90 sm:text-base">
+              Don&apos;t wait for a reply — post a report right now and let our
+              matching engine start working for you immediately.
+            </p>
+            <div className="relative mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/report/lost"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-navy-900 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-50 hover:shadow-xl"
+              >
+                Report a lost item
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+              <Link
+                href="/report/found"
+                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/10"
+              >
+                I found something
+              </Link>
+            </div>
+          </div>
+        </MotionReveal>
       </section>
     </main>
   );

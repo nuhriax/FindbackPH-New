@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { ReportActions } from "@/components/dashboard/report-actions";
-import { Eye, ListChecks, Plus } from "lucide-react";
+import { Eye, ListChecks, Pencil, Plus } from "lucide-react";
 import type { ItemStatus } from "@/types/database";
 
 export const metadata = {
@@ -245,6 +245,13 @@ export default async function MyReportsPage({
             <Link href={href} className="btn-ghost !px-2.5 !py-1.5 text-xs">
               <Eye size={14} />
               View
+            </Link>
+            <Link
+              href={`/dashboard/reports/${report.id}/edit`}
+              className="btn-ghost !px-2.5 !py-1.5 text-xs"
+            >
+              <Pencil size={14} />
+              Edit
             </Link>
             <ReportActions
               itemType={report.kind === "lost" ? "lost_item" : "found_item"}

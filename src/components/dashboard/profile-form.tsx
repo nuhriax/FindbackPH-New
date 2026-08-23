@@ -2,7 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Camera, CheckCircle2, Loader2, Save, Trash2 } from "lucide-react";
-import { updateProfileAction, uploadAvatarAction, removeAvatarAction } from "@/lib/actions/profile";
+import { updateProfileAction, removeAvatarAction } from "@/lib/actions/profile";
+import { uploadAvatarClient } from "@/lib/file-upload-client";
 import type { Profile } from "@/types/database";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
@@ -44,9 +45,8 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     if (!file) return;
     setAvatarError(null);
     setUploading(true);
-    const fd = new FormData();
-    fd.set("avatar", file);
-    const result = await uploadAvatarAction(fd);
+    // Upload through the route handler — Server Actions can't accept File args.
+    const result = await uploadAvatarClient(file);
     setUploading(false);
     if (result?.error) {
       setAvatarError(result.error);
@@ -252,6 +252,8 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       </div>
 
       {error && <p className="field-error mt-5" role="alert">{error}</p>}
+
+      <input type="hidden" name="avatarUrl" value={avatarUrl} />
 
       <div className="mt-7 flex items-center gap-3">
         <button type="submit" disabled={isPending} className="btn-primary">

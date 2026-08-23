@@ -1,10 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Calendar, MapPin } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, ZoomIn } from "lucide-react";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import type { ItemCategory } from "@/types/database";
 import { ACCENT } from "@/components/listing/accents";
+import { PhotoViewerModal } from "@/components/photo-viewer-modal";
 
 export function ItemCard({
   href,
@@ -28,10 +32,12 @@ export function ItemCard({
   imageUrl?: string | null;
 }) {
   const a = ACCENT[kind];
+  const [viewerOpen, setViewerOpen] = useState(false);
   const cityLabel = city ?? "";
   const provinceLabel = province ?? "";
 
   return (
+    <>
     <Link
       href={href}
       className="group relative flex h-full flex-col overflow-hidden rounded-card border border-slate-200/70 bg-white/85 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-navy-200 hover:bg-white hover:shadow-card-hover"
@@ -62,6 +68,28 @@ export function ItemCard({
         >
           {kind === "lost" ? "Lost" : "Found"}
         </span>
+
+        {/* View-photo button — opens fullscreen without leaving the page */}
+        {imageUrl && (
+          <button
+            type="button"
+            aria-label={`View photo of ${title}`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setViewerOpen(true);
+            }}
+            className="
+              absolute right-3 top-3 z-10 flex h-8 w-8 items-center
+              justify-center rounded-full bg-slate-900/70 text-white
+              shadow-md ring-1 ring-white/40 backdrop-blur transition-all
+              hover:bg-slate-900 focus:opacity-100 opacity-90
+              md:opacity-0 md:group-hover:opacity-100
+            "
+          >
+            <ZoomIn size={15} />
+          </button>
+        )}
 
         {/* Category chip */}
         <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-medium text-slate-600 shadow-sm backdrop-blur-md [&_svg]:h-3 [&_svg]:w-3">
@@ -111,6 +139,17 @@ export function ItemCard({
         </div>
       </div>
     </Link>
+
+    {/* Fullscreen photo viewer — OUTSIDE the link so closing it never
+        triggers navigation */}
+    {viewerOpen && imageUrl && (
+      <PhotoViewerModal
+        images={[{ url: imageUrl, alt: title }]}
+        alt={title}
+        onClose={() => setViewerOpen(false)}
+      />
+    )}
+    </>
   );
 }
 

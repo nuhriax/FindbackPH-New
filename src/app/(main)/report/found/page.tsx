@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { CheckCircle2, Lock } from "lucide-react";
 import { createFoundItemAction } from "@/lib/actions/items";
+import { uploadItemImagesClient } from "@/lib/file-upload-client";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { ImageUpload } from "@/components/image-upload";
+import { MotionReveal } from "@/components/effects/motion-reveal";
 
 export default function ReportFoundPage() {
   const [error, setError] = useState<string | null>(null);
@@ -14,71 +16,182 @@ export default function ReportFoundPage() {
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
   const [step, setStep] = useState(1);
 
+  // Validate the currently visible step before moving forward. Hidden
+  // (display:none) fields are skipped by native browser validation, so without
+  // this a user could reach Step 3 with empty required fields.
+  function goToStep(next: number) {
+    setError(null);
+    if (next > step) {
+      const container = document.getElementById(`step-${step}`);
+      if (container) {
+        for (const el of Array.from(
+          container.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+            "input, textarea, select"
+          )
+        )) {
+          if (!el.checkValidity()) {
+            el.reportValidity();
+            return;
+          }
+          // Block whitespace-only values on required text fields.
+          if (
+            (el.name === "title" || el.name === "description") &&
+            el.value.trim().length === 0
+          ) {
+            el.setCustomValidity(
+              el.name === "title"
+                ? "Please enter an item name (spaces don't count)."
+                : "Please describe the item (spaces don't count)."
+            );
+            el.reportValidity();
+            el.setCustomValidity("");
+            return;
+          }
+        }
+      }
+    }
+    setStep(Math.min(3, Math.max(1, next)));
+  }
+
   async function handleSubmit(formData: FormData) {
-    // Never allow a premature submit (e.g. Enter key on an earlier step)
-    // or a submission without at least one photo.
     if (step !== 3) return;
+
+    const form = document.getElementById(
+      "found-report-form"
+    ) as HTMLFormElement | null;
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // Server-side schema also trims; these give instant, friendly feedback.
+    const title = formData.get("title")?.toString() ?? "";
+    const description = formData.get("description")?.toString() ?? "";
+    if (title.trim().length < 3) {
+      setError("Please enter an item name (at least 3 characters — spaces don't count).");
+      setStep(1);
+      return;
+    }
+    if (description.trim().length < 10) {
+      setError("Please describe the item in at least 10 characters (spaces don't count).");
+      setStep(1);
+      return;
+    }
     if (images.length === 0) {
       setError("Please add at least one photo before submitting.");
       return;
     }
-    // Attach selected images to the form data
-    images.forEach((file) => formData.append("images", file));
+    // Selected photos are uploaded separately, after the report is saved.
+    // Server Actions can't accept File objects, so files are sent to the
+    // /api/item-images route handler instead.
     setError(null);
     startTransition(async () => {
       const result = await createFoundItemAction(formData);
       if (result?.error) {
         setError(result.error);
-      } else if (result?.itemId) {
-        setConfirmedId(result.itemId);
+        return;
       }
+      if (!result?.itemId) {
+        setError("We couldn't save your report. Please try again.");
+        return;
+      }
+
+      const uploadErr = await uploadItemImagesClient(
+        "found_item",
+        result.itemId,
+        images
+      );
+      if (uploadErr) {
+        // Roll back the just-created report so a failed photo upload doesn't
+        // leave an orphan report behind.
+        try {
+          await fetch(`/api/items/${result.itemId}`, { method: "DELETE" });
+        } catch {
+          /* best effort */
+        }
+        setError(uploadErr);
+        return;
+      }
+
+      setConfirmedId(result.itemId);
     });
   }
 
   if (confirmedId) {
     return (
-      <div className="py-16 lg:py-24">
-        <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
-            <CheckCircle2 size={26} />
-          </div>
+      <div className="relative py-16 lg:py-24">
+        {/* Celebratory glow */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-8 h-72 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-emerald-300/25 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
+          <MotionReveal>
+            <span className="relative mx-auto flex h-20 w-20 items-center justify-center">
+              <span
+                aria-hidden="true"
+                className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-30"
+              />
+              <span className="relative flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 shadow-lg shadow-emerald-200/50">
+                <CheckCircle2 size={32} className="text-emerald-600" />
+              </span>
+            </span>
+          </MotionReveal>
 
-          <h1 className="mt-5 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
-            Report submitted — thank you!
-          </h1>
+          <MotionReveal delay={80}>
+            <h1 className="mt-6 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+              Thank you — your found report is{" "}
+              <span className="bg-gradient-to-r from-blue-600 via-electric-500 to-violet-500 bg-clip-text text-transparent">
+                live!
+              </span>
+            </h1>
+          </MotionReveal>
 
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-600">
-            Your found report is live. When it&apos;s matched with a lost report,
-            we&apos;ll help you take it from here — every handover brings something
-            one step closer to home.
-          </p>
+          <MotionReveal delay={150}>
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-slate-600 sm:text-base">
+              You just made someone&apos;s day possible. When your report matches
+              a lost report, we&apos;ll flag it and help you arrange a safe
+              return.
+            </p>
+          </MotionReveal>
 
-          <ol className="mx-auto mt-7 flex max-w-md flex-col gap-3 text-left">
-            {[
-              ["It's visible", "Your report is now public to people searching the community."],
-              ["We help it match", "If a lost report seems to match, we flag it as a possible match."],
-              ["Safe return", "Confirm ownership details and arrange a safe, public handover."],
-            ].map(([t, d], i) => (
-              <li key={t} className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white/70 p-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-semibold text-white">
-                  {i + 1}
-                </span>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-navy-900">{t}</p>
-                  <p className="text-xs leading-relaxed text-slate-500">{d}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <MotionReveal delay={220}>
+            <ol className="mx-auto mt-9 flex max-w-md flex-col gap-3 text-left">
+              {[
+                ["It's visible", "Your report is now public to people searching the community."],
+                ["We help it match", "If a lost report seems to match, we flag it as a possible match."],
+                ["Safe return", "Confirm ownership details and arrange a safe, public handover."],
+              ].map(([t, d], i) => (
+                <li
+                  key={t}
+                  className="group flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-[11px] font-bold text-white shadow-sm transition-transform duration-300 group-hover:scale-110">
+                    {i + 1}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-navy-900">{t}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </MotionReveal>
 
-          <div className="mt-8 flex flex-col justify-center gap-2 sm:flex-row">
-            <Link href={`/found/${confirmedId}`} className="btn-primary">
-              View your report
-            </Link>
-            <button type="button" onClick={() => setConfirmedId(null)} className="btn-secondary">
-              Report another
-            </button>
-          </div>
+          <MotionReveal delay={290}>
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href={`/found/${confirmedId}`} className="btn-primary">
+                View your report
+              </Link>
+              <button
+                type="button"
+                onClick={() => setConfirmedId(null)}
+                className="btn-secondary"
+              >
+                Report another item
+              </button>
+            </div>
+          </MotionReveal>
         </div>
       </div>
     );
@@ -122,6 +235,7 @@ export default function ReportFoundPage() {
         </div>
 
         <form
+          id="found-report-form"
           action={handleSubmit}
           onKeyDown={(e) => {
             // Block Enter-to-submit from single-line inputs so users can't
@@ -132,10 +246,10 @@ export default function ReportFoundPage() {
           }}
           className="card mt-6 p-6 sm:p-8"
         >
-          <div className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
+          <div id="step-1" className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="title" className="label">Item name</label>
-                <input id="title" name="title" required placeholder="e.g. Silver house keys" className="input" />
+                <input id="title" name="title" required minLength={3} maxLength={120} placeholder="e.g. Silver house keys" className="input" />
               </div>
 
               <div>
@@ -161,7 +275,7 @@ export default function ReportFoundPage() {
               </div>
             </div>
 
-          <div className={step === 2 ? "space-y-5" : "space-y-5 hidden"}>
+          <div id="step-2" className={step === 2 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="dateFound" className="label">Date found</label>
                 <input id="dateFound" name="dateFound" type="date" required className="input" />
@@ -193,13 +307,17 @@ export default function ReportFoundPage() {
               </div>
             </div>
 
-          <div className={step === 3 ? "space-y-5" : "space-y-5 hidden"}>
+          <div id="step-3" className={step === 3 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label className="label">Photos <span className="font-normal text-slate-500">(at least 1 required)</span></label>
                 <ImageUpload onChange={setImages} />
+                {images.length > 0 && (
+                  <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                    <CheckCircle2 size={14} aria-hidden="true" />
+                    {images.length} photo{images.length > 1 ? "s" : ""} ready — you can submit now.
+                  </p>
+                )}
               </div>
-
-              {error && <p className="field-error" role="alert">{error}</p>}
 
               <div role="note" className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-left">
                 <Lock size={16} className="mt-0.5 shrink-0 text-emerald-600" />
@@ -213,11 +331,22 @@ export default function ReportFoundPage() {
               </div>
             </div>
 
+          {/* Error — always visible regardless of step */}
+          {error && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+            >
+              {error}
+            </div>
+          )}
+
           {/* Navigation */}
           <div className="mt-5 flex items-center justify-between gap-3">
             <button
               type="button"
-              onClick={() => setStep((s) => Math.max(1, s - 1))}
+              onClick={() => goToStep(step - 1)}
               className={step === 1 ? "invisible btn-secondary" : "btn-secondary"}
             >
               Back
@@ -226,10 +355,10 @@ export default function ReportFoundPage() {
             {step < 3 ? (
               <button
                 type="button"
-                onClick={() => setStep((s) => Math.min(3, s + 1))}
+                onClick={() => goToStep(step + 1)}
                 className="btn-primary"
               >
-                Continue
+                {step === 2 ? "Continue to photos" : "Continue"}
               </button>
             ) : (
               <button type="submit" disabled={isPending} className="btn-primary">

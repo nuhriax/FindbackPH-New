@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
-import { getImagePublicUrl } from "@/lib/storage";
+import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
 
 export const dynamic = "force-dynamic";
@@ -57,11 +57,17 @@ export default async function ReportDetailPage({ params }: Props) {
   const imageCol = kind === "lost" ? "lost_item_id" : "found_item_id";
   const { data: images } = await supabase
     .from("item_images")
-    .select("storage_path, position")
+    .select("id, storage_path, position")
     .eq(imageCol, id)
     .order("position", { ascending: true });
 
-  const imageUrls = images?.map((img) => ({ url: getImagePublicUrl(img.storage_path) })) ?? [];
+  const storedPaths = (images ?? []).map((img) => img.storage_path);
+  const signedUrls = await getSignedImageUrls(storedPaths);
+  const urlByPath = new Map(storedPaths.map((p, i) => [p, signedUrls[i]]));
+  const imageUrls = (images ?? []).map((img) => ({
+    id: img.id,
+    url: urlByPath.get(img.storage_path) ?? getImagePublicUrl(img.storage_path),
+  })) as { id: string; url: string }[];
 
   let savedItemId: string | null = null;
   if (user) {
@@ -115,6 +121,8 @@ export default async function ReportDetailPage({ params }: Props) {
     createdAt: raw.created_at ?? null,
     dateLabel: dateVal ? format(new Date(dateVal), "MMM d, yyyy") : "recently",
     reward: raw.reward_amount ?? null,
+    dateOccurred: dateVal ?? null,
+    holdingInfo: raw.current_holding_info ?? null,
   };
 
   return (

@@ -34,12 +34,6 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  // Photos are required
-  const attachedImages = formData.getAll("images") as File[];
-  if (!attachedImages.some((f) => f && f.size > 0)) {
-    return { error: "Please add at least one photo before submitting." };
-  }
-
   const { data: inserted, error } = await supabase
     .from("lost_items")
     .insert({
@@ -59,12 +53,6 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };
-  }
-
-  // Upload any attached images
-  const images = formData.getAll("images") as File[];
-  if (images.length > 0) {
-    await uploadItemImagesAction("lost_item", inserted.id, images);
   }
 
   // Run the matching engine against active found reports
@@ -105,12 +93,6 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  // Photos are required
-  const attachedImages = formData.getAll("images") as File[];
-  if (!attachedImages.some((f) => f && f.size > 0)) {
-    return { error: "Please add at least one photo before submitting." };
-  }
-
   const { data: inserted, error } = await supabase
     .from("found_items")
     .insert({
@@ -130,12 +112,6 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };
-  }
-
-  // Upload any attached images
-  const images = formData.getAll("images") as File[];
-  if (images.length > 0) {
-    await uploadItemImagesAction("found_item", inserted.id, images);
   }
 
   revalidatePath("/found");
@@ -183,81 +159,68 @@ export async function deleteLostItemAction(itemId: string): Promise<ActionResult
   return {};
 }
 
-// --- Phase 4: Image Upload ---
+// --- Phase 4b: Remove Item Image ---
 
-export async function uploadItemImagesAction(
-  itemType: "lost_item" | "found_item",
-  itemId: string,
-  images: File[]
+/**
+ * Removes one photo from the signed-in user's own report: deletes the Storage
+ * object and the matching `item_images` row. Ownership is verified against the
+ * parent report before anything is deleted (RLS enforces this again in
+ * Postgres).
+ */
+export async function removeItemImageAction(
+  imageId: string
 ): Promise<ActionResult> {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) return { error: "You must be signed in" };
+  if (!imageId) return { error: "Missing photo" };
 
-  if (!user) {
-    return { error: "You must be signed in" };
+  const { data: img, error: imgError } = await supabase
+    .from("item_images")
+    .select("id, storage_path, lost_item_id, found_item_id")
+    .eq("id", imageId)
+    .single();
+
+  if (imgError || !img) {
+    return { error: "That photo no longer exists." };
   }
 
-  // Verify ownership
-  const tableName = itemType === "lost_item" ? "lost_items" : "found_items";
-  const { data: item, error: itemError } = await supabase
+  const itemId = img.lost_item_id ?? img.found_item_id;
+  if (!itemId) {
+    return { error: "That photo no longer exists." };
+  }
+  const tableName = img.lost_item_id ? "lost_items" : "found_items";
+
+  // Ownership: only the report's reporter can remove its photos.
+  const { data: item } = await supabase
     .from(tableName)
     .select("reporter_id")
     .eq("id", itemId)
     .single();
 
-  if (itemError || !item || item.reporter_id !== user.id) {
-    return { error: "Not authorized" };
+  if (!item || item.reporter_id !== user.id) {
+    return { error: "You can only remove photos from your own reports." };
   }
 
-  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-  const maxSize = 5 * 1024 * 1024; // 5 MB
+  // Best-effort storage cleanup; the DB row is the source of truth for display.
+  await supabase.storage.from("item-images").remove([img.storage_path]);
 
-  for (const file of images) {
-    if (!validTypes.includes(file.type)) {
-      return { error: "Only image files (JPEG, PNG, WebP, GIF) are allowed" };
-    }
-    if (file.size > maxSize) {
-      return { error: "Image must be smaller than 5 MB" };
-    }
-  }
+  const { error: delError } = await supabase
+    .from("item_images")
+    .delete()
+    .eq("id", imageId);
 
-  // Upload each image to the item_images bucket
-  const uploads = [];
-  for (const [index, file] of images.entries()) {
-    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const fileName = `${itemType === "lost_item" ? "lost" : "found"}_${itemId}_${index}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("item-images")
-      .upload(fileName, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    if (uploadError) {
-      console.error("Upload error:", uploadError);
-      return { error: "Failed to upload image" };
-    }
-
-    uploads.push({
-      lost_item_id: itemType === "lost_item" ? itemId : null,
-      found_item_id: itemType === "found_item" ? itemId : null,
-      storage_path: fileName,
-      position: index,
-    });
-  }
-
-  const { error: insertError } = await supabase.from("item_images").insert(uploads);
-
-  if (insertError) {
-    console.error("Insert error:", insertError);
-    return { error: "Failed to save image records" };
+  if (delError) {
+    console.error("Item image delete error:", delError);
+    return { error: "Couldn't remove that photo. Please try again." };
   }
 
   revalidatePath(`/lost/${itemId}`);
   revalidatePath(`/found/${itemId}`);
+  revalidatePath("/lost");
+  revalidatePath("/found");
   return {};
 }
 
