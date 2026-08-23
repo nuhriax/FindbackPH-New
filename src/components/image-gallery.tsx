@@ -1,174 +1,278 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhotoViewerModal } from "@/components/photo-viewer-modal";
+
+type GalleryImage = {
+  url: string;
+  alt?: string;
+};
+
+type ImageGalleryProps = {
+  images: GalleryImage[];
+  alt: string;
+  /** Optional destination for adding another image to this report. */
+  addMoreHref?: string;
+  /**
+   * When true, the gallery fills the available height.
+   * The main image flexes while thumbnails remain pinned below.
+   */
+  fill?: boolean;
+};
 
 export function ImageGallery({
   images,
   alt,
+  addMoreHref,
   fill = false,
-}: {
-  images: { url: string; alt?: string }[];
-  alt: string;
-  /**
-   * When true the gallery stretches to fill its parent's height (main photo
-   * flexes, thumbnails pinned below) instead of using a fixed 16:9 box.
-   */
-  fill?: boolean;
-}) {
+}: ImageGalleryProps) {
   const [active, setActive] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
-  if (!images || images.length === 0) {
+  const hasImages = images.length > 0;
+  const multiple = images.length > 1;
+  const current = images[active];
+
+  const goTo = useCallback(
+    (index: number) => {
+      if (!images.length) return;
+
+      setActive((index + images.length) % images.length);
+    },
+    [images.length]
+  );
+
+  const previous = useCallback(() => {
+    goTo(active - 1);
+  }, [active, goTo]);
+
+  const next = useCallback(() => {
+    goTo(active + 1);
+  }, [active, goTo]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!multiple) return;
+
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        previous();
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        next();
+        break;
+      case "Home":
+        event.preventDefault();
+        goTo(0);
+        break;
+      case "End":
+        event.preventDefault();
+        goTo(images.length - 1);
+        break;
+    }
+  };
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    if (touchStartX.current === null || !multiple) return;
+
+    const endX = event.changedTouches[0]?.clientX;
+    if (endX === undefined) return;
+
+    const deltaX = endX - touchStartX.current;
+    const swipeThreshold = 50;
+
+    if (Math.abs(deltaX) >= swipeThreshold) {
+      if (deltaX > 0) {
+        previous();
+      } else {
+        next();
+      }
+    }
+
+    touchStartX.current = null;
+  };
+
+  if (!hasImages) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-2xl border border-slate-200/70 bg-ice-50 text-sm text-slate-500">
+      <div
+        className={cn(
+          "flex w-full items-center justify-center rounded-2xl",
+          "border border-slate-200/70 bg-ice-50 text-sm text-slate-500",
+          fill ? "h-full min-h-48" : "aspect-video"
+        )}
+      >
         No photos were uploaded for this report.
       </div>
     );
   }
 
-  const current = images[active];
-  const multiple = images.length > 1;
-
-  /** Wraps around in both directions. */
-  function goTo(index: number) {
-    setActive(((index % images.length) + images.length) % images.length);
-  }
-
   return (
-    <div className={cn("w-full", fill && "flex h-full min-h-0 flex-col")}>
+    <div
+      className={cn("w-full", fill && "flex h-full min-h-0 flex-col")}
+      onKeyDown={handleKeyDown}
+      tabIndex={multiple ? 0 : undefined}
+      role={multiple ? "region" : undefined}
+      aria-label={multiple ? `Photo gallery: ${alt}` : undefined}
+    >
+      {/* Main image */}
       <div
         className={cn(
-          "group relative w-full select-none overflow-hidden",
+          "group relative w-full select-none overflow-hidden bg-slate-100",
           fill
-            ? // Fill mode: stretch to the remaining height of the parent card.
-              "min-h-0 flex-1"
-            : // Standalone mode: fixed 16:9 frame.
-              "aspect-video rounded-2xl border border-slate-200/70"
+            ? "min-h-0 flex-1 rounded-2xl"
+            : "aspect-video rounded-2xl border border-slate-200/70"
         )}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
-        {/* Clicking the photo opens the fullscreen viewer (never changes it).
-            object-cover fills the frame edge-to-edge; the fullscreen viewer
-            shows the complete uncropped picture. */}
         <button
           type="button"
           onClick={() => setViewerOpen(true)}
-          aria-label="View photo fullscreen"
-          className="absolute inset-0 z-0 h-full w-full cursor-zoom-in"
+          aria-label={`View ${current.alt || alt} fullscreen`}
+          className="absolute inset-0 z-0 h-full w-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-electric-500"
         >
           <Image
-            key={current.url}
             src={current.url}
             alt={current.alt || alt}
             fill
             sizes="(max-width: 768px) 100vw, 66vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.01]"
             unoptimized
+            priority={active === 0}
           />
         </button>
 
-        {/* Prev / next arrows — always visible when there is more than one */}
         {multiple && (
           <>
-            <span
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                previous();
+              }}
               aria-label="Previous photo"
-              onClick={(e) => {
-                e.stopPropagation();
-                goTo(active - 1);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.stopPropagation();
-                  goTo(active - 1);
-                }
-              }}
-              className="
-                absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2
-                items-center justify-center rounded-full bg-slate-900/70
-                text-white shadow-lg ring-1 ring-white/40 transition-all
-                hover:bg-slate-900 focus:outline-none focus-visible:ring-2
-                focus-visible:ring-electric-400 sm:h-11 sm:w-11
-              "
+              className={cn(
+                "absolute left-3 top-1/2 z-10 flex h-10 w-10",
+                "-translate-y-1/2 items-center justify-center rounded-full",
+                "bg-slate-900/70 text-white shadow-lg ring-1 ring-white/40",
+                "transition hover:bg-slate-900",
+                "focus:outline-none focus-visible:ring-2",
+                "focus-visible:ring-electric-400",
+                "sm:h-11 sm:w-11"
+              )}
             >
-              <ChevronLeft size={22} />
-            </span>
+              <ChevronLeft size={22} aria-hidden="true" />
+            </button>
 
-            <span
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                next();
+              }}
               aria-label="Next photo"
-              onClick={(e) => {
-                e.stopPropagation();
-                goTo(active + 1);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.stopPropagation();
-                  goTo(active + 1);
-                }
-              }}
-              className="
-                absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2
-                items-center justify-center rounded-full bg-slate-900/70
-                text-white shadow-lg ring-1 ring-white/40 transition-all
-                hover:bg-slate-900 focus:outline-none focus-visible:ring-2
-                focus-visible:ring-electric-400 sm:h-11 sm:w-11
-              "
+              className={cn(
+                "absolute right-3 top-1/2 z-10 flex h-10 w-10",
+                "-translate-y-1/2 items-center justify-center rounded-full",
+                "bg-slate-900/70 text-white shadow-lg ring-1 ring-white/40",
+                "transition hover:bg-slate-900",
+                "focus:outline-none focus-visible:ring-2",
+                "focus-visible:ring-electric-400",
+                "sm:h-11 sm:w-11"
+              )}
             >
-              <ChevronRight size={22} />
-            </span>
+              <ChevronRight size={22} aria-hidden="true" />
+            </button>
 
-            {/* Counter chip */}
-            <span
-              className="
-                absolute right-3 top-3 z-20 rounded-full bg-slate-900/70 px-2.5
-                py-1 text-[11px] font-semibold text-white shadow-md
-              "
+            <div
+              className={cn(
+                "absolute right-3 top-3 z-10 rounded-full",
+                "bg-slate-900/70 px-2.5 py-1 text-[11px]",
+                "font-semibold text-white shadow-md",
+                "pointer-events-none"
+              )}
+              aria-hidden="true"
             >
               {active + 1} / {images.length}
-            </span>
+            </div>
           </>
         )}
       </div>
 
-      {images.length > 1 && (
+      {/* Thumbnails */}
+      {(multiple || addMoreHref) && (
         <div
           className={cn(
-            "flex gap-2 overflow-x-auto pb-1",
+            "flex gap-3 overflow-x-auto pb-1 pl-3",
+            "scrollbar-thin scrollbar-track-transparent",
             fill ? "mt-3 shrink-0" : "mt-3"
           )}
+          role="tablist"
+          aria-label="Photo thumbnails"
         >
-          {images.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => setActive(i)}
-              aria-label={`View image ${i + 1}`}
-              className={cn(
-                "relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border transition-all",
-                i === active
-                  ? "border-electric-500/70 ring-1 ring-electric-500/50"
-                  : "border-slate-200 opacity-60 hover:opacity-100"
-              )}
+          {images.map((image, index) => {
+            const selected = index === active;
+
+            return (
+              <button
+                key={`${image.url}-${index}`}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                aria-label={`View image ${index + 1} of ${images.length}`}
+                onClick={() => goTo(index)}
+                className={cn(
+                  "relative h-16 w-[5.5rem] flex-shrink-0 overflow-hidden rounded-lg",
+                  "border transition-all duration-200",
+                  "focus:outline-none focus-visible:ring-2",
+                  "focus-visible:ring-electric-500",
+                  selected
+                    ? "border-electric-500/70 ring-1 ring-electric-500/50"
+                    : "border-slate-200 opacity-60 hover:opacity-100"
+                )}
+              >
+                <Image
+                  src={image.url}
+                  alt={image.alt || `${alt} thumbnail ${index + 1}`}
+                  fill
+                  sizes="88px"
+                  className="object-cover"
+                  unoptimized
+                />
+
+                {selected && (
+                  <span
+                    className="absolute inset-0 rounded-lg ring-1 ring-inset ring-electric-500/30"
+                    aria-hidden="true"
+                  />
+                )}
+              </button>
+            );
+          })}
+          {addMoreHref && (
+            <Link
+              href={addMoreHref}
+              aria-label="Add more photos"
+              className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-electric-300 hover:bg-electric-50 hover:text-electric-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-500"
             >
-              <Image
-                src={img.url}
-                alt={`${alt} thumbnail ${i + 1}`}
-                fill
-                sizes="96px"
-                className="object-cover"
-                unoptimized
-              />
-            </button>
-          ))}
+              <Plus size={19} strokeWidth={2.5} aria-hidden="true" />
+              <span className="mt-0.5 text-[10px] font-medium">Add more</span>
+            </Link>
+          )}
         </div>
       )}
 
-      {/* Fullscreen viewer (shared component) */}
+      {/* Fullscreen viewer */}
       {viewerOpen && (
         <PhotoViewerModal
           images={images}

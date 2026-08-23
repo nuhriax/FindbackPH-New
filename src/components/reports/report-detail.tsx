@@ -372,6 +372,9 @@ export function ReportDetail({
                   <ImageGallery
                     images={images}
                     alt={item.title}
+                    addMoreHref={
+                      isOwner ? `/dashboard/reports/${item.id}/edit` : undefined
+                    }
                     fill
                   />
                 ) : (
@@ -478,7 +481,13 @@ export function ReportDetail({
             <div className="p-7 sm:p-8 lg:p-9">
               {/* Mobile gallery — the desktop image panel is lg-only */}
               <div className="mb-6 lg:hidden">
-                <ImageGallery images={images} alt={item.title} />
+                <ImageGallery
+                  images={images}
+                  alt={item.title}
+                  addMoreHref={
+                    isOwner ? `/dashboard/reports/${item.id}/edit` : undefined
+                  }
+                />
               </div>
 
               {/* Mobile status */}
