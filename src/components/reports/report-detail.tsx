@@ -38,9 +38,9 @@ export type DetailItem = {
   createdAt: string | null;
   dateLabel: string;
   reward: number | null;
-  /** Raw date (YYYY-MM-DD…) used to prefill the inline edit form. */
+  /** Raw date (YYYY-MM-DDÃ¢â‚¬Â¦) used to prefill the inline edit form. */
   dateOccurred?: string | null;
-  /** Found items only — where the item is currently being kept. */
+  /** Found items only Ã¢â‚¬â€ where the item is currently being kept. */
   holdingInfo?: string | null;
 };
 
@@ -353,7 +353,7 @@ export function ReportDetail({
             {/* Gallery */}
 
             <div className="absolute inset-6 flex flex-col">
-              {/* Framed main photo — stretches to fill the panel height.
+              {/* Framed main photo Ã¢â‚¬â€ stretches to fill the panel height.
                   Transparent bg so the panel's ambient gradient (the site's
                   real background) shows behind the letterboxed photo. */}
               <div
@@ -372,8 +372,13 @@ export function ReportDetail({
                   <ImageGallery
                     images={images}
                     alt={item.title}
-                    addMoreHref={
-                      isOwner ? `/dashboard/reports/${item.id}/edit` : undefined
+                    addMoreItem={
+                      isOwner
+                        ? {
+                            itemType: kind === "lost" ? "lost_item" : "found_item",
+                            itemId: item.id,
+                          }
+                        : undefined
                     }
                     fill
                   />
@@ -479,14 +484,19 @@ export function ReportDetail({
 
           <div className="min-w-0">
             <div className="p-7 sm:p-8 lg:p-9">
-              {/* Mobile gallery — the desktop image panel is lg-only */}
+              {/* Mobile gallery Ã¢â‚¬â€ the desktop image panel is lg-only */}
               <div className="mb-6 lg:hidden">
                 <ImageGallery
                   images={images}
                   alt={item.title}
-                  addMoreHref={
-                    isOwner ? `/dashboard/reports/${item.id}/edit` : undefined
-                  }
+                  addMoreItem={
+                      isOwner
+                        ? {
+                            itemType: kind === "lost" ? "lost_item" : "found_item",
+                            itemId: item.id,
+                          }
+                        : undefined
+                    }
                 />
               </div>
 
@@ -525,7 +535,7 @@ export function ReportDetail({
                 </span>
 
                 <span className="text-slate-300">
-                  •
+                  Ã¢â‚¬Â¢
                 </span>
 
                 <span
@@ -718,7 +728,7 @@ export function ReportDetail({
                         text-emerald-700
                       "
                     >
-                      ₱{item.reward.toLocaleString()}
+                      Ã¢â€šÂ±{item.reward.toLocaleString()}
                     </p>
                   </div>
                 )}
@@ -987,12 +997,12 @@ export function ReportDetail({
                         "
                       >
                         <li>
-                          • Meet in a public and
+                          Ã¢â‚¬Â¢ Meet in a public and
                           well-lit location.
                         </li>
 
                         <li>
-                          • Verify the item&apos;s
+                          Ã¢â‚¬Â¢ Verify the item&apos;s
                           identifying details.
                         </li>
                       </ul>
@@ -1211,7 +1221,7 @@ export function ReportDetail({
                                 "
                               >
                                 {matchCategory}
-                                {" · "}
+                                {" Ã‚Â· "}
                                 {matchLocation}
                               </p>
                             </div>
@@ -1360,7 +1370,7 @@ export function ReportDetail({
                   Posted {reportDate}
                 </span>
 
-                <span>•</span>
+                <span>Ã¢â‚¬Â¢</span>
 
                 <span className="font-mono">
                   ID {item.id.slice(0, 8)}
@@ -1408,7 +1418,7 @@ export function ReportDetail({
           Posted {reportDate}
         </span>
 
-        <span>•</span>
+        <span>Ã¢â‚¬Â¢</span>
 
         <span className="font-mono">
           ID {item.id.slice(0, 8)}

@@ -2,8 +2,12 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { uploadItemImagesClient } from "@/lib/file-upload-client";
+
 import { cn } from "@/lib/utils";
 import { PhotoViewerModal } from "@/components/photo-viewer-modal";
 
@@ -18,6 +22,14 @@ type ImageGalleryProps = {
   /** Optional destination for adding another image to this report. */
   addMoreHref?: string;
   /**
+   * When set, the "Add more" button opens the device file picker directly,
+   * uploads the chosen photos to this report, and refreshes the gallery.
+   */
+  addMoreItem?: {
+    itemType: "lost_item" | "found_item";
+    itemId: string;
+  };
+  /**
    * When true, the gallery fills the available height.
    * The main image flexes while thumbnails remain pinned below.
    */
@@ -28,10 +40,15 @@ export function ImageGallery({
   images,
   alt,
   addMoreHref,
+  addMoreItem,
   fill = false,
 }: ImageGalleryProps) {
+  const router = useRouter();
   const [active, setActive] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const touchStartX = useRef<number | null>(null);
 
   const hasImages = images.length > 0;
@@ -80,6 +97,39 @@ export function ImageGallery({
 
   const handleTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handlePickFiles = () => {
+    setUploadError(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleFilesSelected = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(event.target.files ?? []);
+    // Reset so picking the same file again still fires onChange.
+    event.target.value = "";
+
+    if (!addMoreItem || files.length === 0 || uploading) return;
+
+    setUploading(true);
+    setUploadError(null);
+
+    const error = await uploadItemImagesClient(
+      addMoreItem.itemType,
+      addMoreItem.itemId,
+      files
+    );
+
+    setUploading(false);
+
+    if (error) {
+      setUploadError(error);
+      return;
+    }
+
+    router.refresh();
   };
 
   const handleTouchEnd = (event: React.TouchEvent) => {
@@ -210,7 +260,7 @@ export function ImageGallery({
       </div>
 
       {/* Thumbnails */}
-      {(multiple || addMoreHref) && (
+      {(multiple || addMoreHref || addMoreItem) && (
         <div
           className={cn(
             "flex gap-3 overflow-x-auto pb-1 pl-3",
@@ -259,7 +309,24 @@ export function ImageGallery({
               </button>
             );
           })}
-          {addMoreHref && (
+          {addMoreItem && (
+            <button
+              type="button"
+              aria-label="Add more photos"
+              disabled={uploading}
+              onClick={handlePickFiles}
+              className={cn(
+                "flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-electric-300 hover:bg-electric-50 hover:text-electric-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-500",
+                uploading && "cursor-wait opacity-60"
+              )}
+            >
+              <Plus size={19} strokeWidth={2.5} aria-hidden="true" />
+              <span className="mt-0.5 text-[10px] font-medium">
+                {uploading ? "Uploading…" : "Add more"}
+              </span>
+            </button>
+          )}
+          {addMoreHref && !addMoreItem && (
             <Link
               href={addMoreHref}
               aria-label="Add more photos"
@@ -269,7 +336,24 @@ export function ImageGallery({
               <span className="mt-0.5 text-[10px] font-medium">Add more</span>
             </Link>
           )}
+          {uploadError && (
+            <p className="mt-1 flex-shrink-0 self-center text-xs font-medium text-red-600">
+              {uploadError}
+            </p>
+          )}
         </div>
+      )}
+
+      {/* Hidden file input for the direct-upload "Add more" button */}
+      {addMoreItem && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          multiple
+          className="hidden"
+          onChange={handleFilesSelected}
+        />
       )}
 
       {/* Fullscreen viewer */}
