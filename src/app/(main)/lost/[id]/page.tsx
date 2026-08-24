@@ -47,7 +47,7 @@ export default async function LostItemDetailPage({ params }: Props) {
 
   const { data: raw } = await supabase
     .from("lost_items")
-    .select("*, profiles!lost_items_reporter_id_fkey(username, successful_returns, created_at)")
+    .select("*, profiles!lost_items_reporter_id_fkey(username, first_name, last_name, successful_returns, created_at)")
     .eq("id", id)
     .maybeSingle();
 
@@ -58,7 +58,7 @@ export default async function LostItemDetailPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   const isOwner = user?.id === raw.reporter_id;
-  const reporter = firstRow<{ username: string; successful_returns: number; created_at: string }>(raw.profiles);
+  const reporter = firstRow<{ username: string; first_name: string; last_name: string; successful_returns: number; created_at: string }>(raw.profiles);
 
   // Phase 7 — real trust signals only (see src/lib/trust.ts).
   const emailVerified = isEmailVerified(user);

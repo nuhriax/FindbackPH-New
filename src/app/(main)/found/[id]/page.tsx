@@ -16,6 +16,8 @@ type Props = {
 
 type Reporter = {
   username: string;
+  first_name?: string;
+  last_name?: string;
   successful_returns: number;
   created_at?: string;
 };
@@ -77,6 +79,8 @@ export default async function FoundItemDetailPage({ params }: Props) {
       *,
       profiles!found_items_reporter_id_fkey (
         username,
+        first_name,
+        last_name,
         successful_returns,
         created_at
       )

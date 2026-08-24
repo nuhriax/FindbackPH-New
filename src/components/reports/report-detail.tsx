@@ -203,6 +203,8 @@ export function ReportDetail({
   images: { id: string; url: string }[];
   reporter: {
     username: string;
+    first_name?: string | null;
+    last_name?: string | null;
     successful_returns: number;
   } | null;
   /** Phase 7 — real trust signals; omit to render no badges at all. */
@@ -262,7 +264,17 @@ export function ReportDetail({
       )
     : "Recently";
 
+  const reporterName =
+    (reporter &&
+      [reporter.first_name ?? "", reporter.last_name ?? ""]
+        .map((p: string) => p.trim())
+        .filter(Boolean)
+        .join(" ")) ||
+    reporter?.username ||
+    "FindBack user";
+
   const firstLetter = (
+    reporter?.first_name?.[0] ??
     reporter?.username?.[0] ??
     (isLost ? "R" : "F")
   ).toUpperCase();
@@ -919,8 +931,7 @@ export function ReportDetail({
                               text-slate-900
                             "
                           >
-                            {reporter?.username ??
-                              "FindBack user"}
+                            {reporterName}
                           </p>
 
                           {/* Phase 7 — subtle, real-data-only trust badges */}

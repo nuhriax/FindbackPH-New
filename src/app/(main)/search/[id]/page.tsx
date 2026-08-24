@@ -28,12 +28,12 @@ export default async function ReportDetailPage({ params }: Props) {
   const [lostRes, foundRes] = await Promise.all([
     supabase
       .from("lost_items")
-      .select("*, profiles!lost_items_reporter_id_fkey(username, successful_returns)")
+      .select("*, profiles!lost_items_reporter_id_fkey(username, first_name, last_name, successful_returns)")
       .eq("id", params.id)
       .maybeSingle(),
     supabase
       .from("found_items")
-      .select("*, profiles!found_items_reporter_id_fkey(username, successful_returns)")
+      .select("*, profiles!found_items_reporter_id_fkey(username, first_name, last_name, successful_returns)")
       .eq("id", params.id)
       .maybeSingle(),
   ]);
@@ -52,7 +52,12 @@ export default async function ReportDetailPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   const isOwner = user?.id === raw.reporter_id;
-  const reporter = raw.profiles as { username: string; successful_returns: number } | null;
+  const reporter = raw.profiles as {
+    username: string;
+    first_name?: string;
+    last_name?: string;
+    successful_returns: number;
+  } | null;
 
   const imageCol = kind === "lost" ? "lost_item_id" : "found_item_id";
   const { data: images } = await supabase

@@ -65,7 +65,7 @@ export async function ConversationsList() {
             className="card flex items-center gap-4 p-4 transition-colors hover:border-electric-400/40 hover:shadow-card-hover"
           >
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-sm font-semibold text-white">
-              {other?.username?.[0]?.toUpperCase() ?? "U"}
+              {other?.first_name?.[0]?.toUpperCase() ?? other?.username?.[0]?.toUpperCase() ?? "U"}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">

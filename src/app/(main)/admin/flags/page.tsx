@@ -49,7 +49,7 @@ export default async function AdminFlagsPage() {
   const [{ data: flags, error }, { data: userFlags, error: userFlagsError }] = await Promise.all([
     supabase
       .from("report_flags")
-      .select("*, profiles!report_flags_reporter_id_fkey(username)")
+      .select("*, profiles!report_flags_reporter_id_fkey(username, first_name, last_name)")
       .order("created_at", { ascending: false })
       .limit(100),
     supabase
@@ -95,7 +95,19 @@ export default async function AdminFlagsPage() {
         ) : (
           <div className="mt-8 space-y-3">
             {flags.map((flag: any) => {
-              const reporter = flag.profiles as { username: string } | null;
+              const reporter = flag.profiles as {
+                username: string;
+                first_name?: string;
+                last_name?: string;
+              } | null;
+              const reporterName =
+                (reporter &&
+                  [reporter.first_name ?? "", reporter.last_name ?? ""]
+                    .map((v: string) => v.trim())
+                    .filter(Boolean)
+                    .join(" ")) ||
+                reporter?.username ||
+                "unknown";
               const href =
                 flag.item_type === "lost_item"
                   ? `/lost/${flag.item_id}`
@@ -115,7 +127,7 @@ export default async function AdminFlagsPage() {
                       <p className="mt-1 text-sm text-slate-600">
                         Reported by{" "}
                         <span className="text-slate-700">
-                          @{reporter?.username ?? "unknown"}
+                          {reporterName}
                         </span>{" "}
                         · {format(new Date(flag.created_at), "MMM d, yyyy h:mm a")}
                       </p>

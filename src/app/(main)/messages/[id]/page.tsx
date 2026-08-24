@@ -223,9 +223,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
           {otherUser && (
             <span className="ml-auto text-xs text-slate-500">
               with{" "}
-              <span className="font-medium text-slate-700">
-                {otherUser.first_name || otherUser.username}
-              </span>
+              <span className="font-medium text-slate-700">{displayName}</span>
             </span>
           )}
           {otherUser && <BlockUserButton targetUserId={otherUser.id} />}
