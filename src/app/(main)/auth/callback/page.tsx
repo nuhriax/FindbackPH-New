@@ -29,10 +29,17 @@ function CallbackInner() {
     const supabase = createClient();
     let cancelled = false;
 
-    // Safe internal-path helper (rejects external / open redirects).
+    // Safe internal-path helper (rejects external / open redirects AND never
+    // lands a signed-in user on the home page or auth screens after login).
     const nextRaw = searchParams.get("next");
     const target =
-      nextRaw?.startsWith("/") && !nextRaw.startsWith("//") ? nextRaw : "/dashboard";
+      nextRaw?.startsWith("/") &&
+      !nextRaw.startsWith("//") &&
+      nextRaw !== "/" &&
+      nextRaw !== "/login" &&
+      nextRaw !== "/register"
+        ? nextRaw
+        : "/dashboard";
 
     async function handle() {
       const code = searchParams.get("code");

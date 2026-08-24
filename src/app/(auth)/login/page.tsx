@@ -36,9 +36,18 @@ function LoginInner() {
   const callbackWasOauth = searchParams.get("source") === "oauth";
   const oauthReason = searchParams.get("reason");
   // Respect the protected-page redirect the middleware set (e.g. /dashboard),
-  // falling back to the dashboard. Reject external/open redirects.
+  // falling back to the dashboard. Reject external/open redirects AND never
+  // route a signed-in user back to the home page after login — a `next` of "/"
+  // is normalized to /dashboard.
   const rawNext = searchParams.get("next");
-  const next = rawNext?.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
+  const next =
+    rawNext?.startsWith("/") &&
+    !rawNext.startsWith("//") &&
+    rawNext !== "/" &&
+    rawNext !== "/login" &&
+    rawNext !== "/register"
+      ? rawNext
+      : "/dashboard";
 
   // If a session already exists (e.g. the user just visited a protected page and
   // was bounced here, or is returning while still logged in) skip the form.
