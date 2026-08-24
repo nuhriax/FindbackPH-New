@@ -67,8 +67,9 @@ export function Footer() {
           <div>
             <Logo variant="dark" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
-              Helping Philippine communities reconnect people with the things
-              they&apos;ve lost — safely, quickly, and locally.
+              Lost today. Found tomorrow. Helping Philippine communities
+              reconnect people with the things they&apos;ve lost — safely,
+              quickly, and locally.
             </p>
           </div>
 
