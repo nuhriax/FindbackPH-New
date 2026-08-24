@@ -447,7 +447,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                       </p>
 
                       <p className="mt-0.5 text-sm font-bold text-slate-900">
-                        92% match
+                        High similarity
                       </p>
                     </div>
                   </div>

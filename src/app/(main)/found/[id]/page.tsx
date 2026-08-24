@@ -3,11 +3,8 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
-import {
-  ReportDetail,
-  type DetailItem,
-  type DetailMatch,
-} from "@/components/reports/report-detail";
+import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +17,7 @@ type Props = {
 type Reporter = {
   username: string;
   successful_returns: number;
+  created_at?: string;
 };
 
 type LostItem = {
@@ -79,7 +77,8 @@ export default async function FoundItemDetailPage({ params }: Props) {
       *,
       profiles!found_items_reporter_id_fkey (
         username,
-        successful_returns
+        successful_returns,
+        created_at
       )
     `)
     .eq("id", id)
@@ -100,6 +99,38 @@ export default async function FoundItemDetailPage({ params }: Props) {
   const isOwner = user?.id === raw.reporter_id;
 
   const reporter = firstRow<Reporter>(raw.profiles);
+
+  // Phase 7 — real trust signals only (see src/lib/trust.ts).
+  const emailVerified = isEmailVerified(user);
+  const trust = {
+    ...computeTrustSignals({
+      emailVerified,
+      profileCreatedAt: reporter?.created_at ?? null,
+      successfulReturns: reporter?.successful_returns ?? 0,
+    }),
+    // Set below, once imageUrls is known.
+    verifiedReport: false,
+  };
+
+  // Phase 7 — ownership verification challenge state. Null when none exists.
+  const { data: challengeData } = user
+    ? await supabase.rpc("get_ownership_challenge", {
+        p_item_type: "found_item",
+        p_item_id: id,
+      })
+    : { data: null };
+  const challenge = (challengeData ?? null) as OwnershipChallengeState | null;
+  const ownership = challenge
+    ? {
+        itemType: "found_item" as const,
+        itemId: id,
+        questions: {
+          question1: challenge.question1 as string,
+          question2: (challenge.question2 as string | null) ?? null,
+        },
+        viewerPassed: Boolean(challenge.caller_passed),
+      }
+    : null;
 
   /*
    * These queries are independent, so run them concurrently.
@@ -161,6 +192,9 @@ export default async function FoundItemDetailPage({ params }: Props) {
 
   const savedItemId = savedResult.data?.id ?? null;
 
+  // Verified Report — only when the reporter is email-confirmed AND photos exist.
+  trust.verifiedReport = isVerifiedReport(emailVerified, imageUrls.length);
+
   const matches: DetailMatch[] = [];
 
   for (const match of matchRows ?? []) {
@@ -196,6 +230,7 @@ export default async function FoundItemDetailPage({ params }: Props) {
     reward: null,
     dateOccurred: raw.date_found ?? null,
     holdingInfo: raw.current_holding_info ?? null,
+    reporterId: raw.reporter_id,
   };
 
   return (
@@ -204,6 +239,8 @@ export default async function FoundItemDetailPage({ params }: Props) {
       item={item}
       images={imageUrls}
       reporter={reporter}
+      trust={trust}
+      ownership={ownership}
       isOwner={isOwner}
       savedItemId={savedItemId}
       matches={matches}

@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "@/components/dashboard/profile-form";
 import { CalendarDays, HeartHandshake, ShieldCheck, UserRound } from "lucide-react";
+import { VerifiedAccountBadge, TrustedMemberBadge } from "@/components/ui/verification-badge";
+import { computeTrustSignals, isEmailVerified } from "@/lib/trust";
 
 export const metadata = {
   title: "Profile — FindBack PH",
@@ -50,6 +52,19 @@ export default async function ProfilePage() {
           <p className="font-display text-lg font-semibold text-navy-900">{name || "FindBack member"}</p>
           <p className="text-sm text-slate-500">@{profile.username}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
+            {(() => {
+              const trust = computeTrustSignals({
+                emailVerified: isEmailVerified(user),
+                profileCreatedAt: profile.created_at,
+                successfulReturns: profile.successful_returns,
+              });
+              return (
+                <>
+                  {trust.emailVerified && <VerifiedAccountBadge />}
+                  {trust.trustedMember && <TrustedMemberBadge />}
+                </>
+              );
+            })()}
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
               <HeartHandshake size={13} />
               {profile.successful_returns ?? 0} returns

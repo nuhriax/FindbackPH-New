@@ -57,6 +57,17 @@ export async function getOrCreateConversation(
     return { error: "You cannot message yourself" };
   }
 
+  // Block enforcement — either direction blocks new conversations.
+  const { data: blockRow } = await supabase
+    .from("blocked_users")
+    .select("blocker_id")
+    .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${reporterId}),and(blocker_id.eq.${reporterId},blocked_id.eq.${user.id})`)
+    .limit(1);
+
+  if (blockRow && blockRow.length > 0) {
+    return { error: "Messaging isn't available between these accounts" };
+  }
+
   const [pA, pB] = user.id < reporterId ? [user.id, reporterId] : [reporterId, user.id];
 
   const { data: existing } = await supabase
@@ -125,6 +136,18 @@ export async function sendMessageAction(
   const isParticipant = convo.participant_a === user.id || convo.participant_b === user.id;
   if (!isParticipant) {
     return { error: "You are not part of this conversation" };
+  }
+
+  // Block enforcement — either direction blocks sending.
+  const otherId = convo.participant_a === user.id ? convo.participant_b : convo.participant_a;
+  const { data: blockRow } = await supabase
+    .from("blocked_users")
+    .select("blocker_id")
+    .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${otherId}),and(blocker_id.eq.${otherId},blocked_id.eq.${user.id})`)
+    .limit(1);
+
+  if (blockRow && blockRow.length > 0) {
+    return { error: "Messaging isn't available between these accounts" };
   }
 
   const { error } = await supabase.from("messages").insert({
@@ -202,7 +225,8 @@ export async function getMessages(conversationId: string): Promise<MessageData[]
     .from("messages")
     .select("*")
     .eq("conversation_id", conversationId)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(200);
 
   if (error) {
     console.error("Error fetching messages:", error);

@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { foundItemSchema, lostItemSchema } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
-import { runMatchingForLostItem } from "@/lib/actions/matching";
+import { runMatchingForLostItem, runMatchingForFoundItem } from "@/lib/actions/matching";
 
 export type ActionResult = { error?: string; itemId?: string };
 
@@ -112,6 +112,14 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };
+  }
+
+  // Reverse matching: check this new found item against existing active lost
+  // reports so their owners discover it (best-effort; never blocks the report).
+  try {
+    await runMatchingForFoundItem(inserted.id);
+  } catch (e) {
+    console.error("Reverse matching engine error:", e);
   }
 
   revalidatePath("/found");
@@ -337,7 +345,7 @@ export async function reportFlagAction(formData: FormData): Promise<ActionResult
 
   const validReasons = [
     "scam", "fake_report", "harassment", "suspicious_behavior",
-    "inappropriate_content", "wrong_information", "other",
+    "inappropriate_content", "wrong_information", "impersonation", "other",
   ];
 
   if (!validReasons.includes(reason)) {

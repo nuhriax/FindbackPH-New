@@ -72,7 +72,21 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
           "We couldn't send the confirmation email — the server's email sending (SMTP) isn't working. Check Supabase > Project Settings > Auth > SMTP and confirm the Gmail app password is real (no spaces) and the sender email is allowed, then try again.",
       };
     }
-    return { error: message };
+    // Map known Supabase errors to friendly, non-technical messages instead of
+    // exposing raw provider errors to the UI.
+    if (error.code === "user_already_exists" || /already registered|already exists/i.test(message)) {
+      return {
+        error:
+          "An account with this email already exists. Try logging in instead, or reset your password if you've forgotten it.",
+      };
+    }
+    if (/password/i.test(message) && /characters|least|should be/i.test(message)) {
+      return { error: "Password must be at least 8 characters with an uppercase letter and a number." };
+    }
+    if (/rate limit|too many/i.test(message)) {
+      return { error: "Too many attempts. Please wait a few minutes and try again." };
+    }
+    return { error: "We couldn't create your account right now. Please try again in a moment." };
   }
 
   // Guarantee a complete profile row. The signup trigger normally creates this,
@@ -158,9 +172,14 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Ac
   }
 
   const supabase = createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
-  });
+  // Only pass redirectTo when the site URL is configured — an undefined env var
+  // would otherwise produce a literal "undefined/reset-password" redirect URL.
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    email,
+    process.env.NEXT_PUBLIC_SITE_URL
+      ? { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password` }
+      : undefined
+  );
 
   if (error) {
     console.error("Password reset error:", error);

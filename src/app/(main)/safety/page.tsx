@@ -203,6 +203,63 @@ const activityLog = [
   },
 ];
 
+/* Real, actionable guidance for scams, payments and reporting.
+   Only flows backed by real platform features are referenced:
+   listings can be reported via the "Report this listing" button on
+   every item page (stored in report_flags and reviewed by moderators).
+   There is no in-app "block user" feature yet — so we never pretend
+   there is; we advise disengaging and reporting instead. */
+const scamTopics = [
+  {
+    icon: AlertTriangle,
+    title: "Common scams",
+    description:
+      "Watch out for claims that a stranger \"found your item\" but will only return it after you send money, gift cards, or load — or anyone who cannot describe the item accurately.",
+    status: "SPOT IT",
+    color: "red" as const,
+  },
+  {
+    icon: XCircle,
+    title: "Payment requests",
+    description:
+      "Never send money to receive a found item. A legitimate finder may accept a voluntary reward, but demanding payment first — via GCash, bank transfer, or crypto — is a scam signal.",
+    status: "NEVER PAY FIRST",
+    color: "red" as const,
+  },
+  {
+    icon: MessageCircle,
+    title: "Suspicious requests",
+    description:
+      "Refuse any request to move the conversation off-platform before you are comfortable, to click unknown links, to scan QR codes, or to verify codes sent to your phone.",
+    status: "REFUSE",
+    color: "amber" as const,
+  },
+  {
+    icon: Lock,
+    title: "Personal information",
+    description:
+      "Share only what the handover requires. No one legitimately needs your full address in advance, government IDs, OTPs, passwords, or banking details.",
+    status: "SHARE LESS",
+    color: "blue" as const,
+  },
+  {
+    icon: UserCheck,
+    title: "Reporting users & listings",
+    description:
+      "Every listing has a \"Report this listing\" link. Use it to flag scams, fake reports, harassment, or suspicious behavior — reports go to our moderation team for review.",
+    status: "REPORT",
+    color: "emerald" as const,
+  },
+  {
+    icon: ShieldCheck,
+    title: "Disengage & protect yourself",
+    description:
+      "There is no need to confront anyone. Stop responding, do not share more information, keep evidence of the conversation, and report the listing so moderators can act on it.",
+    status: "STEP AWAY",
+    color: "emerald" as const,
+  },
+];
+
 /* =========================================================
    SMALL COMPONENTS
 ========================================================= */
@@ -508,7 +565,7 @@ export default function SafetyPage() {
             <StatusDot pulse />
 
             <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-emerald-700">
-              System operational
+              Safety guide
             </span>
 
           </div>
@@ -603,17 +660,17 @@ export default function SafetyPage() {
                   <div>
 
                     <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                      Recovery flow
+                      Safety guide
                     </p>
 
                     <p className="mt-1 text-sm font-semibold text-slate-900">
-                      Recovery readiness
+                      Before-handover checklist
                     </p>
 
                   </div>
 
                   <StatusBadge color="emerald">
-                    Active
+                    Guidance
                   </StatusBadge>
 
                 </div>
@@ -622,36 +679,47 @@ export default function SafetyPage() {
 
                 <div className="grid gap-8 p-6 sm:grid-cols-[.8fr_1.2fr] sm:p-8">
 
-                  <div className="group flex flex-col items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-blue-50 via-white to-emerald-50 p-8 transition-transform duration-500 hover:scale-[1.015]">
+                  <div className="group flex flex-col justify-center rounded-[1.5rem] bg-gradient-to-br from-blue-50 via-white to-emerald-50 p-8 transition-transform duration-500 hover:scale-[1.015]">
 
                     <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                      Recovery readiness
+                      Before any handover
                     </p>
 
-                    <div className="mt-4 flex items-end">
+                    <div className="mt-6 space-y-3.5">
 
-                      <span className="font-display text-7xl font-medium leading-none tracking-[-.08em] text-slate-900">
-                        94
-                      </span>
+                      {[
+                        "Verify the person's claim",
+                        "Meet in a public place",
+                        "Bring someone you trust",
+                        "Never share passwords or OTPs",
+                      ].map((check) => (
 
-                      <span className="mb-2 ml-1 text-xs text-slate-400">
-                        /100
-                      </span>
+                        <div
+                          key={check}
+                          className="flex items-start gap-2.5"
+                        >
+
+                          <CheckCircle2
+                            size={13}
+                            className="mt-0.5 shrink-0 text-emerald-600"
+                          />
+
+                          <span className="text-xs font-medium leading-5 text-slate-700">
+                            {check}
+                          </span>
+
+                        </div>
+
+                      ))}
 
                     </div>
 
-                    <div className="mt-4 h-1.5 w-full max-w-[150px] overflow-hidden rounded-full bg-slate-200">
-
-                      <div className="h-full w-[94%] origin-left rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-transform duration-1000" />
-
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-2">
+                    <div className="mt-6 flex items-center gap-2 border-t border-slate-200/70 pt-4">
 
                       <StatusDot pulse />
 
                       <span className="text-[8px] font-bold uppercase tracking-[.15em] text-emerald-700">
-                        Good readiness
+                        Simple habits, safer recovery
                       </span>
 
                     </div>
@@ -684,7 +752,7 @@ export default function SafetyPage() {
                       },
                       {
                         label: "Situation",
-                        value: "Low concern",
+                        value: "Trust your instincts",
                         icon: Radar,
                         color: "amber" as const,
                       },
@@ -754,18 +822,18 @@ export default function SafetyPage() {
 
                     </div>
 
-                    <button
-                      type="button"
-                      className="group inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[.15em] text-blue-600"
+                    <a
+                      href="#protocol"
+                      className="group inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[.15em] text-blue-600 transition-colors hover:text-blue-800"
                     >
-                      Continue
+                      See the full protocol
 
                       <ArrowRight
                         size={14}
                         className="transition-transform duration-300 group-hover:translate-x-1"
                       />
 
-                    </button>
+                    </a>
 
                   </div>
 
@@ -796,7 +864,8 @@ export default function SafetyPage() {
                 ["03", "Situation", "#risk"],
                 ["04", "Location", "#location"],
                 ["05", "Privacy", "#privacy"],
-                ["06", "Response", "#response"],
+                ["06", "Scams", "#scams"],
+                ["07", "Response", "#response"],
               ].map(([number, label, href]) => (
 
                 <a
@@ -822,7 +891,7 @@ export default function SafetyPage() {
                 <StatusDot pulse />
 
                 <span className="text-[8px] font-bold uppercase tracking-[.15em] text-emerald-700">
-                  Monitoring
+                  Guidance
                 </span>
 
               </div>
@@ -1311,6 +1380,25 @@ export default function SafetyPage() {
 
               </div>
 
+              <div className="mt-3 flex items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 transition-all duration-300 hover:bg-blue-50">
+
+                <Lock
+                  size={18}
+                  className="shrink-0 text-blue-600"
+                />
+
+                <p className="text-xs leading-6 text-slate-600">
+                  Listings only ever show a city and an{" "}
+                  <strong className="font-semibold text-slate-700">
+                    approximate area
+                  </strong>{" "}
+                  (for example &ldquo;near SM North EDSA&rdquo;). Never
+                  publish your exact address, and never share it in
+                  chat until the handover is arranged.
+                </p>
+
+              </div>
+
             </div>
 
 
@@ -1510,6 +1598,182 @@ export default function SafetyPage() {
 
 
         {/* =====================================================
+            SCAMS, PAYMENTS & REPORTING
+        ====================================================== */}
+
+        <section
+          id="scams"
+          className="scroll-mt-28 border-t border-slate-200/80 py-24 sm:py-32"
+        >
+
+          <div className="grid gap-14 lg:grid-cols-[.7fr_1.3fr]">
+
+            <div className="safety-reveal">
+
+              <SectionEyebrow number="06" color="red">
+                Scams &amp; reporting
+              </SectionEyebrow>
+
+              <h2 className="mt-7 max-w-xl font-display text-5xl font-medium leading-[.94] tracking-[-.065em] sm:text-6xl">
+
+                If money enters
+
+                <span className="block text-slate-400">
+                  the conversation, walk away.
+                </span>
+
+              </h2>
+
+              <p className="mt-8 max-w-md text-sm leading-7 text-slate-500">
+                Most problems in item recovery come down to a handful
+                of patterns. Learn them once and most scams lose their
+                power over you.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-2.5">
+
+                <a
+                  href="/found"
+                  className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-[0_12px_35px_rgba(15,23,42,.06)]"
+                >
+
+                  <div className="flex items-center gap-3">
+
+                    <UserCheck size={16} className="text-blue-600" />
+
+                    <span className="text-xs font-medium text-slate-700">
+                      Found a suspicious listing?
+                    </span>
+
+                  </div>
+
+                  <span className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[.15em] text-blue-600">
+                    Browse listings
+
+                    <ArrowRight
+                      size={12}
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </span>
+
+                </a>
+
+                <a
+                  href="/contact"
+                  className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-[0_12px_35px_rgba(15,23,42,.06)]"
+                >
+
+                  <div className="flex items-center gap-3">
+
+                    <MessageCircle size={16} className="text-emerald-600" />
+
+                    <span className="text-xs font-medium text-slate-700">
+                      Something we should know?
+                    </span>
+
+                  </div>
+
+                  <span className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[.15em] text-emerald-600">
+                    Contact us
+
+                    <ArrowRight
+                      size={12}
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </span>
+
+                </a>
+
+              </div>
+
+            </div>
+
+
+            <div className="grid overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_25px_80px_rgba(15,23,42,.05)] sm:grid-cols-2">
+
+              {scamTopics.map((topic, index) => {
+
+                const Icon = topic.icon;
+
+                return (
+                  <div
+                    key={topic.title}
+                    className={`group relative p-7 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,.08)] sm:p-8 ${
+                      index < scamTopics.length - 2
+                        ? "border-b border-slate-100"
+                        : ""
+                    } ${index % 2 === 0 ? "sm:border-r sm:border-slate-100" : ""}`}
+                  >
+
+                    <span className="absolute right-7 top-7 font-mono text-[8px] text-slate-300">
+                      0{index + 1}
+                    </span>
+
+                    <div
+                      className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-500 group-hover:scale-110 ${
+                        topic.color === "red"
+                          ? "bg-red-50"
+                          : topic.color === "amber"
+                            ? "bg-amber-50"
+                            : topic.color === "blue"
+                              ? "bg-blue-50"
+                              : "bg-emerald-50"
+                      }`}
+                    >
+
+                      <Icon
+                        size={18}
+                        className={
+                          topic.color === "red"
+                            ? "text-red-500"
+                            : topic.color === "amber"
+                              ? "text-amber-600"
+                              : topic.color === "blue"
+                                ? "text-blue-600"
+                                : "text-emerald-600"
+                        }
+                      />
+
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-between gap-3">
+
+                      <h3 className="text-sm font-semibold text-slate-900">
+                        {topic.title}
+                      </h3>
+
+                      <span
+                        className={`text-[8px] font-bold uppercase tracking-[.14em] ${
+                          topic.color === "red"
+                            ? "text-red-500"
+                            : topic.color === "amber"
+                              ? "text-amber-600"
+                              : topic.color === "blue"
+                                ? "text-blue-600"
+                                : "text-emerald-600"
+                        }`}
+                      >
+                        {topic.status}
+                      </span>
+
+                    </div>
+
+                    <p className="mt-3 text-xs leading-6 text-slate-500">
+                      {topic.description}
+                    </p>
+
+                  </div>
+                );
+              })}
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* =====================================================
             RECOVERY ACTIVITY
         ====================================================== */}
 
@@ -1519,8 +1783,8 @@ export default function SafetyPage() {
 
             <div>
 
-              <SectionEyebrow number="06" color="emerald">
-                Recovery activity
+              <SectionEyebrow number="07" color="emerald">
+                Recovery activity — example
               </SectionEyebrow>
 
               <h2 className="mt-7 font-display text-5xl font-medium leading-[.94] tracking-[-.065em] sm:text-6xl">
@@ -1534,9 +1798,11 @@ export default function SafetyPage() {
               </h2>
 
               <p className="mt-8 max-w-md text-sm leading-7 text-slate-500">
-                Important recovery signals should be easy to understand.
-                FindBack keeps useful context visible so you can make
-                decisions without losing track of what matters.
+                The timeline below is an illustrative example of what a
+                well-run recovery looks like — it is not live data.
+                Important recovery signals should be easy to understand,
+                so you can make decisions without losing track of what
+                matters.
               </p>
 
             </div>

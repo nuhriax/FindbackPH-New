@@ -25,10 +25,12 @@ const CHROME_FREE = new Set([
 export function SiteChrome({
   user,
   profile,
+  unreadCount = 0,
   children,
 }: {
   user: User | null;
   profile: Profile | null;
+  unreadCount?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -36,7 +38,7 @@ export function SiteChrome({
 
   return (
     <>
-      <Navbar user={user} profile={profile} />
+      <Navbar user={user} profile={profile} unreadCount={unreadCount} />
       {children}
       <Footer />
     </>

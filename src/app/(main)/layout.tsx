@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getUnreadNotificationCount } from "@/lib/actions/messaging";
 import { SiteChrome } from "@/components/site-chrome";
 
 /**
@@ -22,8 +23,11 @@ export default async function MainLayout({ children }: { children: React.ReactNo
     profile = data;
   }
 
+  // Real unread notification count for the navbar badge (0 when signed out).
+  const unreadCount = user ? await getUnreadNotificationCount() : 0;
+
   return (
-    <SiteChrome user={user} profile={profile}>
+    <SiteChrome user={user} profile={profile} unreadCount={unreadCount}>
       {/*
         Keep page content above the fixed decorative background.  Without a
         stacking level here, the background's `z-0` layer can paint over the

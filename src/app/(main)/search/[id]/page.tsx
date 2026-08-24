@@ -123,6 +123,7 @@ export default async function ReportDetailPage({ params }: Props) {
     reward: raw.reward_amount ?? null,
     dateOccurred: dateVal ?? null,
     holdingInfo: raw.current_holding_info ?? null,
+    reporterId: raw.reporter_id,
   };
 
   return (

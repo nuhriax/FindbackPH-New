@@ -504,7 +504,7 @@ export default async function AboutPage() {
                     className="px-3 text-center first:pl-0 last:pr-0"
                   >
                     <div
-                      className={`text-3xl font-semibold sm:text-4xl ${stat.accent ? "text-emerald-600" : "text-navy-900"}`}
+                      className={`text-2xl font-semibold sm:text-4xl ${stat.accent ? "text-emerald-600" : "text-navy-900"}`}
                     >
                       <AnimatedNumber value={stat.value} />
                     </div>

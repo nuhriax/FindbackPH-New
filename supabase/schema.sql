@@ -712,3 +712,161 @@ select public.enable_realtime('conversations');
 select public.enable_realtime('notifications');
 
 drop function if exists public.enable_realtime(text);
+
+-- ============================================================================
+-- PHASE 11 — NOTIFICATIONS & ACTIVITY
+-- ============================================================================
+
+-- ----------------------------------------------------------------------------
+-- Dedupe-safe notification insert.
+-- Every server-side notification writer (matching engine, recovery flow,
+-- moderation actions, ownership verification) goes through this security-
+-- definer RPC so a user can never receive two identical UNREAD notifications.
+-- SECURITY: `security definer` is intentional — it bypasses the notifications
+-- RLS policy so the SYSTEM may write to any user's notification feed. It only
+-- ever inserts into `public.notifications` and never reads private data.
+-- Safe to re-run.
+-- ----------------------------------------------------------------------------
+create or replace function public.notify_user_once(
+  p_user_id uuid,
+  p_type text,
+  p_title text,
+  p_message text,
+  p_link text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_user_id is null then
+    return;
+  end if;
+
+  -- Skip when an identical unread notification already exists for this user.
+  if exists (
+    select 1
+    from public.notifications n
+    where n.user_id = p_user_id
+      and n.type = p_type::notification_type
+      and n.title = p_title
+      and coalesce(n.link, '') = coalesce(p_link, '')
+      and n.read = false
+  ) then
+    return;
+  end if;
+
+  insert into public.notifications (user_id, type, title, message, link)
+  values (p_user_id, p_type::notification_type, p_title, p_message, p_link);
+end;
+$$;
+
+-- ----------------------------------------------------------------------------
+-- New-message trigger now uses the dedupe-safe writer so a burst of messages
+-- in one conversation produces ONE unread "New message" notification, not one
+-- per message. Once the user reads it, the next message notifies again.
+-- ----------------------------------------------------------------------------
+create or replace function public.notify_on_new_message()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  other_user uuid;
+begin
+  select case
+    when c.participant_a = new.sender_id then c.participant_b
+    else c.participant_a
+  end into other_user
+  from public.conversations c
+  where c.id = new.conversation_id;
+
+  if other_user is not null and other_user <> new.sender_id then
+    perform public.notify_user_once(
+      other_user,
+      'new_message',
+      'New message',
+      'You have received a new message on FindBack PH.',
+      '/messages'
+    );
+  end if;
+  return new;
+end;
+$$;
+
+-- ============================================================================
+-- PHASE 12 — MODERATION & ABUSE REPORTING
+-- ============================================================================
+
+-- NOTE: `alter type flag_reason add value if not exists 'impersonation';`
+-- must run in a SEPARATE transaction before the statements below (Postgres
+-- does not allow using a newly-added enum value in the same transaction).
+-- It is applied out-of-band when this file is deployed; kept here as a comment
+-- so fresh databases can order it correctly.
+
+-- ---------------------------------------------------------------------------
+-- USER FLAGS — report another user's behaviour to the moderation team
+-- ---------------------------------------------------------------------------
+create table if not exists public.user_flags (
+  id uuid primary key default uuid_generate_v4(),
+  reporter_id uuid not null references public.profiles(id) on delete cascade,
+  target_user_id uuid not null references public.profiles(id) on delete cascade,
+  reason flag_reason not null,
+  details text check (details is null or char_length(details) <= 1000),
+  status text not null default 'pending'
+    check (status in ('pending', 'under_review', 'reviewed', 'resolved', 'dismissed')),
+  created_at timestamptz not null default now(),
+  reviewed_at timestamptz,
+  reviewed_by uuid references public.profiles(id),
+  unique (reporter_id, target_user_id)
+);
+
+create index if not exists user_flags_status_idx on public.user_flags (status, created_at);
+create index if not exists user_flags_target_idx on public.user_flags (target_user_id);
+
+alter table public.user_flags enable row level security;
+
+-- Users may file and read their own reports; admins/moderators read all.
+drop policy if exists "user_flags_insert_own" on public.user_flags;
+create policy "user_flags_insert_own" on public.user_flags for insert
+  to authenticated
+  with check (
+    reporter_id = auth.uid()
+    and target_user_id <> auth.uid()
+  );
+
+drop policy if exists "user_flags_select_own_or_admin" on public.user_flags;
+create policy "user_flags_select_own_or_admin" on public.user_flags for select
+  to authenticated
+  using (
+    reporter_id = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin', 'moderator'))
+  );
+
+-- Only moderators may change review state (enforced again server-side).
+drop policy if exists "user_flags_moderator_update" on public.user_flags;
+create policy "user_flags_moderator_update" on public.user_flags for update
+  to authenticated
+  using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('admin', 'moderator'))
+  );
+
+-- ---------------------------------------------------------------------------
+-- BLOCKED USERS — one-sided mute/block between members
+-- ---------------------------------------------------------------------------
+create table if not exists public.blocked_users (
+  blocker_id uuid not null references public.profiles(id) on delete cascade,
+  blocked_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (blocker_id, blocked_id),
+  check (blocker_id <> blocked_id)
+);
+
+alter table public.blocked_users enable row level security;
+
+drop policy if exists "blocked_users_owner" on public.blocked_users;
+create policy "blocked_users_owner" on public.blocked_users for all
+  to authenticated
+  using (blocker_id = auth.uid())
+  with check (blocker_id = auth.uid() and blocked_id <> auth.uid());

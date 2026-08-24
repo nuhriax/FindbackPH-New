@@ -20,7 +20,6 @@ import { SplitText } from "@/components/effects/split-text";
 import { MotionReveal } from "@/components/effects/motion-reveal";
 import { Aurora } from "@/components/effects/aurora";
 import { CommunityMotif } from "@/components/ui/community-motif";
-import { CommunityStories } from "@/components/home/community-stories";
 import { LiveReportsRefresh } from "@/components/home/live-reports-refresh";
 import { PaperNotes } from "@/components/ui/paper-notes";
 import { ItemCard } from "@/components/item-card";
@@ -476,52 +475,54 @@ export default async function HomePage() {
           </div>
 
           {/* ----------------------------------------------------------------
-              SEARCH
+              PRIMARY CTAs
               ---------------------------------------------------------------- */}
 
           <Reveal delay={80}>
-            <form
-              action="/search"
-              method="GET"
-              className="mx-auto mt-9 max-w-3xl"
-            >
-              <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_20px_60px_-25px_rgba(15,23,42,0.25)] transition-all duration-300 focus-within:border-electric-300 focus-within:ring-4 focus-within:ring-electric-100/60">
-                <div className="flex items-center">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center text-slate-400">
-                    <Search size={21} />
-                  </div>
-
-                  <input
-                    name="q"
-                    type="search"
-                    placeholder="Search phones, wallets, keys, IDs..."
-                    aria-label="Search for an item"
-                    autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent px-1 text-sm text-navy-900 outline-none placeholder:text-slate-400 sm:text-base"
+            <div className="mx-auto mt-9 max-w-3xl">
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-center sm:gap-3">
+                <Link
+                  href="/search"
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-electric-600 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-electric-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-100 sm:w-auto"
+                >
+                  <Search
+                    size={16}
+                    className="transition-transform duration-200 group-hover:-translate-y-0.5"
                   />
+                  Find my item
+                  <ArrowRight
+                    size={16}
+                    className="transition-transform duration-200 group-hover:translate-x-1"
+                  />
+                </Link>
 
-                  <button
-                    type="submit"
-                    className="hidden shrink-0 items-center gap-2 rounded-xl bg-electric-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-electric-500 sm:flex"
-                  >
-                    Search
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
+                <Link
+                  href="/report/lost"
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-medium text-navy-900 shadow-sm transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-100 sm:w-auto"
+                >
+                  <PackageSearch
+                    size={15}
+                    className="text-sunrise-500 transition-transform duration-200 group-hover:scale-110"
+                  />
+                  Report lost item
+                </Link>
+
+                <Link
+                  href="/report/found"
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-medium text-navy-900 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-100 sm:w-auto"
+                >
+                  <HeartHandshake
+                    size={15}
+                    className="text-emerald-500 transition-transform duration-200 group-hover:scale-110"
+                  />
+                  Report found item
+                </Link>
               </div>
 
               <p className="mt-3 text-center text-[11px] text-slate-500">
                 Search by item, location, category, or description
               </p>
-
-              <button
-                type="submit"
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-electric-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-electric-500 sm:hidden"
-              >
-                Search
-                <ArrowRight size={16} />
-              </button>
-            </form>
+            </div>
           </Reveal>
 
           {/* ----------------------------------------------------------------
@@ -652,6 +653,13 @@ export default async function HomePage() {
                 />
               </div>
             </div>
+
+            {lostCount === 0 && foundCount === 0 && recoveredCount === 0 && (
+              <p className="mt-4 text-center text-sm leading-relaxed text-slate-500">
+                Your community starts here — be the first to report a lost or
+                found item in your area.
+              </p>
+            )}
           </Reveal>
         </div>
       </section>
@@ -774,12 +782,6 @@ export default async function HomePage() {
           )}
         </div>
       </section>
-
-      {/* ====================================================================
-          COMMUNITY STORIES
-          ==================================================================== */}
-
-      <CommunityStories />
 
       {/* ====================================================================
           SAFETY

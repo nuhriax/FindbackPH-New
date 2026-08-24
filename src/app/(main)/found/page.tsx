@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { ItemCard } from "@/components/item-card";
 import {
   CATEGORIES,
@@ -7,6 +7,13 @@ import {
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import type { ItemCategory } from "@/types/database";
 import { Reveal } from "@/components/reveal";
+import {
+  calculateMatch,
+  MATCH_THRESHOLDS,
+  type MatchResult,
+  type MatchStrength,
+  type MatchableItem,
+} from "@/lib/matching";
 import { ListingHero } from "@/components/listing/listing-hero";
 import { ListingSearch } from "@/components/listing/listing-search";
 import { ListingCategories } from "@/components/listing/listing-categories";
@@ -48,43 +55,6 @@ const ROUTES = {
   lost: "/lost",
 } as const;
 
-const MATCH_THRESHOLDS = {
-  possible: 45,
-  likely: 65,
-  strong: 80,
-} as const;
-
-const MATCH_WEIGHTS = {
-  category: 30,
-  city: 20,
-  province: 10,
-  title: 20,
-  description: 10,
-  date: 10,
-} as const;
-
-/**
- * Words that are generally too generic to be useful
- * when comparing item descriptions.
- */
-const STOP_WORDS = new Set([
-  "the",
-  "and",
-  "for",
-  "with",
-  "from",
-  "this",
-  "that",
-  "have",
-  "has",
-  "was",
-  "were",
-  "lost",
-  "found",
-  "item",
-  "thing",
-]);
-
 /* ==========================================================================
    Types
    ========================================================================== */
@@ -110,8 +80,10 @@ type FoundItem = {
   category: ItemCategory;
   city: string | null;
   province: string | null;
+  approximate_location: string | null;
   date_found: string | null;
   description: string | null;
+  distinguishing_features: string | null;
   created_at: string;
 };
 
@@ -121,25 +93,16 @@ type LostItem = {
   category: ItemCategory;
   city: string | null;
   province: string | null;
+  approximate_location: string | null;
   date_lost: string | null;
   description: string | null;
+  distinguishing_features: string | null;
 };
 
 type FoundImage = {
   found_item_id: string;
   storage_path: string;
   position?: number | null;
-};
-
-type MatchStrength =
-  | "possible"
-  | "likely"
-  | "strong";
-
-type MatchResult = {
-  score: number;
-  strength: MatchStrength;
-  matchedSignals: string[];
 };
 
 type FoundStats = {
@@ -306,308 +269,6 @@ function reportedLabel(
   }
 
   return `Reported ${format(date, "MMM d, yyyy")}`;
-}
-
-/* ==========================================================================
-   Matching Helpers
-   ========================================================================== */
-
-function normalizeText(
-  value: string | null,
-): string {
-  return (
-    value
-      ?.toLowerCase()
-      .replace(/[^a-z0-9\s]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim() ?? ""
-  );
-}
-
-function normalizedWords(
-  value: string | null,
-): Set<string> {
-  const normalized = normalizeText(value);
-
-  if (!normalized) {
-    return new Set();
-  }
-
-  return new Set(
-    normalized
-      .split(/\s+/)
-      .map((word) => word.trim())
-      .filter(
-        (word) =>
-          word.length >= 3 &&
-          !STOP_WORDS.has(word),
-      ),
-  );
-}
-
-function wordOverlap(
-  a: string | null,
-  b: string | null,
-): number {
-  const left = normalizedWords(a);
-  const right = normalizedWords(b);
-
-  if (!left.size || !right.size) {
-    return 0;
-  }
-
-  let matches = 0;
-
-  for (const word of left) {
-    if (right.has(word)) {
-      matches += 1;
-    }
-  }
-
-  return (
-    matches /
-    Math.max(left.size, right.size)
-  );
-}
-
-function normalizeLocation(
-  value: string | null,
-): string {
-  return normalizeText(value);
-}
-
-function sameLocation(
-  a: string | null,
-  b: string | null,
-): boolean {
-  const left = normalizeLocation(a);
-  const right = normalizeLocation(b);
-
-  if (!left || !right) {
-    return false;
-  }
-
-  return (
-    left === right ||
-    left.includes(right) ||
-    right.includes(left)
-  );
-}
-
-function getDateMatchScore(
-  foundDateValue: string | null,
-  lostDateValue: string | null,
-): number {
-  const foundDate =
-    parseDateOnly(foundDateValue);
-
-  const lostDate =
-    parseDateOnly(lostDateValue);
-
-  if (!foundDate || !lostDate) {
-    return 0;
-  }
-
-  const days = Math.abs(
-    differenceInCalendarDays(
-      foundDate,
-      lostDate,
-    ),
-  );
-
-  if (days <= 3) {
-    return MATCH_WEIGHTS.date;
-  }
-
-  if (days <= 7) {
-    return MATCH_WEIGHTS.date * 0.7;
-  }
-
-  if (days <= 30) {
-    return MATCH_WEIGHTS.date * 0.4;
-  }
-
-  return 0;
-}
-
-function getMatchStrength(
-  score: number,
-): MatchStrength | null {
-  if (
-    score >= MATCH_THRESHOLDS.strong
-  ) {
-    return "strong";
-  }
-
-  if (
-    score >= MATCH_THRESHOLDS.likely
-  ) {
-    return "likely";
-  }
-
-  if (
-    score >= MATCH_THRESHOLDS.possible
-  ) {
-    return "possible";
-  }
-
-  return null;
-}
-
-function calculateMatch(
-  found: FoundItem,
-  lost: LostItem,
-): MatchResult | null {
-  let score = 0;
-
-  const matchedSignals: string[] = [];
-
-  /* ------------------------------------------------------------------------
-     Category
-     ------------------------------------------------------------------------ */
-
-  if (
-    found.category &&
-    found.category === lost.category
-  ) {
-    score += MATCH_WEIGHTS.category;
-
-    matchedSignals.push(
-      "Same category",
-    );
-  }
-
-  /* ------------------------------------------------------------------------
-     City
-     ------------------------------------------------------------------------ */
-
-  if (
-    sameLocation(
-      found.city,
-      lost.city,
-    )
-  ) {
-    score += MATCH_WEIGHTS.city;
-
-    matchedSignals.push(
-      "Same city",
-    );
-  }
-
-  /* ------------------------------------------------------------------------
-     Province
-     ------------------------------------------------------------------------ */
-
-  if (
-    sameLocation(
-      found.province,
-      lost.province,
-    )
-  ) {
-    score += MATCH_WEIGHTS.province;
-
-    matchedSignals.push(
-      "Same province",
-    );
-  }
-
-  /* ------------------------------------------------------------------------
-     Title
-     ------------------------------------------------------------------------ */
-
-  const titleOverlap =
-    wordOverlap(
-      found.title,
-      lost.title,
-    );
-
-  if (titleOverlap >= 0.5) {
-    score += MATCH_WEIGHTS.title;
-
-    matchedSignals.push(
-      "Very similar item details",
-    );
-  } else if (titleOverlap >= 0.3) {
-    score +=
-      MATCH_WEIGHTS.title * 0.6;
-
-    matchedSignals.push(
-      "Similar item details",
-    );
-  } else if (titleOverlap >= 0.2) {
-    score +=
-      MATCH_WEIGHTS.title * 0.35;
-
-    matchedSignals.push(
-      "Related item details",
-    );
-  }
-
-  /* ------------------------------------------------------------------------
-     Description
-     ------------------------------------------------------------------------ */
-
-  const descriptionOverlap =
-    wordOverlap(
-      found.description,
-      lost.description,
-    );
-
-  if (descriptionOverlap >= 0.3) {
-    score += MATCH_WEIGHTS.description;
-
-    matchedSignals.push(
-      "Similar description",
-    );
-  } else if (
-    descriptionOverlap >= 0.2
-  ) {
-    score +=
-      MATCH_WEIGHTS.description * 0.5;
-
-    matchedSignals.push(
-      "Related description",
-    );
-  }
-
-  /* ------------------------------------------------------------------------
-     Dates
-     ------------------------------------------------------------------------ */
-
-  const dateScore =
-    getDateMatchScore(
-      found.date_found,
-      lost.date_lost,
-    );
-
-  if (dateScore > 0) {
-    score += dateScore;
-
-    matchedSignals.push(
-      "Close report dates",
-    );
-  }
-
-  const normalizedScore = Math.min(
-    Math.round(score),
-    100,
-  );
-
-  const strength =
-    getMatchStrength(
-      normalizedScore,
-    );
-
-  if (!strength) {
-    return null;
-  }
-
-  return {
-    score: normalizedScore,
-    strength,
-    matchedSignals:
-      matchedSignals.slice(0, 3),
-  };
 }
 
 /* ==========================================================================
@@ -812,8 +473,10 @@ async function fetchLostCandidates(
       category,
       city,
       province,
+      approximate_location,
       date_lost,
-      description
+      description,
+      distinguishing_features
     `)
     .eq("status", "active")
     .order("created_at", {
@@ -858,7 +521,7 @@ async function fetchLostCandidates(
 export const metadata = {
   title: {
     absolute:
-      "Found Items Philippines — Help Return Them",
+      "Found Items Philippines â€” Help Return Them",
   },
 
   description:
@@ -1055,8 +718,10 @@ export default async function FoundItemsPage({
           category,
           city,
           province,
+          approximate_location,
           date_found,
           description,
+          distinguishing_features,
           created_at
         `)
         .eq("status", "active")
@@ -1153,8 +818,32 @@ export default async function FoundItemsPage({
       for (const lost of lostItems) {
         const result =
           calculateMatch(
-            found,
-            lost,
+            {
+              id: found.id,
+              title: found.title,
+              category: found.category,
+              city: found.city,
+              province: found.province,
+              approximate_location:
+                found.approximate_location,
+              date: found.date_found,
+              description: found.description,
+              distinguishing_features:
+                found.distinguishing_features,
+            } satisfies MatchableItem,
+            {
+              id: lost.id,
+              title: lost.title,
+              category: lost.category,
+              city: lost.city,
+              province: lost.province,
+              approximate_location:
+                lost.approximate_location,
+              date: lost.date_lost,
+              description: lost.description,
+              distinguishing_features:
+                lost.distinguishing_features,
+            } satisfies MatchableItem,
           );
 
         if (
@@ -1411,6 +1100,70 @@ export default async function FoundItemsPage({
         />
 
         {/* ==================================================================
+            RETURN JOURNEY â€” REPORT â†’ VERIFY â†’ CONNECT â†’ RETURN
+            ================================================================== */}
+
+        <section
+          aria-label="How returning works"
+          className="mt-8 rounded-[2rem] border border-emerald-200/70 bg-gradient-to-br from-emerald-50/80 to-white/60 p-6 backdrop-blur sm:p-8"
+        >
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">
+            The return journey
+          </p>
+          <h2 className="mt-2 font-display text-xl font-semibold tracking-tight text-navy-900 sm:text-2xl">
+            From your hands back home.
+          </h2>
+          <ol className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                number: "01",
+                label: "REPORT",
+                description:
+                  "Describe what you found â€” item name, category, where and when. Add a photo so the owner can recognize it.",
+              },
+              {
+                number: "02",
+                label: "VERIFY",
+                description:
+                  "When someone claims it, ask them to describe a detail you kept private. Confirm ownership before anything else.",
+              },
+              {
+                number: "03",
+                label: "CONNECT",
+                description:
+                  "Message through FindBack. No phone numbers or personal contact details needed on the public report.",
+              },
+              {
+                number: "04",
+                label: "RETURN",
+                description:
+                  "Meet somewhere visible and staffed â€” a barangay hall or mall guard station â€” and complete the handover.",
+              },
+            ].map((s) => (
+              <li key={s.number} className="border-t border-emerald-200/70 pt-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs text-emerald-600">{s.number}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">
+                    {s.label}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                  {s.description}
+                </p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-6 flex items-start gap-2 rounded-xl border border-amber-200/70 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-slate-600">
+            <AlertTriangle size={14} aria-hidden="true" className="mt-0.5 shrink-0 text-amber-600" />
+            <span>
+              <span className="font-semibold text-navy-900">Finder&apos;s reminder:</span> never publish
+              full ID numbers, phone numbers, or exact private addresses on a public report â€” verify
+              ownership privately instead.
+            </span>
+          </p>
+        </section>
+
+        {/* ==================================================================
             ERROR
             ================================================================== */}
 
@@ -1433,7 +1186,7 @@ export default async function FoundItemsPage({
             <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-600">
               This is usually
               temporary. Give it
-              another go — your
+              another go â€” your
               filters will stay
               exactly where you
               left them.
@@ -1468,7 +1221,7 @@ export default async function FoundItemsPage({
               }`}
               description={
                 hasFilters
-                  ? `Showing ${resultStart.toLocaleString()}–${resultEnd.toLocaleString()} reports matching your search.`
+                  ? `Showing ${resultStart.toLocaleString()}â€“${resultEnd.toLocaleString()} reports matching your search.`
                   : "Browse the latest reports from the community."
               }
               sort={sort}
@@ -1553,11 +1306,12 @@ export default async function FoundItemsPage({
 
                                 <div className="min-w-0">
                                   <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-700">
+                                    {match.score}%{" "}
                                     {matchLabel}
                                   </p>
 
                                   <p className="mt-0.5 truncate text-[10px] text-emerald-600/70">
-                                    {match.matchedSignals[0] ??
+                                    {match.signals[0] ??
                                       "Similar details"}
                                   </p>
                                 </div>
@@ -1609,11 +1363,11 @@ export default async function FoundItemsPage({
 
                         {match &&
                           match
-                            .matchedSignals
+                            .signals
                             .length >
                             1 && (
                             <div className="mt-2 flex flex-wrap gap-1.5 px-1">
-                              {match.matchedSignals
+                              {match.signals
                                 .slice(
                                   1,
                                 )
@@ -1783,7 +1537,7 @@ export default async function FoundItemsPage({
 
           <p className="relative mx-auto mt-3 max-w-xl text-sm leading-6 text-emerald-100/90 sm:text-base">
             Post a found report
-            in under a minute —
+            in under a minute â€”
             we&apos;ll compare it
             against active lost
             reports and help you

@@ -146,7 +146,7 @@ export default async function MyReportsPage({
           <EmptyReports />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full min-w-[640px] text-left">
               <thead className="border-b border-slate-200/70 bg-slate-50/70">
                 <tr className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                   <th className="px-4 py-3">Type</th>

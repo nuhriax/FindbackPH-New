@@ -22,8 +22,18 @@ import { MessageButton } from "@/components/message-button";
 import { SaveButton } from "@/components/save-button";
 import { ShareButton } from "@/components/share-button";
 import { ReportFlagButton } from "@/components/report-flag-button";
+import { UserReportButton } from "@/components/user-report-button";
 import { ReportOwnerActions } from "@/components/reports/report-owner-actions";
 import { ReportEditToggle } from "@/components/reports/report-edit-toggle";
+import { OwnershipChallengeManager } from "@/components/reports/ownership-challenge-manager";
+import { OwnershipChallengeForm } from "@/components/reports/ownership-challenge-form";
+import {
+  OwnershipVerifiedBadge,
+  TrustedMemberBadge,
+  VerifiedAccountBadge,
+  VerifiedReportBadge,
+} from "@/components/ui/verification-badge";
+import type { TrustSignals } from "@/lib/trust";
 
 export type DetailItem = {
   id: string;
@@ -42,6 +52,8 @@ export type DetailItem = {
   dateOccurred?: string | null;
   /** Found items only Ã¢â‚¬â€ where the item is currently being kept. */
   holdingInfo?: string | null;
+  /** Phase 12 — enables "Report this user" against the listing's reporter. */
+  reporterId?: string | null;
 };
 
 export type DetailMatch = {
@@ -177,6 +189,8 @@ export function ReportDetail({
   item,
   images,
   reporter,
+  trust,
+  ownership,
   isOwner,
   savedItemId,
   matches,
@@ -190,6 +204,15 @@ export function ReportDetail({
   reporter: {
     username: string;
     successful_returns: number;
+  } | null;
+  /** Phase 7 — real trust signals; omit to render no badges at all. */
+  trust?: TrustSignals & { verifiedReport: boolean } | null;
+  /** Phase 7 — ownership verification challenge state for this report. */
+  ownership?: {
+    itemType: "lost_item" | "found_item";
+    itemId: string;
+    questions: { question1: string; question2: string | null } | null;
+    viewerPassed: boolean;
   } | null;
   isOwner: boolean;
   savedItemId: string | null;
@@ -882,7 +905,7 @@ export function ReportDetail({
                       </div>
 
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
                           <UserRound
                             size={13}
                             className="shrink-0 text-slate-400"
@@ -899,6 +922,11 @@ export function ReportDetail({
                             {reporter?.username ??
                               "FindBack user"}
                           </p>
+
+                          {/* Phase 7 — subtle, real-data-only trust badges */}
+                          {trust?.emailVerified && <VerifiedAccountBadge />}
+                          {trust?.trustedMember && <TrustedMemberBadge />}
+                          {trust?.verifiedReport && <VerifiedReportBadge />}
                         </div>
 
                         <p
@@ -946,6 +974,41 @@ export function ReportDetail({
                     </div>
                   </div>
                 </section>
+
+                {/* =================================================
+                    OWNERSHIP VERIFICATION (Phase 7)
+                    Owner: manage private challenge questions.
+                    Others (signed-in): answer them privately.
+                ================================================== */}
+
+                {ownership && (
+                  <section>
+                    {isOwner ? (
+                      <OwnershipChallengeManager
+                        itemType={ownership.itemType}
+                        itemId={ownership.itemId}
+                        initialQuestion1={ownership.questions?.question1 ?? ""}
+                        initialQuestion2={ownership.questions?.question2 ?? ""}
+                      />
+                    ) : ownership.viewerPassed ? (
+                      <div className="rounded-xl border border-slate-200 bg-white p-3">
+                        <OwnershipVerifiedBadge />
+                        <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                          You verified your ownership of this item with the reporter&apos;s
+                          private questions.
+                        </p>
+                      </div>
+                    ) : ownership.questions ? (
+                      <OwnershipChallengeForm
+                        itemType={ownership.itemType}
+                        itemId={ownership.itemId}
+                        question1={ownership.questions.question1}
+                        question2={ownership.questions.question2}
+                        hasSecondQuestion={Boolean(ownership.questions.question2)}
+                      />
+                    ) : null}
+                  </section>
+                )}
 
                 {/* Safety */}
 
@@ -1392,6 +1455,13 @@ export function ReportDetail({
                   itemType={itemType}
                   itemId={item.id}
                 />
+
+                {item.reporterId && (
+                  <span className="text-slate-300">·</span>
+                )}
+                {item.reporterId && (
+                  <UserReportButton targetUserId={item.reporterId} />
+                )}
               </div>
             </div>
           </div>

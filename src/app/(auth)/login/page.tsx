@@ -29,6 +29,9 @@ function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered") === "true";
+  // /auth/callback bounces failed email-confirmation/reset links here with
+  // ?error=callback — show a friendly explanation instead of a bare form.
+  const callbackFailed = searchParams.get("error") === "callback";
   // Respect the protected-page redirect the middleware set (e.g. /dashboard),
   // falling back to the dashboard. Reject external/open redirects.
   const rawNext = searchParams.get("next");
@@ -72,6 +75,16 @@ function LoginInner() {
 
   return (
     <div className={cn("auth-form", shake && "auth-shake")}>
+      {callbackFailed && (
+        <div className="auth-error-block" role="alert">
+          <TriangleAlert size={16} aria-hidden="true" />
+          <span>
+            This sign-in link is invalid or has expired. Please try logging in
+            again, or request a new link.
+          </span>
+        </div>
+      )}
+
       {registered && (
         <div className="auth-success-block" role="status">
           <span className="auth-check-badge">

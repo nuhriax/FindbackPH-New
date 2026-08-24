@@ -5,8 +5,8 @@ export type ItemCategory =
 export type UserRole = "user" | "moderator" | "admin";
 export type ConversationItemType = "lost_item" | "found_item";
 export type NotificationType = "new_message" | "possible_match" | "report_update" | "item_returned" | "moderation_action";
-export type FlagReason = "scam" | "fake_report" | "harassment" | "suspicious_behavior" | "inappropriate_content" | "wrong_information" | "other";
-export type FlagStatus = "pending" | "reviewed" | "dismissed";
+export type FlagReason = "scam" | "fake_report" | "harassment" | "suspicious_behavior" | "inappropriate_content" | "wrong_information" | "impersonation" | "other";
+export type FlagStatus = "pending" | "under_review" | "reviewed" | "resolved" | "dismissed";
 
 // Interfaces don't carry implicit index signatures, which stops them from being
 // assignable to the library's `GenericTable["Row"]` (`Record<string, unknown>`),
@@ -142,6 +142,41 @@ export type ReportFlag = {
   reviewed_by: string | null;
 };
 
+/** Phase 12 — a report filed against another member's behaviour. */
+export type UserFlag = {
+  id: string;
+  reporter_id: string;
+  target_user_id: string;
+  reason: FlagReason;
+  details: string | null;
+  status: FlagStatus;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+};
+
+/** Phase 12 — one-sided block between members. */
+export type BlockedUser = {
+  blocker_id: string;
+  blocked_id: string;
+  created_at: string;
+};
+
+/**
+ * Phase 7 — ownership verification challenge. Answer hashes are NEVER exposed
+ * through the API (column-level grants in supabase/trust.sql), so this type
+ * only models the columns any caller may legitimately see.
+ */
+export type OwnershipVerification = {
+  id: string;
+  item_type: ConversationItemType;
+  item_id: string;
+  owner_id: string;
+  question_1: string;
+  question_2: string | null;
+};
+
+
 // Minimal Supabase generated-types shape — hand-written to match schema.sql.
 // Regenerate with `supabase gen types typescript` once the project is live for full accuracy.
 //
@@ -218,6 +253,17 @@ export interface Database {
         Update: Partial<ReportFlag>;
         Relationships: [];
       };
+      ownership_verifications: {
+        // Selectable Row deliberately omits answer hashes (column-level grants
+        // in supabase/trust.sql), but writes still carry them.
+        Row: OwnershipVerification;
+        Insert: Omit<OwnershipVerification, "id"> & {
+          answer_1_hash: string;
+          answer_2_hash?: string | null;
+        };
+        Update: Partial<{ question_1: string; question_2: string | null; answer_1_hash: string; answer_2_hash: string | null }>;
+        Relationships: [];
+      };
       contact_messages: {
         Row: ContactMessage;
         Insert: Omit<ContactMessage, "id" | "created_at" | "status"> & { status?: "new" | "read" };
@@ -230,8 +276,46 @@ export interface Database {
         Update: Partial<{ id: string; admin_id: string; action: string; target_type: string | null; target_id: string | null; details: unknown | null; created_at: string }>;
         Relationships: [];
       };
+      user_flags: {
+        Row: UserFlag;
+        Insert: Omit<UserFlag, "id" | "status" | "created_at" | "reviewed_at" | "reviewed_by">;
+        Update: Partial<UserFlag>;
+        Relationships: [];
+      };
+      blocked_users: {
+        Row: BlockedUser;
+        Insert: Omit<BlockedUser, "created_at">;
+        Update: Partial<BlockedUser>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      /** Phase 7 — pass/fail ownership check done inside Postgres. */
+      verify_ownership_answers: {
+        Args: { p_item_type: string; p_item_id: string; p_answer_1: string; p_answer_2?: string | null };
+        Returns: unknown;
+      };
+      /** Phase 7 — challenge questions + caller's own pass state. */
+      get_ownership_challenge: {
+        Args: { p_item_type: string; p_item_id: string };
+        Returns: unknown;
+      };
+      /**
+       * Notifications & Activity — dedupe-safe notification insert used by the
+       * matching engine, recovery flow and moderation actions. Skips the insert
+       * when an identical UNREAD notification already exists for the user.
+       */
+      notify_user_once: {
+        Args: {
+          p_user_id: string;
+          p_type: string;
+          p_title: string;
+          p_message: string;
+          p_link?: string | null;
+        };
+        Returns: undefined;
+      };
+    };
   };
 }

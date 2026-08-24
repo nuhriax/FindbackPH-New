@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { sendMessageAction } from "@/lib/actions/messaging";
+import { BlockUserButton } from "@/components/block-user-button";
 import { Send, ArrowLeft } from "lucide-react";
 
 type Participant = {
@@ -103,7 +104,8 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
         .from("messages")
         .select("*")
         .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: true })
+        .limit(200);
 
       if (msgError) console.error("Error:", msgError);
       setMessages(msgs ?? []);
@@ -202,7 +204,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6 flex items-center gap-4">
+        <div className="mb-6 flex flex-wrap items-center gap-4">
           <Link href="/messages" className="rounded-lg p-1.5 text-slate-600 transition-colors hover:bg-blue-50 hover:text-navy-900">
             <ArrowLeft size={20} />
           </Link>
@@ -212,6 +214,15 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
           >
             Item: {itemTitle}
           </Link>
+          {otherUser && (
+            <span className="ml-auto text-xs text-slate-500">
+              with{" "}
+              <span className="font-medium text-slate-700">
+                {otherUser.first_name || otherUser.username}
+              </span>
+            </span>
+          )}
+          {otherUser && <BlockUserButton targetUserId={otherUser.id} />}
         </div>
 
         <div className="card flex h-[600px] sm:h-[700px] flex-col overflow-hidden">

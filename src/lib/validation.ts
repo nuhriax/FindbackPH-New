@@ -71,9 +71,21 @@ const baseItemFields = {
   approximateLocation: z.string().trim().max(200).optional(),
 };
 
+// Dates must parse AND must not be in the future — a lost/found report can't
+// be dated tomorrow. Enforced server-side; the client only offers hints.
+function isNotFutureDate(d: string) {
+  const parsed = Date.parse(d);
+  if (Number.isNaN(parsed)) return true; // handled by the format check
+  // Allow a small tolerance (end-of-day) so "today" is always accepted.
+  return parsed <= Date.now() + 24 * 60 * 60 * 1000;
+}
+
 export const lostItemSchema = z.object({
   ...baseItemFields,
-  dateLost: z.string().refine((d) => !Number.isNaN(Date.parse(d)), "Enter a valid date"),
+  dateLost: z
+    .string()
+    .refine((d) => !Number.isNaN(Date.parse(d)), "Enter a valid date")
+    .refine(isNotFutureDate, "The date can't be in the future"),
   rewardAmount: z.coerce.number().int().nonnegative().optional(),
 });
 
@@ -81,7 +93,10 @@ export type LostItemInput = z.infer<typeof lostItemSchema>;
 
 export const foundItemSchema = z.object({
   ...baseItemFields,
-  dateFound: z.string().refine((d) => !Number.isNaN(Date.parse(d)), "Enter a valid date"),
+  dateFound: z
+    .string()
+    .refine((d) => !Number.isNaN(Date.parse(d)), "Enter a valid date")
+    .refine(isNotFutureDate, "The date can't be in the future"),
   currentHoldingInfo: z.string().max(500).optional(),
 });
 

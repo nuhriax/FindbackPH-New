@@ -125,6 +125,25 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* --- Mobile ergonomics ---------------------------------------------- */
+  /* iOS Safari zooms any focused input whose font-size is below 16px, which
+     breaks one-handed form filling. Bump form controls to 16px on phones. */
+  @media (max-width: 639px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Fixed backgrounds are ignored on iOS and cause jank on Android —
+     fall back to normal scrolling attachment on small screens. */
+  @media (max-width: 767px) {
+    body {
+      background-attachment: scroll;
+    }
+  }
 }
 
 @layer components {

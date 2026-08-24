@@ -2,29 +2,26 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { reportFlagAction } from "@/lib/actions/items";
+import { reportUserAction } from "@/lib/actions/moderation";
 import { useToast } from "@/components/ui/toast";
 import { CheckCircle2, Flag, X } from "lucide-react";
 
-// Values must match the report_flags.reason enum in the database.
+// Values must match the flag_reason enum in the database (user-safe subset).
 const REASONS: { label: string; value: string }[] = [
   { label: "Scam", value: "scam" },
-  { label: "Fake listing", value: "fake_report" },
   { label: "Harassment", value: "harassment" },
   { label: "Impersonation", value: "impersonation" },
-  { label: "Suspicious activity", value: "suspicious_behavior" },
+  { label: "Suspicious behaviour", value: "suspicious_behavior" },
   { label: "Inappropriate content", value: "inappropriate_content" },
-  { label: "Wrong information", value: "wrong_information" },
   { label: "Other", value: "other" },
 ];
 
-export function ReportFlagButton({
-  itemType,
-  itemId,
-}: {
-  itemType: "lost_item" | "found_item";
-  itemId: string;
-}) {
+/**
+ * "Report this user" — files a user_flags row against the reporter of a
+ * listing. Mirrors ReportFlagButton's look and flow. Server actions validate
+ * everything again (auth, not-self target, reason enum).
+ */
+export function UserReportButton({ targetUserId }: { targetUserId: string }) {
   const [open, setOpen] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,27 +41,26 @@ export function ReportFlagButton({
   }, [open]);
 
   function handleSubmit(formData: FormData) {
-    formData.set("itemType", itemType);
-    formData.set("itemId", itemId);
+    formData.set("targetUserId", targetUserId);
     setError(null);
     startTransition(async () => {
-      const result = await reportFlagAction(formData);
+      const result = await reportUserAction(formData);
       if (result?.error) {
-        if (result.error === "You must be signed in to report") {
+        if (result.error === "You must be signed in to report a user") {
           router.push("/login");
           return;
         }
-        if (result.error === "You have already reported this item") {
+        if (result.error === "You have already reported this user") {
           setOpen(false);
           setDone(true);
-          toast("info", "You've already reported this listing. Our team will review it.");
+          toast("info", "You've already reported this user. Our team will review it.");
           return;
         }
         setError(result.error);
       } else {
         setOpen(false);
         setDone(true);
-        toast("success", "Thank you. This listing has been reported for review.");
+        toast("success", "Thank you. This user has been reported for review.");
       }
     });
   }
@@ -73,7 +69,7 @@ export function ReportFlagButton({
     return (
       <p className="flex items-center gap-2 text-sm text-emerald-700">
         <CheckCircle2 size={16} aria-hidden="true" />
-        Reported. Our team will review this listing.
+        Reported
       </p>
     );
   }
@@ -85,7 +81,7 @@ export function ReportFlagButton({
         className="inline-flex items-center gap-2 text-xs font-medium text-slate-600 transition-colors hover:text-red-600"
       >
         <Flag size={14} aria-hidden="true" />
-        Report this listing
+        Report this user
       </button>
 
       {open && (
@@ -98,15 +94,15 @@ export function ReportFlagButton({
             action={handleSubmit}
             role="dialog"
             aria-modal="true"
-            aria-label="Report this listing"
+            aria-label="Report this user"
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md rounded-card border border-slate-200/70 bg-white p-6 shadow-soft fade-in"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="font-display text-lg font-semibold text-navy-900">Report this listing</h3>
+                <h3 className="font-display text-lg font-semibold text-navy-900">Report this user</h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  Help keep FindBack PH safe. Our moderation team will review your report.
+                  Tell our moderation team what happened. Reports are private.
                 </p>
               </div>
               <button
@@ -122,8 +118,8 @@ export function ReportFlagButton({
 
             <div className="mt-5 space-y-4">
               <div>
-                <label htmlFor="flag-reason" className="label">Reason</label>
-                <select id="flag-reason" name="reason" required className="input" defaultValue="">
+                <label htmlFor="user-flag-reason" className="label">Reason</label>
+                <select id="user-flag-reason" name="reason" required className="input" defaultValue="">
                   <option value="" disabled>
                     Select a reason…
                   </option>
@@ -136,9 +132,9 @@ export function ReportFlagButton({
               </div>
 
               <div>
-                <label htmlFor="flag-details" className="label">Details (optional)</label>
+                <label htmlFor="user-flag-details" className="label">Details (optional)</label>
                 <textarea
-                  id="flag-details"
+                  id="user-flag-details"
                   name="details"
                   rows={4}
                   placeholder="Add anything that will help our reviewers…"

@@ -2,10 +2,13 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ItemCard } from "@/components/item-card";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
+import { getSignedImageUrls, getImagePublicUrl } from "@/lib/storage";
 import { formatDistanceToNow, isValid } from "date-fns";
 import {
   ArrowRight,
+  Camera,
   Check,
+  Clock,
   Filter,
   Search,
   X,
@@ -24,7 +27,18 @@ type SearchPageProps = {
     city?: string;
     category?: string;
     type?: string;
+    when?: string;
+    photos?: string;
   };
+};
+
+const WHEN_FILTERS = ["today", "week", "month"] as const;
+type WhenFilter = (typeof WHEN_FILTERS)[number];
+
+const WHEN_LABELS: Record<WhenFilter, string> = {
+  today: "Today",
+  week: "This week",
+  month: "This month",
 };
 
 type SearchItem = {
@@ -60,6 +74,91 @@ function orLiteral(value: string): string {
   return `"${value.replace(/"/g, '""')}"`;
 }
 
+/** ISO timestamp that starts the window for a date filter (server time). */
+function whenCutoff(when: WhenFilter): string {
+  const now = new Date();
+
+  if (when === "today") {
+    now.setHours(0, 0, 0, 0);
+    return now.toISOString();
+  }
+
+  const days = when === "week" ? 7 : 30;
+  now.setDate(now.getDate() - days);
+  return now.toISOString();
+}
+
+/**
+ * Keep only items that have at least one photo recorded in item_images.
+ * Real filtering against a real table — no client-side guessing.
+ */
+async function filterWithPhotos(
+  supabase: ReturnType<typeof createClient>,
+  table: "lost_items" | "found_items",
+  rows: SearchItem[],
+): Promise<SearchItem[]> {
+  const ids = rows.map((row) => row.id);
+  if (ids.length === 0) return rows;
+
+  const column = table === "lost_items" ? "lost_item_id" : "found_item_id";
+  const { data } = await supabase
+    .from("item_images")
+    .select(column)
+    .in(column, ids);
+
+  const withPhotoIds = new Set(
+    ((data ?? []) as Record<string, string>[]).map((row) => row[column]),
+  );
+
+  return rows.filter((row) => withPhotoIds.has(row.id));
+}
+
+/**
+ * Build a map of item id -> photo URL for the given result rows, using the
+ * same signed-URL flow as the home / lost / found listing pages.
+ */
+async function loadImageMap(
+  supabase: ReturnType<typeof createClient>,
+  table: "lost_items" | "found_items",
+  rows: SearchItem[],
+): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  const ids = rows.map((row) => row.id);
+  if (ids.length === 0) return map;
+
+  const column = table === "lost_items" ? "lost_item_id" : "found_item_id";
+  const { data: rawImages } = await supabase
+    .from("item_images")
+    .select(`${column}, storage_path, position`)
+    .in(column, ids)
+    .order("position", { ascending: true });
+
+  const images = (rawImages ?? []) as unknown as Record<
+    string,
+    string | null
+  >[];
+
+  const paths = Array.from(
+    new Set(images.map((img) => img.storage_path).filter(Boolean)),
+  ) as string[];
+  if (paths.length === 0) return map;
+
+  const signed = await getSignedImageUrls(paths);
+  const urlByPath = new Map(
+    paths.map((path, idx) => [path, signed[idx] ?? getImagePublicUrl(path)]),
+  );
+
+  for (const img of images) {
+    const key = img[column];
+    const url = img.storage_path ? urlByPath.get(img.storage_path) : undefined;
+    if (typeof key === "string" && url && !map.has(key)) {
+      map.set(key, url);
+    }
+  }
+
+  return map;
+}
+
 /**
  * Fetch a single table for the search page. Runs each table independently so
  * that if one fails (e.g. a missing column or an unparseable query) the other
@@ -68,9 +167,15 @@ function orLiteral(value: string): string {
 async function searchTable(
   supabase: ReturnType<typeof createClient>,
   table: "lost_items" | "found_items",
-  filters: { q: string; category: string; city: string },
+  filters: {
+    q: string;
+    category: string;
+    city: string;
+    when: WhenFilter | "";
+    photos: boolean;
+  },
 ): Promise<{ data: SearchItem[] | null; error: unknown }> {
-  const { q, category, city } = filters;
+  const { q, category, city, when, photos } = filters;
 
   try {
     let query: any = supabase
@@ -88,32 +193,48 @@ async function searchTable(
       query = query.ilike("city", `%${escapeLike(city)}%`);
     }
 
+    if (when) {
+      // Real date filter — created_at is an indexed timestamptz column.
+      query = query.gte("created_at", whenCutoff(when));
+    }
+
+    let rows: SearchItem[];
+
     if (!q) {
       const res = await query;
-      return { data: (res.data as SearchItem[]) ?? null, error: res.error };
+      if (res.error) return { data: null, error: res.error };
+      rows = (res.data as SearchItem[]) ?? [];
+    } else {
+      // Prefer Postgres full-text search. If the query can't be parsed or the
+      // search column is missing in the deployed DB, fall back to a LIKE search so
+      // users always get results instead of a blank page.
+      const fts = await query.textSearch("search_vector", q, {
+        type: "websearch",
+      });
+      if (!fts.error) {
+        rows = (fts.data as SearchItem[]) ?? [];
+      } else {
+        const pattern = `%${escapeLike(q)}%`;
+        const like = await query.or(
+          [
+            `title.ilike.${orLiteral(pattern)}`,
+            `description.ilike.${orLiteral(pattern)}`,
+            `category.ilike.${orLiteral(pattern)}`,
+            `city.ilike.${orLiteral(pattern)}`,
+            `province.ilike.${orLiteral(pattern)}`,
+          ].join(",")
+        );
+        if (like.error) return { data: null, error: like.error };
+        rows = (like.data as SearchItem[]) ?? [];
+      }
     }
 
-    // Prefer Postgres full-text search. If the query can't be parsed or the
-    // search column is missing in the deployed DB, fall back to a LIKE search so
-    // users always get results instead of a blank page.
-    const fts = await query.textSearch("search_vector", q, {
-      type: "websearch",
-    });
-    if (!fts.error) {
-      return { data: (fts.data as SearchItem[]) ?? null, error: fts.error };
+    // Real "with photo" filtering against item_images.
+    if (photos) {
+      rows = await filterWithPhotos(supabase, table, rows);
     }
 
-    const pattern = `%${escapeLike(q)}%`;
-    const like = await query.or(
-      [
-        `title.ilike.${orLiteral(pattern)}`,
-        `description.ilike.${orLiteral(pattern)}`,
-        `category.ilike.${orLiteral(pattern)}`,
-        `city.ilike.${orLiteral(pattern)}`,
-        `province.ilike.${orLiteral(pattern)}`,
-      ].join(",")
-    );
-    return { data: (like.data as SearchItem[]) ?? null, error: like.error };
+    return { data: rows, error: null };
   } catch (err) {
     // Never let a thrown (rather than returned) exception blank the page.
     return { data: null, error: err };
@@ -131,6 +252,35 @@ export default async function SearchPage({
     ? (searchParams.type ?? "").trim()
     : "";
 
+  // Date-window filter — only accepted values pass through.
+  const rawWhen = (searchParams.when ?? "").trim();
+  const when: WhenFilter | "" = WHEN_FILTERS.includes(rawWhen as WhenFilter)
+    ? (rawWhen as WhenFilter)
+    : "";
+
+  // "With photo" filter — real filter backed by the item_images table.
+  const photos = (searchParams.photos ?? "").trim() === "1";
+
+  /** Build a /search href preserving all current filters, with overrides. */
+  function buildHref(overrides: {
+    type?: string;
+    when?: string;
+    photos?: string;
+  }): string {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (city) params.set("city", city);
+    if (category) params.set("category", category);
+    const nextType = overrides.type ?? type;
+    if (nextType) params.set("type", nextType);
+    const nextWhen = overrides.when !== undefined ? overrides.when : when;
+    if (nextWhen) params.set("when", nextWhen);
+    const nextPhotos =
+      overrides.photos !== undefined ? overrides.photos : photos ? "1" : "";
+    if (nextPhotos) params.set("photos", nextPhotos);
+    return `/search${params.toString() ? `?${params.toString()}` : ""}`;
+  }
+
   const activeCategory = CATEGORIES.includes(category as any)
     ? category
     : "";
@@ -141,16 +291,26 @@ export default async function SearchPage({
       q,
       category: activeCategory,
       city,
+      when,
+      photos,
     }),
     searchTable(supabase, "found_items", {
       q,
       category: activeCategory,
       city,
+      when,
+      photos,
     }),
   ]);
 
   const lostItems = (type === "found" ? [] : (lostResult.data ?? [])) as SearchItem[];
   const foundItems = (type === "lost" ? [] : (foundResult.data ?? [])) as SearchItem[];
+
+  // Attach real photos to results (same signed-URL flow as other listing pages).
+  const [lostImageMap, foundImageMap] = await Promise.all([
+    loadImageMap(supabase, "lost_items", lostItems),
+    loadImageMap(supabase, "found_items", foundItems),
+  ]);
 
   // Only show the full error screen when BOTH sources fail.
   const error = lostResult.error && foundResult.error
@@ -160,7 +320,12 @@ export default async function SearchPage({
   const totalResults = lostItems.length + foundItems.length;
 
   const hasSearch =
-    Boolean(q) || Boolean(city) || Boolean(activeCategory);
+    Boolean(q) ||
+    Boolean(city) ||
+    Boolean(activeCategory) ||
+    Boolean(type) ||
+    Boolean(when) ||
+    photos;
 
   const hasResults = totalResults > 0;
 
@@ -298,6 +463,12 @@ export default async function SearchPage({
                   />
                 )}
 
+                {type && <FilterTag label={type === "lost" ? "Lost" : "Found"} />}
+
+                {when && <FilterTag label={WHEN_LABELS[when]} />}
+
+                {photos && <FilterTag label="With photo" />}
+
                 <Link
                   href={clearHref}
                   className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs text-slate-500 transition hover:text-blue-700"
@@ -316,35 +487,74 @@ export default async function SearchPage({
       ================================================================= */}
 
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-        {/* Lost / Found toggle */}
-        <div className="mb-7 flex w-fit flex-wrap items-center gap-1 rounded-xl border border-slate-200/80 bg-white/75 p-1.5 shadow-sm backdrop-blur">
-          {[
-            { label: "All", value: "" },
-            { label: "Lost", value: "lost" },
-            { label: "Found", value: "found" },
-          ].map((opt) => {
-            const params = new URLSearchParams();
-            if (q) params.set("q", q);
-            if (city) params.set("city", city);
-            if (category) params.set("category", category);
-            if (opt.value) params.set("type", opt.value);
-            const href = `/search${params.toString() ? `?${params.toString()}` : ""}`;
-            const active = type === opt.value;
-            return (
-              <Link
-                key={opt.label}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={
-                  active
-                    ? "rounded-lg bg-electric-500 px-4 py-2 text-sm font-semibold text-white shadow-sm"
-                    : "rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-electric-50 hover:text-electric-700"
-                }
-              >
-                {opt.label}
-              </Link>
-            );
-          })}
+        {/* Filter chips */}
+        <div className="mb-7 flex flex-wrap items-center gap-2">
+          {/* Lost / Found */}
+          <div className="flex flex-wrap items-center gap-1 rounded-xl border border-slate-200/80 bg-white/75 p-1.5 shadow-sm backdrop-blur">
+            {[
+              { label: "All", value: "" },
+              { label: "Lost", value: "lost" },
+              { label: "Found", value: "found" },
+            ].map((opt) => {
+              const active = type === opt.value;
+              return (
+                <Link
+                  key={opt.label}
+                  href={buildHref({ type: opt.value })}
+                  aria-current={active ? "page" : undefined}
+                  className={
+                    active
+                      ? "rounded-lg bg-electric-500 px-4 py-2 text-sm font-semibold text-white shadow-sm"
+                      : "rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-electric-50 hover:text-electric-700"
+                  }
+                >
+                  {opt.label}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Date window — backed by created_at in the database */}
+          <div className="flex flex-wrap items-center gap-1 rounded-xl border border-slate-200/80 bg-white/75 p-1.5 shadow-sm backdrop-blur">
+            <Clock size={14} className="ml-2 mr-0.5 shrink-0 text-slate-400" />
+            {[
+              { label: "Anytime", value: "" },
+              ...WHEN_FILTERS.map((w) => ({
+                label: WHEN_LABELS[w],
+                value: w as string,
+              })),
+            ].map((opt) => {
+              const active = when === opt.value;
+              return (
+                <Link
+                  key={opt.label}
+                  href={buildHref({ when: opt.value })}
+                  aria-current={active ? "page" : undefined}
+                  className={
+                    active
+                      ? "rounded-lg bg-navy-900 px-3 py-2 text-xs font-semibold text-white shadow-sm sm:text-sm"
+                      : "rounded-lg px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-electric-50 hover:text-electric-700 sm:text-sm"
+                  }
+                >
+                  {opt.label}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* With photo — backed by the item_images table */}
+          <Link
+            href={buildHref({ photos: photos ? "" : "1" })}
+            aria-current={photos ? "page" : undefined}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2.5 text-sm font-medium shadow-sm backdrop-blur transition ${
+              photos
+                ? "border-electric-300 bg-electric-500 text-white"
+                : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-electric-300 hover:text-electric-700"
+            }`}
+          >
+            <Camera size={14} />
+            With photo
+          </Link>
         </div>
 
         {error ? (
@@ -409,6 +619,7 @@ export default async function SearchPage({
                     items={foundItems}
                     hrefPrefix="/found"
                     kind="found"
+                    imageMap={foundImageMap}
                   />
                 )}
 
@@ -423,6 +634,7 @@ export default async function SearchPage({
                     items={lostItems}
                     hrefPrefix="/lost"
                     kind="lost"
+                    imageMap={lostImageMap}
                   />
                 )}
               </div>
@@ -444,12 +656,14 @@ function SearchGroup({
   items,
   hrefPrefix,
   kind,
+  imageMap,
 }: {
   title: string;
   description: string;
   items: SearchItem[];
   hrefPrefix: "/lost" | "/found";
   kind: "lost" | "found";
+  imageMap: Map<string, string>;
 }) {
   return (
     <section>
@@ -502,6 +716,7 @@ function SearchGroup({
               reported={formatRelative(item.created_at)}
               description={item.description}
               kind={kind}
+              imageUrl={imageMap.get(item.id) ?? null}
             />
           </div>
         ))}
@@ -556,13 +771,13 @@ function EmptySearch({
 
       <h3 className="mt-4 font-display text-xl font-bold text-navy-900">
         {hasFilters
-          ? "No matching reports"
+          ? "No matching reports found."
           : "No reports yet"}
       </h3>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
         {hasFilters
-          ? "Try a different item name, location, or category — or browse all active reports."
+          ? "Try another keyword, location, or category."
           : "Nothing to show just yet — but something out there might still be waiting to come home. Check again soon, or be the first to post."}
       </p>
 

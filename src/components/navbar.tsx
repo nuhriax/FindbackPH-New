@@ -5,11 +5,12 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { Search, Bell, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark, ChevronDown } from "lucide-react";
+import { Search, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark, ChevronDown } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
 import { Logo } from "@/components/logo";
+import { NotificationBell } from "@/components/notification-bell";
 
 // Primary actions stay in the top bar; secondary info pages live under "More"
 // so the navbar doesn't overflow or bury the main CTAs.
@@ -32,7 +33,15 @@ function getInitials(profile: Profile | null) {
   return (first + last).toUpperCase() || (profile.username?.[0] ?? "U").toUpperCase();
 }
 
-export function Navbar({ user, profile }: { user: User | null; profile: Profile | null }) {
+export function Navbar({
+  user,
+  profile,
+  unreadCount = 0,
+}: {
+  user: User | null;
+  profile: Profile | null;
+  unreadCount?: number;
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -67,6 +76,19 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
       document.removeEventListener("keydown", onKey);
     };
   }, [moreOpen]);
+
+  // Close the mobile menu on Escape or whenever the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   const firstName = profile?.first_name ?? user?.user_metadata?.full_name ?? "FindBack";
 
@@ -176,14 +198,7 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
 
             {user ? (
               <>
-                <Link
-                  href="/notifications"
-                  aria-label="Notifications"
-                  className="relative rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
-                >
-                  <Bell size={18} />
-                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-sunrise-500" />
-                </Link>
+                <NotificationBell initialCount={unreadCount} />
                 <Link
                   href="/messages"
                   aria-label="Messages"
@@ -243,13 +258,20 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
             )}
           </div>
 
-          {/* Mobile toggle */}
-          <div className="flex items-center gap-1 lg:hidden">
+          {/* Mobile actions — search stays one tap away */}
+          <div className="flex items-center gap-0.5 lg:hidden">
+            <Link
+              href="/search"
+              aria-label="Search"
+              className="rounded-full p-2.5 text-slate-600 transition-colors hover:bg-white/80 hover:text-navy-800"
+            >
+              <Search size={20} />
+            </Link>
             {user ? (
               <Link
                 href="/dashboard"
                 aria-label="Dashboard"
-                className="rounded-full p-2 text-slate-600 hover:text-navy-800"
+                className="rounded-full p-2.5 text-slate-600 transition-colors hover:bg-white/80 hover:text-navy-800"
               >
                 <LayoutDashboard size={20} />
               </Link>
@@ -258,18 +280,19 @@ export function Navbar({ user, profile }: { user: User | null; profile: Profile 
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className="rounded-full p-2 text-slate-700 transition-colors hover:bg-white/80"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-slate-700 transition-colors hover:bg-white/80"
             >
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu â€” floating panel below the pill */}
+        {/* Mobile menu — floating panel below the pill. Height tracks the
+            viewport so long signed-in menus always fit and can scroll. */}
         <div
           className={clsx(
-            "mt-2 overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-[0_24px_60px_-28px_rgba(20,34,79,0.5)] backdrop-blur-2xl transition-[max-height,opacity] duration-300 lg:hidden",
-            open ? "max-h-[42rem] opacity-100" : "max-h-0 border-transparent opacity-0"
+            "mt-2 overflow-y-auto overscroll-contain rounded-3xl border border-white/70 bg-white/90 shadow-[0_24px_60px_-28px_rgba(20,34,79,0.5)] backdrop-blur-2xl transition-[max-height,opacity] duration-300 lg:hidden",
+            open ? "max-h-[calc(100dvh-6rem)] opacity-100" : "max-h-0 border-transparent opacity-0"
           )}
         >
           <nav className="flex flex-col gap-1 px-3 py-4">

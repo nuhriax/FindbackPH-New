@@ -2,12 +2,25 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { CheckCircle2, Lock } from "lucide-react";
+import { CheckCircle2, Lock, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
 import { createFoundItemAction } from "@/lib/actions/items";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { ImageUpload } from "@/components/image-upload";
 import { MotionReveal } from "@/components/effects/motion-reveal";
+
+const STEPS = 4;
+
+type ReviewSnapshot = {
+  title: string;
+  category: string;
+  description: string;
+  date: string;
+  city: string;
+  province: string;
+  approximateLocation: string;
+  currentHoldingInfo: string;
+};
 
 export default function ReportFoundPage() {
   const [error, setError] = useState<string | null>(null);
@@ -15,6 +28,12 @@ export default function ReportFoundPage() {
   const [images, setImages] = useState<File[]>([]);
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
   const [step, setStep] = useState(1);
+  // Read-only summary shown on the Review step so users see exactly what
+  // will be published before they commit.
+  const [review, setReview] = useState<ReviewSnapshot | null>(null);
+  // Set when the server tells us the session expired mid-flow, so we can
+  // offer a sign-in link instead of a dead-end error.
+  const [authRequired, setAuthRequired] = useState(false);
 
   // Validate the currently visible step before moving forward. Hidden
   // (display:none) fields are skipped by native browser validation, so without
@@ -50,11 +69,30 @@ export default function ReportFoundPage() {
         }
       }
     }
-    setStep(Math.min(3, Math.max(1, next)));
+    // Snapshot the form into a read-only summary for the Review step.
+    if (next === STEPS && next > step) {
+      const form = document.getElementById(
+        "found-report-form"
+      ) as HTMLFormElement | null;
+      if (form) {
+        const fd = new FormData(form);
+        setReview({
+          title: fd.get("title")?.toString() ?? "",
+          category: fd.get("category")?.toString() ?? "",
+          description: fd.get("description")?.toString() ?? "",
+          date: fd.get("dateFound")?.toString() ?? "",
+          city: fd.get("city")?.toString() ?? "",
+          province: fd.get("province")?.toString() ?? "",
+          approximateLocation: fd.get("approximateLocation")?.toString() ?? "",
+          currentHoldingInfo: fd.get("currentHoldingInfo")?.toString() ?? "",
+        });
+      }
+    }
+    setStep(Math.min(STEPS, Math.max(1, next)));
   }
 
   async function handleSubmit(formData: FormData) {
-    if (step !== 3) return;
+    if (step !== STEPS) return;
 
     const form = document.getElementById(
       "found-report-form"
@@ -89,6 +127,7 @@ export default function ReportFoundPage() {
       const result = await createFoundItemAction(formData);
       if (result?.error) {
         setError(result.error);
+        if (/signed in/i.test(result.error)) setAuthRequired(true);
         return;
       }
       if (!result?.itemId) {
@@ -183,13 +222,26 @@ export default function ReportFoundPage() {
               <Link href={`/found/${confirmedId}`} className="btn-primary">
                 View your report
               </Link>
+              <Link href="/search" className="btn-secondary">
+                Search for matches
+              </Link>
+            </div>
+            <div className="mt-3 flex flex-col justify-center gap-3 sm:flex-row">
               <button
                 type="button"
-                onClick={() => setConfirmedId(null)}
+                onClick={() => {
+                  setConfirmedId(null);
+                  setStep(1);
+                  setReview(null);
+                  setImages([]);
+                }}
                 className="btn-secondary"
               >
                 Report another item
               </button>
+              <Link href="/" className="btn-secondary">
+                Return home
+              </Link>
             </div>
           </MotionReveal>
         </div>
@@ -209,12 +261,40 @@ export default function ReportFoundPage() {
             Thank you for helping return this item to its owner. Every report brings
             something one step closer to home.
           </p>
+
+          {/* Journey — REPORT → VERIFY → CONNECT → RETURN */}
+          <ol
+            aria-label="How returning works"
+            className="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-x-1.5 gap-y-2"
+          >
+            {[
+              ["Report", "Describe what you found"],
+              ["Verify", "We check ownership together"],
+              ["Connect", "Message through FindBack"],
+              ["Return", "Safe, public handover"],
+            ].map(([label, hint], i, arr) => (
+              <li key={label} className="flex items-center gap-1.5">
+                <span
+                  title={hint}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-700 backdrop-blur"
+                >
+                  {label}
+                </span>
+                {i < arr.length - 1 && (
+                  <span
+                    aria-hidden="true"
+                    className="h-px w-4 bg-emerald-200 sm:w-6"
+                  />
+                )}
+              </li>
+            ))}
+          </ol>
         </div>
 
         {/* Progress steps */}
         <div className="mt-8">
           <div className="flex items-center gap-2">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3, 4].map((s) => (
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
@@ -227,10 +307,12 @@ export default function ReportFoundPage() {
           </div>
           <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">
             {step === 1
-              ? "Item details"
+              ? "Step 1 · Describe the item"
               : step === 2
-                ? "Where & when"
-                : "Photos & review"}
+                ? "Step 2 · Where & when"
+                : step === 3
+                  ? "Step 3 · Photos"
+                  : "Step 4 · Review & submit"}
           </p>
         </div>
 
@@ -314,9 +396,81 @@ export default function ReportFoundPage() {
                 {images.length > 0 && (
                   <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
                     <CheckCircle2 size={14} aria-hidden="true" />
-                    {images.length} photo{images.length > 1 ? "s" : ""} ready — you can submit now.
+                    {images.length} photo{images.length > 1 ? "s" : ""} ready — continue to review.
                   </p>
                 )}
+              </div>
+
+              <p className="text-xs text-slate-500">
+                Next, you&apos;ll review exactly what will be published before submitting.
+              </p>
+            </div>
+
+          {/* Step 4 — Review everything before it goes live */}
+          <div id="step-4" className={step === STEPS ? "space-y-5" : "space-y-5 hidden"}>
+              {review && (
+                <dl className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white/80">
+                  {[
+                    ["Item", review.title],
+                    ["Category", CATEGORY_LABELS[review.category as keyof typeof CATEGORY_LABELS] ?? review.category],
+                    ["Description", review.description],
+                    ["Date found", review.date],
+                    ["Location", [review.city, review.province].filter(Boolean).join(", ")],
+                    ...(review.approximateLocation
+                      ? [["Approximate location", review.approximateLocation]]
+                      : []),
+                    ...(review.currentHoldingInfo
+                      ? [["Currently kept", review.currentHoldingInfo]]
+                      : []),
+                    ["Photos", images.length === 0 ? "None yet" : `${images.length} photo${images.length > 1 ? "s" : ""}`],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex gap-3 px-4 py-3">
+                      <dt className="w-40 shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</dt>
+                      <dd className="whitespace-pre-wrap text-sm text-navy-900">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+
+              {/* Safety — what NOT to publish (existing Safety design language) */}
+              <div role="note" className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-left">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-600" />
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">
+                      Before you publish
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-700">
+                      Keep identifying information off this public report. Never post:
+                    </p>
+                    <ul className="mt-2 space-y-1.5">
+                      {[
+                        "Full ID numbers or photos of government IDs",
+                        "Your phone number, email, or social accounts",
+                        "Exact home or private addresses",
+                        "Wallet contents, card numbers, or bank details",
+                      ].map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-xs leading-relaxed text-slate-600">
+                          <XCircle size={13} className="mt-0.5 shrink-0 text-amber-500" aria-hidden="true" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ownership verification — preparation only, no fake verification */}
+              <div role="note" className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-left">
+                <ShieldCheck size={16} className="mt-0.5 shrink-0 text-emerald-600" />
+                <p className="text-xs leading-relaxed text-slate-700">
+                  <span className="font-semibold text-navy-900">
+                    Prepare to verify ownership.
+                  </span>{" "}
+                  Keep one small detail about the item <span className="font-medium">off</span> this
+                  report. When someone claims it, ask them to describe that detail privately
+                  through FindBack messages before arranging a safe, public handover.
+                </p>
               </div>
 
               <div role="note" className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-left">
@@ -339,6 +493,16 @@ export default function ReportFoundPage() {
               className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
             >
               {error}
+              {authRequired && (
+                <p className="mt-2">
+                  <Link
+                    href="/login?next=/report/found"
+                    className="font-semibold underline underline-offset-2 hover:text-red-800"
+                  >
+                    Sign in and try again
+                  </Link>
+                </p>
+              )}
             </div>
           )}
 
@@ -352,13 +516,13 @@ export default function ReportFoundPage() {
               Back
             </button>
 
-            {step < 3 ? (
+            {step < STEPS ? (
               <button
                 type="button"
                 onClick={() => goToStep(step + 1)}
                 className="btn-primary"
               >
-                {step === 2 ? "Continue to photos" : "Continue"}
+                {step === 2 ? "Continue to photos" : step === 3 ? "Review report" : "Continue"}
               </button>
             ) : (
               <button type="submit" disabled={isPending} className="btn-primary">

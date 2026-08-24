@@ -62,7 +62,9 @@ export function SocialAuthButtons({ next = "/dashboard" }: { next?: string }) {
         provider,
         options: { redirectTo },
       });
-      if (error) setError(error.message);
+      if (error) {
+        setError("Unable to start sign-in with that provider right now. Please try again.");
+      }
     } catch {
       setError("Unable to sign in with that provider right now. Please try again.");
     } finally {

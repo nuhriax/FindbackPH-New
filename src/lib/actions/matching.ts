@@ -1,81 +1,131 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 
 export type ActionResult = { error: string } | { error?: undefined };
 
 /**
- * Computes a similarity score (0–1) between a lost item and a found item.
- * Factors: category match, city/province match, date proximity, text similarity in title/description.
+ * Runs the matching engine for a newly-posted found item against all active
+ * lost items. This is the reverse direction of `runMatchingForLostItem`: a
+ * lost report created earlier should still discover items found later.
  */
-function computeMatchScore(
-  lost: { category: string; city: string; province: string; date_lost: string; title: string; description: string },
-  found: { category: string; city: string; province: string; date_found: string; title: string; description: string }
-): number {
-  let score = 0;
-  let maxScore = 0;
+export async function runMatchingForFoundItem(foundItemId: string): Promise<ActionResult> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Category (weight 3)
-  if (lost.category === found.category) {
-    score += 3;
+  if (!user) {
+    return { error: "You must be signed in" };
   }
-  maxScore += 3;
 
-  // Province (weight 2)
-  if (lost.province.toLowerCase() === found.province.toLowerCase()) {
-    score += 2;
+  // Fetch the found item
+  const { data: foundItem, error: foundError } = await supabase
+    .from("found_items")
+    .select("*")
+    .eq("id", foundItemId)
+    .single();
+
+  if (foundError || !foundItem) {
+    return { error: "Found item not found" };
   }
-  maxScore += 2;
 
-  // City (weight 2)
-  if (lost.city.toLowerCase() === found.city.toLowerCase()) {
-    score += 2;
+  if (foundItem.status !== "active") {
+    return {};
   }
-  maxScore += 2;
 
-  // Date proximity (weight 1.5) — only if dates are within 30 days
-  const lostDate = Date.parse(lost.date_lost);
-  const foundDate = Date.parse(found.date_found);
-  if (!Number.isNaN(lostDate) && !Number.isNaN(foundDate)) {
-    const diffDays = Math.abs(lostDate - foundDate) / (1000 * 60 * 60 * 24);
-    if (diffDays <= 30) {
-      const dateScore = Math.max(0, 1.5 * (1 - diffDays / 30));
-      score += dateScore;
+  if (foundItem.reporter_id !== user.id) {
+    return { error: "You can only run matching for your own reports" };
+  }
+
+  // Only match against active lost reports that haven't been recovered.
+  // Bounded so a large table never loads fully into memory.
+  const { data: lostItems, error: lostError } = await supabase
+    .from("lost_items")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (lostError) {
+    console.error("Reverse matching query error:", lostError);
+    return { error: "Could not run matching" };
+  }
+
+  const matches: { lost_item_id: string; found_item_id: string; score: number }[] = [];
+
+  for (const lost of lostItems ?? []) {
+    const score = computeMatchScore(lost, foundItem);
+    if (score > MATCH_THRESHOLD) {
+      matches.push({
+        lost_item_id: lost.id,
+        found_item_id: foundItemId,
+        score: Math.round(score * 100) / 100,
+      });
     }
   }
-  maxScore += 1.5;
 
-  // Title similarity (weight 1.5)
-  const titleSimilarity = jaccardSimilarity(
-    lost.title.toLowerCase(),
-    found.title.toLowerCase()
-  );
-  score += 1.5 * titleSimilarity;
-  maxScore += 1.5;
+  if (matches.length > 0) {
+    // Duplicate protection (server level): figure out which matches are
+    // genuinely NEW before upserting, so notifications only fire when a match
+    // row is actually created — never on repeat runs of the engine.
+    const { data: existingRows } = await supabase
+      .from("matches")
+      .select("lost_item_id")
+      .in(
+        "lost_item_id",
+        matches.map((m) => m.lost_item_id),
+      )
+      .eq("found_item_id", foundItemId);
 
-  // Description overlap (weight 2)
-  const descSimilarity = jaccardSimilarity(
-    lost.description.toLowerCase(),
-    found.description.toLowerCase()
-  );
-  score += 2 * descSimilarity;
-  maxScore += 2;
+    const alreadyMatched = new Set((existingRows ?? []).map((r) => r.lost_item_id));
+    const newMatches = matches.filter((m) => !alreadyMatched.has(m.lost_item_id));
 
-  return maxScore > 0 ? Math.min(score / maxScore, 1) : 0;
-}
+    // Insert new matches, skipping ones that already exist (unique constraint).
+    const { error: insertError } = await supabase.from("matches").upsert(
+      matches.map((m) => ({
+        lost_item_id: m.lost_item_id,
+        found_item_id: m.found_item_id,
+        score: m.score,
+      })),
+      { onConflict: "lost_item_id,found_item_id", ignoreDuplicates: true },
+    );
 
-function jaccardSimilarity(a: string, b: string): number {
-  const setA = new Set(a.split(/\W+/).filter(Boolean));
-  const setB = new Set(b.split(/\W+/).filter(Boolean));
-  if (setA.size === 0 && setB.size === 0) return 0;
-  const intersection = [...setA].filter((w) => setB.has(w)).length;
-  const union = setA.size + setB.size - intersection;
-  return union > 0 ? intersection / union : 0;
+    if (insertError && insertError.code !== "23505") {
+      console.error("Match insert error:", insertError);
+    }
+
+    // One notification per affected lost-report owner (not per match), and
+    // only when that owner gained at least one genuinely new match. The
+    // `notify_user_once` RPC re-checks for duplicates at the DB level.
+    if (newMatches.length > 0) {
+      const linkByOwner = new Map<string, string>();
+      for (const m of newMatches) {
+        const lost = (lostItems ?? []).find((l) => l.id === m.lost_item_id);
+        if (lost && !linkByOwner.has(lost.reporter_id)) {
+          linkByOwner.set(lost.reporter_id, `/lost/${lost.id}`);
+        }
+      }
+
+      for (const [ownerId, link] of linkByOwner) {
+        await supabase.rpc("notify_user_once", {
+          p_user_id: ownerId,
+          p_type: "possible_match",
+          p_title: "Possible match found",
+          p_message: `A newly reported found item may match your lost item "${foundItem.title}".`,
+          p_link: link,
+        });
+      }
+    }
+  }
+
+  return {};
 }
 
 /**
  * Runs the matching engine for a newly-posted lost item against all active found items.
- * Stores matches with score > 0.6 (60%).
+ * Stores matches with score above the threshold.
  */
 export async function runMatchingForLostItem(lostItemId: string): Promise<ActionResult> {
   const supabase = createClient();
@@ -103,11 +153,18 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
     return {};
   }
 
-  // Fetch all active found items in the same province (or nationwide if no province match)
+  if (lostItem.reporter_id !== user.id) {
+    return { error: "You can only run matching for your own reports" };
+  }
+
+  // Fetch recent active found items to compare against.
+  // Bounded so a large table never loads fully into memory.
   const { data: foundItems, error: foundError } = await supabase
     .from("found_items")
     .select("*")
-    .eq("status", "active");
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(500);
 
   if (foundError) {
     console.error("Matching query error:", foundError);
@@ -118,9 +175,8 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
   const matches: { lost_item_id: string; found_item_id: string; score: number }[] = [];
 
   for (const found of foundItems ?? []) {
-    // Skip items already matched and not dismissed
-    const existingScore = await computeMatchScore(lostItem, found);
-    if (existingScore > 0.6) {
+    const existingScore = computeMatchScore(lostItem, found);
+    if (existingScore > MATCH_THRESHOLD) {
       matches.push({
         lost_item_id: lostItemId,
         found_item_id: found.id,
@@ -129,33 +185,45 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
     }
   }
 
-  // Insert new matches (ignore duplicates)
+  // Insert new matches, skipping duplicates via the unique constraint.
   if (matches.length > 0) {
-    const { error: insertError } = await supabase.from("matches").insert(
+    // Duplicate protection (server level): only genuinely NEW matches count as
+    // news. Repeat engine runs must never re-notify the reporter.
+    const { data: existingRows } = await supabase
+      .from("matches")
+      .select("found_item_id")
+      .eq("lost_item_id", lostItemId)
+      .in(
+        "found_item_id",
+        matches.map((m) => m.found_item_id),
+      );
+
+    const alreadyMatched = new Set((existingRows ?? []).map((r) => r.found_item_id));
+    const newMatches = matches.filter((m) => !alreadyMatched.has(m.found_item_id));
+
+    const { error: insertError } = await supabase.from("matches").upsert(
       matches.map((m) => ({
         lost_item_id: m.lost_item_id,
         found_item_id: m.found_item_id,
         score: m.score,
       })),
+      { onConflict: "lost_item_id,found_item_id", ignoreDuplicates: true },
     );
 
-    // Note: ignore duplicate key conflicts
     if (insertError && insertError.code !== "23505") {
       console.error("Match insert error:", insertError);
     }
 
-    // Create notifications for each match
-    const { data: notifier } = await supabase.auth.getUser();
-    if (notifier.user) {
-      for (const m of matches) {
-        await supabase.from("notifications").insert({
-          user_id: lostItem.reporter_id,
-          type: "possible_match",
-          title: "Possible match found",
-          message: `We found a possible match for your lost item "${lostItem.title}".`,
-          link: `/lost/${lostItemId}`,
-        });
-      }
+    // One notification per run (not one per match), only when new matches were
+    // actually created. `notify_user_once` re-checks duplicates at the DB level.
+    if (newMatches.length > 0) {
+      await supabase.rpc("notify_user_once", {
+        p_user_id: lostItem.reporter_id,
+        p_type: "possible_match",
+        p_title: "Possible match found",
+        p_message: `We found ${newMatches.length} possible match${newMatches.length > 1 ? "es" : ""} for your lost item "${lostItem.title}".`,
+        p_link: `/lost/${lostItemId}`,
+      });
     }
   }
 

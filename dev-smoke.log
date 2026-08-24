@@ -1,0 +1,16 @@
+
+> findback-ph@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.15
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+ ✓ Compiled /src/middleware in 385ms (142 modules)
+ ○ Compiling /search ...
+ ✓ Compiled /search in 10.7s (1877 modules)
+ GET /search?q=phone&when=week&photos=1&type=lost 200 in 11746ms
+ GET /search?category=bags 200 in 536ms
+[?25h

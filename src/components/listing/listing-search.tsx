@@ -144,7 +144,7 @@ export function ListingSearch({
             <Link
               key={chip.href}
               href={chip.href}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700"
             >
               {chip.label}
               <X aria-hidden="true" className="h-3 w-3 text-slate-400" />
@@ -152,7 +152,7 @@ export function ListingSearch({
           ))}
           <Link
             href={clearAllHref ?? "/"}
-            className="px-1.5 text-xs font-medium text-slate-500 transition-colors hover:text-blue-700"
+            className="inline-flex min-h-[36px] items-center px-2 py-2 text-xs font-medium text-slate-500 transition-colors hover:text-blue-700"
           >
             Clear all
           </Link>

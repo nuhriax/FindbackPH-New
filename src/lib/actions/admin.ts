@@ -44,6 +44,14 @@ export async function updateReportStatusAction(
   const supabase = createClient();
   const tableName = itemType === "lost_item" ? "lost_items" : "found_items";
 
+  // Read the current owner first so we can notify them about moderation
+  // actions on their own report.
+  const { data: existing } = await supabase
+    .from(tableName)
+    .select("reporter_id, title")
+    .eq("id", itemId)
+    .single();
+
   const { error } = await supabase
     .from(tableName)
     .update({ status })
@@ -52,6 +60,18 @@ export async function updateReportStatusAction(
   if (error) {
     console.error("Error updating report status:", error);
     return { error: "Could not update report" };
+  }
+
+  // Moderation notification — only on a genuine removal, with safe generic
+  // wording. Moderator notes / flag details are NEVER included.
+  if (status === "removed" && existing?.reporter_id) {
+    await supabase.rpc("notify_user_once", {
+      p_user_id: existing.reporter_id,
+      p_type: "moderation_action",
+      p_title: "Your report was removed by moderation",
+      p_message: `Your report "${existing.title ?? ""}" was removed by the FindBack PH moderation team because it did not follow the community guidelines. Contact support if you believe this was a mistake.`,
+      p_link: "/dashboard/reports",
+    });
   }
 
   revalidatePath("/admin/reports");
@@ -88,16 +108,22 @@ export async function deleteReportAction(
 }
 
 /**
- * Reviews a report flag (marks it reviewed or dismissed).
- * Only admins/moderators can do this.
+ * Reviews a report flag (advances its moderation status).
+ * Only admins/moderators can do this — checked server-side, never trusted
+ * from the client. Allowed transitions cover the full review workflow:
+ * pending → under_review → resolved / dismissed (plus legacy "reviewed").
  */
 export async function reviewFlagAction(
   flagId: string,
-  status: "reviewed" | "dismissed"
+  status: "under_review" | "reviewed" | "resolved" | "dismissed"
 ): Promise<ActionResult> {
   const authorized = await isAdminUser();
   if (!authorized) {
     return { error: "Not authorized" };
+  }
+
+  if (!["under_review", "reviewed", "resolved", "dismissed"].includes(status)) {
+    return { error: "Invalid status" };
   }
 
   const supabase = createClient();
@@ -117,6 +143,47 @@ export async function reviewFlagAction(
   if (error) {
     console.error("Error reviewing flag:", error);
     return { error: "Could not update flag" };
+  }
+
+  revalidatePath("/admin/flags");
+  revalidatePath("/admin");
+  return {};
+}
+
+/**
+ * Reviews a USER report the same way as listing flags.
+ * Only admins/moderators can do this.
+ */
+export async function reviewUserFlagAction(
+  flagId: string,
+  status: "under_review" | "resolved" | "dismissed"
+): Promise<ActionResult> {
+  const authorized = await isAdminUser();
+  if (!authorized) {
+    return { error: "Not authorized" };
+  }
+
+  if (!["under_review", "resolved", "dismissed"].includes(status)) {
+    return { error: "Invalid status" };
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from("user_flags")
+    .update({
+      status,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: user!.id,
+    })
+    .eq("id", flagId);
+
+  if (error) {
+    console.error("Error reviewing user flag:", error);
+    return { error: "Could not update user report" };
   }
 
   revalidatePath("/admin/flags");
@@ -146,6 +213,18 @@ export async function setUserSuspensionAction(
   if (error) {
     console.error("Error updating user suspension:", error);
     return { error: "Could not update user" };
+  }
+
+  // Real moderation event — generic wording only, never moderator notes.
+  if (suspended) {
+    await supabase.rpc("notify_user_once", {
+      p_user_id: userId,
+      p_type: "moderation_action",
+      p_title: "Your account was suspended",
+      p_message:
+        "Your FindBack PH account has been suspended by the moderation team due to a violation of the community guidelines. Contact support if you believe this was a mistake.",
+      p_link: "/contact",
+    });
   }
 
   revalidatePath("/admin/users");
