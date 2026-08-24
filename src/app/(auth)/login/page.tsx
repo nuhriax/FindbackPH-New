@@ -87,16 +87,16 @@ function LoginInner() {
                 We couldn&apos;t complete your Google/Facebook sign-in. Please
                 try again, or use your email and password instead.
               </span>
-              {oauthReason && (
-                <span className="mt-1 block text-[11px] opacity-70">
-                  Reason: {oauthReason}
-                </span>
-              )}
             </>
           ) : (
             <span>
               This sign-in link is invalid or has expired. Please try logging in
               again, or request a new link.
+            </span>
+          )}
+          {oauthReason && (
+            <span className="mt-1 block text-[11px] opacity-70">
+              Reason: {oauthReason}
             </span>
           )}
         </div>

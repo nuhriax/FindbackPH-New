@@ -57,10 +57,26 @@ function CallbackInner() {
             router.replace(target);
           }
           router.refresh();
-        } else {
-          console.error("Auth callback: code exchange failed:", error.message);
-          router.replace("/login?error=callback");
+          return;
         }
+
+        console.error("Auth callback: code exchange failed:", error.message);
+
+        // Recovery path: a code can only be exchanged ONCE. If something
+        // re-ran the callback (double navigation, extension prefetch, etc.),
+        // the first exchange may already have established the session — in
+        // that case treat the user as signed in instead of showing an error.
+        const { data: existing } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (existing.session) {
+          router.replace(target);
+          router.refresh();
+          return;
+        }
+
+        router.replace(
+          `/login?error=callback&reason=${encodeURIComponent(error.message)}`
+        );
         return;
       }
 
