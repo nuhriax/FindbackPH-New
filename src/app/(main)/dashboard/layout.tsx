@@ -18,6 +18,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .eq("id", user.id)
     .single();
 
+  // Onboarding gate — Google/Facebook sign-ups must add their real name and
+  // choose a username before they can use the dashboard.
+  if (profile && (!profile.first_name?.trim() || !profile.last_name?.trim())) {
+    redirect("/complete-profile");
+  }
+
   const isAdmin = profile ? profile.role === "admin" || profile.role === "moderator" : false;
 
   return (

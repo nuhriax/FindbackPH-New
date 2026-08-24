@@ -16,6 +16,7 @@ type AuthFieldProps = {
   minLength?: number;
   error?: string;
   value?: string;
+  defaultValue?: string;
   onChange?: (value: string) => void;
   autoFocus?: boolean;
 };
@@ -35,6 +36,7 @@ export function AuthField({
   minLength,
   error,
   value,
+  defaultValue,
   onChange,
   autoFocus,
 }: AuthFieldProps) {
@@ -66,6 +68,7 @@ export function AuthField({
           autoComplete={autoComplete}
           placeholder={placeholder ?? `Enter ${label.toLowerCase()}`}
           value={value}
+          defaultValue={value === undefined ? defaultValue : undefined}
           onChange={onChange ? (e) => onChange(e.target.value) : undefined}
           autoFocus={autoFocus}
           aria-invalid={error ? true : undefined}

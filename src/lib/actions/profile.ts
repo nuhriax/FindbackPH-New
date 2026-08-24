@@ -87,6 +87,63 @@ export async function removeAvatarAction(): Promise<ActionResult> {
 }
 
 /**
+ * Onboarding gate for Google/Facebook sign-ups. OAuth providers don't give us
+ * a real name or a chosen username, so new social members MUST complete this
+ * before using the dashboard. Only updates the three identity fields — never
+ * touches location/bio/avatar (those stay whatever the user later sets).
+ */
+export async function completeOnboardingAction(formData: FormData): Promise<ActionResult> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in" };
+  }
+
+  const raw = {
+    firstName: formData.get("firstName")?.toString().trim() ?? "",
+    lastName: formData.get("lastName")?.toString().trim() ?? "",
+    username: formData.get("username")?.toString().trim() ?? "",
+  };
+
+  const parsed = profileSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", parsed.data.username)
+    .neq("id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    return { error: "That username is already taken" };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      first_name: parsed.data.firstName,
+      last_name: parsed.data.lastName,
+      username: parsed.data.username,
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    console.error("Onboarding profile error:", error);
+    return { error: "We couldn't save your details. Please try again." };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+  return {};
+}
+
+/**
  * Updates the signed-in user's public profile. Derives the target id from the
  * session (never trusts a client-supplied id) and enforces a unique username.
  */

@@ -53,7 +53,7 @@ function CallbackInner() {
       if (code) {
         // Google/Facebook OAuth, email confirmation, or password reset — the
         // `code` is single-use and swapped for a session here.
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
         if (cancelled) return;
         if (!error) {
           // Signup email-confirmation links carry `signup=1`, so confirmed
@@ -62,9 +62,29 @@ function CallbackInner() {
           // flows never set this flag, so they keep the existing behavior.
           if (searchParams.get("signup") === "1") {
             router.replace("/verify-success");
-          } else {
-            router.replace(target);
+            router.refresh();
+            return;
           }
+
+          // Onboarding gate: Google/Facebook only give us a display handle, so
+          // members without a real name on file must complete their profile
+          // before the dashboard.
+          const uid = sessionData?.user?.id;
+          if (uid) {
+            const { data: prof } = await supabase
+              .from("profiles")
+              .select("first_name, last_name")
+              .eq("id", uid)
+              .maybeSingle();
+            if (cancelled) return;
+            if (!prof?.first_name?.trim() || !prof?.last_name?.trim()) {
+              router.replace("/complete-profile");
+              router.refresh();
+              return;
+            }
+          }
+
+          router.replace(target);
           router.refresh();
           return;
         }
