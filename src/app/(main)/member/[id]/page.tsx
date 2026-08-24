@@ -98,10 +98,10 @@ export default async function MemberProfilePage({ params }: Props) {
 return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        {/* Header card */}
+        {/* Profile card — identity + facts in one */}
         <section className="card overflow-hidden">
           <div className="h-28 bg-gradient-to-br from-electric-500/15 via-ice-50 to-emerald-50/60" />
-          <div className="flex flex-col gap-4 px-6 pb-6 sm:flex-row sm:items-end sm:px-8">
+          <div className="flex flex-col gap-4 px-6 sm:flex-row sm:items-end sm:px-8">
             <div className="-mt-10">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -142,30 +142,30 @@ return (
               </Link>
             )}
           </div>
-        </section>
 
-        {/* Facts */}
-        <section className="mt-5 grid gap-3 sm:grid-cols-2">
-          <div className="card flex items-center gap-3 p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <HeartHandshake size={18} />
-            </span>
-            <div>
-              <p className="font-display text-xl font-bold text-navy-900">
-                {profile.successful_returns}
-              </p>
-              <p className="text-xs text-slate-500">items reunited</p>
+          {/* Facts strip — same card, divided from the identity block */}
+          <div className="mt-5 grid grid-cols-2 divide-x divide-slate-200/70 border-t border-slate-200/70 bg-ice-50/40">
+            <div className="flex items-center gap-3 px-6 py-4 sm:px-8">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <HeartHandshake size={18} />
+              </span>
+              <div>
+                <p className="font-display text-xl font-bold text-navy-900">
+                  {profile.successful_returns}
+                </p>
+                <p className="text-xs text-slate-500">items reunited</p>
+              </div>
             </div>
-          </div>
-          <div className="card flex items-center gap-3 p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ice-50 text-electric-600">
-              <MapPin size={18} />
-            </span>
-            <div>
-              <p className="font-display text-xl font-bold text-navy-900">
-                {joined ?? "—"}
-              </p>
-              <p className="text-xs text-slate-500">member since</p>
+            <div className="flex items-center gap-3 px-6 py-4 sm:px-8">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ice-50 text-electric-600">
+                <MapPin size={18} />
+              </span>
+              <div>
+                <p className="font-display text-xl font-bold text-navy-900">
+                  {joined ?? "—"}
+                </p>
+                <p className="text-xs text-slate-500">member since</p>
+              </div>
             </div>
           </div>
         </section>
