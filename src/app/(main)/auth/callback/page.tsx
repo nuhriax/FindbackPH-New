@@ -35,6 +35,12 @@ function CallbackInner() {
     async function handle() {
       const code = searchParams.get("code");
 
+      // Provider-level failures (Google/Facebook consent cancelled, misconfigured
+      // redirect URI, provider outage…) arrive WITHOUT a code but WITH
+      // `error` / `error_code` / `error_description` params from Supabase.
+      const oauthError =
+        searchParams.get("error") ?? searchParams.get("error_code") ?? null;
+
       if (code) {
         // Google/Facebook OAuth, email confirmation, or password reset — the
         // `code` is single-use and swapped for a session here.
@@ -52,12 +58,27 @@ function CallbackInner() {
           }
           router.refresh();
         } else {
+          console.error("Auth callback: code exchange failed:", error.message);
           router.replace("/login?error=callback");
         }
         return;
       }
 
-      // No code (e.g. OAuth error redirect) — fall back to checking the session.
+      if (oauthError) {
+        // Social sign-in failed before a session ever existed — this is NOT an
+        // expired email link, so surface a matching message.
+        if (!cancelled) {
+          console.error(
+            "Auth callback: provider returned an error:",
+            oauthError,
+            searchParams.get("error_description")
+          );
+          router.replace("/login?error=callback&source=oauth");
+        }
+        return;
+      }
+
+      // No code (e.g. session already consumed elsewhere) — fall back to checking the session.
       const { data } = await supabase.auth.getSession();
       if (cancelled) return;
       if (data.session) {

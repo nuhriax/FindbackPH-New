@@ -31,7 +31,9 @@ function LoginInner() {
   const registered = searchParams.get("registered") === "true";
   // /auth/callback bounces failed email-confirmation/reset links here with
   // ?error=callback — show a friendly explanation instead of a bare form.
+  // Failed Google/Facebook sign-ins add &source=oauth so the message matches.
   const callbackFailed = searchParams.get("error") === "callback";
+  const callbackWasOauth = searchParams.get("source") === "oauth";
   // Respect the protected-page redirect the middleware set (e.g. /dashboard),
   // falling back to the dashboard. Reject external/open redirects.
   const rawNext = searchParams.get("next");
@@ -78,10 +80,17 @@ function LoginInner() {
       {callbackFailed && (
         <div className="auth-error-block" role="alert">
           <TriangleAlert size={16} aria-hidden="true" />
-          <span>
-            This sign-in link is invalid or has expired. Please try logging in
-            again, or request a new link.
-          </span>
+          {callbackWasOauth ? (
+            <span>
+              We couldn&apos;t complete your Google/Facebook sign-in. Please try
+              again, or use your email and password instead.
+            </span>
+          ) : (
+            <span>
+              This sign-in link is invalid or has expired. Please try logging in
+              again, or request a new link.
+            </span>
+          )}
         </div>
       )}
 
