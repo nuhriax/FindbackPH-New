@@ -913,7 +913,13 @@ export function ReportDetail({
                           ring-blue-50/50
                         "
                       >
-                        {firstLetter}
+                        {item.reporterId ? (
+                          <Link href={`/member/${item.reporterId}`} title="View member profile">
+                            {firstLetter}
+                          </Link>
+                        ) : (
+                          firstLetter
+                        )}
                       </div>
 
                       <div className="min-w-0">
@@ -923,16 +929,25 @@ export function ReportDetail({
                             className="shrink-0 text-slate-400"
                           />
 
-                          <p
-                            className="
+                          {item.reporterId ? (
+                            <Link
+                              href={`/member/${item.reporterId}`}
+                              className="truncate text-sm font-bold text-slate-900 transition-colors hover:text-electric-700 hover:underline"
+                            >
+                              {reporterName}
+                            </Link>
+                          ) : (
+                            <p
+                              className="
                               truncate
                               text-sm
                               font-bold
                               text-slate-900
                             "
-                          >
-                            {reporterName}
-                          </p>
+                            >
+                              {reporterName}
+                            </p>
+                          )}
 
                           {/* Phase 7 — subtle, real-data-only trust badges */}
                           {trust?.emailVerified && <VerifiedAccountBadge />}

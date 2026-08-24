@@ -221,10 +221,12 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
             Item: {itemTitle}
           </Link>
           {otherUser && (
-            <span className="ml-auto text-xs text-slate-500">
-              with{" "}
-              <span className="font-medium text-slate-700">{displayName}</span>
-            </span>
+            <Link
+              href={`/member/${otherUser.id}`}
+              className="ml-auto text-xs text-slate-500 transition-colors hover:text-electric-700 hover:underline"
+            >
+              with <span className="font-medium text-slate-700">{displayName}</span>
+            </Link>
           )}
           {otherUser && <BlockUserButton targetUserId={otherUser.id} />}
         </div>

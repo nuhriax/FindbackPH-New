@@ -19,7 +19,7 @@ export async function ConversationsList() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("username, first_name, last_name, avatar_url")
+        .select("id, username, first_name, last_name, avatar_url")
         .eq("id", otherId)
         .single();
 
@@ -69,9 +69,12 @@ export async function ConversationsList() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="font-medium text-navy-900">
+                <Link
+                  href={`/member/${other?.id}`}
+                  className="font-medium text-navy-900 transition-colors hover:text-electric-700"
+                >
                   {other?.first_name ? `${other.first_name} ${other.last_name}` : other?.username ?? "Someone"}
-                </span>
+                </Link>
                 <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   {convo.item_type === "lost_item" ? "Lost" : "Found"}
                 </span>

@@ -291,6 +291,14 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      /**
+       * Member profiles — real "email confirmed" signal for an arbitrary user
+       * id (lookup only; never returns account data). Used by /member/[id].
+       */
+      is_email_verified: {
+        Args: { p_uid: string };
+        Returns: boolean;
+      };
       /** Phase 7 — pass/fail ownership check done inside Postgres. */
       verify_ownership_answers: {
         Args: { p_item_type: string; p_item_id: string; p_answer_1: string; p_answer_2?: string | null };
