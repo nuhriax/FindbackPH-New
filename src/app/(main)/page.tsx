@@ -429,7 +429,16 @@ export default async function HomePage() {
 
         <CommunityMotif className="absolute bottom-1 right-8 hidden w-64 opacity-70 lg:block" />
 
-        <div className="relative z-10 mx-auto max-w-5xl">
+        <div className="relative z-10 mx-auto max-w-6xl">
+          <div className="brand-art mb-10 overflow-hidden rounded-[2rem] border border-[#f5b301]/35 shadow-[0_24px_80px_-22px_rgba(0,223,210,0.42)] sm:mb-14">
+            {/* The supplied brand artwork remains the hero's focal point on every screen. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/findback-ph-hero.png"
+              alt="FindBack PH — Lost today. Found tomorrow."
+              className="block h-auto w-full"
+            />
+          </div>
           {/* ----------------------------------------------------------------
               TITLE
               ---------------------------------------------------------------- */}

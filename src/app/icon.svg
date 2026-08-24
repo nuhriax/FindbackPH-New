@@ -1,20 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4E93F1"/>
-      <stop offset="1" stop-color="#1769E0"/>
+    <clipPath id="lens"><circle cx="27" cy="27" r="11.5"/></clipPath>
+    <linearGradient id="wv" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#17B3AC"/><stop offset="1" stop-color="#0C7C7C"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="15" fill="url(#g)"/>
-  <!-- Philippine sun -->
-  <g stroke="#FFE0B3" stroke-width="3" stroke-linecap="round">
-    <path d="M32 8v6"/><path d="M32 50v6"/>
-    <path d="M8 32h6"/><path d="M50 32h6"/>
-    <path d="M14.5 14.5l4.2 4.2"/><path d="M45.3 45.3l4.2 4.2"/>
-    <path d="M14.5 49.5l4.2-4.2"/><path d="M45.3 18.7l4.2-4.2"/>
+  <!-- Philippine sun rays -->
+  <g fill="#F5B301">
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(45 27 27)"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(90 27 27)"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(135 27 27)"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(180 27 27)"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(225 27 27)"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(270 27 27)"/>
+    <path d="M27 1.5 L29.4 11 L24.6 11 Z" transform="rotate(315 27 27)"/>
   </g>
   <!-- magnifying glass -->
-  <circle cx="30" cy="30" r="11" fill="#ffffff" opacity="0.95"/>
-  <circle cx="30" cy="30" r="11" fill="none" stroke="#0F4C81" stroke-width="4"/>
-  <path d="M38.5 38.5L52 52" stroke="#0F4C81" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="27" cy="27" r="15" fill="#0A2F3C" stroke="#17A398" stroke-width="5"/>
+  <!-- tropical scene inside lens -->
+  <g clip-path="url(#lens)">
+    <path d="M21.5 37 C21.5 31 22.3 27.5 23.5 25.5" stroke="#7FD8D2" stroke-width="1.6" stroke-linecap="round"/>
+    <g stroke="#7FD8D2" stroke-width="1.5" stroke-linecap="round" fill="none">
+      <path d="M23.5 25.5 C20.5 24 18 24.5 16.5 26.5"/>
+      <path d="M23.5 25.5 C21.5 22.5 19 22 17 23.5"/>
+      <path d="M23.5 25.5 C24.5 22 27 20.5 29.5 21.5"/>
+      <path d="M23.5 25.5 C26.5 24.5 29 25.5 30.5 28"/>
+    </g>
+    <g fill="#F5B301">
+      <rect x="28.5" y="29.5" width="6" height="6.5" rx="0.6"/>
+      <path d="M28.5 29.5 L31.5 25.5 L34.5 29.5 Z"/>
+    </g>
+    <path d="M33.5 20.5 l0.9 1.8 2 0.3 -1.45 1.4 0.35 2 -1.8 -0.95 -1.8 0.95 0.35 -2 -1.45 -1.4 2 -0.3 Z" fill="#F5B301"/>
+    <path d="M15.5 34 C18.5 32.5 21 33.5 23.5 35 C26 36.5 29 36.5 31.5 35 L38.5 35 L38.5 38.5 L15.5 38.5 Z" fill="#12807E"/>
+  </g>
+  <!-- handle -->
+  <path d="M38.5 38.5 L50.5 50.5" stroke="#17A398" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M40 40 L48 48" stroke="#5FD0C8" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <!-- waves -->
+  <path d="M2 52 C10 45 22 45.5 32 49 C42 52.5 52 51.5 60 47 L60 56 C50 61 38 61.5 28 57.5 C18 53.5 9 54.5 2 58 Z" fill="url(#wv)"/>
+  <path d="M6 60 C13 55.5 22 55.8 30 58.5 C38 61.2 48 60.8 56 57.5 L56 61.5 C47 64.8 37 65 29 62.2 C21 59.4 12.5 59.8 6 62.5 Z" fill="#0C7C7C" opacity="0.85"/>
 </svg>

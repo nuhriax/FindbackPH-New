@@ -124,17 +124,17 @@ export function BackgroundEffects({
           BASE ATMOSPHERE
       ============================================================ */}
 
-      <div className="absolute inset-0 bg-[#fbf6ef]" />
+      <div className="absolute inset-0 bg-[#020706]" />
 
       <div
         className="
           absolute inset-0
           bg-[radial-gradient(
             ellipse_75%_60%_at_50%_42%,
-            rgba(255,255,255,0.98)_0%,
-            rgba(255,255,255,0.9)_38%,
-            rgba(238,245,255,0.5)_70%,
-            rgba(214,233,255,0.22)_100%
+            rgba(8,29,30,0.88)_0%,
+            rgba(3,13,14,0.92)_38%,
+            rgba(1,7,7,0.78)_70%,
+            rgba(0,0,0,0.96)_100%
           )]
         "
       />

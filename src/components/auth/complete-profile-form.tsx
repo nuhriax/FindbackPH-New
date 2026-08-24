@@ -46,7 +46,7 @@ export function CompleteProfileForm({
       }
       setStatus("success");
       const t = window.setTimeout(() => {
-        router.replace("/");
+        router.replace("/dashboard");
         router.refresh();
       }, 700);
       setTimer(t);
@@ -105,7 +105,7 @@ export function CompleteProfileForm({
             ? "Saved!"
             : status === "loading"
               ? "Saving…"
-              : "Continue to dashboard"}
+              : "Continue to Homepage"}
         </SubmitButton>
       </form>
     </div>
