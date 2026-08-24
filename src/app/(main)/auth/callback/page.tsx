@@ -3,6 +3,8 @@
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Logo } from "@/components/logo";
+import { Spinner } from "@/components/ui/spinner";
 
 /**
  * OAuth / email-confirmation callback. Supabase redirects here after a user
@@ -13,7 +15,7 @@ import { createClient } from "@/lib/supabase/client";
  */
 export default function CallbackPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CallbackLoading />}>
       <CallbackInner />
     </Suspense>
   );
@@ -120,5 +122,34 @@ function CallbackInner() {
     };
   }, [router, searchParams]);
 
-  return null;
+  return <CallbackLoading />;
+}
+
+/**
+ * Branded in-transition state shown while the auth code is exchanged for a
+ * session. Matches the auth shell (Logo + card styling) so the handoff from
+ * Google/Facebook back into FindBack PH feels continuous instead of a blank
+ * white flash.
+ */
+function CallbackLoading() {
+  return (
+    <div className="auth-root">
+      <div className="auth-shell">
+        <div className="auth-brand">
+          <Logo />
+        </div>
+
+        <section className="auth-card" aria-label="Signing you in" aria-busy="true">
+          <div className="auth-page flex flex-col items-center text-center">
+            <Spinner size="lg" className="mb-5 text-electric-600" />
+
+            <h1 className="auth-title">Signing you in…</h1>
+            <p className="auth-subtitle">
+              One moment while we set up your session.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 }
