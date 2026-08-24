@@ -34,6 +34,7 @@ function LoginInner() {
   // Failed Google/Facebook sign-ins add &source=oauth so the message matches.
   const callbackFailed = searchParams.get("error") === "callback";
   const callbackWasOauth = searchParams.get("source") === "oauth";
+  const oauthReason = searchParams.get("reason");
   // Respect the protected-page redirect the middleware set (e.g. /dashboard),
   // falling back to the dashboard. Reject external/open redirects.
   const rawNext = searchParams.get("next");
@@ -81,10 +82,17 @@ function LoginInner() {
         <div className="auth-error-block" role="alert">
           <TriangleAlert size={16} aria-hidden="true" />
           {callbackWasOauth ? (
-            <span>
-              We couldn&apos;t complete your Google/Facebook sign-in. Please try
-              again, or use your email and password instead.
-            </span>
+            <>
+              <span>
+                We couldn&apos;t complete your Google/Facebook sign-in. Please
+                try again, or use your email and password instead.
+              </span>
+              {oauthReason && (
+                <span className="mt-1 block text-[11px] opacity-70">
+                  Reason: {oauthReason}
+                </span>
+              )}
+            </>
           ) : (
             <span>
               This sign-in link is invalid or has expired. Please try logging in

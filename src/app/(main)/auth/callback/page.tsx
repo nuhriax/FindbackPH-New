@@ -66,14 +66,22 @@ function CallbackInner() {
 
       if (oauthError) {
         // Social sign-in failed before a session ever existed — this is NOT an
-        // expired email link, so surface a matching message.
+        // expired email link, so surface a matching message. Pass through the
+        // provider's own error code/description so the login screen can show
+        // exactly WHY it failed (e.g. redirect_uri_mismatch).
         if (!cancelled) {
+          const desc =
+            searchParams.get("error_description") ??
+            searchParams.get("error_code") ??
+            oauthError;
           console.error(
             "Auth callback: provider returned an error:",
             oauthError,
             searchParams.get("error_description")
           );
-          router.replace("/login?error=callback&source=oauth");
+          router.replace(
+            `/login?error=callback&source=oauth&reason=${encodeURIComponent(desc)}`
+          );
         }
         return;
       }
