@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${plusJakarta.variable}`}>
-      <body className="findback-night flex min-h-screen flex-col font-sans text-navy-900 antialiased">
+      <body className="flex min-h-screen flex-col font-sans text-navy-900 antialiased">
         {/* Skip link for keyboard / screen-reader users */}
         <a
           href="#main-content"
