@@ -21,6 +21,12 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  // Terms/Privacy consent must accompany every signup (the form's noValidate
+  // attribute means the HTML `required` alone doesn't guarantee this).
+  if (formData.get("terms") !== "on") {
+    return { error: "Please agree to the Privacy Policy and Terms of Service." };
+  }
+
   const supabase = createClient();
 
   // Enforce unique username server-side before creating the auth user.

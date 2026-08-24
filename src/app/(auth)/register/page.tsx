@@ -35,6 +35,16 @@ export default function RegisterPage() {
 
   async function handleSubmit(formData: FormData) {
     if (submittingRef.current) return;
+    // The form uses noValidate (custom password UX), so the native `required`
+    // on the checkbox never fires — enforce consent explicitly here AND
+    // server-side in registerAction.
+    if (formData.get("terms") !== "on") {
+      setError("Please agree to the Privacy Policy and Terms of Service.");
+      setShake(true);
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+      timerRef.current = window.setTimeout(() => setShake(false), 550);
+      return;
+    }
     submittingRef.current = true;
     setError(null);
     setStatus("loading");
