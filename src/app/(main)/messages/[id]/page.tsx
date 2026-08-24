@@ -46,7 +46,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
   const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
@@ -168,7 +168,13 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
   }, [conversationId, supabase]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Scroll the MESSAGES container only — never the whole page. Using the
+    // container's own scroll height avoids the page lurching down when a new
+    // message is sent or received.
+    const el = scrollerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages]);
 
   function handleSendMessage(formData: FormData) {
@@ -227,7 +233,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
 
         <div className="card flex h-[600px] sm:h-[700px] flex-col overflow-hidden">
           {/* Messages list */}
-          <div className="flex-1 overflow-y-auto bg-gradient-to-b from-ice-50/60 to-white/40 p-6">
+          <div ref={scrollerRef} className="flex-1 overflow-y-auto bg-gradient-to-b from-ice-50/60 to-white/40 p-6">
             {messages.length === 0 ? (
               <p className="pt-8 text-center text-sm text-slate-600">
                 No messages yet. Start the conversation below.
@@ -255,7 +261,6 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
                     </div>
                   );
                 })}
-                <div ref={messagesEndRef} />
               </div>
             )}
           </div>
