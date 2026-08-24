@@ -27,7 +27,7 @@ export default async function CompleteProfilePage() {
   // Already has a real name — nothing to do here.
   const incomplete =
     !profile || !profile.first_name?.trim() || !profile.last_name?.trim();
-  if (!incomplete) redirect("/dashboard");
+  if (!incomplete) redirect("/");
 
   const meta = (user.user_metadata ?? {}) as Record<string, string | undefined>;
   const fullName = meta.full_name?.trim() ?? "";

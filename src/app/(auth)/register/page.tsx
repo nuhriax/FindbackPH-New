@@ -61,10 +61,10 @@ export default function RegisterPage() {
         setStatus("success");
         timerRef.current = window.setTimeout(() => {
           // When email confirmation is off in Supabase, registration already
-          // establishes a session — go straight to the dashboard. Otherwise we
+          // establishes a session — land on the homepage. Otherwise we
           // send the user to log in (they must confirm their email first).
           if (result?.autoSignIn) {
-            router.push("/dashboard");
+            router.push("/");
           } else {
             router.push("/login?registered=true");
           }

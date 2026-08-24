@@ -29,17 +29,16 @@ function CallbackInner() {
     const supabase = createClient();
     let cancelled = false;
 
-    // Safe internal-path helper (rejects external / open redirects AND never
-    // lands a signed-in user on the home page or auth screens after login).
+    // Safe internal-path helper (rejects external / open redirects and auth
+    // screens as targets). Defaults to the homepage — the post-login landing.
     const nextRaw = searchParams.get("next");
     const target =
       nextRaw?.startsWith("/") &&
       !nextRaw.startsWith("//") &&
-      nextRaw !== "/" &&
       nextRaw !== "/login" &&
       nextRaw !== "/register"
         ? nextRaw
-        : "/dashboard";
+        : "/";
 
     async function handle() {
       const code = searchParams.get("code");
@@ -53,35 +52,17 @@ function CallbackInner() {
       if (code) {
         // Google/Facebook OAuth, email confirmation, or password reset — the
         // `code` is single-use and swapped for a session here.
-        const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (cancelled) return;
         if (!error) {
           // Signup email-confirmation links carry `signup=1`, so confirmed
           // accounts land on a dedicated "email verified" screen instead of
-          // being silently pushed to the dashboard. OAuth and password-reset
+          // being silently pushed anywhere else. OAuth and password-reset
           // flows never set this flag, so they keep the existing behavior.
           if (searchParams.get("signup") === "1") {
             router.replace("/verify-success");
             router.refresh();
             return;
-          }
-
-          // Onboarding gate: Google/Facebook only give us a display handle, so
-          // members without a real name on file must complete their profile
-          // before the dashboard.
-          const uid = sessionData?.user?.id;
-          if (uid) {
-            const { data: prof } = await supabase
-              .from("profiles")
-              .select("first_name, last_name")
-              .eq("id", uid)
-              .maybeSingle();
-            if (cancelled) return;
-            if (!prof?.first_name?.trim() || !prof?.last_name?.trim()) {
-              router.replace("/complete-profile");
-              router.refresh();
-              return;
-            }
           }
 
           router.replace(target);

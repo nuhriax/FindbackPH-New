@@ -46,7 +46,7 @@ export function CompleteProfileForm({
       }
       setStatus("success");
       const t = window.setTimeout(() => {
-        router.replace("/dashboard");
+        router.replace("/");
         router.refresh();
       }, 700);
       setTimer(t);
