@@ -70,6 +70,18 @@ export function DecodeText({
         setOut(resolve());
       }
     }, Math.max(8, speed));
+
+    // Fail-safe: mobile browsers throttle timers heavily (especially in
+    // background tabs or data-saver mode), which can leave the text scrambled
+    // forever. Never let the scramble outlive a hard cap.
+    const elapsedCap = Math.max(3000, text.length * Math.max(8, speed) * 2 + 1500);
+    setTimeout(() => {
+      if (timer.current) {
+        clearInterval(timer.current);
+        timer.current = null;
+      }
+      setOut(text);
+    }, elapsedCap);
   }, [resolve, speed, text]);
 
   // Kick off on mount for reduced motion / "auto", or when scrolled into view.

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "./use-prefers-reduced-motion";
@@ -31,6 +31,48 @@ export function MotionReveal({
   blur = true,
 }: MotionRevealProps) {
   const reduced = usePrefersReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Same fail-safe pattern as SplitText: the server-rendered markup (and any
+  // visitor whose JS fails) sees the fully-visible content; the hidden state is
+  // only applied after hydration, and a fallback timer guarantees the reveal
+  // even if IntersectionObserver never fires on the device.
+  const [mounted, setMounted] = useState(false);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -40px 0px" }
+    );
+
+    io.observe(el);
+
+    const fallback = setTimeout(() => {
+      setInView(true);
+      io.disconnect();
+    }, 2500);
+
+    return () => {
+      io.disconnect();
+      clearTimeout(fallback);
+    };
+  }, []);
+
+  const hidden = mounted && !inView && !reduced;
 
   if (reduced) {
     return <div className={className}>{children}</div>;
@@ -38,10 +80,10 @@ export function MotionReveal({
 
   return (
     <motion.div
+      ref={ref}
       className={cn("will-change-transform", className)}
-      initial={{ opacity: 0, y, filter: blur ? "blur(6px)" : "blur(0px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-60px" }}
+      initial={hidden ? { opacity: 0, y, filter: blur ? "blur(6px)" : "blur(0px)" } : false}
+      animate={hidden ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{ duration: 0.7, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}

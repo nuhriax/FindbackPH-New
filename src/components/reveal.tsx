@@ -36,7 +36,17 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
     );
 
     io.observe(el);
-    return () => io.disconnect();
+
+    // Fail-safe: if the observer never fires (some mobile browsers), reveal anyway.
+    const fallback = setTimeout(() => {
+      setVisible(true);
+      io.disconnect();
+    }, 2500);
+
+    return () => {
+      io.disconnect();
+      clearTimeout(fallback);
+    };
   }, []);
 
   return (

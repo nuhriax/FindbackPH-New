@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "./use-prefers-reduced-motion";
@@ -36,6 +37,49 @@ type SplitTextProps = {
  */
 export function SplitText({ segments, className, delay = 0, stagger = 0.07 }: SplitTextProps) {
   const reduced = usePrefersReducedMotion();
+  const ref = useRef<HTMLSpanElement>(null);
+
+  // `mounted` only flips after hydration, so the server-rendered HTML (and any
+  // visitor whose JavaScript fails) always sees the fully-visible heading.
+  // `inView` drives the reveal; a fallback timer guarantees the text becomes
+  // visible even on mobile browsers where IntersectionObserver misbehaves.
+  const [mounted, setMounted] = useState(false);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      // A small negative bottom margin matches the previous "reveal slightly
+      // after entering" feel without preventing the hero from ever triggering.
+      { rootMargin: "0px 0px -40px 0px" }
+    );
+
+    io.observe(el);
+
+    // Fail-safe: never leave the heading hidden for more than 2.5s.
+    const fallback = setTimeout(() => {
+      setInView(true);
+      io.disconnect();
+    }, 2500);
+
+    return () => {
+      io.disconnect();
+      clearTimeout(fallback);
+    };
+  }, []);
 
   // Flatten segments into word tokens, each carrying an optional class and a
   // flag if it must start a fresh line.
@@ -70,8 +114,13 @@ export function SplitText({ segments, className, delay = 0, stagger = 0.07 }: Sp
     );
   }
 
+  // The heading is only hidden between hydration and the reveal trigger. If JS
+  // never runs (or the observer never fires and the fallback lapses), the text
+  // simply stays visible — it can never end up blank or stuck mid-animation.
+  const hidden = mounted && !inView && !reduced;
+
   return (
-    <span aria-label={plainText} className={cn("block whitespace-normal", className)}>
+    <span ref={ref} aria-label={plainText} className={cn("block whitespace-normal", className)}>
       {tokens.map((token, i) => {
         return (
           <span key={i}>
@@ -88,17 +137,22 @@ export function SplitText({ segments, className, delay = 0, stagger = 0.07 }: Sp
                   token.className
                 )}
                 initial={
-                  token.single
-                    ? { opacity: 0, y: 28, filter: "blur(8px)" }
-                    : { opacity: 0, y: "115%", rotateX: -24, filter: "blur(6px)" }
+                  hidden
+                    ? token.single
+                      ? { opacity: 0, y: 28, filter: "blur(8px)" }
+                      : { opacity: 0, y: "115%", rotateX: -24, filter: "blur(6px)" }
+                    : false
                 }
-                whileInView={{
-                  opacity: 1,
-                  y: "0%",
-                  rotateX: 0,
-                  filter: "blur(0px)",
-                }}
-                viewport={{ once: true, margin: "-60px" }}
+                animate={
+                  hidden
+                    ? undefined
+                    : {
+                        opacity: 1,
+                        y: "0%",
+                        rotateX: 0,
+                        filter: "blur(0px)",
+                      }
+                }
                 transition={{
                   duration: 0.7,
                   delay: delay / 1000 + i * stagger,

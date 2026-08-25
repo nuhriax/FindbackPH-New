@@ -55,9 +55,15 @@ export function AnimatedNumber({
       { threshold: 0.3 }
     );
     io.observe(el);
+
+    // Fail-safe: if the observer never fires (some mobile browsers), start the
+    // count-up anyway so the stat never stays stuck at 0.
+    const fallback = setTimeout(start, 2500);
+
     return () => {
       cancelAnimationFrame(raf);
       io.disconnect();
+      clearTimeout(fallback);
     };
   }, [value, duration]);
 

@@ -43,10 +43,13 @@ export function ShinyText({
   }
 
   const style: CSSProperties = {
+    // A faint solid base under the sheen: if a browser doesn't support
+    // background-clip:text or the shine animation (older mobile browsers),
+    // the text stays dimly readable instead of disappearing entirely.
+    color: "rgba(255,255,255,0.28)",
     backgroundImage: `linear-gradient(120deg, rgba(255,255,255,0) 0%, ${sheen} 55%, rgba(255,255,255,0) 100%)`,
     WebkitBackgroundClip: "text",
     backgroundClip: "text",
-    color: "transparent",
     backgroundSize: "180% 100%",
     backgroundRepeat: "no-repeat",
     animation: `shine-x ${duration}s linear infinite`,
