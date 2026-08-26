@@ -1,4 +1,5 @@
 ﻿"use client";
+import Link from "next/link";
 import { InPageNav } from "@/components/in-page-nav";
 import { SplitText } from "@/components/effects/split-text";
 import { Aurora } from "@/components/effects/aurora";
@@ -1632,7 +1633,7 @@ export default function SafetyPage() {
 
               <div className="mt-8 flex flex-col gap-2.5">
 
-                <a
+                <Link
                   href="/found"
                   className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-[0_12px_35px_rgba(15,23,42,.06)]"
                 >
@@ -1656,7 +1657,7 @@ export default function SafetyPage() {
                     />
                   </span>
 
-                </a>
+                </Link>
 
                 <a
                   href="/contact"
