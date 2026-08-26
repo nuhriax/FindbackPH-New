@@ -3,9 +3,35 @@
 import { createClient } from "@/lib/supabase/server";
 import { foundItemSchema, lostItemSchema } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
+import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { runMatchingForLostItem, runMatchingForFoundItem } from "@/lib/actions/matching";
 
 export type ActionResult = { error?: string; itemId?: string };
+
+/**
+ * Anti-spam: a short cooldown between reports per user. Checks the timestamp of
+ * the user's most recent report (lost OR found) and blocks a new one until the
+ * window has passed. Server-side only — clients can't bypass it.
+ */
+const REPORT_COOLDOWN_MS = 3 * 60 * 1000; // 3 minutes
+
+async function reportCooldownMsRemaining(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string
+): Promise<number> {
+  let latest = 0;
+  for (const table of ["lost_items", "found_items"] as const) {
+    const { data } = await supabase
+      .from(table)
+      .select("created_at")
+      .eq("reporter_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const ts = data?.[0]?.created_at as string | undefined;
+    if (ts) latest = Math.max(latest, new Date(ts).getTime());
+  }
+  return Math.max(0, REPORT_COOLDOWN_MS - (Date.now() - latest));
+}
 
 export async function createLostItemAction(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
@@ -15,6 +41,14 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
 
   if (!user) {
     return { error: "You must be signed in to report a lost item" };
+  }
+
+  const rl = await consumeRateLimit("report", 10, 5 * 60 * 1000);
+  if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
+
+  const cooldown = await reportCooldownMsRemaining(supabase, user.id);
+  if (cooldown > 0) {
+    return { error: "Please wait a moment before posting another report." };
   }
 
   const raw = {
@@ -74,6 +108,14 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
 
   if (!user) {
     return { error: "You must be signed in to report a found item" };
+  }
+
+  const rl = await consumeRateLimit("report", 10, 5 * 60 * 1000);
+  if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
+
+  const cooldown = await reportCooldownMsRemaining(supabase, user.id);
+  if (cooldown > 0) {
+    return { error: "Please wait a moment before posting another report." };
   }
 
   const raw = {

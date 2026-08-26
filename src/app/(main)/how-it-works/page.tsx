@@ -215,8 +215,42 @@ export const metadata = {
 };
 
 export default function HowItWorksPage() {
+  const faqSchema = faqs.map((f) => ({
+    "@type": "Question",
+    name: f.question,
+    acceptedAnswer: { "@type": "Answer", text: f.answer },
+  }));
+  const howToSchema = steps.map((s, i) => ({
+    "@type": "HowToStep",
+    position: i + 1,
+    name: s.title,
+    text: s.description,
+  }));
+
   return (
     <main className="relative min-h-screen overflow-hidden py-16 text-navy-900 selection:bg-electric-400/20 selection:text-navy-900 lg:py-24">
+      {/* Rich results for search engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqSchema,
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            name: "How FindBack PH reunites lost and found items",
+            step: howToSchema,
+          }),
+        }}
+      />
       {/* =========================================================
           BACKGROUND
       ========================================================== */}

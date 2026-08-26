@@ -130,6 +130,67 @@ export default async function AdminReportsPage({
             ))}
           </div>
         )}
+
+        {/* Likely duplicate titles in the current page of results */}
+        <PotentialDuplicates type={type} items={(items ?? []) as any[]} />
+      </div>
+    </div>
+  );
+}
+
+function PotentialDuplicates({
+  type,
+  items,
+}: {
+  type: string;
+  items: {
+    id: string;
+    title: string;
+    status: string;
+    created_at: string;
+  }[];
+}) {
+  const norm = (t: string) => t.trim().toLowerCase().replace(/\s+/g, " ");
+  const groups = new Map<string, typeof items>();
+  for (const it of items) {
+    const key = norm(it.title);
+    if (!key) continue;
+    groups.set(key, [...(groups.get(key) ?? []), it]);
+  }
+  const dups = [...groups.values()].filter((g) => g.length > 1);
+  if (dups.length === 0) return null;
+
+  const basePath = type === "lost_item" ? "lost" : "found";
+
+  return (
+    <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+      <h2 className="font-display text-lg font-semibold text-navy-900">
+        Possible duplicate titles ({dups.length})
+      </h2>
+      <p className="mt-1 text-sm text-slate-500">
+        Reports sharing the same title in the current view — worth a quick
+        review before approving.
+      </p>
+      <div className="mt-4 space-y-3">
+        {dups.map((g) => (
+          <div
+            key={g[0].id}
+            className="rounded-xl border border-amber-200/70 bg-white px-4 py-3"
+          >
+            <p className="text-sm font-semibold text-navy-900">{g[0].title}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {g.map((it) => (
+                <Link
+                  key={it.id}
+                  href={`/${basePath}/${it.id}`}
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                >
+                  {it.status} · {format(new Date(it.created_at), "MMM d")}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

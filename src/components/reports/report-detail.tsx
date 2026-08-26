@@ -1205,15 +1205,10 @@ export function ReportDetail({
                           match.category;
 
                         return (
-                          <Link
+                          <div
                             key={match.id}
-                            href={href}
                             className="
-                              group
-                              flex
                               min-w-0
-                              items-center
-                              gap-3
                               rounded-xl
                               border
                               border-slate-200/80
@@ -1226,6 +1221,10 @@ export function ReportDetail({
                               hover:shadow-sm
                             "
                           >
+                            <Link
+                              href={href}
+                              className="group flex min-w-0 items-center gap-3"
+                            >
                             <div
                               className={`
                                 flex
@@ -1325,7 +1324,23 @@ export function ReportDetail({
                                 group-hover:text-blue-600
                               "
                             />
-                          </Link>
+                            </Link>
+
+                            <div className="mt-2 flex items-center justify-between gap-2 border-t border-slate-100 pt-2">
+                              <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+                                {match.score != null
+                                  ? `${Math.round(match.score * 100)}% match`
+                                  : "Possible match"}
+                              </span>
+                              <Link
+                                href={href}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 transition-colors hover:text-blue-800"
+                              >
+                                This might be mine
+                                <ArrowRight size={11} />
+                              </Link>
+                            </div>
+                          </div>
                         );
                       })}
                   </div>

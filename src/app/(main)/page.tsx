@@ -6,6 +6,7 @@ import {
   KeyRound,
   Laptop,
   Lock,
+  MapPin,
   PackageSearch,
   Search,
   ShieldCheck,
@@ -203,6 +204,18 @@ const categories = [
     value: "jewelry",
     icon: Watch,
   },
+];
+
+/** Popular Philippine search destinations, linked to the search page. */
+const POPULAR_CITIES = [
+  "Quezon City",
+  "Manila",
+  "Cebu City",
+  "Makati",
+  "Davao City",
+  "Taguig",
+  "Pasig",
+  "Mandaluyong",
 ];
 
 /* ============================================================================
@@ -554,6 +567,25 @@ export default async function HomePage() {
                 })}
               </div>
 
+              <div className="mt-5 text-center">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  Or browse by popular location
+                </span>
+
+                <div className="mt-2 flex flex-wrap justify-center gap-2">
+                  {POPULAR_CITIES.map((city) => (
+                    <Link
+                      key={city}
+                      href={`/search?city=${encodeURIComponent(city)}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/85 px-3.5 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700"
+                    >
+                      <MapPin size={13} />
+                      {city}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
               <div className="mt-3 text-center">
                 <Link
                   href="/search"
@@ -653,6 +685,15 @@ export default async function HomePage() {
                 />
               </div>
             </div>
+
+            <p className="mt-4 text-center text-sm leading-relaxed text-slate-600">
+              Every recovered report is one more item back where it belongs —
+              together we&apos;ve brought{" "}
+              <span className="font-semibold text-emerald-600">
+                {recoveredCount}
+              </span>{" "}
+              {recoveredCount === 1 ? "item" : "items"} home.
+            </p>
 
             {lostCount === 0 && foundCount === 0 && recoveredCount === 0 && (
               <p className="mt-4 text-center text-sm leading-relaxed text-slate-500">

@@ -114,7 +114,9 @@ export async function POST(req: NextRequest) {
         ""
       ) || "jpg";
     // Unique name so re-uploads / edits never collide with existing files.
-    const fileName = `${prefix}_${itemId}_${Date.now()}_${i}.${ext}`;
+    // The leading "<user-id>/" folder makes the Storage bucket RLS scope every
+    // write to its owner (see item-images policies in supabase/schema.sql).
+    const fileName = `${user.id}/${prefix}_${itemId}_${Date.now()}_${i}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("item-images")

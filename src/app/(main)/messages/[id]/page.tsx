@@ -131,12 +131,11 @@ export default function MessageThreadPage() {
 
       setLoading(false);
 
-      // Mark messages as read
-      await supabase
-        .from("messages")
-        .update({ read_by_receiver: true })
-        .eq("conversation_id", conversationId)
-        .neq("sender_id", user.id);
+      // Mark messages as read via a security-definer RPC (the messages UPDATE
+      // RLS policy only lets a user edit their own rows).
+      await supabase.rpc("mark_messages_read", {
+        p_conversation_id: conversationId,
+      });
     };
 
     fetchData();

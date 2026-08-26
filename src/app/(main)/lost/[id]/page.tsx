@@ -6,6 +6,7 @@ import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
+import { jsonLdStringify } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -25,15 +26,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const location = [item.city, item.province].filter(Boolean).join(", ");
+  const description = [
+    item.description ?? "",
+    location ? `Last seen in ${location}.` : "",
+    "Reported on FindBack PH, the Philippines' lost & found community.",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return {
     title: `${item.title} — Lost item · FindBack PH`,
-    description: [
-      item.description ?? "",
-      location ? `Last seen in ${location}.` : "",
-      "Reported on FindBack PH, the Philippines' lost & found community.",
-    ]
-      .filter(Boolean)
-      .join(" "),
+    description,
+    alternates: { canonical: `/lost/${id}` },
+    openGraph: {
+      title: `${item.title} — Lost item · FindBack PH`,
+      description,
+      type: "website",
+      url: `/lost/${id}`,
+      siteName: "FindBack PH",
+      locale: "en_PH",
+    },
+    twitter: {
+      card: "summary",
+      title: `${item.title} — Lost item · FindBack PH`,
+      description,
+    },
   };
 }
 
@@ -231,20 +248,55 @@ export default async function LostItemDetailPage({ params }: Props) {
     reporterId: raw.reporter_id,
   };
 
+  const locationText = [raw.city, raw.province].filter(Boolean).join(", ");
+  const schemaDescription = raw.description ?? "";
+
   return (
-    <ReportDetail
-      kind="lost"
-      item={item}
-      images={imageUrls}
-      reporter={reporter}
-      trust={trust}
-      ownership={ownership}
-      isOwner={isOwner}
-      savedItemId={savedItemId}
-      matches={matches}
-      backHref="/lost"
-      backLabel="Back to lost items"
-      matchHref={(matchId) => `/found/${matchId}`}
-    />
+    <>
+      {/* Structured data for search engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdStringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: `${raw.title} — Lost item · FindBack PH`,
+            url: `/lost/${id}`,
+            description:
+              schemaDescription +
+              (locationText ? ` Last seen in ${locationText}.` : ""),
+            about: {
+              "@type": "Thing",
+              name: raw.title,
+              description: schemaDescription,
+              ...(locationText
+                ? {
+                    additionalProperty: {
+                      "@type": "PropertyValue",
+                      name: "location",
+                      value: locationText,
+                    },
+                  }
+                : {}),
+            },
+          }),
+        }}
+      />
+
+      <ReportDetail
+        kind="lost"
+        item={item}
+        images={imageUrls}
+        reporter={reporter}
+        trust={trust}
+        ownership={ownership}
+        isOwner={isOwner}
+        savedItemId={savedItemId}
+        matches={matches}
+        backHref="/lost"
+        backLabel="Back to lost items"
+        matchHref={(matchId) => `/found/${matchId}`}
+      />
+    </>
   );
 }

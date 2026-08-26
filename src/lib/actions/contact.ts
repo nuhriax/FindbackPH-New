@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { contactSchema } from "@/lib/validation";
+import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 
 export type ActionResult = { error?: string; success?: boolean };
 
@@ -10,6 +11,9 @@ export type ActionResult = { error?: string; success?: boolean };
  * signed in) so moderators can follow up, but it's optional — anyone can reach out.
  */
 export async function submitContactAction(formData: FormData): Promise<ActionResult> {
+  const rl = await consumeRateLimit("contact", 5, 10 * 60 * 1000);
+  if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
+
   const raw = {
     name: formData.get("name")?.toString() ?? "",
     email: formData.get("email")?.toString() ?? "",

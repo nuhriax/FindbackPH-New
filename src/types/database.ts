@@ -177,6 +177,27 @@ export type OwnershipVerification = {
 };
 
 
+/** Phase 2 — server-persisted possible-match alert preferences (one row per user). */
+export type AlertPreference = {
+  user_id: string;
+  enable_match_alerts: boolean;
+  match_city: string | null;
+  match_category: string | null;
+  last_notified_at: string | null;
+  updated_at: string;
+};
+
+/** Phase 16 — 3-tap "Did it reunite?" user signal. Unique per (user, report). */
+export type ReuniteFeedback = {
+  id: string;
+  user_id: string;
+  item_type: ConversationItemType;
+  item_id: string;
+  reunited: boolean;
+  rating: number | null;
+  created_at: string;
+};
+
 // Minimal Supabase generated-types shape — hand-written to match schema.sql.
 // Regenerate with `supabase gen types typescript` once the project is live for full accuracy.
 //
@@ -288,6 +309,24 @@ export interface Database {
         Update: Partial<BlockedUser>;
         Relationships: [];
       };
+      alert_preferences: {
+        Row: AlertPreference;
+        Insert: Omit<AlertPreference, "user_id" | "last_notified_at"> & {
+          user_id: string;
+          updated_at?: string;
+          last_notified_at?: string | null;
+        };
+        Update: Partial<AlertPreference>;
+        Relationships: [];
+      };
+      reunite_feedback: {
+        Row: ReuniteFeedback;
+        Insert: Omit<ReuniteFeedback, "id" | "created_at" | "rating"> & {
+          rating?: number | null;
+        };
+        Update: Partial<ReuniteFeedback>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -322,6 +361,11 @@ export interface Database {
           p_message: string;
           p_link?: string | null;
         };
+        Returns: undefined;
+      };
+      /** Phase — read receipts: participant marks the other party's messages read. */
+      mark_messages_read: {
+        Args: { p_conversation_id: string };
         Returns: undefined;
       };
     };

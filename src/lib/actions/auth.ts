@@ -2,11 +2,15 @@
 
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { loginSchema, registerSchema } from "@/lib/validation";
+import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { redirect } from "next/navigation";
 
 export type ActionResult = { error?: string; ok?: true; autoSignIn?: boolean };
 
 export async function registerAction(formData: FormData): Promise<ActionResult> {
+  const rl = await consumeRateLimit("register", 5, 15 * 60 * 1000);
+  if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
+
   const raw = {
     firstName: formData.get("firstName")?.toString() ?? "",
     lastName: formData.get("lastName")?.toString() ?? "",
@@ -135,6 +139,9 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
 }
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {
+  const rl = await consumeRateLimit("login", 10, 15 * 60 * 1000);
+  if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
+
   const raw = {
     email: formData.get("email")?.toString() ?? "",
     password: formData.get("password")?.toString() ?? "",
@@ -171,6 +178,9 @@ export async function logoutAction() {
 // --- Phase 11: Password Reset ---
 
 export async function requestPasswordResetAction(formData: FormData): Promise<ActionResult> {
+  const rl = await consumeRateLimit("password-reset", 5, 15 * 60 * 1000);
+  if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
+
   const email = formData.get("email")?.toString() ?? "";
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

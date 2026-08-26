@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { CommunityMotif } from "@/components/ui/community-motif";
 import { OverviewTabs } from "@/components/dashboard/overview-tabs";
+import { ReuniteFeedback, type ReuniteItem } from "@/components/dashboard/reunite-feedback";
 
 type DashboardMatch = {
   id: string;
@@ -72,6 +73,15 @@ export default async function DashboardPage() {
     (lostItems ?? []).filter((i) => i.status === "recovered").length +
     (foundItems ?? []).filter((i) => i.status === "recovered").length;
   const savedCount = (savedItems ?? []).length;
+
+  const recoveredItems: ReuniteItem[] = [
+    ...(lostItems ?? [])
+      .filter((i) => i.status === "recovered")
+      .map((i) => ({ id: i.id, title: i.title, kind: "lost" as const })),
+    ...(foundItems ?? [])
+      .filter((i) => i.status === "recovered")
+      .map((i) => ({ id: i.id, title: i.title, kind: "found" as const })),
+  ];
 
   const undismissedMatches = (matches ?? []).filter(
     (m: any) => !m.dismissed && m.found_items && m.found_items.length > 0
@@ -162,6 +172,13 @@ export default async function DashboardPage() {
               </Link>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* "Did it reunite?" user signal */}
+      {recoveredItems.length > 0 && (
+        <div className="mt-5">
+          <ReuniteFeedback items={recoveredItems} />
         </div>
       )}
 

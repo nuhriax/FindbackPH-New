@@ -247,11 +247,10 @@ export async function markMessagesRead(conversationId: string): Promise<void> {
 
   if (!user) return;
 
-  await supabase
-    .from("messages")
-    .update({ read_by_receiver: true })
-    .eq("conversation_id", conversationId)
-    .neq("sender_id", user.id);
+  // Marks messages as read via a security-definer RPC. The messages UPDATE RLS
+  // policy only allows editing your own rows, so marking the OTHER party's
+  // messages read goes through mark_messages_read (verifies participation).
+  await supabase.rpc("mark_messages_read", { p_conversation_id: conversationId });
 }
 
 /**

@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { AlertTriangle, Bell, CheckCircle2, KeyRound, Mail, ShieldCheck, Trash2 } from "lucide-react";
 import { changePasswordAction, deleteAccountAction } from "@/lib/actions/settings";
+import { MatchAlertPrefs } from "@/components/dashboard/match-alert-prefs";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
@@ -19,6 +20,7 @@ export default function SettingsPage() {
       <div className="mt-8 space-y-6">
         <AccountDetailsCard />
         <ChangePasswordCard />
+        <MatchAlertPrefs />
         <NotificationsPrefsCard />
         <PrivacyCard />
         <DeleteAccountCard />

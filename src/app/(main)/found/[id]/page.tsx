@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
+import { jsonLdStringify } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export async function generateMetadata({
   const location = [item.city, item.province].filter(Boolean).join(", ");
 
   const description = [
-    item.description,
+    item.description ?? "",
     location && `Found in ${location}.`,
     "Reported on FindBack PH, the Philippines' lost & found community.",
   ]
@@ -66,6 +67,20 @@ export async function generateMetadata({
   return {
     title: `${item.title} — Found item · FindBack PH`,
     description,
+    alternates: { canonical: `/found/${id}` },
+    openGraph: {
+      title: `${item.title} — Found item · FindBack PH`,
+      description,
+      type: "website",
+      url: `/found/${id}`,
+      siteName: "FindBack PH",
+      locale: "en_PH",
+    },
+    twitter: {
+      card: "summary",
+      title: `${item.title} — Found item · FindBack PH`,
+      description,
+    },
   };
 }
 
@@ -238,20 +253,55 @@ export default async function FoundItemDetailPage({ params }: Props) {
     reporterId: raw.reporter_id,
   };
 
+  const locationText = [raw.city, raw.province].filter(Boolean).join(", ");
+  const schemaDescription = raw.description ?? "";
+
   return (
-    <ReportDetail
-      kind="found"
-      item={item}
-      images={imageUrls}
-      reporter={reporter}
-      trust={trust}
-      ownership={ownership}
-      isOwner={isOwner}
-      savedItemId={savedItemId}
-      matches={matches}
-      backHref="/found"
-      backLabel="Back to found items"
-      matchHref={(matchId) => `/lost/${matchId}`}
-    />
+    <>
+      {/* Structured data for search engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdStringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: `${raw.title} — Found item · FindBack PH`,
+            url: `/found/${id}`,
+            description:
+              schemaDescription +
+              (locationText ? ` Found in ${locationText}.` : ""),
+            about: {
+              "@type": "Thing",
+              name: raw.title,
+              description: schemaDescription,
+              ...(locationText
+                ? {
+                    additionalProperty: {
+                      "@type": "PropertyValue",
+                      name: "location",
+                      value: locationText,
+                    },
+                  }
+                : {}),
+            },
+          }),
+        }}
+      />
+
+      <ReportDetail
+        kind="found"
+        item={item}
+        images={imageUrls}
+        reporter={reporter}
+        trust={trust}
+        ownership={ownership}
+        isOwner={isOwner}
+        savedItemId={savedItemId}
+        matches={matches}
+        backHref="/found"
+        backLabel="Back to found items"
+        matchHref={(matchId) => `/lost/${matchId}`}
+      />
+    </>
   );
 }

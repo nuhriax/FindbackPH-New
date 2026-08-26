@@ -195,6 +195,14 @@ alter table public.locations enable row level security;
 drop policy if exists "profiles_select_all" on public.profiles;
 create policy "profiles_select_all" on public.profiles for select using (true);
 
+-- Least privilege for anonymous visitors: they may read the public-safe columns
+-- only. Sensitive fields (role, is_suspended, is_banned) are revoked from the
+-- `anon` role so an unauthenticated request can never read them. Authenticated
+-- sessions (including admin/moderation server code) keep full access.
+revoke select on public.profiles from anon;
+grant select (id, username, first_name, last_name, avatar_url, successful_returns, location, bio, created_at, updated_at)
+  on public.profiles to anon;
+
 drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles for update using (auth.uid() = id);
 
@@ -419,9 +427,12 @@ drop policy if exists "conversations_participate" on public.conversations;
 create policy "conversations_participate" on public.conversations for all
   using (participant_a = auth.uid() or participant_b = auth.uid());
 
--- Messages: only participants in the conversation can read/write
+-- Messages: participants can read their conversation; a user may only send,
+-- update or delete their OWN messages.
 drop policy if exists "messages_conversation_participant" on public.messages;
-create policy "messages_conversation_participant" on public.messages for all
+drop policy if exists "messages_select_participant" on public.messages;
+create policy "messages_select_participant" on public.messages for select
+  to authenticated
   using (
     exists (
       select 1 from public.conversations c
@@ -429,6 +440,62 @@ create policy "messages_conversation_participant" on public.messages for all
         and (c.participant_a = auth.uid() or c.participant_b = auth.uid())
     )
   );
+
+drop policy if exists "messages_insert_own" on public.messages;
+create policy "messages_insert_own" on public.messages for insert
+  to authenticated
+  with check (
+    sender_id = auth.uid()
+    and exists (
+      select 1 from public.conversations c
+      where c.id = conversation_id
+        and (c.participant_a = auth.uid() or c.participant_b = auth.uid())
+    )
+  );
+
+drop policy if exists "messages_update_own" on public.messages;
+create policy "messages_update_own" on public.messages for update
+  to authenticated
+  using (sender_id = auth.uid())
+  with check (sender_id = auth.uid());
+
+drop policy if exists "messages_delete_own" on public.messages;
+create policy "messages_delete_own" on public.messages for delete
+  to authenticated
+  using (sender_id = auth.uid());
+
+-- Read receipts: a participant surfaces read_by_receiver on messages SENT BY the
+-- OTHER party. Because the UPDATE policy only allows editing your own rows, this
+-- goes through a security-definer RPC that verifies participation and only
+-- flips read_by_receiver on the counterparty's messages (never body/sender_id).
+drop function if exists public.mark_messages_read(uuid);
+create function public.mark_messages_read(p_conversation_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_caller uuid := auth.uid();
+begin
+  if v_caller is null then
+    return;
+  end if;
+  if not exists (
+    select 1 from public.conversations c
+    where c.id = p_conversation_id
+      and (c.participant_a = v_caller or c.participant_b = v_caller)
+  ) then
+    return;
+  end if;
+  update public.messages
+     set read_by_receiver = true
+   where conversation_id = p_conversation_id
+     and sender_id <> v_caller;
+end;
+$$;
+
+grant execute on function public.mark_messages_read(uuid) to authenticated;
 
 -- Notifications: only the owner can see them
 drop policy if exists "notifications_owner" on public.notifications;
@@ -626,13 +693,14 @@ create policy "Avatar delete own"
 --
 -- Policy notes:
 --   * Public SELECT lets report photos render anywhere on the site.
---   * INSERT / UPDATE / DELETE are open to any authenticated user. Unlike the
---     avatars bucket, uploaded paths ("lost_<id>.jpg", "found_<id>.png") do not
---     contain the uploader's user id, so the bucket layer can't scope them down.
---     Instead, the /api/item-images route handler performs the ownership check
---     (it only uploads after confirming the signed-in user owns that report),
---     and the app then records the file in public.item_images — whose RLS keeps
---     every row tied to the correct lost/found item by trusted server code.
+--   * INSERT / UPDATE / DELETE require the object's first path folder to equal
+--     the authenticated user's id (same pattern as the avatars bucket). The app
+--     writes photo paths as "<user-id>/lost_<itemId>_<ts>_<i>.<ext>", so the
+--     Storage bucket scopes every write to its owner — one user can never
+--     overwrite or delete another user's files. The /api/item-images route
+--     handler additionally confirms the signed-in user owns that report before
+--     attaching photos, and records the files in public.item_images (RLS keeps
+--     every row tied to the correct lost/found item).
 -- ----------------------------------------------------------------------------
 -- Create the public "item-images" bucket. Safe to re-run (ignores if it exists).
 insert into storage.buckets (id, name, public)
@@ -649,19 +717,28 @@ drop policy if exists "Authenticated can insert item images" on storage.objects;
 create policy "Authenticated can insert item images"
   on storage.objects for insert
   to authenticated
-  with check (bucket_id = 'item-images');
+  with check (
+    bucket_id = 'item-images'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
 
 drop policy if exists "Authenticated can update item images" on storage.objects;
 create policy "Authenticated can update item images"
   on storage.objects for update
   to authenticated
-  using (bucket_id = 'item-images');
+  using (
+    bucket_id = 'item-images'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
 
 drop policy if exists "Authenticated can delete item images" on storage.objects;
 create policy "Authenticated can delete item images"
   on storage.objects for delete
   to authenticated
-  using (bucket_id = 'item-images');
+  using (
+    bucket_id = 'item-images'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
 
 -- ============================================================================
 -- REALTIME REPLICATION
