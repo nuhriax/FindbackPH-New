@@ -82,9 +82,9 @@ export function MotionReveal({
     <motion.div
       ref={ref}
       className={cn("will-change-transform", className)}
-      initial={hidden ? { opacity: 0, y, filter: blur ? "blur(6px)" : "blur(0px)" } : false}
-      animate={hidden ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ duration: 0.7, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
+      initial={hidden ? { opacity: 0 } : false}
+      animate={hidden ? undefined : { opacity: 1 }}
+      transition={{ duration: 0.5, delay: delay / 1000, ease: "easeOut" }}
     >
       {children}
     </motion.div>

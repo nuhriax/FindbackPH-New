@@ -136,27 +136,12 @@ export function SplitText({ segments, className, delay = 0, stagger = 0.07 }: Sp
                   token.single ? "block" : undefined,
                   token.className
                 )}
-                initial={
-                  hidden
-                    ? token.single
-                      ? { opacity: 0, y: 28, filter: "blur(8px)" }
-                      : { opacity: 0, y: "115%", rotateX: -24, filter: "blur(6px)" }
-                    : false
-                }
-                animate={
-                  hidden
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        y: "0%",
-                        rotateX: 0,
-                        filter: "blur(0px)",
-                      }
-                }
+                initial={hidden ? { opacity: 0 } : false}
+                animate={hidden ? undefined : { opacity: 1 }}
                 transition={{
-                  duration: 0.7,
+                  duration: 0.5,
                   delay: delay / 1000 + i * stagger,
-                  ease: [0.16, 1, 0.3, 1],
+                  ease: "easeOut",
                 }}
               >
                 {token.single ? (
