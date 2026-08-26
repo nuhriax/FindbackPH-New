@@ -5,7 +5,7 @@
  * This module is now a thin adapter over the Phase 6 deterministic engine in
  * `@/lib/matching`, so every consumer (listing pages, server actions, report
  * detail pages) uses ONE algorithm with identical weights and explainability.
- * The 0â€“1 score below is simply the engine's 0â€“100 score divided by 100.
+ * The 0-1 score below is simply the engine's 0-100 score divided by 100.
  */
 
 import { calculateMatch, type MatchableItem } from "@/lib/matching";
@@ -16,7 +16,7 @@ export type {
   MatchStrength,
 } from "@/lib/matching";
 
-/** Minimum score (0â€“1) required before two items count as a possible match.
+/** Minimum score (0-1) required before two items count as a possible match.
  *  Aligned with the engine's "possible" threshold (40/100). */
 export const MATCH_THRESHOLD = 0.4;
 

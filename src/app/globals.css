@@ -232,7 +232,7 @@
     background-size: 56px 56px;
   }
 
-  /* Extremely subtle technical grid for the luminous background â€” faded at the
+  /* Extremely subtle technical grid for the luminous background — faded at the
      edges via the mask applied by the GridBackground component. */
   .bg-grid-soft {
     background-image:
@@ -326,7 +326,7 @@
 }
 
 /* Flowing dotted "connection / network" lines used by the site-wide
-   futuristic background (BackgroundEffects â†’ BackdropArt). The dash pattern
+   futuristic background (BackgroundEffects -> BackdropArt). The dash pattern
    is 1 + 9 = 10 units, so a -30 dashoffset shift loops seamlessly. */
 @keyframes fb-dash {
   to {

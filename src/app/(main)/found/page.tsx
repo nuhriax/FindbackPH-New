@@ -521,7 +521,7 @@ async function fetchLostCandidates(
 export const metadata = {
   title: {
     absolute:
-      "Found Items Philippines â€” Help Return Them",
+      "Found Items Philippines ” Help Return Them",
   },
 
   description:
@@ -1100,7 +1100,7 @@ export default async function FoundItemsPage({
         />
 
         {/* ==================================================================
-            RETURN JOURNEY â€” REPORT â†’ VERIFY â†’ CONNECT â†’ RETURN
+            RETURN JOURNEY ” REPORT ’ VERIFY ’ CONNECT ’ RETURN
             ================================================================== */}
 
         <section
@@ -1119,7 +1119,7 @@ export default async function FoundItemsPage({
                 number: "01",
                 label: "REPORT",
                 description:
-                  "Describe what you found â€” item name, category, where and when. Add a photo so the owner can recognize it.",
+                  "Describe what you found ” item name, category, where and when. Add a photo so the owner can recognize it.",
               },
               {
                 number: "02",
@@ -1137,7 +1137,7 @@ export default async function FoundItemsPage({
                 number: "04",
                 label: "RETURN",
                 description:
-                  "Meet somewhere visible and staffed â€” a barangay hall or mall guard station â€” and complete the handover.",
+                  "Meet somewhere visible and staffed ” a barangay hall or mall guard station ” and complete the handover.",
               },
             ].map((s) => (
               <li key={s.number} className="border-t border-emerald-200/70 pt-4">
@@ -1157,7 +1157,7 @@ export default async function FoundItemsPage({
             <AlertTriangle size={14} aria-hidden="true" className="mt-0.5 shrink-0 text-amber-600" />
             <span>
               <span className="font-semibold text-navy-900">Finder&apos;s reminder:</span> never publish
-              full ID numbers, phone numbers, or exact private addresses on a public report â€” verify
+              full ID numbers, phone numbers, or exact private addresses on a public report ” verify
               ownership privately instead.
             </span>
           </p>
@@ -1186,7 +1186,7 @@ export default async function FoundItemsPage({
             <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-600">
               This is usually
               temporary. Give it
-              another go â€” your
+              another go ” your
               filters will stay
               exactly where you
               left them.
@@ -1221,7 +1221,7 @@ export default async function FoundItemsPage({
               }`}
               description={
                 hasFilters
-                  ? `Showing ${resultStart.toLocaleString()}â€“${resultEnd.toLocaleString()} reports matching your search.`
+                  ? `Showing ${resultStart.toLocaleString()}“${resultEnd.toLocaleString()} reports matching your search.`
                   : "Browse the latest reports from the community."
               }
               sort={sort}
@@ -1537,7 +1537,7 @@ export default async function FoundItemsPage({
 
           <p className="relative mx-auto mt-3 max-w-xl text-sm leading-6 text-emerald-100/90 sm:text-base">
             Post a found report
-            in under a minute â€”
+            in under a minute ”
             we&apos;ll compare it
             against active lost
             reports and help you
