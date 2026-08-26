@@ -51,6 +51,27 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
+// Anti-dual-account guard: Gmail ignores dots and "+tag" suffixes, so
+// "j.u.a.n+shop@gmail.com", "juan@gmail.com" etc. all reach ONE mailbox while
+// Supabase treats them as different addresses (allowing multiple accounts from
+// a single Gmail inbox). Canonicalize those (and only those) domains before
+// signup so duplicates collide with Supabase's unique-email constraint.
+// Non-Gmail providers are left byte-identical apart from lowercasing — their
+// local parts may legitimately be case-sensitive/dot-significant.
+export function normalizeEmail(email: string): string {
+  const trimmed = email.trim().toLowerCase();
+  const atIndex = trimmed.lastIndexOf("@");
+  if (atIndex <= 0) return trimmed;
+  const local = trimmed.slice(0, atIndex);
+  const domain = trimmed.slice(atIndex + 1);
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    // googlemail.com is Gmail's alternate domain — fold it onto gmail.com too.
+    const canonical = local.split("+")[0].replace(/\./g, "");
+    return `${canonical}@gmail.com`;
+  }
+  return trimmed;
+}
+
 const baseItemFields = {
   // .trim() ensures whitespace-only input ("   ") is rejected, and stored
   // values have no leading/trailing spaces.

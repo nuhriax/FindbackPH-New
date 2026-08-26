@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
-import { loginSchema, registerSchema } from "@/lib/validation";
+import { loginSchema, registerSchema, normalizeEmail } from "@/lib/validation";
 import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { redirect } from "next/navigation";
 
@@ -44,10 +44,15 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: "That username is already taken" };
   }
 
+  // Canonicalize Gmail-style aliases (dots / +tags) BEFORE creating the auth
+  // user so one physical Gmail inbox can't register multiple accounts under
+  // lookalike addresses. See normalizeEmail in lib/validation.ts.
+  const email = normalizeEmail(parsed.data.email);
+
   // Sign up the user. Metadata travels with the auth user so the
   // `handle_new_user` trigger (see supabase/schema.sql) can fill the profile row.
   const { data, error } = await supabase.auth.signUp({
-    email: parsed.data.email,
+    email,
     password: parsed.data.password,
     options: {
       data: {
@@ -128,7 +133,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
   let autoSignIn = false;
   if (data.user?.id) {
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: parsed.data.email,
+      email,
       password: parsed.data.password,
     });
     autoSignIn = !signInError;
