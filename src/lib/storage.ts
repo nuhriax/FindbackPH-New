@@ -30,7 +30,7 @@ export async function getSignedImageUrls(
 
   const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
     ? createServiceRoleClient()
-    : createClient();
+    : await createClient();
 
   const { data, error } = await supabase.storage
     .from("item-images")

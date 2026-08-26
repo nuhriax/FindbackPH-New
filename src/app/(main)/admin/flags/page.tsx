@@ -45,7 +45,7 @@ export default async function AdminFlagsPage() {
   const authorized = await isAdminUser();
   if (!authorized) notFound();
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const [{ data: flags, error }, { data: userFlags, error: userFlagsError }] = await Promise.all([
     supabase
       .from("report_flags")

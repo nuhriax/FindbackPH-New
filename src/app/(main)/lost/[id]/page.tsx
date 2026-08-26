@@ -9,14 +9,15 @@ import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipC
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createClient();
+  const { id } = await params;
+  const supabase = await createClient();
   const { data: item } = await supabase
     .from("lost_items")
     .select("title, city, province, description")
-    .eq("id", params.id)
+    .eq("id", id)
     .maybeSingle();
 
   if (!item) {
@@ -42,8 +43,8 @@ function firstRow<T>(value: T[] | T | null | undefined): T | null {
 }
 
 export default async function LostItemDetailPage({ params }: Props) {
-  const supabase = createClient();
-  const id = params.id;
+  const supabase = await createClient();
+  const { id } = await params;
 
   const { data: raw } = await supabase
     .from("lost_items")

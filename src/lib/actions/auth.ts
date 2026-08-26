@@ -27,7 +27,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     return { error: "Please agree to the Privacy Policy and Terms of Service." };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Enforce unique username server-side before creating the auth user.
   const { data: existing } = await supabase
@@ -145,7 +145,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
@@ -163,7 +163,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
 }
 
 export async function logoutAction() {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
 }
@@ -177,7 +177,7 @@ export async function requestPasswordResetAction(formData: FormData): Promise<Ac
     return { error: "Enter a valid email address" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   // Only pass redirectTo when the site URL is configured — an undefined env var
   // would otherwise produce a literal "undefined/reset-password" redirect URL.
   const { error } = await supabase.auth.resetPasswordForEmail(
@@ -213,7 +213,7 @@ export async function resetPasswordAction(formData: FormData): Promise<ActionRes
     return { error: "Passwords do not match" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({
     password: password,
   });

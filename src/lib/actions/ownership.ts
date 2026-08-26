@@ -60,7 +60,7 @@ export async function saveOwnershipChallengeAction(
     return { error: "Questions must be different" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -108,7 +108,7 @@ export async function deleteOwnershipChallengeAction(
   itemType: "lost_item" | "found_item",
   itemId: string
 ): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -145,7 +145,7 @@ export async function submitOwnershipAnswersAction(
 ): Promise<{ passed: boolean; error?: string }> {
   if (!answer1.trim()) return { passed: false, error: "Please answer the questions" };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

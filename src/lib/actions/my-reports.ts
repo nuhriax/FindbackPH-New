@@ -19,7 +19,7 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
   const id = formData.get("id")?.toString() ?? "";
   if (!id) return { error: "Missing report id" };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -92,7 +92,7 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
  * owner marks it as returned, so people who reached out get a real update.
  */
 async function notifyReturnedParticipants(itemType: "lost_item" | "found_item", itemId: string, ownerId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: conversations } = await supabase
     .from("conversations")
     .select("participant_a, participant_b")
@@ -134,7 +134,7 @@ export async function setMyReportStatusAction(
   itemId: string,
   status: "recovered" | "archived" | "active"
 ): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -19,7 +19,7 @@ const USER_FLAG_REASONS = [
  * be one of the allowed enum values. RLS re-checks reporter_id on insert.
  */
 export async function reportUserAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -78,7 +78,7 @@ export async function reportUserAction(formData: FormData): Promise<ActionResult
  * message) you — enforced again inside the messaging actions.
  */
 export async function blockUserAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -107,7 +107,7 @@ export async function blockUserAction(formData: FormData): Promise<ActionResult>
 
 /** Removes an existing block. */
 export async function unblockUserAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -137,7 +137,7 @@ export async function unblockUserAction(formData: FormData): Promise<ActionResul
 
 /** Returns true when either side of a pair has blocked the other. */
 export async function isBlockedBetween(a: string, b: string): Promise<boolean> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from("blocked_users")
     .select("blocker_id")

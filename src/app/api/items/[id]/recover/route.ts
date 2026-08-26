@@ -11,9 +11,9 @@ const UUID_RE =
  */
 export async function POST(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -23,7 +23,7 @@ export async function POST(
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   if (!UUID_RE.test(id)) {
     return NextResponse.json({ error: "Item not found." }, { status: 404 });

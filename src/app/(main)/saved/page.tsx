@@ -10,7 +10,7 @@ import Image from "next/image";
 export const dynamic = "force-dynamic";
 
 export default async function SavedItemsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

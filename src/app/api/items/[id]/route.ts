@@ -46,7 +46,7 @@ function mapStatus(status: string | null): string {
   }
 }
 
-async function loadItem(supabase: ReturnType<typeof createClient>, id: string, table: "lost_items" | "found_items") {
+async function loadItem(supabase: Awaited<ReturnType<typeof createClient>>, id: string, table: "lost_items" | "found_items") {
   const fk = `${table}_reporter_id_fkey`;
 
   return supabase
@@ -64,11 +64,11 @@ async function loadItem(supabase: ReturnType<typeof createClient>, id: string, t
  */
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
-  const { id } = params;
+  const { id } = await params;
 
   if (!UUID_RE.test(id)) {
     return NextResponse.json(
@@ -181,9 +181,9 @@ export async function GET(
  */
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -193,7 +193,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   if (!UUID_RE.test(id)) {
     return NextResponse.json({ error: "Item not found." }, { status: 404 });

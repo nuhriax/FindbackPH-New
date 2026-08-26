@@ -8,7 +8,7 @@ import { runMatchingForLostItem, runMatchingForFoundItem } from "@/lib/actions/m
 export type ActionResult = { error?: string; itemId?: string };
 
 export async function createLostItemAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -67,7 +67,7 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
 }
 
 export async function createFoundItemAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -127,7 +127,7 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
 }
 
 export async function markLostItemRecoveredAction(itemId: string): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -148,7 +148,7 @@ export async function markLostItemRecoveredAction(itemId: string): Promise<Actio
 }
 
 export async function deleteLostItemAction(itemId: string): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -178,7 +178,7 @@ export async function deleteLostItemAction(itemId: string): Promise<ActionResult
 export async function removeItemImageAction(
   imageId: string
 ): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -235,7 +235,7 @@ export async function removeItemImageAction(
 // --- Phase 8: Saved Items ---
 
 export async function saveItemAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -269,7 +269,7 @@ export async function saveItemAction(formData: FormData): Promise<ActionResult> 
 
 export async function unsaveItemAction(formData: FormData): Promise<ActionResult> {
   const savedItemId = formData.get("savedItemId")?.toString() ?? "";
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -296,7 +296,7 @@ export async function unsaveItemAction(formData: FormData): Promise<ActionResult
 }
 
 export async function getUserSavedItems(userId?: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -325,7 +325,7 @@ export async function getUserSavedItems(userId?: string) {
 // --- Phase 9: Report Flags ---
 
 export async function reportFlagAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

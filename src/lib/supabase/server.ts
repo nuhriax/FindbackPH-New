@@ -4,8 +4,9 @@ import type { Database } from "@/types/database";
 
 // Use in Server Components, Server Actions, and Route Handlers.
 // Respects the signed-in user's session and RLS policies.
-export function createClient() {
-  const cookieStore = cookies();
+// NOTE: async since Next.js 15 (cookies() returns a Promise).
+export async function createClient() {
+  const cookieStore = await cookies();
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

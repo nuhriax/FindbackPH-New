@@ -16,7 +16,7 @@ const AVATAR_MAX_SIZE = 4 * 1024 * 1024; // 4 MB
  * never accumulates dangling avatar files.
  */
 export async function uploadAvatarAction(formData: FormData): Promise<{ avatarUrl?: string; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -61,7 +61,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ avatarUr
  * Removes the signed-in user's stored avatar file and clears the reference.
  */
 export async function removeAvatarAction(): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -93,7 +93,7 @@ export async function removeAvatarAction(): Promise<ActionResult> {
  * touches location/bio/avatar (those stay whatever the user later sets).
  */
 export async function completeOnboardingAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -148,7 +148,7 @@ export async function completeOnboardingAction(formData: FormData): Promise<Acti
  * session (never trusts a client-supplied id) and enforces a unique username.
  */
 export async function updateProfileAction(formData: FormData): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

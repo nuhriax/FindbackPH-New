@@ -11,7 +11,7 @@ export type ActionResult = { error: string } | { error?: undefined };
  * lost report created earlier should still discover items found later.
  */
 export async function runMatchingForFoundItem(foundItemId: string): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -128,7 +128,7 @@ export async function runMatchingForFoundItem(foundItemId: string): Promise<Acti
  * Stores matches with score above the threshold.
  */
 export async function runMatchingForLostItem(lostItemId: string): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

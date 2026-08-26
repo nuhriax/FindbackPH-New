@@ -15,13 +15,14 @@ export const dynamic = "force-dynamic";
 export default async function AdminReportsPage({
   searchParams,
 }: {
-  searchParams: { type?: string };
+  searchParams: Promise<{ type?: string }>;
 }) {
+  const { type: rawType } = await searchParams;
   const authorized = await isAdminUser();
   if (!authorized) notFound();
 
-  const supabase = createClient();
-    const type = searchParams.type === "found_item" ? "found_item" : "lost_item";
+  const supabase = await createClient();
+    const type = rawType === "found_item" ? "found_item" : "lost_item";
     const table = type === "lost_item" ? "lost_items" : "found_items";
     const dateField = type === "lost_item" ? "date_lost" : "date_found";
 

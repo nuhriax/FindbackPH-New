@@ -28,7 +28,7 @@ export async function changePasswordAction(formData: FormData): Promise<ActionRe
     return { error: "Passwords do not match" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -52,7 +52,7 @@ export async function changePasswordAction(formData: FormData): Promise<ActionRe
  * session token cannot grant. Cascade rules remove the profile and reports.
  */
 export async function deleteAccountAction(): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

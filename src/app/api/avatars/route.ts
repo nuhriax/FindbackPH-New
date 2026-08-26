@@ -18,7 +18,7 @@ const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const AVATAR_MAX_SIZE = 4 * 1024 * 1024; // 4 MB
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

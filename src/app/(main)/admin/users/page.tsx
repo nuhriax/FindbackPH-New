@@ -14,7 +14,7 @@ export default async function AdminUsersPage() {
   const authorized = await isAdminUser();
   if (!authorized) notFound();
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: users, error } = await supabase
     .from("profiles")
     .select("*")

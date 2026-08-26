@@ -9,8 +9,13 @@ import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
-export default async function EditReportPage({ params }: { params: { id: string } }) {
-  const supabase = createClient();
+export default async function EditReportPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: reportId } = await params;
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -18,8 +23,8 @@ export default async function EditReportPage({ params }: { params: { id: string 
   if (!user) redirect("/login");
 
   const [lostRes, foundRes] = await Promise.all([
-    supabase.from("lost_items").select("*").eq("id", params.id).maybeSingle(),
-    supabase.from("found_items").select("*").eq("id", params.id).maybeSingle(),
+    supabase.from("lost_items").select("*").eq("id", reportId).maybeSingle(),
+    supabase.from("found_items").select("*").eq("id", reportId).maybeSingle(),
   ]);
 
   const lost = lostRes.data as Record<string, any> | null;
@@ -38,7 +43,7 @@ export default async function EditReportPage({ params }: { params: { id: string 
   const { data: images } = await supabase
     .from("item_images")
     .select("id, storage_path")
-    .eq(imageCol, params.id)
+    .eq(imageCol, reportId)
     .order("position", { ascending: true });
 
   const storedPaths = (images ?? []).map((img) => img.storage_path);
@@ -53,7 +58,7 @@ export default async function EditReportPage({ params }: { params: { id: string 
     kind === "lost_item" ? (item.date_lost as string) : (item.date_found as string);
 
   const editable: EditableReport = {
-    id: params.id,
+    id: reportId,
     title: item.title,
     category: item.category,
     description: item.description,

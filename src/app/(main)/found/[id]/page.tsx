@@ -9,9 +9,9 @@ import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipC
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 type Reporter = {
@@ -38,12 +38,13 @@ function firstRow<T>(value: T | T[] | null | undefined): T | null {
 export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
-  const supabase = createClient();
+  const { id } = await params;
+  const supabase = await createClient();
 
   const { data: item } = await supabase
     .from("found_items")
     .select("title, city, province, description")
-    .eq("id", params.id)
+    .eq("id", id)
     .maybeSingle();
 
   if (!item) {
@@ -69,8 +70,8 @@ export async function generateMetadata({
 }
 
 export default async function FoundItemDetailPage({ params }: Props) {
-  const supabase = createClient();
-  const { id } = params;
+  const supabase = await createClient();
+  const { id } = await params;
 
   // Fetch the main item first because everything else depends on it.
   const { data: raw, error: itemError } = await supabase

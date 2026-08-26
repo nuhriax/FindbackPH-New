@@ -11,7 +11,7 @@ export type ActionResult = { error: string } | { error?: undefined };
  * Returns true if authorized, false otherwise.
  */
 export async function isAdminUser(): Promise<boolean> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -41,7 +41,7 @@ export async function updateReportStatusAction(
     return { error: "Not authorized" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const tableName = itemType === "lost_item" ? "lost_items" : "found_items";
 
   // Read the current owner first so we can notify them about moderation
@@ -92,7 +92,7 @@ export async function deleteReportAction(
     return { error: "Not authorized" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const tableName = itemType === "lost_item" ? "lost_items" : "found_items";
 
   const { error } = await supabase.from(tableName).delete().eq("id", itemId);
@@ -126,7 +126,7 @@ export async function reviewFlagAction(
     return { error: "Invalid status" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -167,7 +167,7 @@ export async function reviewUserFlagAction(
     return { error: "Invalid status" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -204,7 +204,7 @@ export async function setUserSuspensionAction(
     return { error: "Not authorized" };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
     .update({ is_suspended: suspended })
@@ -241,7 +241,7 @@ export async function logAdminAction(
   targetId: string | null,
   details?: unknown
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
 
 export async function ConversationsList() {
   const conversations = (await getUserConversations()) as ConversationData[];
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

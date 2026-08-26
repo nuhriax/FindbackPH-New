@@ -6,7 +6,7 @@ import type { Notification } from "@/types/database";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardNotificationsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

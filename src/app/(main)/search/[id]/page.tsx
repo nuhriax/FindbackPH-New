@@ -7,13 +7,14 @@ import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/re
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createClient();
+  const { id } = await params;
+  const supabase = await createClient();
   const [lost, found] = await Promise.all([
-    supabase.from("lost_items").select("title").eq("id", params.id).maybeSingle(),
-    supabase.from("found_items").select("title").eq("id", params.id).maybeSingle(),
+    supabase.from("lost_items").select("title").eq("id", id).maybeSingle(),
+    supabase.from("found_items").select("title").eq("id", id).maybeSingle(),
   ]);
   const title = lost.data?.title ?? found.data?.title;
   return {
@@ -23,18 +24,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ReportDetailPage({ params }: Props) {
-  const supabase = createClient();
+  const { id } = await params;
+  const supabase = await createClient();
 
   const [lostRes, foundRes] = await Promise.all([
     supabase
       .from("lost_items")
       .select("*, profiles!lost_items_reporter_id_fkey(username, first_name, last_name, successful_returns)")
-      .eq("id", params.id)
+      .eq("id", id)
       .maybeSingle(),
     supabase
       .from("found_items")
       .select("*, profiles!found_items_reporter_id_fkey(username, first_name, last_name, successful_returns)")
-      .eq("id", params.id)
+      .eq("id", id)
       .maybeSingle(),
   ]);
 
@@ -45,7 +47,6 @@ export default async function ReportDetailPage({ params }: Props) {
 
   const kind: "lost" | "found" = lost ? "lost" : "found";
   const raw = (lost ?? found) as Record<string, any>;
-  const id = params.id;
 
   const {
     data: { user },

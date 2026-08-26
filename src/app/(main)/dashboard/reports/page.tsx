@@ -38,17 +38,18 @@ const STATUS_OPTIONS = [
 export default async function MyReportsPage({
   searchParams,
 }: {
-  searchParams: { kind?: string; status?: string };
+  searchParams: Promise<{ kind?: string; status?: string }>;
 }) {
-  const supabase = createClient();
+  const sp = await searchParams;
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
 
-  const kind = KIND_OPTIONS.some((o) => o.value === searchParams.kind) ? searchParams.kind! : "all";
-  const status = STATUS_OPTIONS.some((o) => o.value === searchParams.status) ? searchParams.status! : "all";
+  const kind = KIND_OPTIONS.some((o) => o.value === sp.kind) ? sp.kind! : "all";
+  const status = STATUS_OPTIONS.some((o) => o.value === sp.status) ? sp.status! : "all";
   const statusFilter = status === "all" ? undefined : status;
 
   const lostBase = supabase

@@ -127,16 +127,7 @@ export function BackgroundEffects({
       <div className="absolute inset-0 bg-[#fbf6ef]" />
 
       <div
-        className="
-          absolute inset-0
-          bg-[radial-gradient(
-            ellipse_75%_60%_at_50%_42%,
-            rgba(255,255,255,0.98)_0%,
-            rgba(255,255,255,0.9)_38%,
-            rgba(238,245,255,0.5)_70%,
-            rgba(214,233,255,0.22)_100%
-          )]
-        "
+        className="absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_42%,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.9)_38%,rgba(238,245,255,0.5)_70%,rgba(214,233,255,0.22)_100%)]"
       />
 
       {/* ============================================================
@@ -852,15 +843,7 @@ export function BackgroundEffects({
       {/* FOREGROUND HAZE */}
 
       <div
-        className="
-          absolute inset-0
-          bg-[radial-gradient(
-            ellipse_42%_35%_at_50%_45%,
-            rgba(255,255,255,0.58),
-            rgba(255,255,255,0.12)_55%,
-            transparent_80%
-          )]
-        "
+        className="absolute inset-0 bg-[radial-gradient(ellipse_42%_35%_at_50%_45%,rgba(255,255,255,0.58),rgba(255,255,255,0.12)_55%,transparent_80%)]"
       />
 
       {/* ANIMATIONS */}

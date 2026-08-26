@@ -12,7 +12,7 @@ import { SiteChrome } from "@/components/site-chrome";
  * separate `(auth)` route group below and never touch this layout at all.
  */
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

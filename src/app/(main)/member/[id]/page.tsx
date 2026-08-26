@@ -40,11 +40,12 @@ async function reportList(
 }
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function MemberProfilePage({ params }: Props) {
-  const supabase = createClient();
+  const supabase = await createClient();
+  const { id } = await params;
 
   const {
     data: { user },
@@ -56,7 +57,7 @@ export default async function MemberProfilePage({ params }: Props) {
     .select(
       "id, username, first_name, last_name, avatar_url, bio, successful_returns, created_at"
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .maybeSingle();
 
   if (error || !profile) notFound();

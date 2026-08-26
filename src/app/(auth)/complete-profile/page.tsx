@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
  * so most people only have to confirm and pick a username.
  */
 export default async function CompleteProfilePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

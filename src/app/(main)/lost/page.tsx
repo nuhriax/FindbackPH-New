@@ -167,7 +167,7 @@ async function createImageMap(images: ItemImage[]): Promise<Map<string, string>>
  * active reports, all reports, and a per-category breakdown. Every count uses a
  * lightweight "head" query so it only returns totals, not rows.
  */
-async function fetchLostCounts(supabase: ReturnType<typeof createClient>) {
+async function fetchLostCounts(supabase: Awaited<ReturnType<typeof createClient>>) {
   const [activeRes, totalRes] = await Promise.all([
     supabase
       .from("lost_items")
@@ -255,7 +255,7 @@ export default async function LostItemsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const params = await searchParams;
 
   /* ------------------------------------------------------------------------

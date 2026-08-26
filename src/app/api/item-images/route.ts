@@ -22,7 +22,7 @@ const MAX_SIZE = 5 * 1024 * 1024; // 5 MB per image
 const MAX_COUNT = 4;
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

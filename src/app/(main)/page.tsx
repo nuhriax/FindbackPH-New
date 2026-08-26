@@ -210,7 +210,7 @@ const categories = [
    ============================================================================ */
 
 export default async function HomePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   /* --------------------------------------------------------------------------
      COUNTS + REPORTS

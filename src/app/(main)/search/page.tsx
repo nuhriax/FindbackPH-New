@@ -22,14 +22,14 @@ export const metadata = {
 };
 
 type SearchPageProps = {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     city?: string;
     category?: string;
     type?: string;
     when?: string;
     photos?: string;
-  };
+  }>;
 };
 
 const WHEN_FILTERS = ["today", "week", "month"] as const;
@@ -93,7 +93,7 @@ function whenCutoff(when: WhenFilter): string {
  * Real filtering against a real table — no client-side guessing.
  */
 async function filterWithPhotos(
-  supabase: ReturnType<typeof createClient>,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   table: "lost_items" | "found_items",
   rows: SearchItem[],
 ): Promise<SearchItem[]> {
@@ -118,7 +118,7 @@ async function filterWithPhotos(
  * same signed-URL flow as the home / lost / found listing pages.
  */
 async function loadImageMap(
-  supabase: ReturnType<typeof createClient>,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   table: "lost_items" | "found_items",
   rows: SearchItem[],
 ): Promise<Map<string, string>> {
@@ -165,7 +165,7 @@ async function loadImageMap(
  * still renders — the page is never blank.
  */
 async function searchTable(
-  supabase: ReturnType<typeof createClient>,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   table: "lost_items" | "found_items",
   filters: {
     q: string;
@@ -243,23 +243,24 @@ async function searchTable(
 export default async function SearchPage({
   searchParams,
 }: SearchPageProps) {
-  const supabase = createClient();
+  const sp = await searchParams;
+  const supabase = await createClient();
 
-  const q = normalizeQuery(searchParams.q);
-  const city = normalizeQuery(searchParams.city, 50);
-  const category = normalizeQuery(searchParams.category, 50);
-  const type = ["lost", "found"].includes((searchParams.type ?? "").trim())
-    ? (searchParams.type ?? "").trim()
+  const q = normalizeQuery(sp.q);
+  const city = normalizeQuery(sp.city, 50);
+  const category = normalizeQuery(sp.category, 50);
+  const type = ["lost", "found"].includes((sp.type ?? "").trim())
+    ? (sp.type ?? "").trim()
     : "";
 
   // Date-window filter — only accepted values pass through.
-  const rawWhen = (searchParams.when ?? "").trim();
+  const rawWhen = (sp.when ?? "").trim();
   const when: WhenFilter | "" = WHEN_FILTERS.includes(rawWhen as WhenFilter)
     ? (rawWhen as WhenFilter)
     : "";
 
   // "With photo" filter — real filter backed by the item_images table.
-  const photos = (searchParams.photos ?? "").trim() === "1";
+  const photos = (sp.photos ?? "").trim() === "1";
 
   /** Build a /search href preserving all current filters, with overrides. */
   function buildHref(overrides: {

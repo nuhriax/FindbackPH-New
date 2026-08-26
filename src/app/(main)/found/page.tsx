@@ -380,8 +380,8 @@ async function imageMap(
  * replace these category queries with a single RPC/grouped query.
  */
 async function fetchFoundCounts(
-  supabase: ReturnType<
-    typeof createClient
+  supabase: Awaited<
+    ReturnType<typeof createClient>
   >,
 ): Promise<FoundStats> {
   const [
@@ -459,8 +459,8 @@ async function fetchFoundCounts(
    ========================================================================== */
 
 async function fetchLostCandidates(
-  supabase: ReturnType<
-    typeof createClient
+  supabase: Awaited<
+    ReturnType<typeof createClient>
   >,
   category: string,
   city: string,
@@ -534,7 +534,7 @@ export default async function FoundItemsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const supabase =
-    createClient();
+    await createClient();
 
   const params =
     await searchParams;

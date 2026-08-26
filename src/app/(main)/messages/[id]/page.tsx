@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useTransition, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { sendMessageAction } from "@/lib/actions/messaging";
 import { BlockUserButton } from "@/components/block-user-button";
 import { Send, ArrowLeft } from "lucide-react";
@@ -36,7 +36,8 @@ type Conversation = {
   messages?: RawMessage[];
 };
 
-export default function MessageThreadPage({ params }: { params: { id: string } }) {
+export default function MessageThreadPage() {
+  const routeParams = useParams<{ id: string }>();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [otherUser, setOtherUser] = useState<Participant | null>(null);
   const [itemTitle, setItemTitle] = useState<string>("Item");
@@ -50,7 +51,7 @@ export default function MessageThreadPage({ params }: { params: { id: string } }
 
   const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
-  const conversationId = params.id;
+  const conversationId = routeParams.id;
 // MARKER_SPLIT
 
   // Fetch conversation and initial messages

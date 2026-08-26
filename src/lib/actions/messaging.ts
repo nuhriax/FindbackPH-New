@@ -30,7 +30,7 @@ export async function getOrCreateConversation(
   itemType: "lost_item" | "found_item",
   itemId: string
 ): Promise<ConversationData | { error: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -109,7 +109,7 @@ export async function sendMessageAction(
   conversationId: string,
   body: string
 ): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -169,7 +169,7 @@ export async function sendMessageAction(
  * Returns all conversations for the current user, newest first.
  */
 export async function getUserConversations(): Promise<ConversationData[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -203,7 +203,7 @@ export async function getUserConversations(): Promise<ConversationData[]> {
  * Returns all messages for a conversation if the current user is a participant.
  */
 export async function getMessages(conversationId: string): Promise<MessageData[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -240,7 +240,7 @@ export async function getMessages(conversationId: string): Promise<MessageData[]
  * Marks all messages in a conversation as read for the current user.
  */
 export async function markMessagesRead(conversationId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -258,7 +258,7 @@ export async function markMessagesRead(conversationId: string): Promise<void> {
  * Returns unread notification count for the current user.
  */
 export async function getUnreadNotificationCount(): Promise<number> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -283,7 +283,7 @@ export async function getUnreadNotificationCount(): Promise<number> {
  * Returns recent notifications for the current user.
  */
 export async function getNotifications(): Promise<any[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -309,7 +309,7 @@ export async function getNotifications(): Promise<any[]> {
  * Marks a notification as read.
  */
 export async function markNotificationRead(notificationId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -329,7 +329,7 @@ export async function markNotificationRead(notificationId: string): Promise<void
  * Deletes a conversation (and its messages) for the current user.
  */
 export async function deleteConversationAction(conversationId: string): Promise<ActionResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -354,7 +354,7 @@ export async function deleteConversationAction(conversationId: string): Promise<
  * Marks every notification for the current user as read.
  */
 export async function markAllNotificationsRead(): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
