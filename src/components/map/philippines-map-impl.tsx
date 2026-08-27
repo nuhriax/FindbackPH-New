@@ -50,10 +50,11 @@ export type PhilippinesMapProps =
       points: MapPoint[];
     };
 
-const TILE_URL =
-  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+// Keyless OpenStreetMap raster tiles. (CARTO's basemaps started requiring an
+// API key — they now serve transparent "API KEY REQUIRED" placeholder tiles.)
+const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 /** Clamp a picked coordinate into the Philippine bounding box. */
 function clampToPhilippines(lat: number, lng: number): [number, number] {
@@ -95,6 +96,30 @@ function SizeRefresher() {
     return () => {
       window.clearTimeout(id);
       window.removeEventListener("resize", onResize);
+    };
+  }, [map]);
+  return null;
+}
+
+/**
+ * Scroll-to-zoom that doesn't hijack page scrolling.
+ *
+ * The mouse wheel zooms ONLY after the user clicks the map once (and stops
+ * again when the cursor leaves). Without this, wheel-over-map would trap the
+ * page scroll — the classic reason maps feel "frozen" on long pages.
+ */
+function ScrollWheelZoomActivator() {
+  const map = useMap();
+  useEffect(() => {
+    map.scrollWheelZoom.disable();
+    const container = map.getContainer();
+    const enable = () => map.scrollWheelZoom.enable();
+    const disable = () => map.scrollWheelZoom.disable();
+    map.on("click", enable);
+    container.addEventListener("mouseleave", disable);
+    return () => {
+      map.off("click", enable);
+      container.removeEventListener("mouseleave", disable);
     };
   }, [map]);
   return null;
@@ -212,6 +237,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
         attributionControl
       >
         <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+        <ScrollWheelZoomActivator />
 
         {props.mode === "pick" ? (
           <PickMap
@@ -224,8 +250,10 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
         )}
       </MapContainer>
 
+      {/* Legend sits top-RIGHT so it never covers Leaflet's zoom control
+          (which lives in the map's top-left corner). */}
       {props.mode === "view" && (
-        <div className="pointer-events-none absolute left-3 top-3 z-[500] flex items-center gap-3 rounded-full border border-slate-200 bg-white/95 px-3.5 py-1.5 shadow-sm">
+        <div className="pointer-events-none absolute right-3 top-3 z-[500] flex items-center gap-3 rounded-full border border-slate-200 bg-white/95 px-3.5 py-1.5 shadow-sm">
           <span className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-slate-600">
             <span
               aria-hidden="true"
@@ -242,6 +270,24 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
           </span>
         </div>
       )}
+
+      {/* Hint for the click-to-activate scroll zoom behaviour. */}
+      <div className="pointer-events-none absolute bottom-3 left-3 z-[500] flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 px-3 py-1 text-[10px] font-semibold tracking-wide text-slate-500 shadow-sm">
+        <svg
+          aria-hidden="true"
+          width="11"
+          height="11"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 5v14M5 12l7 7 7-7" />
+        </svg>
+        CLICK MAP, THEN SCROLL TO ZOOM
+      </div>
     </div>
   );
 }
