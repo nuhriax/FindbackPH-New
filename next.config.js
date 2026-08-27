@@ -14,6 +14,10 @@ const nextConfig = {
   //     script (src/app/layout.tsx) and Next.js injects inline hydration
   //     scripts, so 'unsafe-inline' is genuinely required. Inline JSON-LD
   //     <script type="application/ld+json"> blocks are data, not executable.
+  //   - In non-production builds only, 'unsafe-eval' is appended because the
+  //     Next.js dev runtime (webpack HMR / React Refresh in main-app.js)
+  //     evaluates strings as JavaScript and is blocked without it. Production
+  //     builds do not use eval(), so production keeps the strict policy.
   //   - style-src 'self' 'unsafe-inline': Next.js emits inline <style> for
   //     critical CSS during streaming.
   //   - connect-src includes https/wss for the Supabase client (REST, storage,
@@ -47,7 +51,7 @@ const nextConfig = {
               "form-action 'self'",
               "frame-ancestors 'none'",
               "object-src 'none'",
-              "script-src 'self' 'unsafe-inline'",
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://*.supabase.co",
               "font-src 'self' data:",

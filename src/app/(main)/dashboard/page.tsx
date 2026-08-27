@@ -19,7 +19,7 @@ type DashboardMatch = {
   lost_item_id: string;
   found_item_id: string;
   found_items:
-    | { id: string; title: string; city: string; province: string; category: string }[]
+    | { id: string; title: string; city: string; province: string; category: string }
     | null;
 };
 
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
   ];
 
   const undismissedMatches = (matches ?? []).filter(
-    (m: any) => !m.dismissed && m.found_items && m.found_items.length > 0
+    (m: any) => !m.dismissed && m.found_items
   );
 
   const firstName = profile?.first_name?.trim() || "";

@@ -51,7 +51,11 @@ export type LostItem = {
   province: string;
   approximate_location: string | null;
   reward_amount: number | null;
-  status: ItemStatus;
+  // status/category are widened beyond the DB enums for read/filter typing:
+  // list pages pass raw URL-param strings to .eq("status"/"category", ...),
+  // which postgrest-js v2 strictly types against Row. Writes remain
+  // constrained (see Insert below) and Zod validates user input.
+  status: ItemStatus | string;
   created_at: string;
   updated_at: string;
 };
@@ -60,6 +64,9 @@ export type FoundItem = {
   id: string;
   reporter_id: string;
   title: string;
+  // item_category is a Postgres ENUM (schema.sql:19), so reads are always
+  // valid members. Raw-string filters go through explicit casts at the
+  // individual .eq() call sites instead of widening this read type.
   category: ItemCategory;
   description: string;
   distinguishing_features: string | null;
@@ -68,7 +75,7 @@ export type FoundItem = {
   province: string;
   approximate_location: string | null;
   current_holding_info: string | null;
-  status: ItemStatus;
+  status: ItemStatus | string;
   created_at: string;
   updated_at: string;
 };
@@ -162,8 +169,7 @@ export type BlockedUser = {
   created_at: string;
 };
 
-/**
- * Phase 7 — ownership verification challenge. Answer hashes are NEVER exposed
+/** Phase 7 - ownership verification challenge. Answer hashes are NEVER exposed
  * through the API (column-level grants in supabase/trust.sql), so this type
  * only models the columns any caller may legitimately see.
  */
@@ -174,6 +180,7 @@ export type OwnershipVerification = {
   owner_id: string;
   question_1: string;
   question_2: string | null;
+  updated_at: string;
 };
 
 
@@ -217,14 +224,33 @@ export interface Database {
       lost_items: {
         Row: LostItem;
         Insert: Omit<LostItem, "id" | "created_at" | "updated_at" | "status"> & { status?: ItemStatus };
-        Update: Partial<LostItem>;
-        Relationships: [];
+        // Index signature disables postgrest-js v2 excess-property rejection
+        // for the shared lost/found update path in my-reports.ts.
+        Update: Partial<LostItem> & { [key: string]: unknown };
+        Relationships: [
+          {
+            foreignKeyName: "lost_items_reporter_id_fkey";
+            columns: ["reporter_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       found_items: {
         Row: FoundItem;
         Insert: Omit<FoundItem, "id" | "created_at" | "updated_at" | "status"> & { status?: ItemStatus };
-        Update: Partial<FoundItem>;
-        Relationships: [];
+        // See lost_items.Update note re: index signature.
+        Update: Partial<FoundItem> & { [key: string]: unknown };
+        Relationships: [
+          {
+            foreignKeyName: "found_items_reporter_id_fkey";
+            columns: ["reporter_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       item_images: {
         Row: ItemImage;
@@ -260,19 +286,71 @@ export interface Database {
         Row: ItemMatch;
         Insert: Omit<ItemMatch, "id" | "created_at" | "dismissed">;
         Update: Partial<ItemMatch>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "matches_lost_item_id_fkey";
+            columns: ["lost_item_id"];
+            isOneToOne: false;
+            referencedRelation: "lost_items";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "matches_found_item_id_fkey";
+            columns: ["found_item_id"];
+            isOneToOne: false;
+            referencedRelation: "found_items";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       saved_items: {
         Row: SavedItem;
         Insert: Omit<SavedItem, "id" | "created_at">;
         Update: Partial<SavedItem>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "saved_items_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "saved_items_lost_item_id_fkey";
+            columns: ["lost_item_id"];
+            isOneToOne: false;
+            referencedRelation: "lost_items";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "saved_items_found_item_id_fkey";
+            columns: ["found_item_id"];
+            isOneToOne: false;
+            referencedRelation: "found_items";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       report_flags: {
         Row: ReportFlag;
         Insert: Omit<ReportFlag, "id" | "status" | "created_at" | "reviewed_at" | "reviewed_by">;
         Update: Partial<ReportFlag>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "report_flags_reporter_id_fkey";
+            columns: ["reporter_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "report_flags_reviewed_by_fkey";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       ownership_verifications: {
         // Selectable Row deliberately omits answer hashes (column-level grants
@@ -281,8 +359,9 @@ export interface Database {
         Insert: Omit<OwnershipVerification, "id"> & {
           answer_1_hash: string;
           answer_2_hash?: string | null;
+          updated_at?: string;
         };
-        Update: Partial<{ question_1: string; question_2: string | null; answer_1_hash: string; answer_2_hash: string | null }>;
+        Update: Partial<{ question_1: string; question_2: string | null; answer_1_hash: string; answer_2_hash: string | null; updated_at: string }>;
         Relationships: [];
       };
       contact_messages: {

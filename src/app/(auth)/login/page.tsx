@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { AuthField } from "@/components/auth/form-field";
 import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
 import { SocialAuthButtons } from "@/components/auth/social-auth";
+import { PasskeySignIn } from "@/components/auth/passkey-signin";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
@@ -124,6 +125,10 @@ function LoginInner() {
       <p className="auth-subtitle">Sign in to your account</p>
 
       <SocialAuthButtons next={next} />
+
+      {/* Rendered only when NEXT_PUBLIC_PASSKEYS_ENABLED is on AND the browser
+          supports WebAuthn; otherwise it renders nothing. */}
+      <PasskeySignIn next={next} />
 
       <form action={handleSubmit} className="auth-form-body" noValidate>
         <AuthField

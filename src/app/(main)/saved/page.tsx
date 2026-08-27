@@ -53,8 +53,10 @@ export default async function SavedItemsPage() {
         ) : (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {savedItems.map((saved) => {
-              const lostItem = saved.lost_items?.[0];
-              const foundItem = saved.found_items?.[0];
+              // Many-to-one embeds resolve to a single object (or null),
+              // matching PostgREST's cardinality rules.
+              const lostItem = saved.lost_items ?? null;
+              const foundItem = saved.found_items ?? null;
               const item = lostItem ?? foundItem ?? null;
               const isLost = !!lostItem;
               const href = isLost ? `/lost/${saved.lost_item_id}` : `/found/${saved.found_item_id}`;

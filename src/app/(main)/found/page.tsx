@@ -489,9 +489,12 @@ async function fetchLostCandidates(
    * to reduce the candidate pool when possible.
    */
   if (category) {
+    // category comes from the URL search params (untyped string). Cast to the
+    // DB enum type: invalid values simply match no rows, exactly as before —
+    // runtime behavior is unchanged by this annotation-only fix.
     query = query.eq(
       "category",
-      category,
+      category as NonNullable<ItemCategory>,
     );
   }
 
