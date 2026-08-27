@@ -2,11 +2,62 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { foundItemSchema, lostItemSchema } from "@/lib/validation";
+import { PH_LAT_RANGE, PH_LNG_RANGE } from "@/lib/ph-locations";
 import { revalidatePath } from "next/cache";
 import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { runMatchingForLostItem, runMatchingForFoundItem } from "@/lib/actions/matching";
 
 export type ActionResult = { error?: string; itemId?: string };
+
+/**
+ * Optional "Pin exact location" coordinates submitted with the report form.
+ * Parsed defensively (the fields are optional hidden inputs) and validated
+ * against the Philippine bounding box — a pin outside the country is ignored
+ * rather than rejected so it can never break a submission.
+ */
+function parseCoordinate(
+  value: FormDataEntryValue | null,
+  range: [number, number]
+): number | null {
+  if (typeof value !== "string" || value.trim() === "") return null;
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  const [min, max] = range;
+  if (n < min || n > max) return null;
+  return n;
+}
+
+/**
+ * Insert a report row. `extra` may carry latitude/longitude; if the deployed
+ * database hasn't had the coordinate migration applied yet (Postgres error
+ * 42703, undefined column), the insert is retried without them so a report is
+ * never lost because of the map feature.
+ */
+async function insertItemRow(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  table: "lost_items" | "found_items",
+  payload: Record<string, unknown>
+): Promise<{ data: { id: string } | null; error: unknown }> {
+  const insert = (row: Record<string, unknown>) =>
+    // `row` is Record<string, unknown> so the retry path can strip the
+    // coordinate keys; the payloads are assembled in this module only.
+    (supabase.from(table).insert(row as never) as any)
+      .select("id")
+      .single();
+
+  let result = await insert(payload);
+  if (
+    result.error &&
+    typeof result.error === "object" &&
+    "code" in result.error &&
+    (result.error as { code?: string }).code === "42703"
+  ) {
+    const { latitude: _lat, longitude: _lng, ...withoutCoords } = payload;
+    result = await insert(withoutCoords);
+  }
+  return result as { data: { id: string } | null; error: unknown };
+}
+
 
 /**
  * Anti-spam: a short cooldown between reports per user. Checks the timestamp of
@@ -68,22 +119,29 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { data: inserted, error } = await supabase
-    .from("lost_items")
-    .insert({
-      reporter_id: user.id,
-      title: parsed.data.title,
-      category: parsed.data.category,
-      description: parsed.data.description,
-      distinguishing_features: parsed.data.distinguishingFeatures ?? null,
-      date_lost: parsed.data.dateLost,
-      city: parsed.data.city,
-      province: parsed.data.province,
-      approximate_location: parsed.data.approximateLocation ?? null,
-      reward_amount: parsed.data.rewardAmount ?? null,
-    })
-    .select("id")
-    .single();
+  const latitude = parseCoordinate(
+    formData.get("latitude"),
+    PH_LAT_RANGE
+  );
+  const longitude = parseCoordinate(
+    formData.get("longitude"),
+    PH_LNG_RANGE
+  );
+
+  const { data: inserted, error } = await insertItemRow(supabase, "lost_items", {
+    reporter_id: user.id,
+    title: parsed.data.title,
+    category: parsed.data.category,
+    description: parsed.data.description,
+    distinguishing_features: parsed.data.distinguishingFeatures ?? null,
+    date_lost: parsed.data.dateLost,
+    city: parsed.data.city,
+    province: parsed.data.province,
+    approximate_location: parsed.data.approximateLocation ?? null,
+    reward_amount: parsed.data.rewardAmount ?? null,
+    // Coordinates are only stored as a pair — never one without the other.
+    ...(latitude !== null && longitude !== null ? { latitude, longitude } : {}),
+  });
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };
@@ -135,22 +193,29 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { data: inserted, error } = await supabase
-    .from("found_items")
-    .insert({
-      reporter_id: user.id,
-      title: parsed.data.title,
-      category: parsed.data.category,
-      description: parsed.data.description,
-      distinguishing_features: parsed.data.distinguishingFeatures ?? null,
-      date_found: parsed.data.dateFound,
-      city: parsed.data.city,
-      province: parsed.data.province,
-      approximate_location: parsed.data.approximateLocation ?? null,
-      current_holding_info: parsed.data.currentHoldingInfo ?? null,
-    })
-    .select("id")
-    .single();
+  const latitude = parseCoordinate(
+    formData.get("latitude"),
+    PH_LAT_RANGE
+  );
+  const longitude = parseCoordinate(
+    formData.get("longitude"),
+    PH_LNG_RANGE
+  );
+
+  const { data: inserted, error } = await insertItemRow(supabase, "found_items", {
+    reporter_id: user.id,
+    title: parsed.data.title,
+    category: parsed.data.category,
+    description: parsed.data.description,
+    distinguishing_features: parsed.data.distinguishingFeatures ?? null,
+    date_found: parsed.data.dateFound,
+    city: parsed.data.city,
+    province: parsed.data.province,
+    approximate_location: parsed.data.approximateLocation ?? null,
+    current_holding_info: parsed.data.currentHoldingInfo ?? null,
+    // Coordinates are only stored as a pair — never one without the other.
+    ...(latitude !== null && longitude !== null ? { latitude, longitude } : {}),
+  });
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };

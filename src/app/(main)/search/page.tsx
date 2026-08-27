@@ -14,6 +14,9 @@ import {
   X,
 } from "lucide-react";
 import { CommunityMotif } from "@/components/ui/community-motif";
+import { PhilippinesMap } from "@/components/map/philippines-map";
+import type { MapPoint } from "@/components/map/philippines-map-impl";
+import { lookupCityCoords } from "@/lib/ph-locations";
 
 export const metadata = {
   title: "Search Lost & Found Items",
@@ -49,6 +52,9 @@ type SearchItem = {
   province: string | null;
   description: string | null;
   created_at: string | null;
+  // Optional pin coordinates; null for pre-map reports / unpinned reports.
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 const SEARCH_LIMIT = 30;
@@ -72,6 +78,38 @@ function escapeLike(value: string): string {
 /** Wrap a value for PostgREST `.or()` so commas/quotes can't break parsing. */
 function orLiteral(value: string): string {
   return `"${value.replace(/"/g, '""')}"`;
+}
+
+/**
+ * Build the points plotted on the search page's Philippines map. A report is
+ * placed at its saved pin when it has one, otherwise at its city's approximate
+ * centroid (static lookup). Reports with neither are simply not plotted —
+ * consistent with never exposing exact locations.
+ */
+function buildMapPoints(
+  items: SearchItem[],
+  kind: "lost" | "found",
+  hrefPrefix: "/lost" | "/found"
+): MapPoint[] {
+  const points: MapPoint[] = [];
+  for (const item of items) {
+    const coords =
+      typeof item.latitude === "number" && typeof item.longitude === "number"
+        ? ([item.latitude, item.longitude] as [number, number])
+        : lookupCityCoords(item.city);
+    if (!coords) continue;
+    points.push({
+      id: `${kind}-${item.id}`,
+      kind,
+      lat: coords[0],
+      lng: coords[1],
+      title: item.title,
+      city: item.city,
+      province: item.province,
+      href: `${hrefPrefix}/${item.id}`,
+    });
+  }
+  return points;
 }
 
 /** ISO timestamp that starts the window for a date filter (server time). */
@@ -159,6 +197,21 @@ async function loadImageMap(
   return map;
 }
 
+/** PostgREST error for "column does not exist" (coordinate columns not migrated yet). */
+function isMissingColumnError(err: unknown): boolean {
+  if (!err) return false;
+  if (typeof err === "object" && "code" in err) {
+    if ((err as { code?: string }).code === "42703") return true;
+  }
+  const message =
+    typeof err === "string"
+      ? err
+      : typeof err === "object" && "message" in err
+        ? String((err as { message?: unknown }).message)
+        : "";
+  return /column .*latitude|column .*longitude/i.test(message);
+}
+
 /**
  * Fetch a single table for the search page. Runs each table independently so
  * that if one fails (e.g. a missing column or an unparseable query) the other
@@ -177,10 +230,18 @@ async function searchTable(
 ): Promise<{ data: SearchItem[] | null; error: unknown }> {
   const { q, category, city, when, photos } = filters;
 
-  try {
+  // Coordinates are optional: the base columns always work, and lat/lng are
+  // appended when the deployed DB has the 103 migration applied.
+  const BASE_COLUMNS =
+    "id, title, category, city, province, description, created_at";
+  const COLUMNS = `${BASE_COLUMNS}, latitude, longitude`;
+
+  async function fetchRows(
+    columns: string
+  ): Promise<{ rows: SearchItem[] | null; error: unknown }> {
     let query: any = supabase
       .from(table as any)
-      .select("id, title, category, city, province, description, created_at")
+      .select(columns)
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(SEARCH_LIMIT);
@@ -198,36 +259,54 @@ async function searchTable(
       query = query.gte("created_at", whenCutoff(when));
     }
 
-    let rows: SearchItem[];
-
     if (!q) {
       const res = await query;
-      if (res.error) return { data: null, error: res.error };
-      rows = (res.data as SearchItem[]) ?? [];
-    } else {
-      // Prefer Postgres full-text search. If the query can't be parsed or the
-      // search column is missing in the deployed DB, fall back to a LIKE search so
-      // users always get results instead of a blank page.
-      const fts = await query.textSearch("search_vector", q, {
-        type: "websearch",
-      });
-      if (!fts.error) {
-        rows = (fts.data as SearchItem[]) ?? [];
-      } else {
-        const pattern = `%${escapeLike(q)}%`;
-        const like = await query.or(
-          [
-            `title.ilike.${orLiteral(pattern)}`,
-            `description.ilike.${orLiteral(pattern)}`,
-            `category.ilike.${orLiteral(pattern)}`,
-            `city.ilike.${orLiteral(pattern)}`,
-            `province.ilike.${orLiteral(pattern)}`,
-          ].join(",")
-        );
-        if (like.error) return { data: null, error: like.error };
-        rows = (like.data as SearchItem[]) ?? [];
-      }
+      if (res.error) return { rows: null, error: res.error };
+      return { rows: ((res.data ?? []) as unknown as SearchItem[]), error: null };
     }
+
+    // Prefer Postgres full-text search. If the query can't be parsed or the
+    // search column is missing in the deployed DB, fall back to a LIKE search so
+    // users always get results instead of a blank page.
+    const fts = await query.textSearch("search_vector", q, {
+      type: "websearch",
+    });
+    if (!fts.error) {
+      return { rows: ((fts.data ?? []) as unknown as SearchItem[]), error: null };
+    }
+
+    const pattern = `%${escapeLike(q)}%`;
+    const like = await supabase
+      .from(table as any)
+      .select(columns)
+      .eq("status", "active")
+      .or(
+        [
+          `title.ilike.${orLiteral(pattern)}`,
+          `description.ilike.${orLiteral(pattern)}`,
+          `category.ilike.${orLiteral(pattern)}`,
+          `city.ilike.${orLiteral(pattern)}`,
+          `province.ilike.${orLiteral(pattern)}`,
+        ].join(",")
+      )
+      .order("created_at", { ascending: false })
+      .limit(SEARCH_LIMIT);
+    if (like.error) return { rows: null, error: like.error };
+    return { rows: ((like.data ?? []) as unknown as SearchItem[]), error: null };
+  }
+
+  try {
+    // First attempt includes the coordinate columns; if the deployed DB
+    // predates the migration (42703 / "column does not exist"), retry with
+    // the base columns so search keeps working — the map just falls back to
+    // city centroids for those reports.
+    let result = await fetchRows(COLUMNS);
+    if (result.error && isMissingColumnError(result.error)) {
+      result = await fetchRows(BASE_COLUMNS);
+    }
+    if (result.error) return { data: null, error: result.error };
+
+    let rows = result.rows as SearchItem[];
 
     // Real "with photo" filtering against item_images.
     if (photos) {
@@ -319,6 +398,13 @@ export default async function SearchPage({
     : null;
 
   const totalResults = lostItems.length + foundItems.length;
+
+  // LOST/FOUND markers for the Philippines map view (pins first, city
+  // centroids as fallback).
+  const mapPoints = [
+    ...buildMapPoints(foundItems, "found", "/found"),
+    ...buildMapPoints(lostItems, "lost", "/lost"),
+  ];
 
   const hasSearch =
     Boolean(q) ||
@@ -609,6 +695,31 @@ export default async function SearchPage({
               <EmptySearch hasFilters={hasSearch} />
             ) : (
               <div className="space-y-12 pt-7">
+                {/* ========================================================
+                    MAP VIEW — Philippines only, LOST/FOUND markers
+                ========================================================= */}
+
+                {mapPoints.length > 0 && (
+                  <section aria-label="Map view">
+                    <div className="flex items-end justify-between gap-4">
+                      <div>
+                        <h2 className="font-display text-xl font-bold text-navy-900 sm:text-2xl">
+                          Map view
+                        </h2>
+                        <p className="mt-2 text-sm text-slate-600">
+                          Approximate locations of {mapPoints.length}{" "}
+                          {mapPoints.length === 1 ? "report" : "reports"} across
+                          the Philippines. Click a marker for details.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 h-[420px] overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                      <PhilippinesMap mode="view" points={mapPoints} />
+                    </div>
+                  </section>
+                )}
+
                 {/* ========================================================
                     FOUND ITEMS
                 ========================================================= */}

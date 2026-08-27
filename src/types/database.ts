@@ -50,6 +50,10 @@ export type LostItem = {
   city: string;
   province: string;
   approximate_location: string | null;
+  // Optional map-pin coordinates (Philippines-only picker). Nullable for
+  // reports created before the map feature or without a pin.
+  latitude: number | null;
+  longitude: number | null;
   reward_amount: number | null;
   // status/category are widened beyond the DB enums for read/filter typing:
   // list pages pass raw URL-param strings to .eq("status"/"category", ...),
@@ -74,6 +78,9 @@ export type FoundItem = {
   city: string;
   province: string;
   approximate_location: string | null;
+  // Optional map-pin coordinates (see LostItem).
+  latitude: number | null;
+  longitude: number | null;
   current_holding_info: string | null;
   status: ItemStatus | string;
   created_at: string;

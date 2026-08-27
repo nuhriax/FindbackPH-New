@@ -93,6 +93,10 @@ create table if not exists public.lost_items (
   city text not null,
   province text not null,
   approximate_location text, -- e.g. "Near SM North EDSA" — never exact address
+  -- Optional "pin exact location" coordinates from the report wizard's
+  -- Philippines-only map picker. Nullable; only stored as a pair.
+  latitude double precision,
+  longitude double precision,
   reward_amount integer, -- in PHP, optional
   status item_status not null default 'active',
   search_vector tsvector,
@@ -111,6 +115,9 @@ create table if not exists public.found_items (
   city text not null,
   province text not null,
   approximate_location text,
+  -- Optional "pin exact location" coordinates (see lost_items).
+  latitude double precision,
+  longitude double precision,
   current_holding_info text, -- e.g. "Kept at barangay hall" — no exact address
   status item_status not null default 'active',
   search_vector tsvector,

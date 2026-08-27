@@ -38,6 +38,8 @@ const nextConfig = {
   //     since these headers are also applied in development.
   //   - img-src https://*.supabase.co: report photos / avatars served straight
   //     from Supabase storage; data:/blob: cover thumbnails & previews.
+  //     https://*.basemaps.cartocdn.com: OpenStreetMap/CARTO raster tiles for
+  //     the Philippines map (report pin picker + /search map view).
   //   - font-src 'self' data:: Plus_Jakarta_Sans is self-hosted via
   //     next/font (may inline subsets as data: URIs).
   async headers() {
@@ -66,7 +68,7 @@ const nextConfig = {
               "object-src 'none'",
               `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.supabase.co",
+              "img-src 'self' data: blob: https://*.supabase.co https://*.basemaps.cartocdn.com",
               "font-src 'self' data:",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* http://localhost:*",
               "script-src-attr 'none'",

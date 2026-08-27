@@ -8,6 +8,7 @@ import { uploadItemImagesClient } from "@/lib/file-upload-client";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { ImageUpload } from "@/components/image-upload";
 import { MotionReveal } from "@/components/effects/motion-reveal";
+import { PhilippinesMap } from "@/components/map/philippines-map";
 
 const STEPS = 4;
 
@@ -20,6 +21,7 @@ type ReviewSnapshot = {
   province: string;
   approximateLocation: string;
   currentHoldingInfo: string;
+  pinned: string;
 };
 
 export default function ReportFoundPage() {
@@ -34,6 +36,10 @@ export default function ReportFoundPage() {
   // Set when the server tells us the session expired mid-flow, so we can
   // offer a sign-in link instead of a dead-end error.
   const [authRequired, setAuthRequired] = useState(false);
+  // Optional "Pin exact location" coordinate captured on the Where & when
+  // step. Kept in state (instead of relying only on the hidden inputs) so the
+  // marker and the coordinate readout can render live.
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
 
   // Validate the currently visible step before moving forward. Hidden
   // (display:none) fields are skipped by native browser validation, so without
@@ -85,6 +91,13 @@ export default function ReportFoundPage() {
           province: fd.get("province")?.toString() ?? "",
           approximateLocation: fd.get("approximateLocation")?.toString() ?? "",
           currentHoldingInfo: fd.get("currentHoldingInfo")?.toString() ?? "",
+          pinned: (() => {
+            const latStr = fd.get("latitude")?.toString() ?? "";
+            const lngStr = fd.get("longitude")?.toString() ?? "";
+            return latStr && lngStr
+              ? `${Number(latStr).toFixed(6)}, ${Number(lngStr).toFixed(6)}`
+              : "";
+          })(),
         });
       }
     }
@@ -381,6 +394,54 @@ export default function ReportFoundPage() {
                 <input id="approximateLocation" name="approximateLocation" placeholder="e.g. Near SM North EDSA" className="input" />
               </div>
 
+              {/* Pin exact location — Philippines-only map picker (optional). */}
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <label className="label">
+                    Pin exact location <span className="font-normal text-slate-500">(optional — helps proximity matching)</span>
+                  </label>
+                  {pin && (
+                    <button
+                      type="button"
+                      onClick={() => setPin(null)}
+                      className="text-xs font-semibold text-red-600 transition hover:text-red-700"
+                    >
+                      Clear pin
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative h-64 overflow-hidden rounded-2xl border border-slate-200">
+                  {step === 2 ? (
+                    <PhilippinesMap
+                      mode="pick"
+                      latitude={pin?.lat ?? null}
+                      longitude={pin?.lng ?? null}
+                      onPick={(lat, lng) => setPin({ lat, lng })}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-slate-100 text-xs text-slate-400">
+                      Map available on this step
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-2 flex items-center justify-between gap-3 text-xs">
+                  <p className="text-slate-500">
+                    {pin
+                      ? "Drag the pin or click the map to adjust."
+                      : "Click anywhere on the map to drop a pin."}
+                  </p>
+                  <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[11px] text-slate-600">
+                    {pin ? `${pin.lat.toFixed(6)}, ${pin.lng.toFixed(6)}` : "no pin set"}
+                  </span>
+                </div>
+
+                {/* The pin travels with the form's FormData via hidden inputs. */}
+                <input type="hidden" name="latitude" value={pin ? String(pin.lat) : ""} />
+                <input type="hidden" name="longitude" value={pin ? String(pin.lng) : ""} />
+              </div>
+
               <div>
                 <label htmlFor="currentHoldingInfo" className="label">
                   Where it&apos;s currently being kept <span className="font-normal text-slate-500">(optional)</span>
@@ -421,6 +482,9 @@ export default function ReportFoundPage() {
                       : []),
                     ...(review.currentHoldingInfo
                       ? [["Currently kept", review.currentHoldingInfo]]
+                      : []),
+                    ...(review.pinned
+                      ? [["Pinned location", review.pinned]]
                       : []),
                     ["Photos", images.length === 0 ? "None yet" : `${images.length} photo${images.length > 1 ? "s" : ""}`],
                   ].map(([label, value]) => (
