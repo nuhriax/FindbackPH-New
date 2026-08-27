@@ -4,6 +4,8 @@ import { ProfileForm } from "@/components/dashboard/profile-form";
 import { CalendarDays, HeartHandshake, ShieldCheck, UserRound } from "lucide-react";
 import { VerifiedAccountBadge, TrustedMemberBadge } from "@/components/ui/verification-badge";
 import { computeTrustSignals, isEmailVerified } from "@/lib/trust";
+import { getBadgeStats, computeBadges } from "@/lib/badges";
+import { BadgesCard } from "@/components/dashboard/badges-card";
 
 export const metadata = {
   title: "Profile — FindBack PH",
@@ -25,6 +27,14 @@ export default async function ProfilePage() {
     .single();
 
   if (!profile) redirect("/dashboard");
+
+  // Badges are derived from existing public/report data — read-only, no DB changes.
+  const stats = await getBadgeStats(supabase, user.id, {
+    memberSince: profile.created_at,
+    emailVerified: isEmailVerified(user),
+  });
+  stats.successfulReturns = profile.successful_returns ?? 0;
+  const earnedBadges = computeBadges(stats);
 
   const name = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
   const initial = (name || profile.username || "U").charAt(0).toUpperCase();
@@ -80,6 +90,24 @@ export default async function ProfilePage() {
       <div className="mt-8">
         <ProfileForm profile={profile} />
       </div>
+
+      {/* Badges — derived from existing public data; purely presentational */}
+      <section className="mt-10">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-navy-900">
+          Badges
+        </h2>
+        <div className="mt-4">
+          <BadgesCard
+            badges={earnedBadges.map(({ id, emoji, name, description, earned }) => ({
+              id,
+              emoji,
+              name,
+              description,
+              earned,
+            }))}
+          />
+        </div>
+      </section>
 
       <div className="mt-5 flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/60 p-4 text-sm text-slate-600">
         <ShieldCheck size={17} className="mt-0.5 shrink-0 text-emerald-600" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import Link from "next/link";
 import { AlertTriangle, Bell, CheckCircle2, KeyRound, Mail, ShieldCheck, Trash2 } from "lucide-react";
 import { changePasswordAction, deleteAccountAction } from "@/lib/actions/settings";
 import { MatchAlertPrefs } from "@/components/dashboard/match-alert-prefs";
@@ -186,7 +187,7 @@ function NotificationsPrefsCard() {
               }`}
             >
               <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                className={`absolute left-0 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
                   prefs[row.key] ? "translate-x-[22px]" : "translate-x-0.5"
                 }`}
               />
@@ -216,9 +217,9 @@ function PrivacyCard() {
             Learn how we protect your information and what we store.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <a href="/privacy" className="btn-secondary !py-2 text-sm">Privacy policy</a>
-            <a href="/terms" className="btn-secondary !py-2 text-sm">Terms of service</a>
-            <a href="/safety" className="btn-secondary !py-2 text-sm">Safety guide</a>
+            <Link href="/privacy" className="btn-secondary !py-2 text-sm">Privacy policy</Link>
+            <Link href="/terms" className="btn-secondary !py-2 text-sm">Terms of service</Link>
+            <Link href="/safety" className="btn-secondary !py-2 text-sm">Safety guide</Link>
           </div>
         </div>
       </div>

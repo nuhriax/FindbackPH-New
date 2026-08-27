@@ -9,6 +9,19 @@ const nextConfig = {
     ],
   },
 
+  // Client-router cache ("staleTimes"): how long visited routes stay usable
+  // in the browser without re-fetching from the server. Next.js 15 defaults
+  // dynamic pages to 0, which made EVERY link click wait on a full server
+  // round-trip. 30s means navigating back/forth between pages you've already
+  // visited renders instantly from cache; fresh visits still stream through
+  // the loading skeletons for up-to-date data.
+  experimental: {
+    staleTimes: {
+      dynamic: 30,
+      static: 300,
+    },
+  },
+
   // Security headers. Narrowest CSP that works with this Next.js + Supabase app:
   //   - script-src 'self' 'unsafe-inline': the app renders an inline theme
   //     script (src/app/layout.tsx) and Next.js injects inline hydration

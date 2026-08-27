@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { NotificationsList } from "@/components/notifications/notifications-list";
+import { BackButton } from "@/components/back-button";
 import type { Notification } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,8 @@ export default async function DashboardNotificationsPage() {
 
   return (
     <div>
-      <span className="section-eyebrow">Your updates</span>
+      <BackButton fallbackHref="/dashboard" />
+      <span className="section-eyebrow mt-3 block">Your updates</span>
       <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy-900">
         Notifications
       </h1>

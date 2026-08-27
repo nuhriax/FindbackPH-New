@@ -10,7 +10,7 @@ import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
 import { Logo } from "@/components/logo";
-import { NotificationBell } from "@/components/notification-bell";
+import { NotificationDropdown, MessagesDropdown, SavedDropdown } from "@/components/navbar/nav-dropdowns";
 
 // Primary actions stay in the top bar; secondary info pages live under "More"
 // so the navbar doesn't overflow or bury the main CTAs.
@@ -36,16 +36,26 @@ function getInitials(profile: Profile | null) {
 export function Navbar({
   user,
   profile,
-  unreadCount = 0,
+  notificationCount = 0,
+  messageCount = 0,
+  savedCount = 0,
 }: {
   user: User | null;
   profile: Profile | null;
-  unreadCount?: number;
+  /** Unread notifications excluding chat messages (shown on the bell). */
+  notificationCount?: number;
+  /** Unread new-message notifications (shown on the chat icon). */
+  messageCount?: number;
+  /** Total saved reports (shown on the bookmark icon). */
+  savedCount?: number;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+
   const moreRef = useRef<HTMLDivElement>(null);
 
   const isActive = (href: string) =>
@@ -59,6 +69,24 @@ export function Navbar({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close the account dropdown on outside click or Escape.
+  useEffect(() => {
+    if (!accountOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAccountOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [accountOpen]);
+
 
   // Close the "More" dropdown on outside click or Escape.
   useEffect(() => {
@@ -198,47 +226,82 @@ export function Navbar({
 
             {user ? (
               <>
-                <NotificationBell initialCount={unreadCount} />
-                <Link
-                  href="/messages"
-                  aria-label="Messages"
-                  className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
-                >
-                  <MessageCircle size={18} />
-                </Link>
-                <Link
-                  href="/saved"
-                  aria-label="Saved items"
-                  className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
-                >
-                  <Bookmark size={18} />
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="group ml-1 flex items-center gap-2.5 rounded-full border border-white/80 bg-white/80 py-1 pl-1 pr-3 shadow-sm transition-colors hover:border-navy-200"
-                  title={firstName}
-                >
-                  {profile?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
-                  ) : (
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
-                      {getInitials(profile)}
-                    </span>
-                  )}
-                  <span className="hidden max-w-[8rem] truncate text-sm font-medium text-navy-900 xl:block">
-                    {profile?.username ?? user.email}
-                  </span>
-                </Link>
-                <form action={logoutAction}>
+                <NotificationDropdown initialCount={notificationCount} />
+                <MessagesDropdown initialCount={messageCount} />
+                <SavedDropdown initialCount={savedCount} />
+                <div ref={accountRef} className="relative ml-1">
                   <button
-                    type="submit"
-                    aria-label="Log out"
-                    className="ml-0.5 rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
+                    type="button"
+                    onClick={() => setAccountOpen((v) => !v)}
+                    aria-haspopup="menu"
+                    aria-expanded={accountOpen}
+                    className="group flex items-center gap-2.5 rounded-full border border-white/80 bg-white/80 py-1 pl-1 pr-3 shadow-sm transition-colors hover:border-navy-200"
+                    title={firstName}
                   >
-                    <LogOut size={18} />
+                    {profile?.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+                    ) : (
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
+                        {getInitials(profile)}
+                      </span>
+                    )}
+                    <span className="hidden max-w-[8rem] truncate text-sm font-medium text-navy-900 xl:block">
+                      {profile?.username ?? user.email}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`text-slate-500 transition-transform ${accountOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
-                </form>
+
+                  {/* Account dropdown — scrollable when tall */}
+                  {accountOpen && (
+                    <div
+                      role="menu"
+                      className="absolute right-0 top-full z-50 mt-2 max-h-[70vh] w-56 overflow-y-auto rounded-2xl border border-navy-100 bg-white p-2 shadow-xl"
+                    >
+                      <Link
+                        href="/dashboard"
+                        role="menuitem"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <LayoutDashboard size={17} className="text-slate-500" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/profile"
+                        role="menuitem"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <Bookmark size={17} className="text-slate-500" />
+                        Profile
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        role="menuitem"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <MessageCircle size={17} className="text-slate-500" />
+                        Settings
+                      </Link>
+                      <div className="my-1 h-px bg-navy-100" />
+                      <form action={logoutAction}>
+                        <button
+                          type="submit"
+                          role="menuitem"
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                        >
+                          <LogOut size={17} />
+                          Sign out
+                        </button>
+                      </form>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <>

@@ -1,9 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
-import type { Profile } from "@/types/database";
-import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 
 /** Routes that render their own full-screen chrome (no Navbar/Footer). */
@@ -21,16 +18,16 @@ const CHROME_FREE = new Set([
  * authentication pages, where they are intentionally omitted so the auth
  * experience fills the entire viewport.
  * (Router-driven, so it stays perfectly in sync with the current URL.)
+ *
+ * The navbar arrives as a pre-rendered React node (a <Suspense>-wrapped async
+ * server component from the layout), so this component stays fully static —
+ * it renders instantly and the real navbar streams in when its data is ready.
  */
 export function SiteChrome({
-  user,
-  profile,
-  unreadCount = 0,
+  navbar,
   children,
 }: {
-  user: User | null;
-  profile: Profile | null;
-  unreadCount?: number;
+  navbar: React.ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -38,7 +35,7 @@ export function SiteChrome({
 
   return (
     <>
-      <Navbar user={user} profile={profile} unreadCount={unreadCount} />
+      {navbar}
       {children}
       <Footer />
     </>

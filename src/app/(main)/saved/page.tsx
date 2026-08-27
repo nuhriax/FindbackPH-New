@@ -5,6 +5,7 @@ import { getUserSavedItems } from "@/lib/actions/items";
 import { Bookmark, MapPin } from "lucide-react";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { RemoveSavedButton } from "@/components/saved/remove-saved-button";
+import { BackButton } from "@/components/back-button";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +25,8 @@ export default async function SavedItemsPage() {
   return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <span className="section-eyebrow">Your saved reports</span>
+        <BackButton fallbackHref="/dashboard" />
+        <span className="section-eyebrow mt-3 block">Your saved reports</span>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900">Saved Items</h1>
           {savedItems.length > 0 && (

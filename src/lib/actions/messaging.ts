@@ -277,6 +277,134 @@ export async function getUnreadNotificationCount(): Promise<number> {
 
   return count ?? 0;
 }
+/**
+ * Splits the unread-notification count into "general" (matches, updates,
+ * moderation, ...) and "messages" so the navbar can show separate Messenger-
+ * style badges on the bell and the chat icon that never overlap.
+ */
+export async function getUnreadCounts(): Promise<{ general: number; messages: number }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { general: 0, messages: 0 };
+
+  const [messagesRes, othersRes] = await Promise.all([
+    supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("read", false)
+      .eq("type", "new_message"),
+    supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("read", false)
+      .neq("type", "new_message"),
+  ]);
+
+  if (messagesRes.error) console.error("Error counting message notifications:", messagesRes.error);
+  if (othersRes.error) console.error("Error counting general notifications:", othersRes.error);
+
+  return { general: othersRes.count ?? 0, messages: messagesRes.count ?? 0 };
+}
+
+export type ConversationPreview = {
+  id: string;
+  item_type: "lost_item" | "found_item";
+  /** Title of the lost/found report the conversation is about. */
+  item_title: string | null;
+  other_id: string;
+  other_name: string;
+  other_avatar_url: string | null;
+  latest_body: string | null;
+  latest_from_me: boolean;
+  /** True when the newest message is theirs and hasn't been read yet. */
+  has_unread: boolean;
+  updated_at: string;
+};
+
+/**
+ * Compact conversation summaries for the navbar's Messenger-style dropdown:
+ * the five most recent threads with counterpart profile and latest message.
+ */
+export async function getConversationPreviews(limit = 5): Promise<ConversationPreview[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("conversations")
+    .select(
+      `id, item_type, item_id, participant_a, participant_b, updated_at,
+       messages(body, sender_id, read_by_receiver, created_at)`
+    )
+    .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
+    .order("updated_at", { ascending: false })
+    // Only the most recent message per conversation is needed for a preview.
+    .order("created_at", { ascending: false, referencedTable: "messages" })
+    .limit(1, { referencedTable: "messages" })
+    .limit(limit);
+
+  if (error || !data) {
+    console.error("Error fetching conversation previews:", error);
+    return [];
+  }
+
+  type PreviewRow = {
+    id: string;
+    item_type: "lost_item" | "found_item";
+    item_id: string;
+    participant_a: string;
+    participant_b: string;
+    updated_at: string;
+    messages?: Array<{
+      body: string;
+      sender_id: string;
+      read_by_receiver: boolean | null;
+      created_at: string;
+    }>;
+  };
+
+  const rows = data as unknown as PreviewRow[];
+
+  return Promise.all(
+    rows.map(async (row) => {
+      const otherId = row.participant_a === user.id ? row.participant_b : row.participant_a;
+
+      const [profileRes, itemRes] = await Promise.all([
+        supabase.from("profiles").select("username, first_name, last_name, avatar_url").eq("id", otherId).single(),
+        (() => {
+          const table = row.item_type === "lost_item" ? "lost_items" : "found_items";
+          return supabase.from(table).select("title").eq("id", row.item_id).single();
+        })(),
+      ]);
+
+      const profile = profileRes.data as { username: string; first_name: string; last_name: string; avatar_url: string | null } | null;
+      const latest = row.messages?.[0];
+
+      return {
+        id: row.id,
+        item_type: row.item_type,
+        item_title: ((itemRes.data as { title: string } | null)?.title ?? null),
+        other_id: otherId,
+        other_name: profile?.first_name
+          ? `${profile.first_name} ${profile.last_name}`
+          : profile?.username ?? "Someone",
+        other_avatar_url: profile?.avatar_url ?? null,
+        latest_body: latest?.body ?? null,
+        latest_from_me: latest ? latest.sender_id === user.id : false,
+        has_unread: !!latest && latest.sender_id !== user.id && !latest.read_by_receiver,
+        updated_at: row.updated_at,
+      } satisfies ConversationPreview;
+    })
+  );
+}
 
 /**
  * Returns recent notifications for the current user.

@@ -364,6 +364,99 @@ export async function getUserSavedItems(userId?: string) {
   return data ?? [];
 }
 
+/** Total number of reports the current user has saved (for a navbar badge). */
+export async function getSavedItemsCount(): Promise<number> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return 0;
+
+  const { count, error } = await supabase
+    .from("saved_items")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error counting saved items:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+export type SavedItemPreview = {
+  id: string;
+  /** Detail-page path for the saved report. */
+  href: string;
+  title: string;
+  status: string;
+  category: string | null;
+  city: string | null;
+  province: string | null;
+  is_lost: boolean;
+  created_at: string;
+};
+
+/**
+ * Compact summaries of the most recently saved reports for the navbar's
+ * Messenger-style dropdown.
+ */
+export async function getSavedItemPreviews(limit = 5): Promise<SavedItemPreview[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("saved_items")
+    .select(
+      `id, created_at, lost_item_id, found_item_id,
+       lost_items(title, status, category, city, province),
+       found_items(title, status, category, city, province)`
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data) {
+    console.error("Error fetching saved item previews:", error);
+    return [];
+  }
+
+  type PreviewRow = {
+    id: string;
+    created_at: string;
+    lost_item_id: string | null;
+    found_item_id: string | null;
+    lost_items?: Array<{ title: string; status: string; category: string; city: string; province: string }> | null;
+    found_items?: Array<{ title: string; status: string; category: string; city: string; province: string }> | null;
+  };
+
+  return (data as unknown as PreviewRow[]).map((row) => {
+    // Many-to-one embeds resolve to single-object arrays under postgrest-js v2.
+    const lost = row.lost_items?.[0];
+    const found = row.found_items?.[0];
+    const item = lost ?? found ?? null;
+    const isLost = !!lost;
+
+    return {
+      id: row.id,
+      href: isLost ? `/lost/${row.lost_item_id}` : `/found/${row.found_item_id}`,
+      title: item?.title ?? "Unknown item",
+      status: item?.status ?? "active",
+      category: item?.category ?? null,
+      city: item?.city ?? null,
+      province: item?.province ?? null,
+      is_lost: isLost,
+      created_at: row.created_at,
+    };
+  });
+}
+
 // --- Phase 9: Report Flags ---
 
 export async function reportFlagAction(formData: FormData): Promise<ActionResult> {

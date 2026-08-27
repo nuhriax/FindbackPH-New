@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 import { ConversationsList } from "@/components/messaging/conversations-list";
+import { BackButton } from "@/components/back-button";
 
 export const dynamic = "force-dynamic";
 
 export default function DashboardMessagesPage() {
   return (
     <div>
-      <span className="section-eyebrow">Your inbox</span>
+      <BackButton fallbackHref="/dashboard" />
+      <span className="section-eyebrow mt-3 block">Your inbox</span>
       <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy-900">
         Messages
       </h1>

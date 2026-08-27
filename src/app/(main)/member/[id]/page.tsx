@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { computeTrustSignals } from "@/lib/trust";
+import { computeBadges, getBadgeStats } from "@/lib/badges";
+import { BadgesCard } from "@/components/dashboard/badges-card";
 import { getAvatarPublicUrl } from "@/lib/storage";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { BlockUserButton } from "@/components/block-user-button";
@@ -80,6 +82,14 @@ export default async function MemberProfilePage({ params }: Props) {
     reportList(supabase, "lost_items", profile.id),
     reportList(supabase, "found_items", profile.id),
   ]);
+
+  // Badge computation — derived from already-public data, respects RLS.
+  const badgeStats = await getBadgeStats(supabase, profile.id, {
+    memberSince: profile.created_at ?? null,
+    emailVerified,
+  });
+  badgeStats.successfulReturns = profile.successful_returns;
+  const earnedBadges = computeBadges(badgeStats);
 
   const reports = [
     ...lost.map((r) => ({ row: r, kind: "lost" as const })),
@@ -177,6 +187,26 @@ return (
             <p className="text-sm leading-relaxed text-slate-700">{profile.bio}</p>
           </section>
         )}
+
+        {/* Badges */}
+        <section className="mt-8">
+          <h2 className="font-display text-xl font-semibold tracking-tight text-navy-900">
+            Badges
+          </h2>
+          <div className="mt-4 card p-6">
+            <BadgesCard
+              badges={earnedBadges.map(
+                ({ id, emoji, name, description, earned }) => ({
+                  id,
+                  emoji,
+                  name,
+                  description,
+                  earned,
+                })
+              )}
+            />
+          </div>
+        </section>
 
         {/* Reports — safe, already-public listings only */}
         <section className="mt-8">
