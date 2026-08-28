@@ -23,6 +23,7 @@ import {
   Map as MlMap,
   Marker as MlMarker,
   Popup as MlPopup,
+  type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { format, isValid } from "date-fns";
@@ -55,14 +56,62 @@ export type PhilippinesMapProps =
       points: MapPoint[];
     };
 
-// Vector basemap (OpenFreeMap "Liberty" style — free, no API key). Unlike the
-// old raster PNG tiles, vector tiles are DRAWN on the GPU at native screen
-// resolution, so streets, buildings and labels stay perfectly sharp and vivid
-// at every zoom level — no more blurriness when zoomed in or out.
-const VECTOR_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+// Basemap: CARTO "Voyager" raster tiles at @2x retina resolution — vivid
+// colors (yellow highways, white streets, green parks, blue water) with every
+// street label drawn. The @2x (512px) images are served for the same tile grid,
+// so the map stays perfectly sharp on high-DPI screens at every zoom level.
+// CARTO's CDN was verified reachable from this network (unlike the previous
+// vector-tile provider, whose tiles were blocked and left the map blank).
+const CARTO_SUBDOMAINS = ["a", "b", "c", "d"] as const;
+const VOYAGER_TILES = CARTO_SUBDOMAINS.map(
+  (s) =>
+    `https://${s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png`,
+);
+const SATELLITE_TILES = [
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+];
 // The mask over the rest of the world uses the same ocean blue as the style's
 // water so the sea blends seamlessly.
 const OCEAN_COLOR = "#aad3df";
+
+/**
+ * Inline MapLibre style: two raster basemaps (street map + satellite) so the
+ * Map/Satellite toggle simply flips layer visibility. Ocean-blue background
+ * matches the Philippines-only mask painted on top.
+ */
+const BASEMAP_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    osm: {
+      type: "raster",
+      tiles: VOYAGER_TILES,
+      tileSize: 512,
+      maxzoom: 20,
+      attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+    },
+    satellite: {
+      type: "raster",
+      tiles: SATELLITE_TILES,
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: "Imagery &copy; Esri",
+    },
+  },
+  layers: [
+    {
+      id: "background",
+      type: "background",
+      paint: { "background-color": OCEAN_COLOR },
+    },
+    { id: "osm", type: "raster", source: "osm" },
+    {
+      id: "satellite",
+      type: "raster",
+      source: "satellite",
+      layout: { visibility: "none" },
+    },
+  ],
+};
 
 const MAX_ZOOM = 19;
 // Tight initial frame around Luzon / Visayas / Mindanao (lng, lat pairs).
@@ -186,9 +235,9 @@ const FALLBACK_MASK_RECTS: Ring[] = [
  * the remote boundary download is slow or blocked.
  */
 /**
- * The fallback mask is baked directly into the style (see makeStyle), so it
- * exists from the very first frame. This function only re-adds it if the style
- * was swapped and the layer went missing.
+ * The fallback mask is painted as soon as the style loads (addFallbackMask
+ * below), so it appears from the very first frame. This function re-adds it
+ * if the style was swapped and the layer went missing.
  */
 function addFallbackMask(map: MlMap) {
   try {
@@ -434,7 +483,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: VECTOR_STYLE_URL,
+      style: BASEMAP_STYLE,
       maxZoom: MAX_ZOOM,
       // Flat Philippines-only map like the reference picture: the initial
       // fitBounds frames the archipelago and panning can never leave the
