@@ -107,6 +107,7 @@ function buildMapPoints(
       city: item.city,
       province: item.province,
       href: `${hrefPrefix}/${item.id}`,
+      date: item.created_at,
     });
   }
   return points;
@@ -707,14 +708,15 @@ export default async function SearchPage({
                           Map view
                         </h2>
                         <p className="mt-2 text-sm text-slate-600">
-                          Approximate locations of {mapPoints.length}{" "}
-                          {mapPoints.length === 1 ? "report" : "reports"} across
-                          the Philippines. Click a marker for details.
+                          Explore Lost &amp; Found reports across the
+                          Philippines. Approximate locations of {mapPoints.length}{" "}
+                          {mapPoints.length === 1 ? "report" : "reports"} —
+                          click a marker for details.
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-6 h-[420px] overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="mt-6 h-[560px] overflow-hidden rounded-2xl border border-slate-200 shadow-sm sm:h-[640px]">
                       <PhilippinesMap mode="view" points={mapPoints} />
                     </div>
                   </section>

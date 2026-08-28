@@ -54,7 +54,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${plusJakarta.variable}`}>
+    // suppressHydrationWarning: the inline theme script below mutates
+    // <html> (data-auth-theme) before React hydrates, by design — without
+    // this, React logs a hydration attribute-mismatch warning on every load.
+    <html lang="en" className={`${plusJakarta.variable}`} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col font-sans text-navy-900 antialiased">
         {/* Skip link for keyboard / screen-reader users */}
         <a

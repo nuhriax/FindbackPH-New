@@ -9,6 +9,7 @@ import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { ImageUpload } from "@/components/image-upload";
 import { MotionReveal } from "@/components/effects/motion-reveal";
 import { PhilippinesMap } from "@/components/map/philippines-map";
+import { ReportStepsIndicator } from "@/components/report-steps-indicator";
 
 const STEPS = 4;
 
@@ -305,29 +306,19 @@ export default function ReportFoundPage() {
         </div>
 
         {/* Progress steps */}
-        <div className="mt-8">
-          <div className="flex items-center gap-2">
-            {[1, 2, 3, 4].map((s) => (
-              <div
-                key={s}
-                className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                  s <= step
-                    ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
-                    : "bg-emerald-100"
-                }`}
-              />
-            ))}
-          </div>
-          <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">
-            {step === 1
+        <ReportStepsIndicator
+          current={step}
+          accent="emerald"
+          caption={
+            step === 1
               ? "Step 1 · Describe the item"
               : step === 2
                 ? "Step 2 · Where & when"
                 : step === 3
                   ? "Step 3 · Photos"
-                  : "Step 4 · Review & submit"}
-          </p>
-        </div>
+                  : "Step 4 · Review & submit"
+          }
+        />
 
         <form
           id="found-report-form"
@@ -411,7 +402,7 @@ export default function ReportFoundPage() {
                   )}
                 </div>
 
-                <div className="relative h-64 overflow-hidden rounded-2xl border border-slate-200">
+                <div className="relative -mx-6 h-72 overflow-hidden border-y border-slate-200 bg-slate-100 sm:-mx-8 sm:h-80 lg:h-[26rem]">
                   {step === 2 ? (
                     <PhilippinesMap
                       mode="pick"

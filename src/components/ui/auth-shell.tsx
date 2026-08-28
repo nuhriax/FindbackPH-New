@@ -1,4 +1,4 @@
-﻿import { Logo } from "@/components/logo";
+﻿import { LogoMark } from "@/components/logo";
 import { cn } from "@/lib/utils";
 
 interface AuthShellProps {
@@ -58,64 +58,72 @@ export function AuthShell({
         ================================================================= */}
 
         <div className="relative flex justify-center">
-          <div className="relative">
+          <div className="relative flex flex-col items-center">
 
-            {/* Outer glow */}
-            <div
-              aria-hidden="true"
-              className="
-                absolute
-                inset-[-18px]
-                rounded-[28px]
-                bg-blue-400/10
-                blur-2xl
-              "
-            />
+            {/* Icon tile (icon only — the wordmark sits below so nothing is clipped) */}
+            <div className="relative">
+              {/* Outer glow */}
+              <div
+                aria-hidden="true"
+                className="
+                  absolute
+                  inset-[-18px]
+                  rounded-[28px]
+                  bg-blue-400/10
+                  blur-2xl
+                "
+              />
 
-            {/* Logo container */}
-            <div
-              className="
-                relative
-                flex
-                h-[72px]
-                w-[72px]
-                items-center
-                justify-center
-                rounded-[22px]
+              {/* Logo container */}
+              <div
+                className="
+                  relative
+                  flex
+                  h-[72px]
+                  w-[72px]
+                  items-center
+                  justify-center
+                  rounded-[22px]
 
-                border
-                border-white/80
+                  border
+                  border-white/80
 
-                bg-gradient-to-br
-                from-white
-                via-white/95
-                to-blue-50/90
+                  bg-gradient-to-br
+                  from-white
+                  via-white/95
+                  to-blue-50/90
 
-                shadow-[0_18px_50px_rgba(15,123,122,0.14)]
+                  shadow-[0_18px_50px_rgba(15,123,122,0.14)]
 
-                ring-1
-                ring-blue-100/60
+                  ring-1
+                  ring-blue-100/60
 
-                backdrop-blur-xl
-              "
-            >
-              <Logo />
+                  backdrop-blur-xl
+                "
+              >
+                <LogoMark className="h-10 w-10" />
+              </div>
+
+              {/* Tiny light accent */}
+              <span
+                aria-hidden="true"
+                className="
+                  absolute
+                  -right-1
+                  -top-1
+                  h-2.5
+                  w-2.5
+                  rounded-full
+                  bg-blue-400
+                  shadow-[0_0_12px_rgba(15,123,122,0.55)]
+                "
+              />
             </div>
 
-            {/* Tiny light accent */}
-            <span
-              aria-hidden="true"
-              className="
-                absolute
-                -right-1
-                -top-1
-                h-2.5
-                w-2.5
-                rounded-full
-                bg-blue-400
-                shadow-[0_0_12px_rgba(15,123,122,0.55)]
-              "
-            />
+            {/* Wordmark below the tile — full brand name, never cropped */}
+            <span className="mt-3 font-display text-lg font-bold tracking-tight text-navy-900">
+              FindBack <span className="text-electric-600">PH</span>
+            </span>
           </div>
         </div>
 

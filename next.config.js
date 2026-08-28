@@ -68,9 +68,12 @@ const nextConfig = {
               "object-src 'none'",
               `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org",
+              "img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* http://localhost:*",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* http://localhost:* https://nominatim.openstreetmap.org https://tile.openstreetmap.org https://server.arcgisonline.com",
+              // worker-src blob: — MapLibre GL spawns its rendering worker
+              // from a blob: URL (falls back to script-src otherwise).
+              "worker-src blob:",
               "script-src-attr 'none'",
             ].join("; "),
           },

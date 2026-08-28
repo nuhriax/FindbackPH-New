@@ -69,12 +69,13 @@ export async function ConversationsList() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <Link
-                  href={`/member/${other?.id}`}
-                  className="font-medium text-navy-900 transition-colors hover:text-electric-700"
-                >
+                {/* NOTE: rendered as a <span>, not a <Link> — this card is
+                    already wrapped in a <Link> to the conversation, and a
+                    nested <a> is invalid HTML that breaks hydration. Clicking
+                    the card opens the conversation with this member. */}
+                <span className="font-medium text-navy-900">
                   {other?.first_name ? `${other.first_name} ${other.last_name}` : other?.username ?? "Someone"}
-                </Link>
+                </span>
                 <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   {convo.item_type === "lost_item" ? "Lost" : "Found"}
                 </span>

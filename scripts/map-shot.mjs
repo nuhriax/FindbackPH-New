@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+const url = process.argv[2] || "http://localhost:3222/search";
+const out = process.argv[3] || "map-check.png";
+const b = await chromium.launch();
+const page = await b.newPage({ viewport: { width: 1440, height: 900 } });
+await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
+await page.waitForTimeout(6000);
+await page.screenshot({ path: out });
+await b.close();
+console.log("saved", out);
