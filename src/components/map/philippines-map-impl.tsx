@@ -23,7 +23,6 @@ import {
   Map as MlMap,
   Marker as MlMarker,
   Popup as MlPopup,
-  type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { format, isValid } from "date-fns";
@@ -56,18 +55,14 @@ export type PhilippinesMapProps =
       points: MapPoint[];
     };
 
-// Plain OpenStreetMap raster tiles. We deliberately don't use CARTO Voyager
-// here: ad-blockers commonly block the `basemaps.cartocdn.com` domain, which
-// made MapLibre throw a flood of AJAXError console errors. OSM's standard
-// water colour is the same (#aad3df), so the look is nearly identical.
-const OSM_TILES = ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"];
-const OSM_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-// Voyager's ocean blue — the mask over the rest of the world uses the exact
-// same colour so the sea blends seamlessly with the basemap's water.
+// Vector basemap (OpenFreeMap "Liberty" style — free, no API key). Unlike the
+// old raster PNG tiles, vector tiles are DRAWN on the GPU at native screen
+// resolution, so streets, buildings and labels stay perfectly sharp and vivid
+// at every zoom level — no more blurriness when zoomed in or out.
+const VECTOR_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+// The mask over the rest of the world uses the same ocean blue as the style's
+// water so the sea blends seamlessly.
 const OCEAN_COLOR = "#aad3df";
-// Esri World Imagery (kept for reference; satellite toggle was removed —
-// the map now always shows the street-level OSM basemap).
 
 const MAX_ZOOM = 19;
 // Tight initial frame around Luzon / Visayas / Mindanao (lng, lat pairs).
@@ -309,57 +304,6 @@ async function addPhilippinesMask(map: MlMap) {
   }
 }
 
-/** Street-level map style: OSM basemap (streets, POIs, labels), ocean base. */
-function makeStyle(): StyleSpecification {
-  return {
-    version: 8,
-    sources: {
-      osm: {
-        type: "raster",
-        tiles: OSM_TILES,
-        tileSize: 256,
-        maxzoom: MAX_ZOOM,
-        attribution: OSM_ATTRIBUTION,
-      },
-      "ph-mask-fallback-source": {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: FALLBACK_MASK_RECTS.map((ring) => ({
-            type: "Feature" as const,
-            properties: {},
-            geometry: { type: "Polygon" as const, coordinates: [ring] },
-          })),
-        },
-      },
-    },
-    layers: [
-      // Ocean blue base (also visible while tiles load).
-      {
-        id: "ocean",
-        type: "background",
-        paint: { "background-color": OCEAN_COLOR },
-      },
-      {
-        id: "osm",
-        type: "raster",
-        source: "osm",
-        paint: { "raster-fade-duration": 300 },
-      },
-      // Built-in Borneo/Sabah/Brunei cover-up, part of the style itself so it
-      // renders on the FIRST frame with zero network or event dependencies.
-      // Malaysia (Kudat, Kota Kinabalu, Sandakan, Brunei, Nunukan…) is hidden
-      // immediately; the detailed archipelago mask replaces this later.
-      {
-        id: "ph-mask-fallback",
-        type: "fill",
-        source: "ph-mask-fallback-source",
-        paint: { "fill-color": OCEAN_COLOR, "fill-opacity": 1 },
-      },
-    ],
-  };
-}
-
 /** Philippines geocoding (street / barangay / city search) via Nominatim,
  * hard-bounded to the PH bounding box. */
 async function searchPhilippinesPlaces(
@@ -490,7 +434,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: makeStyle(),
+      style: VECTOR_STYLE_URL,
       maxZoom: MAX_ZOOM,
       // Flat Philippines-only map like the reference picture: the initial
       // fitBounds frames the archipelago and panning can never leave the
