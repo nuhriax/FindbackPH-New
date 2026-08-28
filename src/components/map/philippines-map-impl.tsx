@@ -66,11 +66,8 @@ const OSM_ATTRIBUTION =
 // Voyager's ocean blue — the mask over the rest of the world uses the exact
 // same colour so the sea blends seamlessly with the basemap's water.
 const OCEAN_COLOR = "#aad3df";
-// Esri World Imagery keeps detail up to ~z17; past maxzoom MapLibre upscales
-// the last real imagery instead of requesting 404 tiles.
-const SATELLITE_TILES = [
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-];
+// Esri World Imagery (kept for reference; satellite toggle was removed —
+// the map now always shows the street-level OSM basemap).
 
 const MAX_ZOOM = 19;
 // Tight initial frame around Luzon / Visayas / Mindanao (lng, lat pairs).
@@ -312,8 +309,8 @@ async function addPhilippinesMask(map: MlMap) {
   }
 }
 
-/** Flat map style like the reference picture: OSM basemap, ocean base. */
-function makeStyle(satelliteFirst: boolean): StyleSpecification {
+/** Street-level map style: OSM basemap (streets, POIs, labels), ocean base. */
+function makeStyle(): StyleSpecification {
   return {
     version: 8,
     sources: {
@@ -323,13 +320,6 @@ function makeStyle(satelliteFirst: boolean): StyleSpecification {
         tileSize: 256,
         maxzoom: MAX_ZOOM,
         attribution: OSM_ATTRIBUTION,
-      },
-      satellite: {
-        type: "raster",
-        tiles: SATELLITE_TILES,
-        tileSize: 256,
-        maxzoom: 17,
-        attribution: "Imagery &copy; Esri, Maxar, Earthstar Geographics",
       },
       "ph-mask-fallback-source": {
         type: "geojson",
@@ -351,17 +341,9 @@ function makeStyle(satelliteFirst: boolean): StyleSpecification {
         paint: { "background-color": OCEAN_COLOR },
       },
       {
-        id: "satellite",
-        type: "raster",
-        source: "satellite",
-        layout: { visibility: satelliteFirst ? "visible" : "none" },
-        paint: { "raster-fade-duration": 300 },
-      },
-      {
         id: "osm",
         type: "raster",
         source: "osm",
-        layout: { visibility: satelliteFirst ? "none" : "visible" },
         paint: { "raster-fade-duration": 300 },
       },
       // Built-in Borneo/Sabah/Brunei cover-up, part of the style itself so it
@@ -487,7 +469,6 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
   );
   const clusterMarkersRef = useRef<MlMarker[]>([]);
   const onPickRef = useRef(props.mode === "pick" ? props.onPick : undefined);
-  const [basemap, setBasemap] = useState<"map" | "satellite">("map");
   const [mapReady, setMapReady] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<
@@ -509,7 +490,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: makeStyle(false),
+      style: makeStyle(),
       maxZoom: MAX_ZOOM,
       // Flat Philippines-only map like the reference picture: the initial
       // fitBounds frames the archipelago and panning can never leave the
@@ -598,20 +579,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-    // --- Map / Satellite toggle ---------------------------------------------
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !mapReady) return;
-    const show = (layer: string, visible: boolean) => {
-      if (map.getLayer(layer)) {
-        map.setLayoutProperty(layer, "visibility", visible ? "visible" : "none");
-      }
-    };
-    show("osm", basemap === "map");
-    show("satellite", basemap === "satellite");
-  }, [basemap, mapReady]);
-
-  // --- View mode: LOST / FOUND report markers ------------------------------
+    // --- View mode: LOST / FOUND report markers ------------------------------
   const allPoints = props.mode === "view" ? props.points : [];
   const points =
     filter === "all" ? allPoints : allPoints.filter((p) => p.kind === filter);
@@ -877,43 +845,6 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     <div className="relative h-full w-full overflow-hidden">
       {/* MapLibre canvas. */}
       <div ref={containerRef} className="h-full w-full" />
-
-      {/* Map / Satellite toggle (Google-Maps style), top-right. */}
-      <div
-        className={`absolute right-3 z-[600] flex overflow-hidden rounded-full border border-slate-200 shadow-md ${
-          props.mode === "view" ? "top-12" : "top-2"
-        }`}
-      >
-        {(["map", "satellite"] as const).map((kind) => (
-          <button
-            key={kind}
-            type="button"
-            onClick={() => setBasemap(kind)}
-            aria-pressed={basemap === kind}
-            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-colors ${
-              basemap === kind
-                ? "bg-blue-600 text-white"
-                : "bg-white/95 text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            {kind === "map" ? "Map" : "Satellite"}
-          </button>
-        ))}
-      </div>
-
-      {/* Legend, top-right above the basemap toggle. */}
-      {props.mode === "view" && (
-        <div className="pointer-events-none absolute right-3 top-3 z-[500] flex items-center gap-3 rounded-full border border-slate-200 bg-white/95 px-3.5 py-1.5 shadow-sm">
-          <span className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-slate-600">
-            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-rose-500" />
-            LOST
-          </span>
-          <span className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-slate-600">
-            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            FOUND
-          </span>
-        </div>
-      )}
 
       {/* Locate-me + rotate controls — bottom-right. */}
       <div className="absolute bottom-3 right-3 z-[500] flex flex-col gap-1">
