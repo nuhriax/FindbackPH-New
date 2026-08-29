@@ -85,6 +85,7 @@ type FoundItem = {
   description: string | null;
   distinguishing_features: string | null;
   created_at: string;
+  view_count?: number | null;
 };
 
 type LostItem = {
@@ -1358,6 +1359,7 @@ export default async function FoundItemsPage({
                           imageUrl={foundImageMap.get(
                             item.id,
                           )}
+                          views={item.view_count}
                         />
 
                         {/* ==================================================

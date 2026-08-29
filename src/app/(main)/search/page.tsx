@@ -55,6 +55,8 @@ type SearchItem = {
   // Optional pin coordinates; null for pre-map reports / unpinned reports.
   latitude?: number | null;
   longitude?: number | null;
+  // Denormalized page-view counter (optional until the 104 migration runs).
+  view_count?: number | null;
 };
 
 const SEARCH_LIMIT = 30;
@@ -234,7 +236,7 @@ async function searchTable(
   // Coordinates are optional: the base columns always work, and lat/lng are
   // appended when the deployed DB has the 103 migration applied.
   const BASE_COLUMNS =
-    "id, title, category, city, province, description, created_at";
+    "id, title, category, city, province, description, created_at, view_count";
   const COLUMNS = `${BASE_COLUMNS}, latitude, longitude`;
 
   async function fetchRows(
@@ -831,6 +833,7 @@ function SearchGroup({
               description={item.description}
               kind={kind}
               imageUrl={imageMap.get(item.id) ?? null}
+              views={item.view_count}
             />
           </div>
         ))}

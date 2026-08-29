@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Calendar, MapPin, ZoomIn } from "lucide-react";
+import { ArrowRight, Calendar, Eye, MapPin, ZoomIn } from "lucide-react";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import type { ItemCategory } from "@/types/database";
@@ -20,6 +20,7 @@ export function ItemCard({
   description,
   kind,
   imageUrl,
+  views,
 }: {
   href: string;
   title: string;
@@ -30,6 +31,8 @@ export function ItemCard({
   description: string | null;
   kind: "lost" | "found";
   imageUrl?: string | null;
+  /** Denormalized page-view counter (optional — hidden when not provided). */
+  views?: number | null;
 }) {
   const a = ACCENT[kind];
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -125,6 +128,14 @@ export function ItemCard({
               {reported}
             </span>
           </div>
+
+          {/* Views counter */}
+          {typeof views === "number" && (
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-400">
+              <Eye aria-hidden="true" className="h-3.5 w-3.5" />
+              {views} {views === 1 ? "view" : "views"}
+            </div>
+          )}
 
           {/* View details */}
           <div className="mt-3 flex items-center justify-between border-t border-slate-200/70 pt-3">

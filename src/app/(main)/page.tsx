@@ -67,6 +67,7 @@ type RecentCard = {
   createdAt: string | null;
   kind: "lost" | "found";
   imageUrl?: string | null;
+  views?: number | null;
 };
 
 type LostRow = Pick<
@@ -78,6 +79,7 @@ type LostRow = Pick<
   | "city"
   | "province"
   | "created_at"
+  | "view_count"
 >;
 
 type FoundRow = Pick<
@@ -89,6 +91,7 @@ type FoundRow = Pick<
   | "city"
   | "province"
   | "created_at"
+  | "view_count"
 >;
 
 /* ============================================================================
@@ -143,6 +146,7 @@ function buildRecentCards(
     createdAt: item.created_at,
     kind: "lost",
     imageUrl: lostImageMap.get(item.id) ?? null,
+    views: item.view_count ?? null,
   }));
 
   const foundCards: RecentCard[] = foundItems.map((item) => ({
@@ -157,6 +161,7 @@ function buildRecentCards(
     createdAt: item.created_at,
     kind: "found",
     imageUrl: foundImageMap.get(item.id) ?? null,
+    views: item.view_count ?? null,
   }));
 
   return [...lostCards, ...foundCards]
@@ -263,7 +268,7 @@ export default async function HomePage() {
     supabase
       .from("lost_items")
       .select(
-        "id, title, category, description, city, province, created_at"
+        "id, title, category, description, city, province, created_at, view_count"
       )
       .eq("status", "active")
       .order("created_at", {
@@ -274,7 +279,7 @@ export default async function HomePage() {
     supabase
       .from("found_items")
       .select(
-        "id, title, category, description, city, province, created_at"
+        "id, title, category, description, city, province, created_at, view_count"
       )
       .eq("status", "active")
       .order("created_at", {
@@ -813,6 +818,7 @@ export default async function HomePage() {
                       description={item.description}
                       kind={item.kind}
                       imageUrl={item.imageUrl}
+                      views={item.views}
                     />
                   </div>
                 </MotionReveal>

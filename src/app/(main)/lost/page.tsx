@@ -51,6 +51,7 @@ type LostItem = {
   date_lost: string | null;
   description: string | null;
   created_at: string;
+  view_count?: number | null;
 };
 
 type ItemImage = {
@@ -614,6 +615,7 @@ export default async function LostItemsPage({
                     description={item.description ?? ""}
                     kind="lost"
                     imageUrl={imageMap.get(item.id)}
+                    views={item.view_count}
                   />
                 </Reveal>
               ))}
