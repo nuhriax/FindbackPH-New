@@ -362,8 +362,6 @@ export function Navbar({
           <nav className="flex flex-col gap-1 px-3 py-4">
             {PRIMARY_LINKS.map((link) => {
               const active = isActive(link.href);
-              const isLost = link.href === "/lost";
-              const isFound = link.href === "/found";
 
               return (
                 <Link
@@ -374,11 +372,7 @@ export function Navbar({
                   className={clsx(
                     "rounded-full px-4 py-2.5 text-sm font-medium transition-colors",
                     active
-                      ? isLost
-                        ? "bg-sunrise-50 text-sunrise-700"
-                        : isFound
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-electric-50 text-electric-700"
+                      ? "bg-electric-50 text-electric-700"
                       : "text-slate-700 hover:bg-navy-50 hover:text-navy-800"
                   )}
                 >
