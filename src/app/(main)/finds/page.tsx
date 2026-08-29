@@ -128,13 +128,17 @@ function buildPageHref({
 }
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
+/** PostgrestFilterBuilder — the chainable type returned after .select(). */
+type FilterBuilder = ReturnType<ReturnType<SupabaseClient["from"]>["select"]>;
 
 /**
  * Shared filter pipeline for both tables so "Finds" results behave exactly like
  * the standalone Lost/Found pages (same search vector, category, city rules).
+ * NOTE: must be called AFTER .select() — supabase-js only exposes filter
+ * methods (.eq/.textSearch/.ilike) on the post-select builder.
  */
 function applyFilters(
-  query: ReturnType<SupabaseClient["from"]>,
+  query: FilterBuilder,
   filters: { q: string; category: string; city: string; sort: SortOption },
 ) {
   let out = query.eq("status", "active");
@@ -219,11 +223,17 @@ export default async function FindsPage({
      ------------------------------------------------------------------------ */
 
   const [lostRes, foundRes] = await Promise.all([
-    applyFilters(supabase.from("lost_items"), filters).select(
-      "id, title, category, city, province, description, created_at, updated_at, view_count",
+    applyFilters(
+      supabase.from("lost_items").select(
+        "id, title, category, city, province, description, created_at, updated_at, view_count",
+      ),
+      filters,
     ),
-    applyFilters(supabase.from("found_items"), filters).select(
-      "id, title, category, city, province, description, created_at, updated_at, view_count",
+    applyFilters(
+      supabase.from("found_items").select(
+        "id, title, category, city, province, description, created_at, updated_at, view_count",
+      ),
+      filters,
     ),
   ]);
 
