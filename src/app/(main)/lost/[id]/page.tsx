@@ -246,6 +246,7 @@ export default async function LostItemDetailPage({ params }: Props) {
     reward: raw.reward_amount ?? null,
     dateOccurred: raw.date_lost ?? null,
     reporterId: raw.reporter_id,
+    viewCount: raw.view_count ?? null,
   };
 
   const locationText = [raw.city, raw.province].filter(Boolean).join(", ");

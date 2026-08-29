@@ -251,6 +251,7 @@ export default async function FoundItemDetailPage({ params }: Props) {
     dateOccurred: raw.date_found ?? null,
     holdingInfo: raw.current_holding_info ?? null,
     reporterId: raw.reporter_id,
+    viewCount: raw.view_count ?? null,
   };
 
   const locationText = [raw.city, raw.province].filter(Boolean).join(", ");

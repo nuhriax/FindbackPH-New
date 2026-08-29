@@ -24,6 +24,7 @@ import { ShareButton } from "@/components/share-button";
 import { ReportFlagButton } from "@/components/report-flag-button";
 import { UserReportButton } from "@/components/user-report-button";
 import { ReportOwnerActions } from "@/components/reports/report-owner-actions";
+import { ViewCounter } from "@/components/view-counter";
 import { ReportEditToggle } from "@/components/reports/report-edit-toggle";
 import { OwnershipChallengeManager } from "@/components/reports/ownership-challenge-manager";
 import { OwnershipChallengeForm } from "@/components/reports/ownership-challenge-form";
@@ -54,6 +55,8 @@ export type DetailItem = {
   holdingInfo?: string | null;
   /** Phase 12 — enables "Report this user" against the listing's reporter. */
   reporterId?: string | null;
+  /** Public view counter ("👁 N views"); null hides the pill (migration 104 not run). */
+  viewCount?: number | null;
 };
 
 export type DetailMatch = {
@@ -587,6 +590,20 @@ export function ReportDetail({
 
                   {categoryLabel}
                 </span>
+
+                {item.viewCount != null && (
+                  <>
+                    <span className="text-slate-300">
+                      •
+                    </span>
+
+                    <ViewCounter
+                      itemType={itemType}
+                      itemId={item.id}
+                      initialCount={item.viewCount}
+                    />
+                  </>
+                )}
               </div>
 
               {/* Title */}

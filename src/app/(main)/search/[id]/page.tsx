@@ -130,6 +130,7 @@ export default async function ReportDetailPage({ params }: Props) {
     dateOccurred: dateVal ?? null,
     holdingInfo: raw.current_holding_info ?? null,
     reporterId: raw.reporter_id,
+    viewCount: raw.view_count ?? null,
   };
 
   return (

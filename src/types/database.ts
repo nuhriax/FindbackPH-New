@@ -55,6 +55,9 @@ export type LostItem = {
   latitude: number | null;
   longitude: number | null;
   reward_amount: number | null;
+  // Denormalized page-view counter ("👁 N views"), RPC-managed only
+  // (supabase/104-item-views.sql). Present after that migration runs.
+  view_count?: number | null;
   // status/category are widened beyond the DB enums for read/filter typing:
   // list pages pass raw URL-param strings to .eq("status"/"category", ...),
   // which postgrest-js v2 strictly types against Row. Writes remain
@@ -82,6 +85,8 @@ export type FoundItem = {
   latitude: number | null;
   longitude: number | null;
   current_holding_info: string | null;
+  // Denormalized page-view counter, RPC-managed only (see LostItem).
+  view_count?: number | null;
   status: ItemStatus | string;
   created_at: string;
   updated_at: string;
@@ -452,6 +457,15 @@ export interface Database {
       /** Phase — read receipts: participant marks the other party's messages read. */
       mark_messages_read: {
         Args: { p_conversation_id: string };
+        Returns: undefined;
+      };
+      /**
+       * Public view counter for lost/found reports (supabase/104-item-views.sql).
+       * SECURITY DEFINER — bumps `view_count` by exactly 1; the only sanctioned
+       * write path for the counter (column UPDATE grants are revoked).
+       */
+      increment_item_view_count: {
+        Args: { p_item_type: string; p_item_id: string };
         Returns: undefined;
       };
     };
