@@ -5,7 +5,6 @@ import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import type { ItemCategory } from "@/types/database";
 import { Reveal } from "@/components/reveal";
 import { ListingHero } from "@/components/listing/listing-hero";
-import { ListingSearch } from "@/components/listing/listing-search";
 import { ListingResultsHeader } from "@/components/listing/listing-results-header";
 import { ListingEmptyState } from "@/components/listing/listing-empty-state";
 
@@ -200,7 +199,7 @@ async function buildImageMap(
 export const metadata = {
   title: { absolute: "Finds — Lost & Found Reports Across the Philippines" },
   description:
-    "Browse every active lost and found report across the Philippines in one feed. Search by keyword, category, and city to find a match.",
+    "Browse every active lost and found report across the Philippines in one community feed.",
 };
 
 export default async function FindsPage({
@@ -360,7 +359,7 @@ export default async function FindsPage({
               </span>
             </>
           }
-          description="Browse lost and found reports side by side. Spot something familiar, then jump into the full report to reunite it with its owner."
+          description="See what people across the Philippines have lost and found."
           ctaHref={ROUTES.reportLost}
           ctaLabel="Report a lost item"
           secondaryHref={ROUTES.reportFound}
@@ -373,25 +372,10 @@ export default async function FindsPage({
         />
       </div>
 
-      {/* ================= SEARCH + TABS ================= */}
+      {/* ================= TYPE TABS ================= */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mt-8">
-          <ListingSearch
-            accent="lost"
-            idPrefix="finds"
-            q={q}
-            category={category}
-            city={city}
-            sort={sort}
-            maxLength={MAX_SEARCH_LENGTH}
-            buttonLabel="Search finds"
-            clearAllHref={hasFilters ? clearHref : undefined}
-          />
-        </div>
-
-        {/* Type tabs */}
         <div
-          className="mt-5 flex flex-wrap items-center gap-2"
+          className="mt-8 flex flex-wrap items-center gap-2"
           role="tablist"
           aria-label="Report type"
         >
@@ -442,6 +426,18 @@ export default async function FindsPage({
             );
           })}
         </div>
+
+        {/* Subtle escape hatch to the full search tool */}
+        <p className="mt-3 text-sm text-slate-500">
+          Looking for something specific?{" "}
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-1 font-medium text-electric-700 underline-offset-4 transition hover:text-electric-600 hover:underline"
+          >
+            Search reports
+            <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
+          </Link>
+        </p>
       </div>
 
       {/* ================= RESULTS ================= */}
@@ -589,6 +585,16 @@ export default async function FindsPage({
                 </Link>
               </p>
             )}
+            <p className="mt-3 text-center text-sm text-slate-500">
+              Looking for something specific?{" "}
+              <Link
+                href="/search"
+                className="inline-flex items-center gap-1 font-medium text-electric-700 underline-offset-4 transition hover:text-electric-600 hover:underline"
+              >
+                Search reports
+                <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
+              </Link>
+            </p>
           </>
         )}
       </div>

@@ -441,7 +441,8 @@ export default async function SearchPage({
               </h1>
 
               <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                Search community reports by item, location, or category.
+                Find a lost or found item by its details, location, or
+                category.
               </p>
             </div>
 
