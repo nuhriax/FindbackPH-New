@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { Facebook, HeartHandshake, Instagram, Mail, MapPin, ShieldCheck, Sparkles } from "lucide-react";
+import { Facebook, HeartHandshake, Instagram, Mail, MapPin, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const EXPLORE = [
@@ -98,8 +98,7 @@ export function Footer() {
             {/* Trust / security */}
             <div className="mt-4 flex flex-wrap gap-2">
               {[
-                { icon: ShieldCheck, label: "Verified Reports" },
-                { icon: HeartHandshake, label: "Community Driven" },
+                { icon: HeartHandshake, label: "Community Reports" },
                 { icon: Sparkles, label: "Privacy Protected" },
               ].map((b) => (
                 <span

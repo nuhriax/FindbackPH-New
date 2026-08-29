@@ -197,9 +197,9 @@ const stats = [
     label: "simple steps",
   },
   {
-    icon: ShieldCheck,
-    value: "100%",
-    label: "safety focused",
+    icon: MapPin,
+    value: "PH",
+    label: "nationwide",
   },
   {
     icon: Users,
@@ -613,7 +613,7 @@ export default function HowItWorksPage() {
               </div>
             </div>
 
-            {/* Match score */}
+            {/* Match signals — explainable, no fabricated confidence score */}
             <div className="relative mx-auto mt-7 max-w-lg rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:p-6">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
@@ -628,27 +628,17 @@ export default function HowItWorksPage() {
                   </span>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-                    Match confidence
-                  </div>
-
-                  <div className="mt-0.5 font-display text-2xl font-semibold text-electric-700">
-                    92%
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
-                <div className="h-full w-[92%] rounded-full bg-gradient-to-r from-electric-500 via-sky-500 to-electric-600" />
+                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+                  Why they may be related
+                </span>
               </div>
 
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {[
-                  "Category",
-                  "Location",
-                  "Color",
-                  "Description",
+                  "Same category",
+                  "Similar location",
+                  "Similar description",
+                  "Similar dates",
                 ].map((item) => (
                   <span
                     key={item}

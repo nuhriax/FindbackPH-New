@@ -513,32 +513,11 @@ export default async function HomePage() {
                     className="transition-transform duration-200 group-hover:translate-x-1"
                   />
                 </Link>
-
-                <Link
-                  href="/report/lost"
-                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-medium text-navy-900 shadow-sm transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-100 sm:w-auto"
-                >
-                  <PackageSearch
-                    size={15}
-                    className="text-sunrise-500 transition-transform duration-200 group-hover:scale-110"
-                  />
-                  Report lost item
-                </Link>
-
-                <Link
-                  href="/report/found"
-                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-medium text-navy-900 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-100 sm:w-auto"
-                >
-                  <HeartHandshake
-                    size={15}
-                    className="text-emerald-500 transition-transform duration-200 group-hover:scale-110"
-                  />
-                  Report found item
-                </Link>
               </div>
 
               <p className="mt-3 text-center text-[11px] text-slate-500">
-                Search by item, location, category, or description
+                Search for a report, or tell the community what you
+                lost or found.
               </p>
             </div>
           </Reveal>
@@ -700,12 +679,6 @@ export default async function HomePage() {
               {recoveredCount === 1 ? "item" : "items"} home.
             </p>
 
-            {lostCount === 0 && foundCount === 0 && recoveredCount === 0 && (
-              <p className="mt-4 text-center text-sm leading-relaxed text-slate-500">
-                Your community starts here — be the first to report a lost or
-                found item in your area.
-              </p>
-            )}
           </Reveal>
         </div>
       </section>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="/maplibre-gl.css" rel="stylesheet">
+<style>html,body,#m{width:100%;height:100%;margin:0}</style></head>
+<body><div id="m"></div>
+<script type="module">
+import * as maplibregl from '/maplibre-gl.mjs';
+maplibregl.config.WORKER_URL = '/maplibre-gl-worker.mjs';
+const map = new maplibregl.Map({
+  container: 'm',
+  style: {
+    version: 8,
+    glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+    sources: { omt: { type: "vector", url: "https://tiles.openfreemap.org/planet" } },
+    layers: [
+      { id: "bg", type: "background", paint: { "background-color": "#f6f2ec" } },
+      { id: "water", type: "fill", source: "omt", "source-layer": "water", paint: { "fill-color": "#aad3df" } },
+      { id: "landuse", type: "fill", source: "omt", "source-layer": "landcover",
+        paint: { "fill-color": "#d0e8b8" } },
+    ],
+  },
+  center: [122, 13], zoom: 5,
+});
+map.on('load', () => { document.title = 'LOADED'; console.log('MAPLOAD'); });
+map.on('error', (e) => { console.error('MAPERR', e && e.error && e.error.message); });
+setTimeout(() => {
+  const fs = map.queryRenderedFeatures(undefined, { layers: ['water'] });
+  console.log('WATER_FEATURES', fs.length);
+  document.title = 'DONE ' + fs.length;
+}, 10000);
+</script></body></html>
+

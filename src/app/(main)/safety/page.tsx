@@ -41,7 +41,7 @@ const protocolSteps = [
     description:
       "Before arranging a handoff, make sure the person has a credible connection to the item. Take your time and ask reasonable questions before moving forward.",
     icon: UserCheck,
-    status: "READY",
+    status: "DO THIS FIRST",
     color: "blue",
   },
   {
@@ -51,7 +51,7 @@ const protocolSteps = [
     description:
       "Pay attention to urgency, pressure, unusual requests, or changes in behavior. A legitimate recovery should not require you to ignore your instincts.",
     icon: Radar,
-    status: "READY",
+    status: "STAY ALERT",
     color: "amber",
   },
   {
@@ -61,7 +61,7 @@ const protocolSteps = [
     description:
       "The recovery should stay focused on the item. Passwords, OTPs, banking details, and unnecessary personal information should never be required.",
     icon: Lock,
-    status: "ACTIVE",
+    status: "NEVER SHARE",
     color: "emerald",
   },
   {
@@ -71,7 +71,7 @@ const protocolSteps = [
     description:
       "If a handoff is needed, choose a visible, familiar, staffed location with people around and an easy way to leave.",
     icon: MapPin,
-    status: "LOCKED",
+    status: "MEET IN PUBLIC",
     color: "blue",
   },
   {
@@ -81,7 +81,7 @@ const protocolSteps = [
     description:
       "Proceed only when the details make sense and you still feel comfortable. You remain in control of whether and when the recovery happens.",
     icon: CheckCircle2,
-    status: "LOCKED",
+    status: "YOUR CALL",
     color: "emerald",
   },
 ];
@@ -91,7 +91,7 @@ const riskSignals = [
     title: "Meeting environment",
     description:
       "A visible, familiar, staffed location with people nearby.",
-    status: "SAFE",
+    status: "MEET IN PUBLIC",
     icon: MapPin,
     color: "emerald",
   },
@@ -99,7 +99,7 @@ const riskSignals = [
     title: "Identity confidence",
     description:
       "Ownership should be reasonably established before the handoff.",
-    status: "REVIEW",
+    status: "VERIFY OWNERSHIP",
     icon: UserCheck,
     color: "amber",
   },
@@ -107,7 +107,7 @@ const riskSignals = [
     title: "Private information",
     description:
       "Sensitive credentials should never be part of a legitimate recovery.",
-    status: "PROTECTED",
+    status: "NEVER SHARE",
     icon: Lock,
     color: "blue",
   },
@@ -115,7 +115,7 @@ const riskSignals = [
     title: "Communication behavior",
     description:
       "Unexpected urgency, pressure, or manipulation deserves attention.",
-    status: "MONITOR",
+    status: "STAY ALERT",
     icon: MessageCircle,
     color: "amber",
   },
@@ -171,35 +171,35 @@ const redFlags = [
 
 const activityLog = [
   {
-    time: "NOW",
+    time: "STEP 1",
     icon: ShieldCheck,
-    title: "Recovery guidance initialized",
+    title: "Report posted",
     description:
-      "Safety guidance is ready to help you evaluate the next step.",
+      "A lost or found report is created with clear, honest details.",
     color: "emerald",
   },
   {
-    time: "01",
+    time: "STEP 2",
     icon: Lock,
-    title: "Privacy protection active",
+    title: "Ownership verified",
     description:
-      "Sensitive credentials remain outside the recovery process.",
+      "The claimant describes specific identifying details before anything changes hands.",
     color: "blue",
   },
   {
-    time: "02",
+    time: "STEP 3",
     icon: MapPin,
-    title: "Meeting guidance available",
+    title: "Public meeting arranged",
     description:
-      "Public and visible meeting environments are recommended.",
+      "A visible, staffed location is chosen and someone you trust is informed.",
     color: "blue",
   },
   {
-    time: "03",
+    time: "STEP 4",
     icon: Radar,
-    title: "Situation monitoring active",
+    title: "Item returned",
     description:
-      "Potential warning signals are surfaced before you act.",
+      "The handover is completed on your terms — or paused if anything feels off.",
     color: "amber",
   },
 ];
@@ -555,7 +555,7 @@ export default function SafetyPage() {
               </p>
 
               <p className="text-[8px] font-semibold uppercase tracking-[0.18em] text-emerald-600">
-                Safety Intelligence
+                Safety Guide
               </p>
             </div>
 
@@ -595,7 +595,7 @@ export default function SafetyPage() {
                 <StatusDot pulse />
 
                 <span className="text-[9px] font-bold uppercase tracking-[0.28em] text-emerald-700">
-                  Intelligent recovery guidance
+                  Practical safety guidance
                 </span>
 
               </div>
@@ -615,10 +615,9 @@ export default function SafetyPage() {
               </h1>
 
               <p className="safety-reveal safety-delay-2 mt-9 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
-                FindBack helps you make safer decisions during an
-                item recovery. It highlights what deserves attention,
-                protects sensitive information, and keeps you in
-                control of the next step.
+                FindBack gives you practical guidance for every step of
+                an item recovery: what to check, what to protect, and
+                how to stay in control of the next move.
               </p>
 
               <div className="safety-reveal safety-delay-3 mt-9 flex flex-wrap gap-2.5">
@@ -1100,11 +1099,11 @@ export default function SafetyPage() {
 
                     <span
                       className={`text-[8px] font-bold uppercase tracking-[.15em] ${
-                        step.status === "ACTIVE"
+                        step.color === "emerald"
                           ? "text-emerald-600"
-                          : step.status === "READY"
-                            ? "text-blue-600"
-                            : "text-slate-300"
+                          : step.color === "amber"
+                            ? "text-amber-600"
+                            : "text-blue-600"
                       }`}
                     >
                       {step.status}
@@ -1173,17 +1172,18 @@ export default function SafetyPage() {
                   <div>
 
                     <p className="text-[8px] font-bold uppercase tracking-[.18em] text-amber-700">
-                      Current assessment
+                      Watch for these
                     </p>
 
                     <p className="mt-2 text-xl font-semibold tracking-tight text-slate-900">
-                      Low concern · monitor
+                      Pressure, urgency, and secrecy
                     </p>
 
                     <p className="mt-2 text-xs leading-6 text-slate-500">
-                      No critical warning is currently highlighted.
-                      Continue with normal verification and remain
-                      comfortable with each step.
+                      These are the clearest warning signs during a
+                      handover. You are never obligated to continue a
+                      meeting that makes you uncomfortable — pause and
+                      step away whenever you need to.
                     </p>
 
                   </div>
@@ -1335,7 +1335,7 @@ export default function SafetyPage() {
 
 
         {/* =====================================================
-            LOCATION INTELLIGENCE
+            WHERE TO MEET
         ====================================================== */}
 
         <section
@@ -1348,7 +1348,7 @@ export default function SafetyPage() {
             <div>
 
               <SectionEyebrow number="04" color="blue">
-                Location intelligence
+                Where to meet
               </SectionEyebrow>
 
               <h2 className="mt-7 font-display text-5xl font-medium leading-[.94] tracking-[-.065em] sm:text-6xl">
@@ -2353,7 +2353,7 @@ export default function SafetyPage() {
 
               <Sparkles size={13} />
 
-              FindBack Safety Intelligence
+              FindBack Safety Guide
 
             </div>
 
