@@ -176,7 +176,10 @@ export function PhotoViewerModal({
 
       {/* Counter + dots */}
       <div className="mt-4 flex shrink-0 flex-col items-center gap-2">
-        <p className="text-base font-semibold text-white drop-shadow">
+        <p
+          style={{ color: "#ffffff", opacity: 1 }}
+          className="text-base font-semibold"
+        >
           {multiple ? `${active + 1} / ${images.length}` : alt}
         </p>
         {multiple && (
@@ -192,7 +195,10 @@ export function PhotoViewerModal({
             ))}
           </div>
         )}
-        <p className="text-xs font-medium text-slate-300">
+        <p
+          style={{ color: "#e2e8f0", opacity: 1 }}
+          className="text-xs font-medium"
+        >
           Click outside the photo or press Esc to close
         </p>
       </div>
