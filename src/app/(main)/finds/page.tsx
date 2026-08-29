@@ -9,7 +9,13 @@ import { ListingSearch } from "@/components/listing/listing-search";
 import { ListingResultsHeader } from "@/components/listing/listing-results-header";
 import { ListingEmptyState } from "@/components/listing/listing-empty-state";
 
-import { ArrowLeft, ArrowRight, AlertTriangle } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  AlertTriangle,
+  SearchCheck,
+  HeartHandshake,
+} from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow, isValid } from "date-fns";
 
@@ -361,8 +367,8 @@ export default async function FindsPage({
           secondaryLabel="Report a found item"
           trust={[
             { icon: AlertTriangle, label: "Lost reports" },
-            { icon: ArrowRight, label: "Match" },
-            { icon: ArrowRight, label: "Return" },
+            { icon: SearchCheck, label: "Smart matching" },
+            { icon: HeartHandshake, label: "Safe returns" },
           ]}
         />
       </div>
@@ -558,19 +564,32 @@ export default async function FindsPage({
             )}
           </>
         ) : (
-          <ListingEmptyState
-            accent="lost"
-            title="No finds yet"
-            description={
-              hasFilters
-                ? "Try changing your search, category, or location filters — or check the dedicated Lost and Found pages."
-                : "Be the first to report an item and give it a chance to come home."
-            }
-            hasFilters={hasFilters}
-            clearHref={clearHref}
-            reportHref={ROUTES.reportLost}
-            reportLabel="Report a lost item"
-          />
+          <>
+            <ListingEmptyState
+              accent="lost"
+              title="No finds yet"
+              description={
+                hasFilters
+                  ? "Try changing your search, category, or type tab — new reports appear here the moment they're posted."
+                  : "Be the first to report an item and give it a chance to come home."
+              }
+              hasFilters={hasFilters}
+              clearHref={clearHref}
+              reportHref={ROUTES.reportLost}
+              reportLabel="Report a lost item"
+            />
+            {!hasResults && !hasFilters && (
+              <p className="mt-4 text-center text-sm text-slate-500">
+                Found something?{" "}
+                <Link
+                  href={ROUTES.reportFound}
+                  className="font-medium text-emerald-600 hover:text-emerald-700"
+                >
+                  Post a found report →
+                </Link>
+              </p>
+            )}
+          </>
         )}
       </div>
 
