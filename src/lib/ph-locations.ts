@@ -151,16 +151,45 @@ const CITY_LOOKUP: Map<string, [number, number]> = new Map(
   CITIES.map(([name, lat, lng]) => [normalizeCityKey(name), [lat, lng]])
 );
 
+// Disambiguation entries for cities whose names repeat across provinces.
+// Keyed by "city province" so "San Fernando City, La union" resolves to La
+// Union's San Fernando (not Pampanga's) when the full string is tried first.
+const AMBIGUOUS_CITY_PROVINCE: Array<[string, number, number]> = [
+  ["san fernando la union", 16.6158, 120.3186],
+  ["san fernando pampanga", 15.0393, 120.6896],
+  ["san jose mindoro", 12.3536, 121.0689],
+  ["san jose nueva ecija", 15.7839, 120.9894],
+  ["san jose antique", 10.7667, 121.9333],
+  ["santa cruz laguna", 14.4281, 121.4167],
+  ["santa cruz marinduque", 13.4806, 121.9333],
+  ["santa cruz zambales", 15.7739, 119.9158],
+  ["rodriguez rizal", 14.7333, 121.1333],
+];
+
 /**
  * Resolve a city name to an approximate Philippine coordinate.
- * Returns null when the city isn't in the lookup (caller should skip the
- * marker rather than guess).
+ * Accepts bare city names ("Baguio") as well as combined strings the forms
+ * produce ("San Fernando City, La union"): the whole string is tried first,
+ * then each comma-separated part, so a trailing province never blocks a
+ * match. Returns null when nothing matches (caller should skip the marker
+ * rather than guess).
  */
 export function lookupCityCoords(
   city: string | null | undefined
 ): [number, number] | null {
   if (!city) return null;
-  const key = normalizeCityKey(city);
-  if (!key) return null;
-  return CITY_LOOKUP.get(key) ?? null;
+  const parts = city
+    .split(",")
+    .map((part) => normalizeCityKey(part))
+    .filter(Boolean);
+  const keys = [normalizeCityKey(city), ...parts].filter(Boolean);
+  for (const key of keys) {
+    const direct = CITY_LOOKUP.get(key);
+    if (direct) return direct;
+    const disambiguated = AMBIGUOUS_CITY_PROVINCE.find(
+      ([nameKey]) => nameKey === key
+    );
+    if (disambiguated) return [disambiguated[1], disambiguated[2]];
+  }
+  return null;
 }

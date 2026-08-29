@@ -1189,10 +1189,10 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
-      // The report-location picker is an archipelago overview: prevent its
-      // zoom controls from cropping Luzon, Visayas, or Mindanao out of view.
-      maxZoom:
-        props.mode === "pick" ? PHILIPPINES_OVERVIEW_MAX_ZOOM : MAX_ZOOM,
+      // Pick mode starts at the archipelago overview but MUST allow zooming
+      // in — the whole point of the picker is placing a precise pin. Only
+      // the initial camera frames the whole country (see fitBounds on ready).
+      maxZoom: MAX_ZOOM,
       // Keep the camera focused on the Philippines and nearby context; the
       // soft boundary mask makes the archipelago visually dominant.
       maxBounds: MAP_MAX_BOUNDS,
