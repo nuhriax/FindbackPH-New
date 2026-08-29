@@ -8,15 +8,35 @@ import { incrementItemViewAction } from "@/lib/actions/views";
 /**
  * "👁 N views" pill for report detail pages.
  *
- * Renders the server-fetched count immediately, then — once per browser per
- * report (localStorage dedupe, so refreshes don't inflate) — fires the
- * RPC-backed server action to register the view. The displayed number
- * catches up on the next visit; no client-side fake math needed.
+ * Renders the server-fetched count immediately, then registers the view via
+ * an RPC-backed server action. The SERVER dedupes (migration 105 ledger):
+ * signed-in viewers are keyed by their account id — one view per person per
+ * report across every device and browser; signed-out viewers are keyed by a
+ * persistent random id in localStorage — one view per browser. Revisits,
+ * refreshes and re-opening photos never bump the number.
  *
- * Tolerates the migration (supabase/104-item-views.sql) not having run yet:
- * the increment silently no-ops and the pill hides itself when no count is
- * available.
+ * Tolerates the migrations not having run yet: the increment silently
+ * no-ops and the pill hides itself when no count is available.
  */
+
+/** Stable per-browser viewer id so signed-out visitors dedupe too. */
+function getViewerKey(): string {
+  try {
+    let key = window.localStorage.getItem("fb_viewer_id");
+    if (!key || !/^[A-Za-z0-9_-]{8,128}$/.test(key)) {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      key = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+      window.localStorage.setItem("fb_viewer_id", key);
+    }
+    return key;
+  } catch {
+    // Private mode / storage disabled — send a per-session id; the DB still
+    // dedupes signed-in users by account, anonymous views just won't dedupe.
+    return `s${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
+  }
+}
+
 export function ViewCounter({
   itemType,
   itemId,
@@ -32,22 +52,17 @@ export function ViewCounter({
   useEffect(() => {
     if (count === null) return;
 
-    const key = `fb_viewed_${itemType}_${itemId}`;
-    try {
-      if (window.localStorage.getItem(key)) return;
-      window.localStorage.setItem(key, "1");
-    } catch {
-      // Private mode / storage disabled — still count the view, just un-deduped.
-    }
-
     let cancelled = false;
     const current = count;
-    incrementItemViewAction(itemType, itemId).then(() => {
-      // Optimistically reflect this browser's own view.
-      if (!cancelled) setCount(current + 1);
-    }).catch(() => {
-      /* best-effort */
-    });
+    // The DB ledger decides whether this viewer already counted; the client
+    // key is just the anonymous fallback identity.
+    incrementItemViewAction(itemType, itemId, getViewerKey())
+      .then(() => {
+        if (!cancelled) setCount(current + 1);
+      })
+      .catch(() => {
+        /* best-effort */
+      });
     return () => {
       cancelled = true;
     };

@@ -3,25 +3,43 @@
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Registers one page view for a lost/found report.
+ * Registers one page view for a lost/found report - at most ONE per viewer.
  *
- * The increment happens in a hardened SECURITY DEFINER RPC (see
- * supabase/104-item-views.sql): clients can never write `view_count`
- * directly, and this action merely forwards a validated (item_type, id)
- * pair. The caller (ViewCounter) dedupes per browser so refreshes don't
- * inflate the count. Best-effort — failures are swallowed because a missed
- * view is harmless.
+ * Dedupe happens server-side in the SECURITY DEFINER RPC
+ * `register_item_view` (see supabase/105-item-view-dedupe.sql): the view is
+ * only counted the first time a given viewer sees a given report. Viewers
+ * are keyed by their auth user id when signed in (one account = one view
+ * across all devices/browsers), otherwise by a persistent random browser id.
+ *
+ * The DB ledger is the source of truth; ViewCounter's client key is just the
+ * anonymous fallback identity.
+ *
+ * Falls back to the legacy 104 RPC (`increment_item_view_count`, no dedupe)
+ * while the 105 migration hasn't run yet - so the counter never breaks.
+ * Best-effort - failures are swallowed because a missed view is harmless.
  */
 export async function incrementItemViewAction(
   itemType: "lost_item" | "found_item",
   itemId: string,
+  viewerKey?: string,
 ): Promise<void> {
   if (itemType !== "lost_item" && itemType !== "found_item") return;
   if (!/^[0-9a-f-]{36}$/i.test(itemId)) return;
 
   const supabase = await createClient();
-  await supabase.rpc("increment_item_view_count", {
+
+  const { error } = await supabase.rpc("register_item_view", {
     p_item_type: itemType,
     p_item_id: itemId,
+    p_viewer_key: typeof viewerKey === "string" ? viewerKey : "",
   });
+
+  if (error && /function public\.register_item_view/i.test(error.message)) {
+    // 105 migration not applied yet - degrade to the per-bump 104 RPC.
+    await supabase.rpc("increment_item_view_count", {
+      p_item_type: itemType,
+      p_item_id: itemId,
+    });
+  }
 }
+

@@ -468,6 +468,19 @@ export interface Database {
         Args: { p_item_type: string; p_item_id: string };
         Returns: undefined;
       };
+      /**
+       * 105 migration — dedupe ledger RPC: registers a view at most once
+       * per viewer (auth uid when signed in, browser key otherwise) and
+       * bumps view_count only for a first-time (item, viewer) pair.
+       */
+      register_item_view: {
+        Args: {
+          p_item_type: string;
+          p_item_id: string;
+          p_viewer_key: string;
+        };
+        Returns: undefined;
+      };
     };
   };
 }
