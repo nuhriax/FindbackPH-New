@@ -482,6 +482,20 @@ export interface Database {
         /** true = this call actually counted a brand-new viewer. */
         Returns: boolean;
       };
+      /**
+       * Owner-only: who viewed this report (from the item_views ledger).
+       * Returns rows only when the caller is the reporter; empty otherwise.
+       */
+      get_item_viewers: {
+        Args: { p_item_type: string; p_item_id: string };
+        Returns: {
+          display_name: string | null;
+          username: string | null;
+          avatar_url: string | null;
+          is_member: boolean;
+          viewed_at: string;
+        }[];
+      };
     };
   };
 }

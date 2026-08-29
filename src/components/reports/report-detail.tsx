@@ -25,6 +25,7 @@ import { ReportFlagButton } from "@/components/report-flag-button";
 import { UserReportButton } from "@/components/user-report-button";
 import { ReportOwnerActions } from "@/components/reports/report-owner-actions";
 import { ViewCounter } from "@/components/view-counter";
+import { ReportViewers, type ReportViewer } from "@/components/reports/report-viewers";
 import { ReportEditToggle } from "@/components/reports/report-edit-toggle";
 import { OwnershipChallengeManager } from "@/components/reports/ownership-challenge-manager";
 import { OwnershipChallengeForm } from "@/components/reports/ownership-challenge-form";
@@ -197,6 +198,7 @@ export function ReportDetail({
   isOwner,
   savedItemId,
   matches,
+  viewers,
   backHref = "/search",
   backLabel = "Back to search",
   matchHref,
@@ -222,6 +224,8 @@ export function ReportDetail({
   isOwner: boolean;
   savedItemId: string | null;
   matches: DetailMatch[];
+  /** Owner-only: who viewed this report (fetched server-side via RPC). */
+  viewers?: ReportViewer[] | null;
   backHref?: string;
   backLabel?: string;
   matchHref?: (id: string) => string;
@@ -1052,6 +1056,9 @@ export function ReportDetail({
                     ) : null}
                   </section>
                 )}
+
+                {/* Owner-only: who viewed this report (item_views ledger) */}
+                {isOwner && viewers && <ReportViewers viewers={viewers} />}
 
                 {/* Safety */}
 

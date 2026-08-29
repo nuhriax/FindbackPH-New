@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import type { ReportViewer } from "@/components/reports/report-viewers";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
 import { jsonLdStringify } from "@/lib/utils";
 
@@ -117,6 +118,23 @@ export default async function FoundItemDetailPage({ params }: Props) {
   } = await supabase.auth.getUser();
 
   const isOwner = user?.id === raw.reporter_id;
+
+  // Owner-only viewer list ( SECURITY DEFINER RPC enforces ownership; returns
+  // empty rows for everyone else, so a failed fetch just hides the panel).
+  let viewers: ReportViewer[] | null = null;
+  if (isOwner) {
+    const { data: viewerRows } = await supabase.rpc("get_item_viewers", {
+      p_item_type: "found_item",
+      p_item_id: id,
+    });
+    viewers = (viewerRows ?? []).map((row) => ({
+      displayName: row.display_name ?? row.username ?? "Someone",
+      username: row.username,
+      avatarUrl: row.avatar_url,
+      isMember: row.is_member,
+      viewedAt: row.viewed_at,
+    }));
+  }
 
   const reporter = firstRow<Reporter>(raw.profiles);
 
@@ -299,6 +317,7 @@ export default async function FoundItemDetailPage({ params }: Props) {
         isOwner={isOwner}
         savedItemId={savedItemId}
         matches={matches}
+        viewers={viewers}
         backHref="/found"
         backLabel="Back to found items"
         matchHref={(matchId) => `/lost/${matchId}`}

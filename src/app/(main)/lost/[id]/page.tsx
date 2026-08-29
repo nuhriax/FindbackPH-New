@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import type { ReportViewer } from "@/components/reports/report-viewers";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
 import { jsonLdStringify } from "@/lib/utils";
 
@@ -77,6 +78,23 @@ export default async function LostItemDetailPage({ params }: Props) {
 
   const isOwner = user?.id === raw.reporter_id;
   const reporter = firstRow<{ username: string; first_name: string; last_name: string; successful_returns: number; created_at: string }>(raw.profiles);
+
+  // Owner-only viewer list ( SECURITY DEFINER RPC enforces ownership; returns
+  // empty rows for everyone else, so a failed fetch just hides the panel).
+  let viewers: ReportViewer[] | null = null;
+  if (isOwner) {
+    const { data: viewerRows } = await supabase.rpc("get_item_viewers", {
+      p_item_type: "lost_item",
+      p_item_id: id,
+    });
+    viewers = (viewerRows ?? []).map((row) => ({
+      displayName: row.display_name ?? row.username ?? "Someone",
+      username: row.username,
+      avatarUrl: row.avatar_url,
+      isMember: row.is_member,
+      viewedAt: row.viewed_at,
+    }));
+  }
 
   // Phase 7 — real trust signals only (see src/lib/trust.ts).
   const emailVerified = isEmailVerified(user);
@@ -294,6 +312,7 @@ export default async function LostItemDetailPage({ params }: Props) {
         isOwner={isOwner}
         savedItemId={savedItemId}
         matches={matches}
+        viewers={viewers}
         backHref="/lost"
         backLabel="Back to lost items"
         matchHref={(matchId) => `/found/${matchId}`}
