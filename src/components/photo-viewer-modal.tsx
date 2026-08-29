@@ -176,7 +176,7 @@ export function PhotoViewerModal({
 
       {/* Counter + dots */}
       <div className="mt-4 flex shrink-0 flex-col items-center gap-2">
-        <p className="text-sm font-medium text-white">
+        <p className="text-base font-semibold text-white drop-shadow">
           {multiple ? `${active + 1} / ${images.length}` : alt}
         </p>
         {multiple && (
@@ -192,7 +192,7 @@ export function PhotoViewerModal({
             ))}
           </div>
         )}
-        <p className="text-xs text-slate-400">
+        <p className="text-xs font-medium text-slate-300">
           Click outside the photo or press Esc to close
         </p>
       </div>
