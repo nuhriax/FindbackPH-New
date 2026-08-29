@@ -1,24 +1,8 @@
 "use client";
 
-/**
- * Philippines map (MapLibre GL) used in two places:
- *
- *  - mode="pick"  → the report wizard's "Pin exact location" picker. Click the
- *    map (or drag the pin) to choose a spot; picked pins are clamped to the
- *    Philippine bounding box.
- *  - mode="view"  → the search page's map view: LOST (red) / FOUND (green)
- *    markers with a legend and small popups.
- *
- * The map is a flat, Philippines-only view like a classic web map: only the
- * archipelago is drawn on the basemap texture; everything outside is flat
- * ocean blue (no borders or outlines). Fitted to the Philippines on first
- * load; zoom, pan, search and markers all behave normally afterwards.
- *
- * Loaded via next/dynamic with ssr:false (see philippines-map.tsx) because
- * MapLibre needs `window`.
- */
-
 import * as maplibregl from "maplibre-gl";
+import { config as maplibreConfig } from "maplibre-gl";
+
 import {
   Map as MlMap,
   Marker as MlMarker,
@@ -27,9 +11,22 @@ import {
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { format, isValid } from "date-fns";
-import type { FeatureCollection as GeoJsonFeatureCollection } from "geojson";
+import type {
+  FeatureCollection as GeoJsonFeatureCollection,
+  LineString,
+} from "geojson";
 import { useEffect, useRef, useState } from "react";
 import { PH_BOUNDS } from "@/lib/ph-locations";
+
+// MapLibre GL v6 computes its default worker URL from `import.meta.url`, which
+// webpack replaces with the *page* URL in the client bundle — so the spawned
+// "worker" is the page's own HTML document. It starts without errors but never
+// runs any code, so no tiles are ever fetched and only the style background
+// renders (blank beige map). Point WORKER_URL at a real copy of the worker
+// script served from /public instead.
+if (typeof window !== "undefined" && !maplibreConfig.WORKER_URL) {
+  maplibreConfig.WORKER_URL = "/maplibre-gl-worker.mjs";
+}
 
 export type MapPoint = {
   id: string;
@@ -56,83 +53,480 @@ export type PhilippinesMapProps =
       points: MapPoint[];
     };
 
-// Basemap: CARTO "Voyager" raster tiles at @2x retina resolution — vivid
-// colors (yellow highways, white streets, green parks, blue water) with every
-// street label drawn. The @2x (512px) images are served for the same tile grid,
-// so the map stays perfectly sharp on high-DPI screens at every zoom level.
-// CARTO's CDN was verified reachable from this network (unlike the previous
-// vector-tile provider, whose tiles were blocked and left the map blank).
-const CARTO_SUBDOMAINS = ["a", "b", "c", "d"] as const;
-const VOYAGER_TILES = CARTO_SUBDOMAINS.map(
-  (s) =>
-    `https://${s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png`,
-);
-const SATELLITE_TILES = [
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-];
-// The mask over the rest of the world uses the same ocean blue as the style's
-// water so the sea blends seamlessly.
-const OCEAN_COLOR = "#aad3df";
+// Subtle outside-country dimming: a translucent deep-blue wash that shades
+// everything outside the Philippines (Borneo, Sabah, Taiwan…) without hiding
+// the topographic terrain beneath. A fully opaque slab would clash with the
+// basemap's own ocean color and show hard straight edges over open water.
+const OUTSIDE_PH_MASK_COLOR = "#a9c9de";
+const OUTSIDE_PH_MASK_OPACITY = 1;
+
+// Professional topographic basemap (terrain, roads, place labels that grow
+// with zoom). Hillshade adds elevation relief without satellite imagery.
+// These public ArcGIS tiled services are Web Mercator raster tiles.
+const REALISTIC_TOPO_TILES =
+  "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
+const REALISTIC_HILLSHADE_TILES =
+  "https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}";
+const ESRI_ATTRIBUTION =
+  "Tiles & data © Esri, Garmin, GEBCO, NOAA NGDC, and other contributors";
+
+function makeGraticule(): GeoJsonFeatureCollection<LineString> {
+  const features: GeoJsonFeatureCollection<LineString>["features"] = [];
+
+  for (const lng of [116, 120, 124, 128]) {
+    features.push({
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [lng, 3],
+          [lng, 22],
+        ],
+      },
+    });
+  }
+
+  for (const lat of [4, 8, 12, 16, 20]) {
+    features.push({
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [113, lat],
+          [130, lat],
+        ],
+      },
+    });
+  }
+
+  return { type: "FeatureCollection", features };
+}
+
+const REALISTIC_TOPO_STYLE: StyleSpecification = {
+  version: 8,
+  // Font glyphs for symbol layers (sea-name labels, province labels).
+  // Same endpoint the repo already uses in map-test.html.
+  glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  sources: {
+    "realistic-topo": {
+      type: "raster",
+      tiles: [REALISTIC_TOPO_TILES],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: ESRI_ATTRIBUTION,
+    },
+    "realistic-hillshade": {
+      type: "raster",
+      tiles: [REALISTIC_HILLSHADE_TILES],
+      tileSize: 256,
+      maxzoom: 16,
+      attribution: ESRI_ATTRIBUTION,
+    },
+    // Full street-level detail (streets, barangays, POIs) for close zooms —
+    // faded in via the `osm-detail` layer so cities show every road when the
+    // user zooms in, while the whole country keeps the atlas look.
+    "osm-detail": {
+      type: "raster",
+      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: "© OpenStreetMap contributors",
+    },
+
+    "sea-names": {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: { name: "Philippine Sea" },
+            geometry: { type: "Point", coordinates: [127.6, 13.2] },
+          },
+          {
+            type: "Feature",
+            properties: { name: "Sulu Sea" },
+            geometry: { type: "Point", coordinates: [119.2, 8.6] },
+          },
+          {
+            type: "Feature",
+            properties: { name: "South China Sea" },
+            geometry: { type: "Point", coordinates: [115.2, 14.2] },
+          },
+          {
+            type: "Feature",
+            properties: { name: "Celebes Sea" },
+            geometry: { type: "Point", coordinates: [122.6, 4.4] },
+          },
+          {
+            type: "Feature",
+            properties: { name: "Luzon Strait" },
+            geometry: { type: "Point", coordinates: [121.4, 20.9] },
+          },
+        ],
+      },
+    },
+    graticule: {
+      type: "geojson",
+      data: makeGraticule(),
+    },
+  },
+  layers: [
+    {
+      id: "topographic-base",
+      type: "raster",
+      source: "realistic-topo",
+      paint: {
+        "raster-opacity": 1,
+        // Premium readability: gently desaturated + slightly contrasted so the
+        // red/green report pins and labels always dominate the terrain art.
+        "raster-saturation": -0.18,
+        "raster-contrast": 0.1,
+        "raster-brightness-min": 0.04,
+        "raster-brightness-max": 0.99,
+        // Instant tile display while panning/zooming: removes the cross-fade
+        // flash that makes the map feel sluggish.
+        "raster-fade-duration": 0,
+      },
+    },
+    {
+      id: "terrain-relief",
+      type: "raster",
+      source: "realistic-hillshade",
+      paint: {
+        // Subtle grayscale relief (20–35%) over the topo basemap at every zoom.
+        "raster-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0,
+          0.22,
+          10,
+          0.3,
+          16,
+          0.24,
+        ],
+        "raster-saturation": -1,
+        "raster-contrast": 0.15,
+        "raster-fade-duration": 0,
+      },
+    },
+    {
+      // Street-level OSM detail — invisible at country zooms, faded in once the
+      // topographic basemap runs out of road detail so cities show every
+      // street, barangay and landmark.
+      id: "osm-detail",
+      type: "raster",
+      source: "osm-detail",
+      minzoom: 11,
+      paint: {
+        "raster-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          0,
+          16,
+          1,
+        ],
+        "raster-fade-duration": 0,
+      },
+    },
+    {
+      id: "graticule",
+      type: "line",
+      source: "graticule",
+      minzoom: 3,
+      maxzoom: 7,
+      paint: {
+        "line-color": "#4d8eb6",
+        "line-width": 0.8,
+        "line-opacity": 0.12,
+      },
+    },
+    {
+      id: "sea-labels",
+      type: "symbol",
+      source: "sea-names",
+      layout: {
+        visibility: "visible",
+        "text-field": ["get", "name"],
+        "text-font": ["Noto Sans Regular"],
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.22,
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          3,
+          9,
+          6,
+          12,
+        ],
+      },
+      minzoom: 3,
+      maxzoom: 8,
+      paint: {
+        "text-color": "#315f87",
+        "text-halo-color": "rgba(214, 230, 245, 0.72)",
+        "text-halo-width": 1.1,
+      },
+    },
+  ],
+};
+
+// OSM raster tiles are kept as an automatic fallback if the OpenFreeMap
+// vector tiles can't be fetched (offline dev, CDN outage). OSM's tile usage
+// policy allows light use with proper attribution; do not hammer it.
+const OSM_TILES = ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"];
 
 /**
- * Inline MapLibre style: two raster basemaps (street map + satellite) so the
- * Map/Satellite toggle simply flips layer visibility. Ocean-blue background
- * matches the Philippines-only mask painted on top.
+ * Fallback inline style (raster OSM source). Only used when the
+ * OpenFreeMap basemap fails to load — see the map "error" handler.
  */
-const BASEMAP_STYLE: StyleSpecification = {
+const RASTER_FALLBACK_STYLE: StyleSpecification = {
   version: 8,
   sources: {
     osm: {
       type: "raster",
-      tiles: VOYAGER_TILES,
-      tileSize: 512,
-      maxzoom: 20,
-      attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-    },
-    satellite: {
-      type: "raster",
-      tiles: SATELLITE_TILES,
+      tiles: OSM_TILES,
       tileSize: 256,
       maxzoom: 19,
-      attribution: "Imagery &copy; Esri",
+      attribution: "&copy; OpenStreetMap contributors",
     },
   },
   layers: [
     {
       id: "background",
       type: "background",
-      paint: { "background-color": OCEAN_COLOR },
+      paint: { "background-color": "#a9c7dc" },
     },
     { id: "osm", type: "raster", source: "osm" },
-    {
-      id: "satellite",
-      type: "raster",
-      source: "satellite",
-      layout: { visibility: "none" },
-    },
   ],
 };
 
+// --- Provinces: colored choropleth -------------------------------------------
+//
+// Each Philippine province gets its own soft pastel color (stable per name) so
+// the archipelago reads like a premium "colored map" and provinces are easy to
+// tell apart at a glance. Provinces can be hovered (tooltip with the name) and
+// clicked (in view mode) to zoom to that province.
+
+// geoBoundaries ADM1 (provinces) — same source family as the ADM0 mask above.
+const PH_PROVINCE_URL =
+  "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/PHL/ADM1/geoBoundaries-PHL-ADM1_simplified.geojson";
+
+// Region-family palette, modelled on a classic PRINTED ATLAS physical map of
+// the Philippines: the whole country is drawn in subtle terrain tones
+// (beige / khaki / tan / pale olive-green, like shaded relief), with only
+// slight shade variation per province so neighbors stay distinguishable
+// without breaking the uniform "paper map" look.
+const REGION_FAMILIES: Array<{
+  test: (lat: number, lng: number) => boolean;
+  shades: string[];
+}> = [
+  // Northern Luzon — slightly greener highlands tone.
+  {
+    test: (lat) => lat >= 16.0,
+    shades: ["#d3d2ac", "#dcdbb8", "#c9c8a0"],
+  },
+  // Central Luzon + Southern Tagalog mainland — pale khaki.
+  {
+    test: (lat) => lat >= 13.6,
+    shades: ["#ded5b2", "#e5ddc0", "#d4cab4"],
+  },
+  // Bicol + Masbate — warm parchment.
+  {
+    test: (lat, lng) => lat >= 12.0 && lng >= 123.4,
+    shades: ["#e3d9bb", "#eae1c8", "#d8cdb4"],
+  },
+  // CALABARZON / MIMAROPA / Palawan — pale olive-gold.
+  {
+    test: (lat) => lat >= 11.4,
+    shades: ["#dcd6ae", "#e3debc", "#d2cc9e"],
+  },
+  // Visayas — sandy tan.
+  {
+    test: (lat) => lat >= 9.6,
+    shades: ["#e6dcba", "#ede4c6", "#d9ceb0"],
+  },
+  // Mindanao east (Caraga, northern Davao) — light sand.
+  {
+    test: (_lat, lng) => lng >= 125.6,
+    shades: ["#e9e0be", "#f0e8cc", "#ded4ae"],
+  },
+  // Mindanao west/south (Zamboanga, Bangsamoro, SOCCSKSARGEN) — warm parchment.
+  {
+    test: () => true,
+    shades: ["#e4d9b6", "#ebe2c4", "#d9ceb0"],
+  },
+];
+
+/** Stable shade choice within a region family (hash → slot). */
+function shadeFor(name: string, shades: string[]): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return shades[Math.abs(h) % shades.length];
+}
+
+/** Rough centroid of a polygon feature's outer ring (good enough for banding). */
+function centroid(geometry: {
+  type: string;
+  coordinates: unknown;
+}): { lat: number; lng: number } {
+  const coords =
+    geometry.type === "Polygon"
+      ? (geometry.coordinates as number[][][])[0]
+      : ((geometry.coordinates as number[][][][])[0]?.[0] ?? []);
+  let sx = 0;
+  let sy = 0;
+  for (const [x, y] of coords) {
+    sx += x;
+    sy += y;
+  }
+  const n = coords.length || 1;
+  return { lng: sx / n, lat: sy / n };
+}
+
+/** Region-family color for a province feature (name + centroid banded). */
+function provinceColor(
+  name: string,
+  geometry: { type: string; coordinates: unknown },
+): string {
+  const { lat, lng } = centroid(geometry);
+  const family = REGION_FAMILIES.find((f) => f.test(lat, lng))!;
+  return shadeFor(name, family.shades);
+}
+
+/** Province FeatureCollection (cached per session). */
+let phProvinceData: GeoJsonFeatureCollection | null = null;
+
+/**
+ * Approximate area of a lat/lng polygon ring (shoelace, degrees² — only used
+ * comparatively, to pick a province's largest island for its label point).
+ */
+function ringAreaSq(ring: [number, number][]): number {
+  let sum = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    sum += (ring[j][0] - ring[i][0]) * (ring[j][1] + ring[i][1]);
+  }
+  return Math.abs(sum / 2);
+}
+
+/** Average of a ring's vertices — good-enough label anchor for a polygon. */
+function ringCentroid(ring: [number, number][]): [number, number] {
+  let x = 0;
+  let y = 0;
+  for (const [lng, lat] of ring) {
+    x += lng;
+    y += lat;
+  }
+  return [x / Math.max(ring.length, 1), y / Math.max(ring.length, 1)];
+}
+
+/**
+ * One label point per province, anchored at the centroid of its LARGEST
+ * polygon — so multi-island provinces (ARMM, MIMAROPA…) get a single label
+ * instead of one per islet.
+ */
+function provinceLabelPoints(data: GeoJsonFeatureCollection): GeoJsonFeatureCollection {
+  const best = new Map<string, { area: number; lng: number; lat: number }>();
+  for (const feature of data.features) {
+    const name = String(
+      feature.properties?.shapeName ??
+        feature.properties?.name ??
+        feature.properties?.NAME_1 ??
+        "",
+    );
+    if (!name) continue;
+    const geometry = feature.geometry as {
+      type: string;
+      coordinates: unknown;
+    } | null;
+    if (!geometry) continue;
+    const rings: [number, number][][] =
+      geometry.type === "Polygon"
+        ? [(geometry.coordinates as unknown[])[0] as [number, number][]]
+        : geometry.type === "MultiPolygon"
+          ? (geometry.coordinates as [number, number][][][]).map(
+              (poly) => poly[0] as [number, number][],
+            )
+          : [];
+    for (const ring of rings) {
+      if (!Array.isArray(ring) || ring.length < 3) continue;
+      const area = ringAreaSq(ring);
+      const prev = best.get(name);
+      if (!prev || area > prev.area) {
+        const [lng, lat] = ringCentroid(ring);
+        best.set(name, { area, lng, lat });
+      }
+    }
+  }
+  return {
+    type: "FeatureCollection",
+    features: [...best.entries()].map(([name, p]) => ({
+      type: "Feature",
+      properties: { name },
+      geometry: { type: "Point", coordinates: [p.lng, p.lat] },
+    })),
+  };
+}
+
+async function loadProvinceGeojson(): Promise<GeoJsonFeatureCollection | null> {
+  if (phProvinceData) return phProvinceData;
+  try {
+    const res = await fetch(PH_PROVINCE_URL);
+    if (!res.ok) return null;
+    const geojson = (await res.json()) as GeoJsonFeatureCollection & {
+      features?: Array<{
+        properties?: Record<string, unknown>;
+      }>;
+    };
+    if (geojson?.type !== "FeatureCollection" || !geojson.features?.length)
+      return null;
+    for (const feature of geojson.features) {
+      const name = String(
+        feature.properties?.shapeName ??
+          feature.properties?.name ??
+          feature.properties?.NAME_1 ??
+          "",
+      );
+      (feature.properties ??= {}).color = provinceColor(
+        name,
+        feature.geometry as { type: string; coordinates: unknown },
+      );
+    }
+    phProvinceData = geojson;
+    return geojson;
+  } catch {
+    return null; // Cosmetic layer — a failed download must never break the map.
+  }
+}
+
 const MAX_ZOOM = 19;
-// Tight initial frame around Luzon / Visayas / Mindanao (lng, lat pairs).
+const PHILIPPINES_OVERVIEW_MAX_ZOOM = 4.1;
+// Initial frame covering the ENTIRE archipelago — Batanes in the north
+// (~21.2 N), Tawi-Tawi in the south (~4.5 N), Benham Rise east, Spratlys west
+// — so no part of the country is ever cropped on first load (lng, lat pairs).
 const INITIAL_BOUNDS: [[number, number], [number, number]] = [
-  [118.9, 4.8],
-  [126.3, 19.6],
+  [116.0, 3.9],
+  [128.0, 21.4],
 ];
 // Hard geographic limit for pan/zoom (lng, lat pairs) — the same Philippine
 // bounding box used everywhere else, so the map can never be dragged into
 // neighbouring countries.
 const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
-  [113.0, 3.5],
-  [128.5, 21.5],
+  [115.8, 3.8],
+  [128.2, 21.6],
 ];
 
 // --- Philippines-only mask ---------------------------------------------------
 //
-// Like the reference picture: ONLY the Philippine archipelago is drawn on the
-// map texture; everything outside is flat ocean blue. Implemented as a MapLibre
-// "donut" fill — a world-covering rectangle with each Philippine island ring
-// as a hole. No outlines or borders are drawn.
+// The boundary mask softly dims everything outside the Philippine archipelago.
+// This preserves the realistic topographic context (Malaysia, Borneo, Taiwan,
+// etc.) while keeping FindBackPH focused on the Philippines.
 
 type Ring = [number, number][];
 type PhFeature = {
@@ -254,13 +648,18 @@ function addFallbackMask(map: MlMap) {
       map.addSource("ph-mask-fallback-source", {
         type: "geojson",
         data: fallback as unknown as GeoJsonFeatureCollection,
+        tolerance: 0,
+        buffer: 0,
       });
     }
     map.addLayer({
       id: "ph-mask-fallback",
       type: "fill",
       source: "ph-mask-fallback-source",
-      paint: { "fill-color": OCEAN_COLOR, "fill-opacity": 1 },
+      paint: {
+        "fill-color": OUTSIDE_PH_MASK_COLOR,
+        "fill-opacity": OUTSIDE_PH_MASK_OPACITY,
+      },
     });
   } catch {
     // Cosmetic only — never break the map because the mask failed.
@@ -284,19 +683,21 @@ const WORLD_RING: Ring = [
   [180, -85],
   [180, 85],
   [-180, 85],
+  [-180, -85],
 ];
 
 /**
- * Paint over everything outside the Philippine boundary with flat ocean blue
- * so ONLY the archipelago shows on the basemap — exactly like the reference
- * picture. No outline, no borders. Works for the Map and Satellite basemaps.
+ * Dim the area outside the Philippine boundary so the realistic topographic
+ * basemap remains visible around the archipelago, while the Philippines stays
+ * visually dominant. No hard outline is drawn.
  */
 async function addPhilippinesMask(map: MlMap) {
   try {
     const remoteRings = await loadPhBoundaryRings();
-    // Remote boundary failed? Fall back to the built-in Borneo rectangle so
-    // Malaysia / Sabah / Brunei never leak onto the map.
-    const rings = remoteRings.length ? remoteRings : FALLBACK_MASK_RECTS;
+    // A rectangular fallback creates visible straight-edged blocks over the
+    // ocean. Leave the basemap untouched until the real boundary is ready.
+    if (!remoteRings.length) return;
+    const rings = remoteRings;
     if (!map.isStyleLoaded()) return;
     if (map.getLayer("ph-mask")) return;
 
@@ -304,25 +705,49 @@ async function addPhilippinesMask(map: MlMap) {
       // MapLibre fills with the non-zero winding rule: the hole rings must wind
       // in the OPPOSITE direction to the outer ring, otherwise the "holes" fill
       // in and neighbouring land (Sabah, Borneo, Taiwan...) stays visible.
+      //
+      // IMPORTANT: this must be a SINGLE polygon whose outer ring is WORLD_RING
+      // with every island as a hole. Making one feature per island (each with
+      // its own WORLD_RING outer) paints a full world rectangle per island and
+      // blanks the entire map.
       const sign = ringAreaSign(WORLD_RING);
+      // Drop degenerate rings and make sure every hole is properly closed —
+      // open rings break the fill triangulation in some tiles.
+      const holes = rings
+        .filter((ring) => ring.length >= 4)
+        .map((ring) => {
+          const first = ring[0];
+          const last = ring[ring.length - 1];
+          const closed =
+            first[0] === last[0] && first[1] === last[1]
+              ? ring
+              : [...ring, first];
+          return ringAreaSign(closed) === sign ? [...closed].reverse() : closed;
+        });
       const mask: PhFeatureCollection = {
         type: "FeatureCollection",
-        features: rings.map((ring) => ({
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              WORLD_RING,
-              ringAreaSign(ring) === sign ? [...ring].reverse() : ring,
-            ],
+        features: [
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [WORLD_RING, ...holes],
+            },
           },
-        })),
+        ],
       };
 
       map.addSource("ph-mask-source", {
         type: "geojson",
         data: mask as unknown as GeoJsonFeatureCollection,
+        // Disable Douglas-Peucker simplification (it creates self-intersecting
+        // rings that break the nonzero winding fill), but KEEP a positive
+        // buffer: buffer 0 clips hole rings exactly at tile boundaries, which
+        // yields open/degenerate rings that fail triangulation in individual
+        // tiles — visible as straight-edged rectangular patches on the map.
+        tolerance: 0,
+        buffer: 64,
       });
     } else {
       const fallback: PhFeatureCollection = {
@@ -336,13 +761,18 @@ async function addPhilippinesMask(map: MlMap) {
       map.addSource("ph-mask-source", {
         type: "geojson",
         data: fallback as unknown as GeoJsonFeatureCollection,
+        tolerance: 0,
+        buffer: 64,
       });
     }
     map.addLayer({
       id: "ph-mask",
       type: "fill",
       source: "ph-mask-source",
-      paint: { "fill-color": OCEAN_COLOR, "fill-opacity": 1 },
+      paint: {
+        "fill-color": OUTSIDE_PH_MASK_COLOR,
+        "fill-opacity": OUTSIDE_PH_MASK_OPACITY,
+      },
     });
     if (remoteRings.length) {
       // The detailed mask supersedes the instant fallback rectangle.
@@ -369,11 +799,21 @@ async function searchPhilippinesPlaces(
     lat: string;
     lon: string;
   }>;
-  return data.map((d) => ({
-    name: d.display_name,
-    lat: Number.parseFloat(d.lat),
-    lon: Number.parseFloat(d.lon),
-  }));
+  return data
+    .map((d) => ({
+      name: concisePlaceName(d.display_name),
+      lat: Number.parseFloat(d.lat),
+      lon: Number.parseFloat(d.lon),
+    }))
+    .filter((place) => Number.isFinite(place.lat) && Number.isFinite(place.lon));
+}
+
+function concisePlaceName(displayName: string): string {
+  const parts = displayName
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.slice(0, 3).join(", ") || displayName;
 }
 
 /** Clamp a picked coordinate into the Philippine bounding box. */
@@ -384,6 +824,247 @@ function clampToPhilippines(lat: number, lng: number): [number, number] {
     Math.min(east, Math.max(west, lng)),
   ];
 }
+
+/** True when a coordinate falls inside one of the Philippine island rings. */
+function pointInRing(lng: number, lat: number, ring: Ring): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0];
+    const yi = ring[i][1];
+    const xj = ring[j][0];
+    const yj = ring[j][1];
+
+    const intersects =
+      yi > lat !== yj > lat &&
+      lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi;
+
+    if (intersects) inside = !inside;
+  }
+  return inside;
+}
+
+async function isPhilippinesCoordinate(lat: number, lng: number): Promise<boolean> {
+  const [[south, west], [north, east]] = PH_BOUNDS;
+  if (lat < south || lat > north || lng < west || lng > east) return false;
+
+  const rings = await loadPhBoundaryRings();
+  if (!rings.length) return false;
+  return rings.some((ring) => pointInRing(lng, lat, ring));
+}
+
+/**
+ * Decorative compass rose like a printed atlas map — an inert MapLibre
+ * control (pure SVG, no interaction) rendered above the scale bar.
+ */
+function compassRoseControl(): {
+  onAdd: (map: MlMap) => HTMLElement;
+  onRemove: (map: MlMap) => void;
+} {
+  let el: HTMLElement | null = null;
+  return {
+    onAdd() {
+      el = document.createElement("div");
+      el.className = "fbx-compass-rose";
+      el.setAttribute("aria-hidden", "true");
+      el.style.cssText =
+        "pointer-events:none;margin:6px 0 10px 10px;width:44px;height:56px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25));";
+      el.innerHTML = `
+        <svg viewBox="0 0 44 56" width="44" height="56" xmlns="http://www.w3.org/2000/svg">
+          <text x="22" y="11" text-anchor="middle" font-family="Georgia, serif" font-size="11" font-weight="bold" fill="#2b2b2b">N</text>
+          <g transform="translate(22,33)">
+            <polygon points="0,-22 4.5,-4.5 0,0 -4.5,-4.5" fill="#c0392b" stroke="#7a241b" stroke-width="0.6"/>
+            <polygon points="0,-22 4.5,-4.5 0,0 0,-22" fill="#e74c3c" stroke="#7a241b" stroke-width="0.6" opacity="0.85"/>
+            <polygon points="22,0 4.5,4.5 0,0 4.5,-4.5" fill="#f4f1e8" stroke="#555" stroke-width="0.6"/>
+            <polygon points="0,22 -4.5,4.5 0,0 4.5,4.5" fill="#f4f1e8" stroke="#555" stroke-width="0.6"/>
+            <polygon points="-22,0 -4.5,-4.5 0,0 -4.5,4.5" fill="#f4f1e8" stroke="#555" stroke-width="0.6"/>
+            <circle r="1.6" fill="#2b2b2b"/>
+          </g>
+        </svg>`;
+      return el;
+    },
+    onRemove() {
+      el?.parentNode?.removeChild(el);
+      el = null;
+    },
+  };
+}
+
+/**
+ * Premium styling for MapLibre chrome: floating-card popups, rounded control
+ * groups, and pin animations. Injected once per map instance; scoped to
+ * MapLibre class names + our .fbx-* hooks so nothing else is affected.
+ */
+
+/**
+ * Fetch + draw the colored province layer: pastel fills under the roads and
+ * labels, crisp white province outlines, a hover highlight and zoom-readable
+ * province name labels.
+ */
+async function addProvincesLayers(map: MlMap) {
+  try {
+    if (map.getLayer("ph-provinces-fill")) return;
+    // The 3 MB GeoJSON download happens below; the style can flip to
+    // "unloaded" while we await it (e.g. during the fallback-style swap).
+    // Rather than bailing, wait until it settles before painting.
+    if (!map.isStyleLoaded()) {
+      await new Promise<void>((resolve) => {
+        const done = () => {
+          map.off("styledata", done);
+          resolve();
+        };
+        map.on("styledata", done);
+      });
+    }
+    const data = await loadProvinceGeojson();
+    if (!data || map.getLayer("ph-provinces-fill")) return;
+    if (!map.isStyleLoaded()) {
+      await new Promise<void>((resolve) => map.once("idle", () => resolve()));
+      if (map.getLayer("ph-provinces-fill")) return;
+    }
+    if (map.getSource("ph-provinces")) map.removeSource("ph-provinces");
+    map.addSource("ph-provinces", {
+      type: "geojson",
+      data,
+      // generateId → stable ids for feature-state hover highlighting.
+      generateId: true,
+      tolerance: 0,
+      buffer: 32,
+    });
+    // Flat, saturated region fills like a printed colored map — nearly opaque
+    // so the banding reads clearly even zoomed all the way out.
+    map.addLayer(
+      {
+        id: "ph-provinces-fill",
+        type: "fill",
+        source: "ph-provinces",
+        paint: {
+          "fill-color": ["coalesce", ["get", "color"], "#e8e1cd"],
+          "fill-opacity": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            3,
+            0.92,
+            6,
+            0.85,
+            10,
+            0.7,
+            12,
+            0.3,
+            13.5,
+            0,
+          ],
+        },
+      },
+    );
+    // Hover highlight (white veil) driven by feature-state.
+    map.addLayer(
+      {
+        id: "ph-provinces-hover",
+        type: "fill",
+        source: "ph-provinces",
+        paint: {
+          "fill-color": "#ffffff",
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            0.3,
+            0,
+          ],
+        },
+      },
+    );
+    // Subtle province outlines — thin parchment-tone borders like a printed
+    // atlas (no hard white separators over the uniform terrain tones).
+    map.addLayer(
+      {
+        id: "ph-provinces-outline",
+        type: "line",
+        source: "ph-provinces",
+        layout: { visibility: "visible" },
+        paint: {
+          "line-color": "#7f806f",
+          "line-width": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            4,
+            0.7,
+            8,
+            1.2,
+            12,
+            1.8,
+          ],
+          "line-opacity": 0.7,
+        },
+      },
+    );
+    // Province name labels — ONE label per province (centroid of its largest
+    // polygon) so island chains like ARMM/MIMAROPA don't repeat the name on
+    // every islet. Bold UPPERCASE with a heavy white halo like a printed map.
+    map.addSource("ph-province-label-points", {
+      type: "geojson",
+      data: provinceLabelPoints(data),
+    });
+    map.addLayer(
+      {
+        id: "ph-provinces-labels",
+        type: "symbol",
+        source: "ph-province-label-points",
+        minzoom: 4,
+        maxzoom: 11,
+        layout: {
+          visibility: "visible",
+          "text-field": ["get", "name"],
+          "text-font": ["Noto Sans Bold"],
+          "text-transform": "uppercase",
+          "text-size": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            4,
+            9,
+            6,
+            11,
+            8,
+            13,
+            12,
+            16,
+          ],
+          "text-letter-spacing": 0.08,
+          "text-padding": 6,
+        },
+        paint: {
+          "text-color": "#1b2733",
+          "text-halo-color": "rgba(255, 255, 255, 0.98)",
+          "text-halo-width": 2.8,
+          "text-halo-blur": 0.4,
+        },
+      },
+    );
+  } catch {
+    // Cosmetic only — never break the map because the provinces failed.
+  }
+}
+
+const MAP_CSS = `
+.maplibregl-popup-content{padding:0!important;border-radius:16px!important;overflow:hidden;border:1px solid rgba(226,232,240,.9);box-shadow:0 18px 44px rgba(15,23,42,.22),0 2px 8px rgba(15,23,42,.08)!important}
+.maplibregl-popup-close-button{width:30px;height:30px;font-size:16px;color:#94a3b8;border-radius:0 16px 0 8px;transition:background .15s ease,color .15s ease}
+.maplibregl-popup-close-button:hover{background:#f1f5f9;color:#475569}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip{border-top-color:#fff}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip,.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,.maplibregl-popup-anchor-top-right .maplibregl-popup-tip{border-bottom-color:#fff}
+.maplibregl-ctrl-group{border-radius:12px!important;overflow:hidden;border:1px solid rgba(226,232,240,.9)!important;box-shadow:0 6px 18px rgba(15,23,42,.16),0 1px 3px rgba(15,23,42,.08)!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(6px)}
+.maplibregl-ctrl-group button{transition:background .15s ease}
+.maplibregl-ctrl-group button:hover{background:#f1f5f9!important}
+.maplibregl-ctrl-group button+button{border-top:1px solid #e2e8f0!important}
+.maplibregl-ctrl-attrib{border-radius:8px 0 0 0!important;background:rgba(255,255,255,.85)!important;font-size:10px!important}
+.fbx-pin{cursor:pointer;filter:drop-shadow(0 3px 5px rgba(15,23,42,.4));transform-origin:50% 100%;transition:transform .18s cubic-bezier(.34,1.56,.64,1);animation:fbx-pin-drop .35s cubic-bezier(.34,1.56,.64,1) backwards}
+.fbx-pin:hover{transform:scale(1.18)}
+@keyframes fbx-pin-drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+/* Dark pill tooltip shown when hovering a province. */
+.fbx-prov-tip .maplibregl-popup-content{background:rgba(15,23,42,.94)!important;color:#fff;padding:5px 12px!important;border-radius:9999px!important;border:none!important;box-shadow:0 8px 22px rgba(15,23,42,.4)!important;font-size:12px;font-weight:600;letter-spacing:.02em;backdrop-filter:blur(4px)}
+.fbx-prov-tip .maplibregl-popup-tip{display:none!important}
+`;
 
 /** Escape user-supplied strings before injecting them into popup HTML. */
 function escapeHtml(value: string): string {
@@ -402,20 +1083,32 @@ const PIN_SVG =
 function pickPinElement(): HTMLElement {
   const el = document.createElement("div");
   el.style.cssText =
-    "display:flex;width:34px;height:34px;align-items:center;justify-content:center;" +
+    "display:flex;width:38px;height:38px;align-items:center;justify-content:center;" +
     "border-radius:9999px;background:#2563eb;border:3px solid #fff;" +
-    "box-shadow:0 4px 12px rgba(0,0,0,.35);cursor:grab";
+    "box-shadow:0 6px 18px rgba(37,99,235,.45);cursor:grab;" +
+    "transition:transform .15s ease";
   el.innerHTML = PIN_SVG;
   return el;
 }
 
-/** DOM element for a small LOST (red) / FOUND (green) dot marker. */
+/** Teardrop pin SVG (LOST rose / FOUND emerald) with a white ring. */
+function teardropPinSvg(kind: "lost" | "found"): string {
+  const color = kind === "lost" ? "#e11d48" : "#059669";
+  return (
+    `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">` +
+    `<path d="M15 37C15 37 27.5 21.8 27.5 13.5a12.5 12.5 0 1 0-25 0C2.5 21.8 15 37 15 37Z" fill="${color}" stroke="#fff" stroke-width="2.5"/>` +
+    `<circle cx="15" cy="13.5" r="4.5" fill="#fff" fill-opacity=".95"/>` +
+    `</svg>`
+  );
+}
+
+/** DOM element for a LOST (red) / FOUND (green) teardrop pin marker. */
 function dotPinElement(kind: "lost" | "found"): HTMLElement {
   const el = document.createElement("div");
-  const color = kind === "lost" ? "#f43f5e" : "#10b981";
-  el.style.cssText =
-    "display:block;width:16px;height:16px;border-radius:9999px;" +
-    `background:${color};border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer`;
+  el.className = "fbx-pin";
+  // Soft drop shadow keeps the pin readable over busy topographic tiles.
+  el.style.filter = "drop-shadow(0 2px 3px rgba(15, 23, 42, 0.45))";
+  el.innerHTML = teardropPinSvg(kind);
   return el;
 }
 
@@ -435,21 +1128,24 @@ function formatDate(value?: string | null): string | null {
 function pointPopupHtml(point: MapPoint): string {
   const place = pointPlace(point);
   const when = formatDate(point.date);
-  const badge =
-    point.kind === "lost"
-      ? "background:#fee2e2;color:#be123c"
-      : "background:#d1fae5;color:#047857";
-  const label = point.kind === "lost" ? "Lost" : "Found";
+  const isLost = point.kind === "lost";
+  const badge = isLost
+    ? "background:#ffe4e6;color:#be123c"
+    : "background:#d1fae5;color:#047857";
+  const accent = isLost ? "#e11d48" : "#059669";
+  const label = isLost ? "LOST" : "FOUND";
+
   return (
-    `<div style="min-width:160px;font-family:inherit">` +
-    `<p style="margin:0;font-size:14px;font-weight:600;color:#0f172a">${escapeHtml(point.title)}</p>` +
-    `<p style="margin:2px 0 0;font-size:12px;color:#64748b">${escapeHtml(place)}</p>` +
-    `<p style="margin:6px 0 0"><span style="display:inline-flex;align-items:center;border-radius:9999px;padding:2px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;${badge}">${label}</span></p>` +
+    `<div style="width:244px;font-family:inherit;border-top:4px solid ${accent}">` +
+    `<div style="padding:13px 16px 15px;background:linear-gradient(180deg,${isLost ? "#fff5f6" : "#f2fbf7"},#ffffff)">` +
+    `<span style="display:inline-flex;align-items:center;gap:4px;border-radius:9999px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.08em;box-shadow:inset 0 0 0 1px ${accent}22;${badge}">${isLost ? "🔴" : "🟢"} ${label}</span>` +
+    `<p style="margin:11px 0 0;font-size:15px;line-height:1.4;font-weight:700;color:#0f172a">${escapeHtml(point.title)}</p>` +
+    `<p style="margin:6px 0 0;font-size:12px;color:#475569">📍 ${escapeHtml(place)}</p>` +
     (when
-      ? `<p style="margin:6px 0 0;font-size:11px;color:#94a3b8">${label}: ${escapeHtml(when)}</p>`
+      ? `<p style="margin:4px 0 0;font-size:11.5px;color:#94a3b8">🕐 ${isLost ? "Lost" : "Found"} ${escapeHtml(when)}</p>`
       : "") +
-    `<a href="${escapeHtml(point.href)}" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#2563eb;text-decoration:none">View report &rarr;</a>` +
-    `</div>`
+    `<a href="${escapeHtml(point.href)}" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:13px;padding:10px 12px;border-radius:9999px;background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.02em;text-decoration:none;box-shadow:0 4px 12px rgba(37,99,235,.35);transition:filter .15s ease" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">View Report &rarr;</a>` +
+    `</div></div>`
   );
 }
 
@@ -457,6 +1153,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
   const pickMarkerRef = useRef<MlMarker | null>(null);
+  const lastValidPickRef = useRef<[number, number] | null>(null);
   const viewMarkersRef = useRef<Array<{ marker: MlMarker; el: HTMLElement; point: MapPoint }>>(
     [],
   );
@@ -474,6 +1171,8 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
   // View mode: LOST/FOUND filter + mobile bottom-sheet selection.
   const [filter, setFilter] = useState<"all" | "lost" | "found">("all");
   const [selected, setSelected] = useState<MapPoint | null>(null);
+  // Set once the realistic basemap fails and we've fallen back to raster OSM.
+  const styleFallbackUsedRef = useRef(false);
 
   // Keep the latest onPick without re-creating the map on every render.
   onPickRef.current = props.mode === "pick" ? props.onPick : undefined;
@@ -483,22 +1182,41 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: BASEMAP_STYLE,
-      maxZoom: MAX_ZOOM,
-      // Flat Philippines-only map like the reference picture: the initial
-      // fitBounds frames the archipelago and panning can never leave the
-      // Philippine bounding box.
+      // Realistic topographic raster basemap with hillshade relief.
+      // Falls back to OSM if the ArcGIS tile service is unavailable.
+      style: REALISTIC_TOPO_STYLE,
+      maxPitch: 0,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      // The report-location picker is an archipelago overview: prevent its
+      // zoom controls from cropping Luzon, Visayas, or Mindanao out of view.
+      maxZoom:
+        props.mode === "pick" ? PHILIPPINES_OVERVIEW_MAX_ZOOM : MAX_ZOOM,
+      // Keep the camera focused on the Philippines and nearby context; the
+      // soft boundary mask makes the archipelago visually dominant.
       maxBounds: MAP_MAX_BOUNDS,
-      center: [121.5, 12.5],
-      zoom: 4.6,
+      center: [121.0, 12.2],
+      zoom: 3.9,
       attributionControl: false,
+      // Smoothness: no symbol cross-fade lag on every style data change, and
+      // no re-fetch churn for tiles that haven't actually expired.
+      fadeDuration: 0,
+      refreshExpiredTiles: false,
     });
     mapRef.current = map;
+    // Debug handle (harmless in production): lets diagnostics inspect the map.
+    (window as unknown as Record<string, unknown>).__fbMap = map;
 
     map.addControl(
-      new maplibregl.NavigationControl({ visualizePitch: false }),
+      new maplibregl.NavigationControl({
+        showZoom: true,
+        showCompass: false,
+        visualizePitch: false,
+      }),
       "top-left",
     );
+    map.addControl(new maplibregl.FullscreenControl(), "top-left");
     map.addControl(
       new maplibregl.ScaleControl({ unit: "metric" }),
       "bottom-left",
@@ -508,39 +1226,123 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
       "bottom-right",
     );
 
-    // Frame the whole Philippines as soon as the map is ready, then paint the
-    // outside-the-archipelago mask (flat ocean blue).
+    // If the realistic ArcGIS basemap can't be fetched (offline dev, CDN
+    // outage), transparently fall back to raster OSM once.
+    map.on("error", (e) => {
+      const message =
+        e && typeof e === "object" && "error" in e
+          ? String((e as { error?: { message?: string } }).error?.message ?? "")
+          : "";
+      if (!styleFallbackUsedRef.current && /failed to fetch|network|style/i.test(message)) {
+        styleFallbackUsedRef.current = true;
+        map.setStyle(RASTER_FALLBACK_STYLE);
+      }
+    });
+
+    // Frame the whole Philippines as soon as the map is ready, then add the
+    // soft outside-the-archipelago dimmer.
     const onReady = () => {
       setMapReady(true);
-      map.fitBounds(INITIAL_BOUNDS, { padding: 12, duration: 0 });
-      // Hide Malaysia/Borneo on the very first frame, then swap in the
-      // detailed archipelago mask when the remote boundary arrives.
+      const compact = window.matchMedia("(max-width: 639px)").matches;
+      map.fitBounds(INITIAL_BOUNDS, {
+        padding: compact ? 18 : 34,
+        maxZoom: PHILIPPINES_OVERVIEW_MAX_ZOOM,
+        duration: 0,
+      });
+      // Apply the instant offline fallback mask (hides Borneo/Sabah) first,
+      // then upgrade to the detailed Philippine boundary when its GeoJSON is ready.
       addFallbackMask(map);
       void addPhilippinesMask(map);
+      void addProvincesLayers(map);
     };
     if (map.isStyleLoaded()) onReady();
     else map.once("load", onReady);
 
-    // If the style ever reloads, the mask layer is wiped — re-apply it.
+    // If the style ever reloads (for example after the fallback), the mask is wiped —
+    // re-apply it.
     map.on("styledata", () => {
-      if (map.isStyleLoaded() && !map.getLayer("ph-mask")) {
-        addFallbackMask(map);
-        void addPhilippinesMask(map);
+      if (map.isStyleLoaded()) {
+        if (!map.getLayer("ph-mask")) {
+          void addPhilippinesMask(map);
+        }
+        if (!map.getLayer("ph-provinces-fill")) {
+          void addProvincesLayers(map);
+        }
       }
     });
 
-    // Pick mode: click anywhere to drop / move the pin (clamped to PH).
-    const onClick = (e: maplibregl.MapMouseEvent) => {
-      if (props.mode !== "pick") return;
-      const [lat, lng] = clampToPhilippines(e.lngLat.lat, e.lngLat.lng);
-      onPickRef.current?.(lat, lng);
-      if (map.getZoom() < MAX_ZOOM) {
-        map.flyTo({
-          center: e.lngLat,
-          zoom: Math.min(map.getZoom() + 3, MAX_ZOOM),
-          duration: 800,
-        });
+    // --- Province inspection: hover tooltip + click-to-zoom (view mode) ---
+    let hoveredProvinceId: string | number | null = null;
+    const provinceTip = new MlPopup({
+      closeButton: false,
+      closeOnClick: false,
+      offset: 14,
+      className: "fbx-prov-tip",
+    });
+    map.on("mousemove", "ph-provinces-fill", (e) => {
+      if (!e.features?.length) return;
+      const feature = e.features[0];
+      // Provinces are informational only (tooltip + highlight) — not
+      // clickable, so the cursor stays the default arrow.
+      if (hoveredProvinceId !== null && hoveredProvinceId !== feature.id) {
+        map.setFeatureState(
+          { source: "ph-provinces", id: hoveredProvinceId },
+          { hover: false },
+        );
       }
+      hoveredProvinceId = feature.id ?? null;
+      if (feature.id !== undefined) {
+        map.setFeatureState(
+          { source: "ph-provinces", id: feature.id },
+          { hover: true },
+        );
+      }
+      const name = String(
+        feature.properties?.shapeName ??
+          feature.properties?.name ??
+          feature.properties?.NAME_1 ??
+          "",
+      );
+      if (name) {
+        provinceTip
+          .setLngLat(e.lngLat)
+          .setHTML(escapeHtml(name))
+          .addTo(map);
+      }
+    });
+    map.on("mouseleave", "ph-provinces-fill", () => {
+      map.getCanvas().style.cursor = "";
+      if (hoveredProvinceId !== null) {
+        map.setFeatureState(
+          { source: "ph-provinces", id: hoveredProvinceId },
+          { hover: false },
+        );
+        hoveredProvinceId = null;
+      }
+      provinceTip.remove();
+    });
+
+    // Pick mode: click to drop / move the pin, but only on actual Philippine land.
+    const onClick = async (e: maplibregl.MapMouseEvent) => {
+      if (props.mode !== "pick") return;
+
+      const lat = e.lngLat.lat;
+      const lng = e.lngLat.lng;
+      const valid = await isPhilippinesCoordinate(lat, lng);
+
+      if (!valid) {
+        setGeoError("Please select a location inside the Philippines");
+        return;
+      }
+
+      onPickRef.current?.(lat, lng);
+      lastValidPickRef.current = [lng, lat];
+      const compact = window.matchMedia("(max-width: 639px)").matches;
+      map.fitBounds(INITIAL_BOUNDS, {
+        padding: compact ? 18 : 34,
+        maxZoom: PHILIPPINES_OVERVIEW_MAX_ZOOM,
+        duration: 800,
+      });
     };
     map.on("click", onClick);
 
@@ -555,7 +1357,17 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     ro.observe(container);
     ro.observe(container.parentElement ?? container);
     const timeouts = [100, 300, 600, 1200].map((t) =>
-      window.setTimeout(resize, t),
+      window.setTimeout(() => {
+        resize();
+        if (t === 600) {
+          const compact = window.matchMedia("(max-width: 639px)").matches;
+          map.fitBounds(INITIAL_BOUNDS, {
+            padding: compact ? 18 : 34,
+            maxZoom: PHILIPPINES_OVERVIEW_MAX_ZOOM,
+            duration: 0,
+          });
+        }
+      }, t),
     );
     const onWindowResize = () => resize();
     window.addEventListener("resize", onWindowResize);
@@ -592,7 +1404,8 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
 
     const entries = points.map((point) => {
       const el = dotPinElement(point.kind);
-      const marker = new maplibregl.Marker({ element: el }).setLngLat([
+      // anchor "bottom" places the pin's TIP exactly on the report coordinate.
+      const marker = new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat([
         point.lng,
         point.lat,
       ]);
@@ -600,7 +1413,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
         el.addEventListener("click", () => setSelected(point));
       } else {
         marker.setPopup(
-          new maplibregl.Popup({ offset: 12 }).setHTML(pointPopupHtml(point)),
+          new maplibregl.Popup({ offset: 14 }).setHTML(pointPopupHtml(point)),
         );
       }
       marker.addTo(gl);
@@ -645,12 +1458,20 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
           group.reduce((s, e) => s + e.point.lat, 0) / group.length;
         const el = document.createElement("div");
         el.style.cssText =
-          "display:flex;min-width:26px;height:26px;padding:0 7px;" +
+          "display:flex;min-width:28px;height:28px;padding:0 8px;" +
           "align-items:center;justify-content:center;border-radius:9999px;" +
-          "background:#1e293b;color:#fff;font-size:11px;font-weight:700;" +
-          "border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer";
+          "background:linear-gradient(180deg,#334155,#1e293b);color:#fff;" +
+          "font-size:11.5px;font-weight:700;letter-spacing:.01em;" +
+          "border:2px solid #fff;box-shadow:0 3px 10px rgba(15,23,42,.45);" +
+          "cursor:pointer;transition:transform .15s cubic-bezier(.34,1.56,.64,1)";
         el.setAttribute("aria-label", `${group.length} reports`);
         el.textContent = String(group.length);
+        el.addEventListener("mouseenter", () => {
+          el.style.transform = "scale(1.12)";
+        });
+        el.addEventListener("mouseleave", () => {
+          el.style.transform = "scale(1)";
+        });
         el.addEventListener("click", () => {
           gl.easeTo({
             center: [lng, lat],
@@ -694,16 +1515,26 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
         element: pickPinElement(),
         draggable: true,
       }).addTo(map);
-      marker.on("dragend", () => {
+      marker.on("dragend", async () => {
         const lngLat = marker.getLngLat();
-        const [lat, lng] = clampToPhilippines(lngLat.lat, lngLat.lng);
-        onPickRef.current?.(lat, lng);
-        // Normalise the marker to the clamped position.
-        marker.setLngLat([lng, lat]);
+        const valid = await isPhilippinesCoordinate(lngLat.lat, lngLat.lng);
+
+        if (!valid) {
+          setGeoError("Please keep the pin inside the Philippines");
+          const lastValid = lastValidPickRef.current;
+          if (lastValid) {
+            marker.setLngLat(lastValid);
+          }
+          return;
+        }
+
+        lastValidPickRef.current = [lngLat.lng, lngLat.lat];
+        onPickRef.current?.(lngLat.lat, lngLat.lng);
       });
       pickMarkerRef.current = marker;
     }
     pickMarkerRef.current.setLngLat([pickLng, pickLat]);
+    lastValidPickRef.current = [pickLng, pickLat];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, pickLat, pickLng]);
 
@@ -733,22 +1564,9 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     return () => window.clearTimeout(t);
   }, [geoError]);
 
-    /** Nudge the map rotation (bearing) by `delta` degrees. */
-  function rotateBy(delta: number) {
-    const map = mapRef.current;
-    if (!map) return;
-    map.easeTo({ bearing: (((map.getBearing() + delta) % 360) + 360) % 360, duration: 200 });
-  }
-
-  /** Snap the map back to north-up. */
-  function resetBearing() {
-    mapRef.current?.easeTo({ bearing: 0, duration: 300 });
-  }
-
-  /** Whether a GPS/IP coordinate falls inside the Philippine bounding box. */
-  function insidePh(lat: number, lng: number): boolean {
-    const [[south, west], [north, east]] = PH_BOUNDS;
-    return lat >= south && lat <= north && lng >= west && lng <= east;
+  /** Whether a GPS/IP coordinate falls inside Philippine territory. */
+  async function insidePh(lat: number, lng: number): Promise<boolean> {
+    return isPhilippinesCoordinate(lat, lng);
   }
 
   function flyToLocation(lat: number, lng: number, zoom = 17) {
@@ -771,7 +1589,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
         throw new Error("no coordinates");
       }
       const { latitude, longitude } = data;
-      if (!insidePh(latitude, longitude)) {
+      if (!(await insidePh(latitude, longitude))) {
         setGeoError("You appear to be outside the Philippines");
         return;
       }
@@ -792,23 +1610,19 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     setLocating(true);
     setGeoError(null);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         setLocating(false);
         const { latitude, longitude } = pos.coords;
-        if (!insidePh(latitude, longitude)) {
+        if (!(await insidePh(latitude, longitude))) {
           setGeoError("You appear to be outside the Philippines");
           return;
         }
         flyToLocation(latitude, longitude);
       },
-      (err) => {
+      () => {
         setLocating(false);
         // GPS failed - fall back to an approximate IP-based location.
-        void locateByIp().then(() => {
-          if (err.code === err.PERMISSION_DENIED) {
-            setGeoError("Location blocked - allow it in your browser, or search your place instead");
-          }
-        });
+        void locateByIp();
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
     );
@@ -834,20 +1648,56 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     setSearchOpen(false);
   }
 
+  /** Return to the full-archipelago Philippines overview. */
+  function resetToPhilippines() {
+    const map = mapRef.current;
+    if (!map) return;
+    const compact = window.matchMedia("(max-width: 639px)").matches;
+    map.fitBounds(INITIAL_BOUNDS, {
+      padding: compact ? 18 : 34,
+      maxZoom: PHILIPPINES_OVERVIEW_MAX_ZOOM,
+      duration: 900,
+    });
+  }
+
     const mapArea = (
     <div className="relative h-full w-full overflow-hidden">
+      {/* Premium map chrome (popups, controls, pin animations). */}
+      <style dangerouslySetInnerHTML={{ __html: MAP_CSS }} />
       {/* MapLibre canvas. */}
       <div ref={containerRef} className="h-full w-full" />
 
-      {/* Locate-me + rotate controls — bottom-right. */}
+      {/* Locate-me + reset-Philippines controls — bottom-right. */}
       <div className="absolute bottom-3 right-3 z-[500] flex flex-col gap-1">
+        <button
+          type="button"
+          aria-label="Reset to Philippines view"
+          title="Reset to Philippines view"
+          onClick={resetToPhilippines}
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white/95 text-slate-600 shadow-md transition-colors hover:bg-white hover:text-blue-600"
+        >
+          <svg
+            aria-hidden="true"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 10.5 12 3l9 7.5" />
+            <path d="M5 9.5V21h14V9.5" />
+          </svg>
+        </button>
         <button
           type="button"
           aria-label="Show my location"
           title="Show my location (GPS)"
           onClick={locateMe}
           disabled={locating}
-          className={`flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white/95 text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-blue-600 ${
+          className={`flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white/95 text-slate-600 shadow-md transition-colors hover:bg-white hover:text-blue-600 ${
             locating ? "cursor-wait opacity-70" : ""
           }`}
         >
@@ -859,8 +1709,8 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
           ) : (
             <svg
               aria-hidden="true"
-              width="14"
-              height="14"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -872,34 +1722,30 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
             </svg>
           )}
         </button>
-        <button
-          type="button"
-          aria-label="Rotate map left"
-          title="Rotate left (right-button drag also works)"
-          onClick={() => rotateBy(-15)}
-          className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white/95 text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-blue-600"
-        >
-          &#8634;
-        </button>
-        <button
-          type="button"
-          aria-label="Rotate map right"
-          title="Rotate right (right-button drag also works)"
-          onClick={() => rotateBy(15)}
-          className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white/95 text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-blue-600"
-        >
-          &#8635;
-        </button>
-        <button
-          type="button"
-          aria-label="Reset map rotation to north"
-          title="Reset rotation (north-up)"
-          onClick={resetBearing}
-          className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white/95 text-[11px] font-bold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-blue-600"
-        >
-          &#8982;
-        </button>
       </div>
+
+      {/* Compact legend — bottom-left, above the scale bar. View mode only. */}
+      {props.mode === "view" && (
+        <div
+          aria-label="Map legend"
+          className="absolute bottom-9 left-2.5 z-[500] flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white/95 px-2.5 py-1.5 shadow-md sm:gap-3 sm:px-3 sm:py-2"
+        >
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 sm:text-[11px]">
+            <span
+              aria-hidden="true"
+              className="h-2.5 w-2.5 rounded-full bg-rose-500 ring-1 ring-white"
+            />
+            Lost
+          </span>
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 sm:text-[11px]">
+            <span
+              aria-hidden="true"
+              className="h-2.5 w-2.5 rounded-full bg-emerald-600 ring-1 ring-white"
+            />
+            Found
+          </span>
+        </div>
+      )}
 
       {/* Geolocation error toast (auto-dismisses). */}
       {geoError && (
@@ -991,22 +1837,21 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     </div>
   );
 
-  // View mode: search + filters sit ABOVE the map (per the FindBackPH layout),
-  // so only the map controls (zoom, Map/Satellite, My Location) overlay the
-  // map itself and nothing overlaps.
+  // View mode: search + filters sit ABOVE the map; only compact map controls
+  // (zoom, fullscreen, My Location) overlay the map itself.
   if (props.mode === "view") {
     return (
       <div className="flex h-full w-full flex-col">
         {/* Search + filters, above the map. */}
-        <div className="shrink-0 border-b border-slate-200 bg-white px-3 pb-3 pt-3">
+        <div className="shrink-0 border-b border-slate-200 bg-white px-4 pb-3 pt-4 shadow-sm">
           <form onSubmit={runSearch} className="relative">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search a place in the Philippines..."
-              aria-label="Search a place in the Philippines"
-              className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-8 text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+              placeholder="Search a city, province, or place..."
+              aria-label="Search a city, province, or place in the Philippines"
+              className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm font-medium text-slate-700 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
             />
             <svg
               aria-hidden="true"
@@ -1030,8 +1875,23 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
             )}
           </form>
 
+          <div className="mb-2 mt-3 flex items-center justify-between">
+            <p className="text-xs font-medium text-slate-500">
+              {points.length} {points.length === 1 ? "report" : "reports"} on the map
+            </p>
+            {filter !== "all" && (
+              <button
+                type="button"
+                onClick={() => setFilter("all")}
+                className="text-[11px] font-semibold text-blue-600 hover:text-blue-700"
+              >
+                Show all
+              </button>
+            )}
+          </div>
+
           {/* ALL / LOST / FOUND — horizontally scrollable on small screens. */}
-          <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5">
+          <div className="flex gap-2 overflow-x-auto pb-0.5">
             {(
               [
                 ["all", "ALL"],
@@ -1047,10 +1907,10 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
                   setSelected(null);
                 }}
                 aria-pressed={filter === value}
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-bold tracking-wide transition-colors ${
+                className={`shrink-0 rounded-full border px-4 py-2 text-[11px] font-bold tracking-wide transition-all ${
                   filter === value
                     ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 {label}
@@ -1086,9 +1946,3 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
 
   return mapArea;
 }
-
-
-
-
-
-

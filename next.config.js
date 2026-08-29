@@ -52,7 +52,7 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), payment=()",
+            value: "camera=(), microphone=(), geolocation=(self), payment=()",
           },
           {
             key: "Strict-Transport-Security",
@@ -68,12 +68,17 @@ const nextConfig = {
               "object-src 'none'",
               `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://tiles.openfreemap.org https://maps.openfreemap.org",
+              "img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://services.arcgisonline.com https://server.arcgisonline.com https://tiles.openfreemap.org https://maps.openfreemap.org",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* http://localhost:* https://nominatim.openstreetmap.org https://tile.openstreetmap.org https://server.arcgisonline.com https://tiles.openfreemap.org https://maps.openfreemap.org",
-              // worker-src blob: — MapLibre GL spawns its rendering worker
-              // from a blob: URL (falls back to script-src otherwise).
-              "worker-src blob:",
+              // connect-src must include the tile CDNs because MapLibre GL
+              // loads raster tiles with fetch() (AJAX), not <img> — otherwise
+              // every tile request is CSP-blocked ("AJAXError: Failed to fetch").
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* http://localhost:* https://nominatim.openstreetmap.org https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://services.arcgisonline.com https://server.arcgisonline.com https://tiles.openfreemap.org https://maps.openfreemap.org https://media.githubusercontent.com https://d2ad6b4ur7yvpq.cloudfront.net https://ipapi.co",
+              // worker-src 'self' blob: — MapLibre GL v6 bundles its rendering
+              // worker as a same-origin script (webpack emits
+              // maplibre-gl-csp-worker.js under /_next/), so it MUST be
+              // allowed by 'self'; blob: kept for older fallback paths.
+              "worker-src 'self' blob:",
               "script-src-attr 'none'",
             ].join("; "),
           },
