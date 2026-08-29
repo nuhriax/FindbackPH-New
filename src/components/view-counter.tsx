@@ -54,11 +54,11 @@ export function ViewCounter({
 
     let cancelled = false;
     const current = count;
-    // The DB ledger decides whether this viewer already counted; the client
-    // key is just the anonymous fallback identity.
+    // The DB ledger decides whether this viewer already counted; only bump
+    // the displayed number when the DB says this view was actually new.
     incrementItemViewAction(itemType, itemId, getViewerKey())
-      .then(() => {
-        if (!cancelled) setCount(current + 1);
+      .then((counted) => {
+        if (!cancelled && counted) setCount(current + 1);
       })
       .catch(() => {
         /* best-effort */

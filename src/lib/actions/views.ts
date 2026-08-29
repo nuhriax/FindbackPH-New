@@ -22,13 +22,16 @@ export async function incrementItemViewAction(
   itemType: "lost_item" | "found_item",
   itemId: string,
   viewerKey?: string,
-): Promise<void> {
-  if (itemType !== "lost_item" && itemType !== "found_item") return;
-  if (!/^[0-9a-f-]{36}$/i.test(itemId)) return;
+): Promise<boolean> {
+  if (itemType !== "lost_item" && itemType !== "found_item") return false;
+  if (!/^[0-9a-f-]{36}$/i.test(itemId)) return false;
 
   const supabase = await createClient();
 
-  const { error } = await supabase.rpc("register_item_view", {
+  // Returns true only when the DB actually counted this view (first time this
+  // viewer sees this report). Falls back to the legacy per-bump 104 RPC while
+  // the 105/106 migrations are missing.
+  const { data, error } = await supabase.rpc("register_item_view", {
     p_item_type: itemType,
     p_item_id: itemId,
     p_viewer_key: typeof viewerKey === "string" ? viewerKey : "",
@@ -40,6 +43,9 @@ export async function incrementItemViewAction(
       p_item_type: itemType,
       p_item_id: itemId,
     });
+    return true;
   }
+
+  return data === true;
 }
 

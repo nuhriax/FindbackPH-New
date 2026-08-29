@@ -479,7 +479,8 @@ export interface Database {
           p_item_id: string;
           p_viewer_key: string;
         };
-        Returns: undefined;
+        /** true = this call actually counted a brand-new viewer. */
+        Returns: boolean;
       };
     };
   };
