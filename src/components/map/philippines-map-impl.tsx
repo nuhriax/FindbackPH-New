@@ -112,7 +112,11 @@ const REALISTIC_TOPO_STYLE: StyleSpecification = {
       type: "raster",
       tiles: [REALISTIC_TOPO_TILES],
       tileSize: 256,
-      maxzoom: 19,
+      // Esri World Topo has no tile coverage at z18/z19 in parts of rural PH —
+      // requesting those returns gray "Map data not yet available" error boxes.
+      // Cap at z17 and let MapLibre overzoom (upscale) the last real tiles; the
+      // OSM detail layer fades in above z13 so street-level detail is unaffected.
+      maxzoom: 17,
       attribution: ESRI_ATTRIBUTION,
     },
     // Full street-level detail (streets, barangays, POIs) for close zooms —
@@ -165,6 +169,13 @@ const REALISTIC_TOPO_STYLE: StyleSpecification = {
     },
   },
   layers: [
+    {
+      // Canvas background: matches the topo basemap's paper tone so while
+      // tiles stream in you see a neutral map color instead of dark boxes.
+      id: "background",
+      type: "background",
+      paint: { "background-color": "#e8eef0" },
+    },
     {
       id: "topographic-base",
       type: "raster",
