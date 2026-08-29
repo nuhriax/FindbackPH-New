@@ -60,13 +60,11 @@ export type PhilippinesMapProps =
 const OUTSIDE_PH_MASK_COLOR = "#a9c9de";
 const OUTSIDE_PH_MASK_OPACITY = 1;
 
-// Professional topographic basemap (terrain, roads, place labels that grow
-// with zoom). Hillshade adds elevation relief without satellite imagery.
-// These public ArcGIS tiled services are Web Mercator raster tiles.
+// Professional topographic basemap (terrain with baked-in shaded relief,
+// roads, place labels that grow with zoom). These public ArcGIS tiled
+// services are Web Mercator raster tiles.
 const REALISTIC_TOPO_TILES =
   "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
-const REALISTIC_HILLSHADE_TILES =
-  "https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}";
 const ESRI_ATTRIBUTION =
   "Tiles & data © Esri, Garmin, GEBCO, NOAA NGDC, and other contributors";
 
@@ -115,13 +113,6 @@ const REALISTIC_TOPO_STYLE: StyleSpecification = {
       tiles: [REALISTIC_TOPO_TILES],
       tileSize: 256,
       maxzoom: 19,
-      attribution: ESRI_ATTRIBUTION,
-    },
-    "realistic-hillshade": {
-      type: "raster",
-      tiles: [REALISTIC_HILLSHADE_TILES],
-      tileSize: 256,
-      maxzoom: 16,
       attribution: ESRI_ATTRIBUTION,
     },
     // Full street-level detail (streets, barangays, POIs) for close zooms —
@@ -188,28 +179,6 @@ const REALISTIC_TOPO_STYLE: StyleSpecification = {
         "raster-brightness-max": 0.99,
         // Instant tile display while panning/zooming: removes the cross-fade
         // flash that makes the map feel sluggish.
-        "raster-fade-duration": 0,
-      },
-    },
-    {
-      id: "terrain-relief",
-      type: "raster",
-      source: "realistic-hillshade",
-      paint: {
-        // Subtle grayscale relief (20–35%) over the topo basemap at every zoom.
-        "raster-opacity": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          0,
-          0.22,
-          10,
-          0.3,
-          16,
-          0.24,
-        ],
-        "raster-saturation": -1,
-        "raster-contrast": 0.15,
         "raster-fade-duration": 0,
       },
     },
@@ -1182,7 +1151,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      // Realistic topographic raster basemap with hillshade relief.
+      // Realistic topographic raster basemap (terrain relief baked in).
       // Falls back to OSM if the ArcGIS tile service is unavailable.
       style: REALISTIC_TOPO_STYLE,
       maxPitch: 0,
@@ -1203,6 +1172,9 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
       // no re-fetch churn for tiles that haven't actually expired.
       fadeDuration: 0,
       refreshExpiredTiles: false,
+      // Keep a large tile pool so revisiting a zoom/area is instant instead of
+      // re-downloading raster tiles from the (slow) public tile servers.
+      maxTileCacheSize: 800,
     });
     mapRef.current = map;
     // Debug handle (harmless in production): lets diagnostics inspect the map.
