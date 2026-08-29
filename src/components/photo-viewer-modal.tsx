@@ -78,7 +78,7 @@ export function PhotoViewerModal({
       aria-label="Photo viewer"
       className="
         fixed inset-0 z-[200] flex flex-col items-center
-        justify-center bg-white/80 p-4 backdrop-blur-2xl
+        justify-center bg-slate-950/95 p-4 backdrop-blur-xl
       "
       onClick={onClose}
       onTouchStart={handleTouchStart}
@@ -94,8 +94,8 @@ export function PhotoViewerModal({
         }}
         className="
           absolute right-4 top-4 z-10 flex h-11 w-11 items-center
-          justify-center rounded-full bg-slate-900/80 text-white shadow-lg
-          ring-1 ring-white/40 transition-colors hover:bg-slate-900
+          justify-center rounded-full bg-white/10 text-white shadow-lg
+          ring-1 ring-white/20 transition-colors hover:bg-white/20
         "
       >
         <X size={22} />
@@ -137,8 +137,8 @@ export function PhotoViewerModal({
             className="
               absolute left-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2
               cursor-pointer items-center justify-center rounded-full
-              bg-slate-900/80 text-white shadow-lg ring-1 ring-white/40
-              transition-colors hover:bg-slate-900 sm:left-6 sm:h-14 sm:w-14
+              bg-white/10 text-white shadow-lg ring-1 ring-white/20
+              transition-colors hover:bg-white/20 sm:left-6 sm:h-14 sm:w-14
             "
           >
             <ChevronLeft size={28} />
@@ -160,8 +160,8 @@ export function PhotoViewerModal({
             className="
               absolute right-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2
               cursor-pointer items-center justify-center rounded-full
-              bg-slate-900/80 text-white shadow-lg ring-1 ring-white/40
-              transition-colors hover:bg-slate-900 sm:right-6 sm:h-14 sm:w-14
+              bg-white/10 text-white shadow-lg ring-1 ring-white/20
+              transition-colors hover:bg-white/20 sm:right-6 sm:h-14 sm:w-14
             "
           >
             <ChevronRight size={28} />
@@ -171,7 +171,7 @@ export function PhotoViewerModal({
 
       {/* Counter + dots */}
       <div className="mt-4 flex shrink-0 flex-col items-center gap-2">
-        <p className="text-sm font-medium text-slate-700">
+        <p className="text-sm font-medium text-white">
           {multiple ? `${active + 1} / ${images.length}` : alt}
         </p>
         {multiple && (
@@ -180,14 +180,14 @@ export function PhotoViewerModal({
               <span
                 key={i}
                 className={cn(
-                  "h-1.5 rounded-full bg-slate-800 transition-all",
+                  "h-1.5 rounded-full bg-white transition-all",
                   i === active ? "w-5 opacity-100" : "w-1.5 opacity-40"
                 )}
               />
             ))}
           </div>
         )}
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Click outside the photo or press Esc to close
         </p>
       </div>
