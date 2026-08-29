@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Fullscreen frosted-glass photo viewer. Shows the complete uncropped
- * picture(s) with prev/next arrows, touch swipe, keyboard controls, and a
- * close button. Background matches the site's light aesthetic.
+ * True fullscreen lightbox rendered via portal to <body> so page-level
+ * rounded corners / transforms can never clip it. Shows the complete
+ * uncropped picture(s) with prev/next arrows, touch swipe, keyboard
+ * controls, and a close button over a solid black backdrop.
  *
  * Controlled externally: render it conditionally (`open`) and call `onClose`.
  */
@@ -71,15 +73,18 @@ export function PhotoViewerModal({
     };
   }, []);
 
-  return (
+  // Portal into <body> (client-side only) so the lightbox always covers the
+  // entire viewport, regardless of ancestor transforms/overflow.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Photo viewer"
-      className="
-        fixed inset-0 z-[200] flex flex-col items-center
-        justify-center bg-slate-950/95 p-4 backdrop-blur-xl
-      "
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black"
       onClick={onClose}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -103,7 +108,7 @@ export function PhotoViewerModal({
 
       {/* The photo itself — shown whole (object-contain), never cropped */}
       <div
-        className="relative h-full max-h-[82vh] w-full max-w-6xl"
+        className="relative h-full max-h-[85vh] w-full max-w-6xl overflow-hidden rounded-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <Image
@@ -191,6 +196,7 @@ export function PhotoViewerModal({
           Click outside the photo or press Esc to close
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
