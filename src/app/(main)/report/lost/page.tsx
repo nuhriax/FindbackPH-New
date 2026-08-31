@@ -2,14 +2,28 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import dynamic from "next/dynamic";
 import { CheckCircle2, Lock } from "lucide-react";
 import { createLostItemAction } from "@/lib/actions/items";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { ImageUpload } from "@/components/image-upload";
 import { MotionReveal } from "@/components/effects/motion-reveal";
-import { PhilippinesMap } from "@/components/map/philippines-map";
 import { ReportStepsIndicator } from "@/components/report-steps-indicator";
+import { DraftAutoSave } from "@/components/reports/draft-autosave";
+import { SimilarReportsHint } from "@/components/reports/similar-reports-hint";
+
+// MapLibre + tile layers are the heaviest dependency on this page — load the
+// map lazily so the wizard's first paint never waits on it.
+const PhilippinesMap = dynamic(
+  () => import("@/components/map/philippines-map").then((m) => ({ default: m.PhilippinesMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="skeleton h-64 w-full rounded-2xl" aria-hidden="true" />
+    ),
+  },
+);
 
 const STEPS = 4;
 
@@ -305,10 +319,14 @@ export default function ReportLostPage() {
           }}
           className="card mt-6 p-6 sm:p-8"
         >
+          <DraftAutoSave formId="lost-report-form" storageKey="fb-draft-lost" active={confirmedId === null} />
           <div id="step-1" className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="title" className="label">Item name</label>
                 <input id="title" name="title" required minLength={3} maxLength={120} placeholder="e.g. Black iPhone 15 Pro" className="input" />
+                <div className="mt-2">
+                  <SimilarReportsHint kind="lost" />
+                </div>
               </div>
 
               <div>

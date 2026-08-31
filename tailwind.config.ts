@@ -48,6 +48,13 @@ const config: Config = {
           50: "#EDF9F0", 100: "#D5F1DF", 200: "#A9E3C2", 300: "#7BD1A4", 400: "#46B687",
           500: "#209B68", 600: "#1B8956", 700: "#11683F", 800: "#0E5734", 900: "#0A4026",
         },
+        /* Leaf — nature accents used for organic highlights, badges and the
+           "coming home" moments. Teal stays the primary action color; leaf
+           greens appear only as supporting nature motifs. */
+        leaf: {
+          50: "#F1FAF3", 100: "#DFF3E5", 200: "#BFE7CC", 300: "#92D5AB", 400: "#5CBF87",
+          500: "#35A56B", 600: "#268A56", 700: "#1D6E45", 800: "#175736", 900: "#114229", 950: "#0A2B1B",
+        },
         amber: {
           50: "#FFF3E5", 100: "#FFE6CC", 200: "#FBD0A5", 300: "#F8B574", 400: "#F5913D",
           500: "#F27418", 600: "#DE3810", 700: "#B5490C", 800: "#8F3900", 900: "#6E2D06",
@@ -56,7 +63,11 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-pjs)", "system-ui", "sans-serif"],
-        display: ["var(--font-pjs)", "system-ui", "sans-serif"],
+        // Display/brand typography: Sora (loaded in layout.tsx as --font-sora).
+        // Applied to all headings via globals.css (`@apply font-display`) and
+        // any explicit `font-display` usage — Sora gives the brand voice while
+        // Plus Jakarta Sans keeps the UI/body clear and readable.
+        display: ["var(--font-sora)", "var(--font-pjs)", "system-ui", "sans-serif"],
         // Keep every `font-mono` element on the same Plus Jakarta Sans family so
         // counters/labels don't fall back to a browser monospace font and look
         // out of place on the About / Safety pages.
@@ -65,6 +76,7 @@ const config: Config = {
       borderRadius: { xl: "1rem", "2xl": "1.25rem", "3xl": "1.5rem", card: "1.25rem", button: "0.75rem" },
       boxShadow: {
         glow: "0 0 40px rgba(15, 123, 122, 0.14)",
+        "glow-leaf": "0 0 40px rgba(38, 138, 86, 0.16)",
         "glow-lg": "0 0 70px rgba(15, 123, 122, 0.24)",
         card: "0 24px 60px -26px rgba(51, 46, 38, 0.22)",
         "card-hover": "0 34px 80px -30px rgba(51, 46, 38, 0.30)",

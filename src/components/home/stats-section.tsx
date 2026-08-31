@@ -50,7 +50,7 @@ export function StatsSection({
 
           {/* Recovered */}
           <article className="text-center">
-            <div className="text-5xl lg:text-7xl font-display font-bold text-emerald-600">{fmt(recovered)}</div>
+            <div className="text-5xl lg:text-7xl font-display font-bold text-leaf-600">{fmt(recovered)}</div>
             <div className="mt-2 text-slate-500 text-sm font-medium">Items reunited</div>
           </article>
 

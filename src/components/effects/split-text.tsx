@@ -151,6 +151,12 @@ export function SplitText({ segments, className, delay = 0, stagger = 0.07 }: Sp
                 )}
               </motion.span>
             </span>
+            {/* The word-separating space must live OUTSIDE the overflow-hidden
+                mask: trailing whitespace collapses inside inline-block boxes,
+                which visually jams words together once revealed. */}
+            {!token.single && token.text.endsWith(" ") && (
+              <span aria-hidden="true"> </span>
+            )}
           </span>
         );
       })}

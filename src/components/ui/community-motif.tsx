@@ -43,6 +43,13 @@ export function CommunityMotif({ className }: { className?: string }) {
           strokeDasharray="2 3"
           opacity="0.75"
         />
+        {/* a single leaf at the end of the path — "found its way home" */}
+        <path
+          d="M106 34 C108 30.5, 112 30, 114.5 32 C114 35.5, 110 36.5, 106 34 Z"
+          fill="#92D5AB"
+          opacity="0.85"
+        />
+        <path d="M106 34 C109 33.4, 111.5 32.8, 114.5 32" stroke="#35A56B" strokeWidth="0.7" strokeLinecap="round" opacity="0.8" fill="none" />
         {/* birds */}
         <path
           d="M120 20 q3 -3 6 0 q3 -3 6 0"

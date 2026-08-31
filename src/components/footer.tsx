@@ -4,7 +4,7 @@ import { Logo } from "@/components/logo";
 
 const EXPLORE = [
   { label: "Search", href: "/search" },
-  { label: "Finds", href: "/finds" },
+  { label: "Explore", href: "/explore" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
   { label: "How It Works", href: "/how-it-works" },
@@ -25,51 +25,35 @@ const SOCIALS = [
   { icon: Mail, label: "Email", href: "mailto:findback.support@gmail.com" },
 ];
 
+import { RouteRule } from "@/components/ui/journey-band";
+
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-ice-200/80 bg-gradient-to-b from-white via-white/80 to-ice-50/50 text-navy-900 backdrop-blur-xl">
-      {/* Soft top accent line */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-electric-300/60 to-transparent"
-      />
+    <footer className="footer-ink relative overflow-hidden">
       {/* Faint illustrated map pattern behind the footer */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 1px 1px, rgba(15,123,122,0.55) 1px, transparent 1px)",
+            "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.5) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
           maskImage: "radial-gradient(ellipse 80% 100% at 50% 0%, black, transparent 80%)",
           WebkitMaskImage: "radial-gradient(ellipse 80% 100% at 50% 0%, black, transparent 80%)",
         }}
       />
 
-      {/* Ambient blue glows */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-32 left-1/4 h-64 w-[34rem] -translate-x-1/2 rounded-full bg-electric-100/60 blur-[110px]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -right-20 h-64 w-80 rounded-full bg-sky-100/60 blur-[100px]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-20 top-1/3 h-56 w-56 rounded-full bg-emerald-50/60 blur-[100px]"
-      />
-
-      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1.3fr] md:items-start lg:gap-12">
           {/* Brand */}
           <div>
-            <Logo variant="dark" />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
-              Lost today. Found tomorrow. Helping Philippine communities
-              reconnect people with the things they&apos;ve lost — safely,
-              quickly, and locally.
+            <Logo variant="light" />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
+              Every lost thing has a way home. The Philippines&apos; free
+              community lost-and-found platform — private by default, safe by
+              design, built for every island and barangay.
             </p>
+            <RouteRule className="mt-6 max-w-[220px]" />
           </div>
 
           {/* Explore */}
@@ -103,7 +87,7 @@ export function Footer() {
               ].map((b) => (
                 <span
                   key={b.label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-electric-100/80 bg-electric-50/60 px-2.5 py-1 text-[11px] font-medium text-electric-700"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/70 backdrop-blur"
                 >
                   <b.icon size={12} /> {b.label}
                 </span>
@@ -119,7 +103,7 @@ export function Footer() {
                   aria-label={s.label}
                   target={s.href.startsWith("http") ? "_blank" : undefined}
                   rel={s.href.startsWith("http") ? "noreferrer" : undefined}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-ice-200/80 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-electric-300 hover:bg-electric-500 hover:text-white hover:shadow-[0_8px_20px_-8px_rgba(15,123,122,0.6)]"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/10 hover:text-white"
                 >
                   <s.icon size={16} />
                 </a>
@@ -128,14 +112,14 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-ice-200/70 pt-5 sm:flex-row">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-            <MapPin size={13} className="text-electric-500" />
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-5 sm:flex-row">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-white/60">
+            <MapPin size={13} className="text-teal-300" />
             © {new Date().getFullYear()} FindBack PH
           </p>
-          <p className="flex items-center gap-1.5 text-xs text-slate-400">
-            <HeartHandshake size={13} className="text-electric-400" />
-            A safe and trusted community. Made to help things find their way home.
+          <p className="flex items-center gap-1.5 text-xs text-white/40">
+            <HeartHandshake size={13} className="text-teal-400" />
+            FindBack PH — Every lost thing has a way home. Free, private, and safe for every Filipino.
           </p>
         </div>
       </div>
@@ -153,19 +137,19 @@ function FooterColumn({
   return (
     <div>
       <div className="flex items-center gap-2">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-white/50">
           {title}
         </h3>
-        <span className="mt-px h-px w-6 rounded-full bg-electric-300/70" />
+        <span className="mt-px h-px w-6 rounded-full bg-teal-400/60" />
       </div>
       <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
           <li key={link.label}>
             <Link
               href={link.href}
-              className="group inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-electric-600"
+              className="group inline-flex items-center gap-1 text-sm text-white/60 transition-colors hover:text-white"
             >
-              <span className="h-1 w-1 rounded-full bg-electric-500 opacity-0 transition-opacity group-hover:opacity-100" />
+              <span className="h-1 w-1 rounded-full bg-teal-300 opacity-0 transition-opacity group-hover:opacity-100" />
               {link.label}
             </Link>
           </li>

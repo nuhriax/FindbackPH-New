@@ -229,7 +229,7 @@ export function BackgroundEffects({
           >
             <stop
               offset="0"
-              stopColor="#7a5c83"
+              stopColor="#cdb081"
               stopOpacity="0.38"
             />
             <stop
@@ -239,7 +239,7 @@ export function BackgroundEffects({
             />
             <stop
               offset="1"
-              stopColor="#b8d5ff"
+              stopColor="#e6ceb7"
               stopOpacity="0"
             />
           </linearGradient>
@@ -267,12 +267,12 @@ export function BackgroundEffects({
           <radialGradient id="fb-violet-orb">
             <stop
               offset="0"
-              stopColor="#dcebff"
+              stopColor="#fbf6ee"
               stopOpacity="0.65"
             />
             <stop
               offset="0.3"
-              stopColor="#b8d5ff"
+              stopColor="#e6ceb7"
               stopOpacity="0.22"
             />
             <stop

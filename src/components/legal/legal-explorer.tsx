@@ -44,7 +44,7 @@ export function LegalExplorer({
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         {/* Header */}
         <header className="text-center">
-          <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-600">
+          <span className="inline-flex items-center rounded-full bg-electric-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-electric-600">
             {eyebrow}
           </span>
 
@@ -71,10 +71,10 @@ export function LegalExplorer({
               key={section.id}
               type="button"
               onClick={() => setSelected(section)}
-              className="group flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3.5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:px-5"
+              className="group flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3.5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-electric-200 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-500 focus-visible:ring-offset-2 sm:px-5"
             >
               <span className="flex min-w-0 items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[10px] font-bold text-blue-600">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-electric-50 text-[10px] font-bold text-electric-600">
                   {section.number}
                 </span>
 
@@ -85,17 +85,17 @@ export function LegalExplorer({
 
               <ChevronRight
                 size={16}
-                className="shrink-0 text-slate-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-600"
+                className="shrink-0 text-slate-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-electric-600"
               />
             </button>
           ))}
         </section>
 
         {/* Bottom CTA */}
-        <footer className="mt-8 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 to-sky-50 px-4 py-3 sm:px-5">
+        <footer className="mt-8 rounded-xl border border-electric-100 bg-gradient-to-r from-electric-50 to-electric-50 px-4 py-3 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-electric-100 text-electric-600">
                 <FileText size={16} />
               </div>
 
@@ -115,7 +115,7 @@ export function LegalExplorer({
                   <Link
                     key={action.href + action.label}
                     href={action.href}
-                    className="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="inline-flex items-center justify-center rounded-full bg-electric-600 px-4 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-electric-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-500 focus-visible:ring-offset-2"
                   >
                     {action.label}
                   </Link>
@@ -123,7 +123,7 @@ export function LegalExplorer({
                   <Link
                     key={action.href + action.label}
                     href={action.href}
-                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700 transition hover:border-blue-200 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700 transition hover:border-electric-200 hover:text-electric-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-500 focus-visible:ring-offset-2"
                   >
                     {action.label}
                   </Link>
@@ -150,12 +150,12 @@ export function LegalExplorer({
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
               <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-electric-50 text-electric-600">
                   <span className="text-[10px] font-bold">{selected.number}</span>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-blue-600">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-electric-600">
                     {title}
                   </p>
 
@@ -172,7 +172,7 @@ export function LegalExplorer({
                 type="button"
                 onClick={() => setSelected(null)}
                 aria-label="Close section"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-500"
               >
                 <X size={17} />
               </button>
@@ -190,7 +190,7 @@ export function LegalExplorer({
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-full bg-blue-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="rounded-full bg-electric-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-electric-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-500 focus-visible:ring-offset-2"
               >
                 Got it
               </button>
@@ -212,7 +212,7 @@ function Block({ block }: { block: LegalBlock }) {
       <ul className="mt-3 space-y-2 pl-1 text-sm leading-6 text-slate-600">
         {block.items.map((item) => (
           <li key={item} className="flex items-start gap-2">
-            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-electric-400" />
             {item}
           </li>
         ))}

@@ -86,6 +86,41 @@ export function computeBadges(
   return BADGES.map((badge) => ({ ...badge, earned: badge.check(stats) }));
 }
 
+/* ============================================================================
+   Found Hero levels — gamified progression over successful returns.
+   Derived only from profiles.successful_returns (no DB changes needed).
+   ============================================================================ */
+
+export type HeroLevel = {
+  level: number;
+  name: string;
+  emoji: string;
+  /** Successful returns required to reach this level. */
+  min: number;
+  /** Next threshold, when the level isn't the last one. */
+  nextAt: number | null;
+};
+
+export const HERO_LEVELS: Array<Omit<HeroLevel, "nextAt">> = [
+  { level: 1, name: "Starter", emoji: "🌱", min: 0 },
+  { level: 2, name: "Helper", emoji: "🤝", min: 1 },
+  { level: 3, name: "Guide", emoji: "🧭", min: 3 },
+  { level: 4, name: "Guardian", emoji: "🛡️", min: 5 },
+  { level: 5, name: "Found Hero", emoji: "🦸", min: 10 },
+  { level: 6, name: "Legend", emoji: "👑", min: 20 },
+];
+
+/** Pure function — resolves the hero level for a member's successful returns. */
+export function computeHeroLevel(successfulReturns: number): HeroLevel {
+  const count = Math.max(0, Math.round(successfulReturns || 0));
+  let current = HERO_LEVELS[0];
+  for (const level of HERO_LEVELS) {
+    if (count >= level.min) current = level;
+  }
+  const next = HERO_LEVELS.find((l) => l.min > current.min) ?? null;
+  return { ...current, nextAt: next ? next.min : null };
+}
+
 type Supabase = SupabaseClient<Database>;
 
 /**

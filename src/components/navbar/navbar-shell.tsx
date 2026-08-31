@@ -46,7 +46,7 @@ export function NavbarFallback() {
   return (
     <header className="sticky top-0 z-50 w-full pt-3 sm:pt-4">
       <div className="mx-auto max-w-7xl px-3 sm:px-4">
-        <div className="mx-auto flex h-14 items-center justify-between gap-3 rounded-[20px] border border-white/80 bg-white/85 px-3 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-xl sm:px-4">
+        <div className="navbar-glass mx-auto flex h-14 items-center justify-between gap-3 rounded-[20px] px-3 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] sm:px-4">
           <Logo />
           <div className="skeleton h-9 w-28 rounded-full" />
         </div>

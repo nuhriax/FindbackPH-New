@@ -98,6 +98,7 @@ export default async function ProfilePage() {
         </h2>
         <div className="mt-4">
           <BadgesCard
+            successfulReturns={profile.successful_returns}
             badges={earnedBadges.map(({ id, emoji, name, description, earned }) => ({
               id,
               emoji,

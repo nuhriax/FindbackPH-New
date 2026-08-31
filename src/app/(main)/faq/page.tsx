@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { FaqExplorer, type Faq } from "@/components/faq/faq-explorer";
 
 export const metadata: Metadata = {

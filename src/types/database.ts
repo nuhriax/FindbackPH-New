@@ -98,6 +98,8 @@ export type ItemImage = {
   found_item_id: string | null;
   storage_path: string;
   position: number;
+  /** Client-computed perceptual hash (16 hex chars); null for older uploads. */
+  phash?: string | null;
   created_at: string;
 };
 

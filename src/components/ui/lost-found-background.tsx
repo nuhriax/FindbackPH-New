@@ -41,8 +41,8 @@ export function LostFoundBackground({ className }: { className?: string }) {
         className
       )}
     >
-      {/* Pale blue-white atmosphere: soft center, gentle blue + pale green + pale orange washes at the edges */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_90%_at_left_center,rgba(238,245,255,0.55)_0%,rgba(247,250,255,0.6)_40%,transparent_60%),radial-gradient(ellipse_120%_90%_at_right_center,rgba(214,233,255,0.5)_0%,rgba(247,250,255,0.65)_44%,transparent_62%)]" />
+      {/* Pale cream-green atmosphere: soft center, gentle blue + pale leaf-green + pale orange washes at the edges */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_90%_at_left_center,rgba(238,245,255,0.45)_0%,rgba(247,250,255,0.5)_40%,transparent_60%),radial-gradient(ellipse_110%_85%_at_right_center,rgba(214,233,255,0.4)_0%,rgba(247,250,255,0.55)_44%,transparent_62%),radial-gradient(ellipse_80%_70%_at_8%_90%,rgba(223,243,229,0.4)_0%,transparent_60%),radial-gradient(ellipse_75%_65%_at_94%_88%,rgba(191,231,204,0.32)_0%,transparent_58%)]" />
 
       {/* Faint illustrated map: contour lines + dashed routes */}
       <svg
@@ -83,6 +83,14 @@ export function LostFoundBackground({ className }: { className?: string }) {
           {LOCATION_PATHS.map((p, i) => (
             <path key={`p-${i}`} d={p.d} stroke={p.color} strokeDasharray="2 6" />
           ))}
+        </g>
+
+        {/* Faint leaf outlines — a quiet nature motif, barely there */}
+        <g stroke="rgba(38,138,86,0.20)" strokeWidth="0.55" fill="none">
+          <path d="M 12 14 C 16 10, 21 10, 24 14 C 21 18, 16 18, 12 14 Z" />
+          <path d="M 12 14 C 16 13, 20 13, 24 14" />
+          <path d="M 84 82 C 88 78, 93 78, 96 82 C 93 86, 88 86, 84 82 Z" />
+          <path d="M 84 82 C 88 81, 92 81, 96 82" />
         </g>
       </svg>
     </div>

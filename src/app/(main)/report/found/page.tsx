@@ -2,14 +2,28 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import dynamic from "next/dynamic";
 import { CheckCircle2, Lock, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
 import { createFoundItemAction } from "@/lib/actions/items";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { ImageUpload } from "@/components/image-upload";
 import { MotionReveal } from "@/components/effects/motion-reveal";
-import { PhilippinesMap } from "@/components/map/philippines-map";
 import { ReportStepsIndicator } from "@/components/report-steps-indicator";
+import { DraftAutoSave } from "@/components/reports/draft-autosave";
+import { SimilarReportsHint } from "@/components/reports/similar-reports-hint";
+
+// MapLibre + tile layers are the heaviest dependency on this page — load the
+// map lazily so the wizard's first paint never waits on it.
+const PhilippinesMap = dynamic(
+  () => import("@/components/map/philippines-map").then((m) => ({ default: m.PhilippinesMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="skeleton h-64 w-full rounded-2xl" aria-hidden="true" />
+    ),
+  },
+);
 
 const STEPS = 4;
 
@@ -275,34 +289,6 @@ export default function ReportFoundPage() {
             Thank you for helping return this item to its owner. Every report brings
             something one step closer to home.
           </p>
-
-          {/* Journey — REPORT → VERIFY → CONNECT → RETURN */}
-          <ol
-            aria-label="How returning works"
-            className="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-x-1.5 gap-y-2"
-          >
-            {[
-              ["Report", "Describe what you found"],
-              ["Verify", "We check ownership together"],
-              ["Connect", "Message through FindBack"],
-              ["Return", "Safe, public handover"],
-            ].map(([label, hint], i, arr) => (
-              <li key={label} className="flex items-center gap-1.5">
-                <span
-                  title={hint}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-700 backdrop-blur"
-                >
-                  {label}
-                </span>
-                {i < arr.length - 1 && (
-                  <span
-                    aria-hidden="true"
-                    className="h-px w-4 bg-emerald-200 sm:w-6"
-                  />
-                )}
-              </li>
-            ))}
-          </ol>
         </div>
 
         {/* Progress steps */}
@@ -332,10 +318,14 @@ export default function ReportFoundPage() {
           }}
           className="card mt-6 p-6 sm:p-8"
         >
+          <DraftAutoSave formId="found-report-form" storageKey="fb-draft-found" active={confirmedId === null} />
           <div id="step-1" className={step === 1 ? "space-y-5" : "space-y-5 hidden"}>
               <div>
                 <label htmlFor="title" className="label">Item name</label>
                 <input id="title" name="title" required minLength={3} maxLength={120} placeholder="e.g. Silver house keys" className="input" />
+                <div className="mt-2">
+                  <SimilarReportsHint kind="found" />
+                </div>
               </div>
 
               <div>

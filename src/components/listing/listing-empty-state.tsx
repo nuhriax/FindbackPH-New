@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PackageSearch, Plus } from "lucide-react";
 import { CommunityMotif } from "@/components/ui/community-motif";
+import { JeepneyMotif } from "@/components/ui/filipino-motif";
 import { ACCENT, type Accent } from "./accents";
 
 /**
@@ -45,6 +46,12 @@ export function ListingEmptyState({
 
       <p className="mt-1 max-w-sm text-xs leading-5 text-slate-500">
         {description}
+      </p>
+
+      {/* Warm community line + jeepney — Filipino texture, kept quiet */}
+      <JeepneyMotif className="mt-4 h-8 w-32 opacity-70" />
+      <p className="mt-1 text-[11px] font-medium italic text-leaf-700/80">
+        Tulong-tulong tayo — every item finds its way home.
       </p>
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-2">

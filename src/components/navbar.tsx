@@ -5,18 +5,17 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { Search, Menu, X, LogOut, LayoutDashboard, MessageCircle, Bookmark, ChevronDown } from "lucide-react";
+import { Search, Menu, X, LogOut, LayoutDashboard, User as UserIcon, Settings, Bookmark, ChevronDown } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
 import { Logo } from "@/components/logo";
-import { NotificationDropdown, MessagesDropdown, SavedDropdown } from "@/components/navbar/nav-dropdowns";
+import { NotificationDropdown, MessagesDropdown } from "@/components/navbar/nav-dropdowns";
 
 // Primary actions stay in the top bar; secondary info pages live under "More"
 // so the navbar doesn't overflow or bury the main CTAs.
 const PRIMARY_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Finds", href: "/finds" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
 ];
@@ -135,15 +134,15 @@ export function Navbar({
         {/* Floating pill shell */}
         <div
           className={clsx(
-            "mx-auto flex h-14 items-center justify-between gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
+            "mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
             scrolled
               ? "border-ice-200/80 bg-white/90 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
               : "border-white/80 bg-white/85 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-xl"
           )}
         >
-          <Logo />
+          <Logo className="justify-self-start" />
 
-          <nav className="hidden items-center gap-0.5 lg:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             {PRIMARY_LINKS.map((link) => {
               const active = isActive(link.href);
 
@@ -216,20 +215,19 @@ export function Navbar({
             </div>
           </nav>
 
-          <div className="hidden items-center gap-0.5 lg:flex">
+          <div className="hidden items-center justify-end gap-1 lg:flex">
             <Link
               href="/search"
               aria-label="Search"
-              className="rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
             >
-              <Search size={18} />
+              <Search size={20} />
             </Link>
 
             {user ? (
               <>
                 <NotificationDropdown initialCount={notificationCount} />
                 <MessagesDropdown initialCount={messageCount} />
-                <SavedDropdown initialCount={savedCount} />
                 <div ref={accountRef} className="relative ml-1">
                   <button
                     type="button"
@@ -272,12 +270,28 @@ export function Navbar({
                         Dashboard
                       </Link>
                       <Link
+                        href="/saved"
+                        role="menuitem"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <span className="relative">
+                          <Bookmark size={17} className="text-slate-500" />
+                          {savedCount > 0 && (
+                            <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-electric-600 px-1 text-[10px] font-semibold leading-none text-white">
+                              {savedCount > 9 ? "9+" : savedCount}
+                            </span>
+                          )}
+                        </span>
+                        Saved
+                      </Link>
+                      <Link
                         href="/dashboard/profile"
                         role="menuitem"
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <Bookmark size={17} className="text-slate-500" />
+                        <UserIcon size={17} className="text-slate-500" />
                         Profile
                       </Link>
                       <Link
@@ -286,7 +300,7 @@ export function Navbar({
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <MessageCircle size={17} className="text-slate-500" />
+                        <Settings size={17} className="text-slate-500" />
                         Settings
                       </Link>
                       <div className="my-1 h-px bg-navy-100" />
@@ -362,6 +376,8 @@ export function Navbar({
           <nav className="flex flex-col gap-1 px-3 py-4">
             {PRIMARY_LINKS.map((link) => {
               const active = isActive(link.href);
+              const isLost = link.href === "/lost";
+              const isFound = link.href === "/found";
 
               return (
                 <Link
@@ -372,7 +388,11 @@ export function Navbar({
                   className={clsx(
                     "rounded-full px-4 py-2.5 text-sm font-medium transition-colors",
                     active
-                      ? "bg-electric-50 text-electric-700"
+                      ? isLost
+                        ? "bg-sunrise-50 text-sunrise-700"
+                        : isFound
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-electric-50 text-electric-700"
                       : "text-slate-700 hover:bg-navy-50 hover:text-navy-800"
                   )}
                 >

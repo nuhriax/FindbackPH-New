@@ -1,4 +1,6 @@
-import { CheckCircle2, Lock } from "lucide-react";
+import { CheckCircle2, Lock, TrendingUp } from "lucide-react";
+
+import { computeHeroLevel } from "@/lib/badges";
 
 export type BadgeCard = {
   id: string;
@@ -11,12 +13,62 @@ export type BadgeCard = {
 /**
  * Badges grid — matches existing card/pill design language.
  * Earned: full color tile + green check. Locked: muted/grayscale.
+ * When `successfulReturns` is provided, a "Found Hero" level progress banner
+ * is rendered above the grid.
  */
-export function BadgesCard({ badges }: { badges: BadgeCard[] }) {
+export function BadgesCard({
+  badges,
+  successfulReturns,
+}: {
+  badges: BadgeCard[];
+  successfulReturns?: number | null;
+}) {
   const earnedCount = badges.filter((b) => b.earned).length;
+  const hero =
+    successfulReturns === undefined || successfulReturns === null
+      ? null
+      : computeHeroLevel(successfulReturns);
+  const heroProgress =
+    hero && hero.nextAt !== null
+      ? Math.min(100, Math.round(((successfulReturns ?? 0) / hero.nextAt) * 100))
+      : null;
 
   return (
     <div>
+      {hero && (
+        <div className="mb-5 rounded-2xl border border-emerald-200/70 bg-gradient-to-r from-emerald-50 via-white to-sunrise-50 p-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-2xl shadow-sm">
+              {hero.emoji}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-sm font-semibold text-navy-900">
+                Level {hero.level} · {hero.name}
+              </p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {hero.nextAt !== null
+                  ? `${successfulReturns ?? 0} of ${hero.nextAt} returns to the next level`
+                  : "The highest level — thank you for everything you've returned."}
+              </p>
+              {heroProgress !== null && (
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-all"
+                    style={{ width: `${heroProgress}%` }}
+                    role="progressbar"
+                    aria-valuenow={heroProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Progress to next hero level"
+                  />
+                </div>
+              )}
+            </div>
+            <TrendingUp size={16} className="hidden shrink-0 text-emerald-600 sm:block" />
+          </div>
+        </div>
+      )}
+
       <p className="text-sm text-slate-500">
         Earn badges by helping your community{" "}
         <span className="font-semibold text-navy-900">

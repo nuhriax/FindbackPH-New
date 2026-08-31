@@ -1262,7 +1262,7 @@ export function ReportDetail({
                                 ${
                                   match.kind ===
                                   "lost"
-                                    ? "bg-red-50 text-red-600"
+                                    ? "bg-sunrise-50 text-sunrise-600"
                                     : "bg-emerald-50 text-emerald-600"
                                 }
                               `}
@@ -1288,7 +1288,7 @@ export function ReportDetail({
                                     ${
                                       match.kind ===
                                       "lost"
-                                        ? "text-red-600"
+                                        ? "text-sunrise-600"
                                         : "text-emerald-600"
                                     }
                                   `}

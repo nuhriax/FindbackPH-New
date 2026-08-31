@@ -199,9 +199,10 @@ export function NotificationDropdown({ initialCount }: { initialCount: number })
         onClick={toggle}
         aria-expanded={open}
         aria-label={count > 0 ? `${count} unread notification${count === 1 ? "" : "s"}` : "Notifications"}
-        className="relative rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
+        title="Notifications"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
       >
-        <Bell size={18} />
+        <Bell size={20} />
         <Badge count={count} />
       </button>
 
@@ -242,6 +243,26 @@ export function NotificationDropdown({ initialCount }: { initialCount: number })
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * FindBackMessageIcon — a solid rounded-square chat bubble with a
+ * bottom-left tail. Filled with currentColor, sized on a 24x24 grid.
+ */
+export function FindBackMessageIcon({ size = 18, className }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Solid rounded-square bubble with a bottom-left tail */}
+      <path d="M18 3H6a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h1.5v3.2c0 .42.48.66.82.4L13 18h5a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3Z" />
+    </svg>
   );
 }
 
@@ -323,9 +344,10 @@ export function MessagesDropdown({ initialCount }: { initialCount: number }) {
         onClick={toggle}
         aria-expanded={open}
         aria-label={count > 0 ? `${count} unread message${count === 1 ? "" : "s"}` : "Messages"}
-        className="relative rounded-full p-2.5 text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
+        title="Messages"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
       >
-        <MessageCircle size={18} />
+        <MessageCircle size={20} />
         <Badge count={count} />
       </button>
 

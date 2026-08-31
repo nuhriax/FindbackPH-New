@@ -6,6 +6,15 @@
   :root {
     color-scheme: light;
 
+    /* --- Semantic surface tokens ---------------------------------------
+       Component-level colors should prefer these over raw palette values so
+       a future site-wide dark mode only needs to override this block.    */
+    --color-surface: 255 255 255;
+    --color-surface-muted: 251 246 239;
+    --color-text: 15 23 42;
+    --color-text-muted: 100 116 139;
+    --color-border-subtle: 226 232 240;
+
     /* --- Design tokens -------------------------------------------------- */
     --background: 251 246 239; /* warm sand */
     --foreground: 46 36 23; /* warm espresso text */
@@ -24,6 +33,7 @@
     --glow-medium: 124 201 198; /* teal-300 */
     --glow-bright: 15 123 122; /* brand teal */
     --glow-warm: 255 116 24; /* sunset coral */
+    --glow-leaf: 38 138 86; /* leaf-600 — nature accent, used for organic highlights */
 
     /* --- Typography ------------------------------------------------ */
     /* One font family site-wide. `--font-mono` is mapped to the same Plus
@@ -55,7 +65,9 @@
       radial-gradient(980px 760px at 6% 2%, rgba(250, 243, 231, 0.9), transparent 58%),
       radial-gradient(900px 740px at 95% 6%, rgba(246, 234, 214, 0.85), transparent 56%),
       radial-gradient(1000px 820px at 102% 108%, rgba(247, 220, 196, 0.6), transparent 62%),
-            radial-gradient(1000px 720px at -4% 104%, rgba(230, 210, 178, 0.35), transparent 62%);
+            radial-gradient(1000px 720px at -4% 104%, rgba(230, 210, 178, 0.35), transparent 62%),
+      radial-gradient(900px 700px at 3% 12%, rgba(191, 231, 204, 0.30), transparent 58%),
+      radial-gradient(820px 640px at 97% 16%, rgba(223, 243, 229, 0.34), transparent 58%);
     background-attachment: fixed;
     color: #2e2417;
     font-family: var(--font-pjs), system-ui, sans-serif;
@@ -730,3 +742,372 @@ p {
   0% { background-position: 140% 0; }
   100% { background-position: -140% 0; }
 }
+
+/* ===========================================================================
+   PREMIUM UTILITIES — FindBack PH design system
+   Small, composable helpers that give every page the same "high-tier" feel:
+   glass surfaces, gradient headline accents, quiet hairline dividers and a
+   consistent focus treatment. Prefer these over re-rolling class strings.
+   =========================================================================== */
+@layer utilities {
+  /* Frosted glass surface that sits naturally on the warm-sand backdrop. */
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      0 24px 60px -26px rgba(51, 46, 38, 0.22),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+  }
+
+  /* Brand gradient for a highlighted word inside a headline. */
+  .text-gradient-brand {
+    background: linear-gradient(100deg, #0f7b72 0%, #20948f 45%, #f59341 110%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Hairline divider that fades at the edges — softer than border-solid. */
+  .hairline-x {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(226, 232, 240, 0.9) 18%,
+      rgba(226, 232, 240, 0.9) 82%,
+      transparent
+    );
+  }
+
+  /* Warm glass navbar pill — tinted toward the sand page color so the bar
+     reads as part of the page, not a floating white box. */
+  .navbar-glass {
+    background: rgba(253, 251, 245, 0.82);
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+  }
+
+  .navbar-glass-scrolled {
+    background: rgba(253, 251, 245, 0.92);
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+  }
+
+  /* Premium focus treatment for non-button focusables (links, inputs). */
+  .focus-premium:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(32, 148, 143, 0.22);
+    border-radius: 0.5rem;
+  }
+}
+  /* ==========================================================================
+     EDITORIAL TYPE — oversized display scale for hero / section moments
+     ========================================================================== */
+  .display-hero {
+    font-family: var(--font-display, var(--font-pjs)), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    color: var(--text-heading);
+  }
+
+  .display-giant {
+    font-family: var(--font-display, var(--font-pjs)), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Footer ink — warmed toward the sand page color, with a soft "dawn" fade
+     at the top so the dark band emerges from the page instead of cutting off. */
+  .footer-ink {
+    position: relative;
+    background-color: #0e3330;
+    background-image:
+      radial-gradient(900px 420px at 50% -8%, rgba(245, 214, 175, 0.10), transparent 62%),
+      radial-gradient(900px 500px at 12% -10%, rgba(45, 212, 191, 0.12), transparent 60%),
+      radial-gradient(800px 480px at 92% 8%, rgba(255, 138, 76, 0.09), transparent 55%),
+      radial-gradient(700px 420px at 50% 115%, rgba(45, 212, 191, 0.08), transparent 60%);
+    color: #f4f7f6;
+  }
+
+  .footer-ink::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 140px;
+    background: linear-gradient(180deg, rgba(247, 240, 227, 0.16), transparent);
+    pointer-events: none;
+  }
+
+/* ===========================================================================
+   SITE-WIDE INK THEME — the footer's deep teal-ink palette, everywhere.
+   Activated by the `site-ink` class on <html> (see layout.tsx). These rules
+   are declared LAST so they win the cascade over the light-theme defaults
+   and Tailwind utilities without needing !important.
+   =========================================================================== */
+.site-ink {
+  --text-heading: #eef6f4;
+  --text-body: #eef6f4;
+  --text-muted: rgba(238, 246, 244, 0.72);
+  --text-faint: rgba(238, 246, 244, 0.55);
+  --background: 12 43 41;
+  --foreground: 238 246 244;
+  --card: 22 58 55;
+  --border: 255 255 255;
+  color-scheme: dark;
+}
+
+/* Page canvas — the footer's ink base with its dawn glows. */
+.site-ink body {
+  background-color: #0c2b29;
+  background-image:
+    radial-gradient(1100px 700px at 50% -6%, rgba(245, 214, 175, 0.10), transparent 62%),
+    radial-gradient(950px 640px at 4% 4%, rgba(45, 212, 191, 0.10), transparent 58%),
+    radial-gradient(900px 620px at 96% 8%, rgba(255, 138, 76, 0.07), transparent 55%),
+    radial-gradient(1000px 760px at 50% 112%, rgba(45, 212, 191, 0.08), transparent 60%);
+  color: #eef6f4;
+}
+
+/* Headings + body copy → light ink tones. */
+.site-ink h1,
+.site-ink h2,
+.site-ink h3,
+.site-ink h4,
+.site-ink h5,
+.site-ink h6,
+.site-ink p {
+  color: var(--text-heading);
+}
+
+/* Neutral text utilities → light ink tones. */
+.site-ink .text-navy-700,
+.site-ink .text-navy-800,
+.site-ink .text-navy-900,
+.site-ink .text-slate-700,
+.site-ink .text-slate-800,
+.site-ink .text-slate-900 {
+  color: #eef6f4;
+}
+.site-ink .text-slate-500,
+.site-ink .text-slate-600 {
+  color: rgba(238, 246, 244, 0.72);
+}
+.site-ink .text-slate-300,
+.site-ink .text-slate-400 {
+  color: rgba(238, 246, 244, 0.55);
+}
+
+/* White surfaces → frosted dark glass (footer-card treatment). */
+.site-ink .bg-white,
+.site-ink .bg-white\/80,
+.site-ink .bg-white\/85,
+.site-ink .bg-white\/90,
+.site-ink .bg-white\/95 {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+.site-ink .bg-white\/40,
+.site-ink .bg-white\/45,
+.site-ink .bg-white\/50,
+.site-ink .bg-white\/60,
+.site-ink .bg-white\/70 {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Soft neutral fills → translucent ink tints. */
+.site-ink .bg-slate-50,
+.site-ink .bg-slate-100,
+.site-ink .bg-navy-50 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Borders → hairline light strokes. */
+.site-ink .border-slate-100,
+.site-ink .border-slate-200,
+.site-ink .border-slate-200\/60,
+.site-ink .border-slate-200\/70,
+.site-ink .border-navy-100 {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Dividers built with bg-slate gaps. */
+.site-ink .bg-slate-200 {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Navbar glass → dark glass so it melts into the ink canvas. */
+.site-ink .navbar-glass {
+  background: rgba(12, 43, 41, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.site-ink .navbar-glass-scrolled {
+  background: rgba(12, 43, 41, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+/* Shared glass utility → dark variant. */
+.site-ink .glass {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 24px 60px -26px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Hairline divider → light strokes. */
+.site-ink .hairline-x {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.16) 18%,
+    rgba(255, 255, 255, 0.16) 82%,
+    transparent
+  );
+}
+
+/* Selection + scrollbar tuned for ink. */
+.site-ink ::selection {
+  background: rgba(45, 212, 191, 0.32);
+  color: #f4fbf9;
+}
+.site-ink * {
+  scrollbar-color: rgba(238, 246, 244, 0.28) transparent;
+}
+.site-ink *::-webkit-scrollbar-thumb {
+  background: rgba(238, 246, 244, 0.22);
+}
+.site-ink *::-webkit-scrollbar-thumb:hover {
+  background: rgba(238, 246, 244, 0.38);
+}
+
+/* Shadows read better softened on dark. */
+.site-ink .shadow-soft,
+.site-ink .shadow-lg,
+.site-ink .shadow-xl {
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.55);
+}
+
+/* Inputs inherit ink text. */
+.site-ink input,
+.site-ink textarea,
+.site-ink select {
+  color: #eef6f4;
+}
+
+/* ===========================================================================
+   INK THEME REFINEMENTS — contrast fixes found by auditing every component.
+   =========================================================================== */
+
+/* Pale highlight backgrounds → translucent light, so both dark and light
+   text on them stays readable on the ink canvas. */
+.site-ink .bg-electric-50,
+.site-ink .bg-electric-50\/50,
+.site-ink .bg-blue-50,
+.site-ink .bg-blue-50\/40,
+.site-ink .bg-emerald-50,
+.site-ink .bg-emerald-50\/50,
+.site-ink .bg-amber-50,
+.site-ink .bg-cream-100,
+.site-ink .hover\:bg-electric-50:hover,
+.site-ink .hover\:bg-blue-50:hover,
+.site-ink .hover\:bg-blue-50\/40:hover,
+.site-ink .hover\:bg-blue-50\/50:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.site-ink .hover\:bg-slate-50:hover,
+.site-ink .hover\:bg-slate-100:hover,
+.site-ink .hover\:bg-slate-200:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Brand accent text brightened for dark backgrounds. */
+.site-ink .text-electric-600,
+.site-ink .text-electric-700 {
+  color: #6fe3da;
+}
+.site-ink .text-electric-800,
+.site-ink .text-electric-900 {
+  color: #a5efe9;
+}
+.site-ink .text-emerald-600,
+.site-ink .text-emerald-700 {
+  color: #6ee7b7;
+}
+.site-ink .text-emerald-800 {
+  color: #a7f3d0;
+}
+/* Leaf accents brightened for dark backgrounds (reunited / success moments). */
+.site-ink .text-leaf-600,
+.site-ink .text-leaf-700 {
+  color: #7fdcae;
+}
+.site-ink .text-leaf-800,
+.site-ink .text-leaf-900 {
+  color: #b2eccb;
+}
+.site-ink .text-blue-600,
+.site-ink .text-blue-700 {
+  color: #93c5fd;
+}
+.site-ink .text-sunrise-600,
+.site-ink .text-sunrise-700 {
+  color: #fdba74;
+}
+.site-ink .text-ice-500,
+.site-ink .text-ice-600 {
+  color: rgba(238, 246, 244, 0.72);
+}
+
+/* Cream borders → light hairlines. */
+.site-ink .border-cream-200,
+.site-ink .border-cream-300 {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Table dividers on dark. */
+.site-ink .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.site-ink .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Placeholders (placeholder: variants are distinct classes from text:*). */
+.site-ink .placeholder\:text-slate-400::placeholder,
+.site-ink .placeholder\:text-slate-500::placeholder {
+  color: rgba(238, 246, 244, 0.42);
+}
+
+/* Intentional white buttons inside dark CTA bands stay white. */
+.site-ink .bg-white.text-electric-800 {
+  background-color: #f6fbfa;
+  color: #0b4f4a;
+}
+
+
+
+  /* ==========================================================================
+     INK SECTION — light tonal band that breaks an all-light page rhythm
+     ========================================================================== */
+  .section-ink {
+    position: relative;
+    background-color: #f6efe1;
+    background-image:
+      radial-gradient(900px 500px at 12% -10%, rgba(191, 231, 204, 0.45), transparent 60%),
+      radial-gradient(800px 480px at 92% 8%, rgba(255, 214, 175, 0.35), transparent 55%),
+      radial-gradient(700px 420px at 50% 115%, rgba(191, 231, 204, 0.30), transparent 60%);
+    color: #3d2f22;
+  }
+
+  .section-ink h2,
+  .section-ink h3 {
+    color: #17322f;
+  }
+
+  .section-ink p {
+    color: rgba(61, 47, 34, 0.75);
+  }
+

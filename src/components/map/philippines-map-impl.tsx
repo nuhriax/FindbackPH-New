@@ -1752,7 +1752,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
             <span
               className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
                 selected.kind === "lost"
-                  ? "bg-rose-100 text-rose-700"
+                  ? "bg-sunrise-100 text-sunrise-700"
                   : "bg-emerald-100 text-emerald-700"
               }`}
             >

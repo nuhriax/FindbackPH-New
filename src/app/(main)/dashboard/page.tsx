@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
+  BellRing,
   Bookmark,
   HeartHandshake,
   PackageCheck,
@@ -101,7 +102,7 @@ export default async function DashboardPage() {
   const stats = [
     { label: "Active lost", value: activeLost, icon: PackageX, tone: "sunrise" },
     { label: "Active found", value: activeFound, icon: PackageCheck, tone: "emerald" },
-    { label: "Recovered", value: recovered, icon: HeartHandshake, tone: "blue" },
+    { label: "Recovered", value: recovered, icon: HeartHandshake, tone: "leaf" },
     { label: "Saved", value: savedCount, icon: Bookmark, tone: "violet" },
   ] as const;
 
@@ -146,6 +147,55 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Match candidates — the retention loop: surface waiting matches
+          prominently instead of hiding them behind notifications. */}
+      {undismissedMatches.length > 0 && (
+        <div className="mt-6 overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-electric-50/50 p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-600">
+                <BellRing size={18} aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-600">
+                  Waiting for you
+                </p>
+                <h2 className="mt-0.5 font-display text-base font-bold text-navy-900 sm:text-lg">
+                  {undismissedMatches.length} possible match
+                  {undismissedMatches.length > 1 ? "es" : ""} on your report
+                  {undismissedMatches.length > 1 ? "s" : ""}
+                </h2>
+                <p className="mt-0.5 text-sm text-slate-600">
+                  Our engine found {undismissedMatches.length > 1 ? "reports" : "a report"} that look
+                  {undismissedMatches.length > 1 ? "" : "s"} like your item. Take a look — one might be it.
+                </p>
+              </div>
+            </div>
+            <Link href="/dashboard" className="btn-primary shrink-0" aria-label="Review possible matches">
+              <HeartHandshake size={16} />
+              Review matches
+            </Link>
+          </div>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {undismissedMatches.slice(0, 4).map((m: DashboardMatch) => (
+              <li key={m.id}>
+                <Link
+                  href={`/found/${m.found_item_id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-white bg-white/80 px-3.5 py-2.5 text-sm shadow-sm transition hover:border-emerald-200 hover:bg-white"
+                >
+                  <span className="min-w-0 truncate font-medium text-navy-900">
+                    {m.found_items?.title ?? "Found item"}
+                  </span>
+                  <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold tabular-nums text-emerald-700">
+                    {m.score != null ? `${Math.round(m.score)}% match` : "match"}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Stat tiles */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -200,6 +250,7 @@ const STAT_TONES: Record<string, string> = {
   emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
   blue: "border-blue-200 bg-blue-50 text-blue-600",
   violet: "border-violet-200 bg-violet-50 text-violet-600",
+  leaf: "border-leaf-200 bg-leaf-50 text-leaf-600",
 };
 
 const STAT_ACCENT: Record<string, string> = {

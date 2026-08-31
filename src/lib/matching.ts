@@ -1,5 +1,7 @@
 import { differenceInCalendarDays, isValid } from "date-fns";
 
+import { bestHashDistance, photoScoreFromDistance, type PhotoHash } from "@/lib/phash";
+
 /* ============================================================================
    FindBack PH — deterministic matching engine (Phase 6)
 
@@ -23,12 +25,13 @@ import { differenceInCalendarDays, isValid } from "date-fns";
    ============================================================================ */
 
 export const MATCH_WEIGHTS = {
-  category: 20,
-  location: 30,
-  date: 15,
-  color: 10,
-  brand: 15,
-  description: 10,
+  category: 18,
+  location: 26,
+  date: 12,
+  color: 9,
+  brand: 12,
+  description: 11,
+  photo: 12,
 } as const;
 
 export const MATCH_THRESHOLDS = {
@@ -79,6 +82,12 @@ export type MatchableItem = {
   date: string | null;
   description: string | null;
   distinguishing_features: string | null;
+  /**
+   * Perceptual hashes of the report's photos (from item_images.phash).
+   * Optional — when either side has no hashes the photo factor is excluded
+   * from scoring entirely (never counted as a mismatch).
+   */
+  photoHashes?: PhotoHash[] | null;
 };
 
 /* ============================================================================
@@ -375,6 +384,7 @@ const FACTOR_SCORERS: Record<
   color: scoreColor,
   brand: scoreBrand,
   description: scoreDescription,
+  photo: scorePhoto,
 };
 
 const FACTOR_SUCCESS_LABELS: Record<MatchFactorKey, string> = {
@@ -384,7 +394,20 @@ const FACTOR_SUCCESS_LABELS: Record<MatchFactorKey, string> = {
   color: "Color matched",
   brand: "Brand/model matched",
   description: "Description similar",
+  photo: "Photos look alike",
 };
+
+/* ============================================================================
+   Photo similarity (pHash)
+   ============================================================================ */
+
+function scorePhoto(a: MatchableItem, b: MatchableItem): FactorScore | null {
+  const weight = MATCH_WEIGHTS.photo;
+  const distance = bestHashDistance(a.photoHashes, b.photoHashes);
+  const result = photoScoreFromDistance(distance, weight);
+  if (!result) return null; // No comparable hashes on both sides — excluded.
+  return result;
+}
 
 /* ============================================================================
    Main entry point

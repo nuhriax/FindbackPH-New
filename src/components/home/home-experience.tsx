@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
-import { InPageNav } from "@/components/in-page-nav";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 
 type HomeExperienceStats = {
@@ -479,17 +478,96 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
       </section>
 
       {/* =========================================================
-          ON THIS PAGE — sticky in-page index
+          HOW IT WORKS — 3 STEPS
       ========================================================= */}
-      <InPageNav
-        className="mx-auto mb-6 max-w-7xl px-4 sm:px-6 lg:px-8"
-        items={[
-          { id: "categories-heading", label: "Categories" },
-          { id: "how-heading", label: "How it works" },
-          { id: "safety-heading", label: "Safety" },
-          { id: "cta-heading", label: "Get started" },
-        ]}
-      />
+
+      <section className="relative py-14 sm:py-16" aria-labelledby="how-heading">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <p
+              id="how-heading"
+              className="text-center text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600"
+            >
+              How it works
+            </p>
+
+            <h2 className="mt-2 text-center font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Three steps between lost and found
+            </h2>
+          </Reveal>
+
+          <div className="relative mt-10 grid gap-5 md:grid-cols-3">
+            {/* connector line (desktop) */}
+            <div
+              aria-hidden
+              className="absolute left-[16%] right-[16%] top-12 hidden border-t-2 border-dashed border-blue-200 md:block"
+            />
+
+            {[
+              {
+                step: "1",
+                icon: FileText,
+                title: "Post a report",
+                text: "Describe your item, add a photo, and drop a pin. Takes under two minutes — and your contact details stay hidden.",
+                href: "/report/lost",
+                cta: "Report an item",
+              },
+              {
+                step: "2",
+                icon: Radar,
+                title: "Get matched",
+                text: "We surface reports near where your item went missing, and notify you when a matching found item appears.",
+                href: "/search",
+                cta: "Browse reports",
+              },
+              {
+                step: "3",
+                icon: HeartHandshake,
+                title: "Verify & reunite",
+                text: "Chat privately, confirm ownership with details only the real owner would know, and meet somewhere safe.",
+                href: "/safety",
+                cta: "Safety guide",
+              },
+            ].map((s, i) => {
+              const Icon = s.icon;
+
+              return (
+                <Reveal key={s.step} delay={80 + i * 70}>
+                  <div className="group relative h-full rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_10px_40px_-18px_rgba(15,23,42,0.12)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_55px_-20px_rgba(37,99,235,0.22)]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-500 text-white shadow-[0_10px_25px_-8px_rgba(37,99,235,0.5)] transition duration-300 group-hover:scale-105">
+                        <Icon size={22} />
+
+                        <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-slate-900 text-[10px] font-bold text-white">
+                          {s.step}
+                        </span>
+                      </div>
+
+                      <h3 className="font-display text-lg font-bold text-slate-900">
+                        {s.title}
+                      </h3>
+                    </div>
+
+                    <p className="mt-4 text-sm leading-6 text-slate-600">
+                      {s.text}
+                    </p>
+
+                    <Link
+                      href={s.href}
+                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition group-hover:gap-2.5"
+                    >
+                      {s.cta}
+                      <ArrowRight size={15} />
+                    </Link>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* (InPageNav removed) */}
 
       {/* =========================================================
           TRUST STRIP

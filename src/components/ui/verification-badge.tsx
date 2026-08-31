@@ -38,7 +38,7 @@ export function TrustedMemberBadge() {
   return (
     <span
       title="Long-standing member with at least one successful return recorded on FindBack PH"
-      className={`${base} border-violet-200 bg-violet-50 text-violet-700`}
+      className={`${base} border-navy-200 bg-navy-50 text-navy-700`}
     >
       <HeartHandshake size={11} aria-hidden />
       Trusted member

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { ReportActions } from "@/components/dashboard/report-actions";
+import { BayanihanMotif } from "@/components/ui/filipino-motif";
 import { Eye, ListChecks, Pencil, Plus } from "lucide-react";
 import type { ItemStatus } from "@/types/database";
 
@@ -170,7 +171,7 @@ export default async function MyReportsPage({
     </div>
   );
 
-  function FilterChip({ label, active, href }: { label: string; active: boolean; href: string }) {
+function FilterChip({ label, active, href }: { label: string; active: boolean; href: string }) {
     return (
       <Link
         href={href}
@@ -195,6 +196,11 @@ export default async function MyReportsPage({
         <h3 className="mt-4 font-display text-lg font-semibold text-navy-900">No reports here yet</h3>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-600">
           Reports you create for lost or found items will appear here so you can manage them easily.
+        </p>
+        {/* Bayanihan — the community is ready to help carry it home */}
+        <BayanihanMotif className="mx-auto mt-5 h-10 w-40 opacity-70" />
+        <p className="mt-1 text-xs italic text-leaf-700/80">
+          Bayanihan tayo — someone out there is waiting to help.
         </p>
         <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
           <Link href="/report/lost" className="btn-primary">

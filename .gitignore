@@ -46,3 +46,15 @@ dev.err.log
 
 
 *.log
+
+# Local diagnostics & dev logs
+*.log
+diag-*.js
+live-diag.js
+map-diag.cjs
+map-test.html
+hwdiff.txt
+safediff.txt
+cfg-dump.txt
+workerUrl-dump.txt
+audit-prod.log

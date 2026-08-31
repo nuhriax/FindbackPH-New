@@ -195,6 +195,7 @@ return (
           </h2>
           <div className="mt-4 card p-6">
             <BadgesCard
+              successfulReturns={profile.successful_returns}
               badges={earnedBadges.map(
                 ({ id, emoji, name, description, earned }) => ({
                   id,

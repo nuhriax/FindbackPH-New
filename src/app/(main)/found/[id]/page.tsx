@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { ReportViewer } from "@/components/reports/report-viewers";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
 import { jsonLdStringify } from "@/lib/utils";
@@ -305,6 +306,14 @@ export default async function FoundItemDetailPage({ params }: Props) {
             },
           }),
         }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Discover", href: "/explore" },
+          { label: "Found items", href: "/found" },
+          { label: raw.title },
+        ]}
       />
 
       <ReportDetail

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { ReportViewer } from "@/components/reports/report-viewers";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
 import { jsonLdStringify } from "@/lib/utils";
@@ -300,6 +301,14 @@ export default async function LostItemDetailPage({ params }: Props) {
             },
           }),
         }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Discover", href: "/explore" },
+          { label: "Lost items", href: "/lost" },
+          { label: raw.title },
+        ]}
       />
 
       <ReportDetail

@@ -243,11 +243,11 @@ export default function ContactPage() {
           <div className="relative">
             <div
               aria-hidden="true"
-              className="absolute -inset-1 rounded-[2rem] bg-gradient-to-br from-blue-400/25 via-transparent to-violet-400/25 opacity-60 blur-xl transition-opacity duration-500"
+              className="absolute -inset-1 rounded-[2rem] bg-gradient-to-br from-electric-400/25 via-transparent to-amber-400/25 opacity-60 blur-xl transition-opacity duration-500"
             />
             <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.18)] backdrop-blur-xl">
               {/* Form header strip */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-electric-400 to-violet-500" />
+              <div className="h-1.5 w-full bg-gradient-to-r from-electric-600 via-electric-400 to-amber-500" />
 
               {success ? (
                 <SuccessState />

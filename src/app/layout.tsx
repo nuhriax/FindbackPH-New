@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
 import "./auth.css";
 import { BackgroundEffects } from "@/components/ui/background-effects";
 import { ToastProvider } from "@/components/ui/toast";
+import { PwaRegister } from "@/components/pwa/pwa-register";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-pjs",
+  display: "swap",
+});
+
+// Sora is the display/brand font — used only via the `font-display` Tailwind
+// family (all h1–h6 and hero/stat display text). Plus Jakarta Sans remains the
+// UI/body font for everything else.
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sora",
   display: "swap",
 });
 
@@ -19,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | FindBack PH",
   },
   description:
-    "FindBack PH is the Philippines' community lost-and-found platform. Report a lost or found item, search local reports, match safely, and reunite things with their owners.",
+    "FindBack PH — every lost thing has a way home. The Philippines' free community lost-and-found platform: report a lost or found item, search local reports, match safely, and reunite things with their owners. Private by default, free forever.",
   applicationName: "FindBack PH",
   alternates: {
     canonical: "/",
@@ -41,6 +52,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // PWA installability: served from /manifest.webmanifest with the service
+  // worker registered by <PwaRegister /> (production only).
+  manifest: "/manifest.webmanifest",
   // Search-engine site ownership. Renders verification <meta> tags only when the
   // corresponding env vars are set (the "HTML tag" method), so nothing is emitted
   // until a value is added. Adding a value requires a redeploy (a git push).
@@ -57,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // suppressHydrationWarning: the inline theme script below mutates
     // <html> (data-auth-theme) before React hydrates, by design — without
     // this, React logs a hydration attribute-mismatch warning on every load.
-    <html lang="en" className={`${plusJakarta.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${plusJakarta.variable} ${sora.variable}`} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col font-sans text-navy-900 antialiased">
         {/* Skip link for keyboard / screen-reader users */}
         <a
@@ -88,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <ToastProvider>{children}</ToastProvider>
+        <PwaRegister />
       </body>
     </html>
   );

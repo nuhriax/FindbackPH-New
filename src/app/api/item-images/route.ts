@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isValidPhotoHash } from "@/lib/phash";
 
 /**
  * POST /api/item-images
@@ -99,11 +100,24 @@ export async function POST(req: NextRequest) {
   }
 
   const prefix = itemType === "lost_item" ? "lost" : "found";
+
+  // Optional perceptual hashes computed client-side (one per photo, same
+  // order as `images`). Malformed or missing entries are simply skipped —
+  // hashing must never block an upload.
+  let hashes: (string | null)[] = [];
+  try {
+    const parsed = JSON.parse(formData.get("phashes")?.toString() ?? "[]");
+    if (Array.isArray(parsed)) hashes = parsed;
+  } catch {
+    hashes = [];
+  }
+
   const uploads: {
     lost_item_id: string | null;
     found_item_id: string | null;
     storage_path: string;
     position: number;
+    phash?: string | null;
   }[] = [];
 
   for (let i = 0; i < files.length; i++) {
@@ -139,6 +153,7 @@ export async function POST(req: NextRequest) {
       found_item_id: itemType === "found_item" ? itemId : null,
       storage_path: fileName,
       position: i,
+      ...(isValidPhotoHash(hashes[i]) ? { phash: hashes[i] } : {}),
     });
   }
 

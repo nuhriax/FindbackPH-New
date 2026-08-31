@@ -1,8 +1,8 @@
-﻿/**
+/**
  * Shared similarity scoring used by both the server actions (matching engine)
  * and server components (live fallback candidates on detail pages).
  *
- * This module is now a thin adapter over the Phase 6 deterministic engine in
+ * This module is a thin adapter over the deterministic engine in
  * `@/lib/matching`, so every consumer (listing pages, server actions, report
  * detail pages) uses ONE algorithm with identical weights and explainability.
  * The 0-1 score below is simply the engine's 0-100 score divided by 100.
@@ -35,6 +35,7 @@ export function computeMatchScore(
       date: lost.date_lost ?? null,
       description: lost.description ?? "",
       distinguishing_features: lost.distinguishing_features ?? null,
+      photoHashes: lost.photoHashes ?? null,
     },
     {
       id: found.id ?? "",
@@ -46,7 +47,8 @@ export function computeMatchScore(
       date: found.date_found ?? null,
       description: found.description ?? "",
       distinguishing_features: found.distinguishing_features ?? null,
-    },
+      photoHashes: found.photoHashes ?? null,
+    }
   );
 
   return result ? result.score / 100 : 0;
@@ -55,7 +57,7 @@ export function computeMatchScore(
 /** Explainable variant for callers that want factor breakdowns. */
 export function computeMatchWithFactors(
   lost: Parameters<typeof computeMatchScore>[0],
-  found: Parameters<typeof computeMatchScore>[1],
+  found: Parameters<typeof computeMatchScore>[1]
 ) {
   return calculateMatch(
     {
@@ -68,6 +70,7 @@ export function computeMatchWithFactors(
       date: lost.date_lost ?? null,
       description: lost.description ?? "",
       distinguishing_features: lost.distinguishing_features ?? null,
+      photoHashes: lost.photoHashes ?? null,
     },
     {
       id: found.id ?? "",
@@ -79,10 +82,7 @@ export function computeMatchWithFactors(
       date: found.date_found ?? null,
       description: found.description ?? "",
       distinguishing_features: found.distinguishing_features ?? null,
-    },
+      photoHashes: found.photoHashes ?? null,
+    }
   );
 }
-
-
-
-

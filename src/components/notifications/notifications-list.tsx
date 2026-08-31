@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, HeartHandshake, PackageCheck, ShieldAlert } from "lucide-react";
 import { markNotificationRead, markAllNotificationsRead } from "@/lib/actions/messaging";
 import { useToast } from "@/components/ui/toast";
+import { createClient } from "@/lib/supabase/client";
 import type { Notification } from "@/types/database";
 
 function notificationIcon(type: string) {
   if (type === "possible_match") return { Icon: PackageCheck, cls: "border-emerald-200 bg-emerald-50 text-emerald-600" };
   if (type === "moderation_action") return { Icon: ShieldAlert, cls: "border-amber-200 bg-amber-50 text-amber-600" };
   if (type === "item_returned") return { Icon: HeartHandshake, cls: "border-blue-200 bg-blue-50 text-blue-600" };
-  return { Icon: Bell, cls: "border-indigo-200 bg-indigo-50 text-indigo-600" };
+  return { Icon: Bell, cls: "border-blue-200 bg-blue-50 text-blue-600" };
 }
 
 const FILTERS = [
@@ -41,6 +42,62 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
   const [isPending, startTransition] = useTransition();
   const [filter, setFilter] = useState<FilterKey>("all");
   const { toast } = useToast();
+
+  // Realtime: push new notifications straight into the list as they arrive,
+  // no refresh needed. Subscribed once per mount; RLS on `notifications` means
+  // Postgres only streams rows the signed-in user can already read. If the
+  // realtime feature isn't enabled for the table this degrades gracefully —
+  // the server-rendered list is still correct on every page load.
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+
+  useEffect(() => {
+    const supabase = createClient();
+    let userId: string | null = null;
+
+    const channel = supabase
+      .channel("notifications-live")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications" },
+        (payload) => {
+          const row = payload.new as {
+            id: string;
+            user_id?: string;
+            type?: string;
+            title?: string;
+            message?: string;
+            link?: string | null;
+            read?: boolean;
+            created_at?: string;
+          };
+          if (!row?.id || userId !== row.user_id) return;
+          if (itemsRef.current.some((n) => n.id === row.id)) return;
+          const next: Notification = {
+            id: row.id,
+            user_id: row.user_id ?? "",
+            type: (row.type ?? "update") as Notification["type"],
+            title: row.title ?? "Update",
+            message: row.message ?? "",
+            link: row.link ?? null,
+            read: row.read ?? false,
+            created_at: row.created_at ?? new Date().toISOString(),
+          };
+          setItems((prev) => [next, ...prev]);
+          toast("success", next.title);
+        }
+      )
+      .subscribe();
+
+    supabase.auth.getUser().then(({ data }) => {
+      userId = data.user?.id ?? null;
+    });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const unreadCount = items.filter((n) => !n.read).length;
   const filtered = items.filter((n) => matchesFilter(n.type, filter));

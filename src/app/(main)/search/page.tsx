@@ -10,6 +10,7 @@ import {
   Check,
   Clock,
   Filter,
+  MapPin,
   Search,
   X,
 } from "lucide-react";
@@ -441,8 +442,8 @@ export default async function SearchPage({
               </h1>
 
               <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                Find a lost or found item by its details, location, or
-                category.
+                Search by keyword, location, or category — every report is
+                posted by a real person who wants to see it come home.
               </p>
             </div>
 
@@ -475,8 +476,11 @@ export default async function SearchPage({
 
                 {/* Location */}
                 <div className="flex min-h-[52px] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-electric-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-electric-100">
-                  <span className="text-sm text-slate-500">
-                    @
+                  <span
+                    aria-hidden="true"
+                    className="text-sm text-slate-500"
+                  >
+                    <MapPin size={16} className="shrink-0" />
                   </span>
 
                   <input
@@ -623,7 +627,7 @@ export default async function SearchPage({
                   aria-current={active ? "page" : undefined}
                   className={
                     active
-                      ? "rounded-lg bg-navy-900 px-3 py-2 text-xs font-semibold text-white shadow-sm sm:text-sm"
+                      ? "rounded-lg bg-electric-600 px-3 py-2 text-xs font-semibold text-white shadow-sm sm:text-sm"
                       : "rounded-lg px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-electric-50 hover:text-electric-700 sm:text-sm"
                   }
                 >

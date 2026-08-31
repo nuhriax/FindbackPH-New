@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   HeartHandshake,
+  type LucideIcon,
   KeyRound,
   Laptop,
   Lock,
@@ -24,6 +25,7 @@ import { CommunityMotif } from "@/components/ui/community-motif";
 import { LiveReportsRefresh } from "@/components/home/live-reports-refresh";
 import { PaperNotes } from "@/components/ui/paper-notes";
 import { ItemCard } from "@/components/item-card";
+import { ButtonLink } from "@/components/ui/button";
 import { AnimatedNumber } from "@/components/home/animated-number";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
@@ -48,7 +50,7 @@ export const metadata: Metadata = {
     absolute: "FindBack PH — Philippines' Lost & Found Community",
   },
   description:
-    "Search and report lost or found items anywhere in the Philippines. Post what you lost or found, get matched with a possible owner, and reunite safely with FindBack PH.",
+    "FindBack PH is the Philippines' free community lost-and-found platform. Report what you lost, post what you found, and match safely: your contact details stay private until you choose to share them.",
 };
 
 /* ============================================================================
@@ -415,7 +417,7 @@ export default async function HomePage() {
           HERO
           ==================================================================== */}
 
-      <section className="relative overflow-hidden px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:pb-20 lg:pt-20">
+      <section className="relative overflow-hidden px-4 pb-10 pt-9 sm:px-6 sm:pb-14 sm:pt-12 lg:pb-16 lg:pt-14">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -452,15 +454,15 @@ export default async function HomePage() {
               TITLE
               ---------------------------------------------------------------- */}
 
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-4xl text-center">
             <MotionReveal>
-              <div className="inline-flex items-center gap-2 rounded-full border border-electric-200 bg-electric-50 px-3 py-1.5 text-xs font-semibold text-electric-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-electric-200 bg-electric-50 px-3.5 py-1.5 text-xs font-semibold text-electric-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_6px_16px_-8px_rgba(15,123,114,0.4)]">
                 <Search size={13} />
                 FindBack PH
               </div>
             </MotionReveal>
 
-            <h1 className="mt-6 font-display text-4xl font-bold leading-[1.04] tracking-tight text-navy-900 sm:text-5xl lg:text-6xl">
+            <h1 className="display-hero mt-6 text-5xl sm:text-6xl lg:text-[5.25rem]">
               <SplitText
                 segments={[
                   {
@@ -485,9 +487,11 @@ export default async function HomePage() {
             </h1>
 
             <MotionReveal delay={260}>
-              <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                A community-powered way to find lost belongings
-                and help return the things others are looking for.
+              <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                The Philippines&apos; free community lost-and-found platform.
+                Report what you lost, post what you found, and match safely.
+                Your contact details stay private until <em>you</em> choose to
+                share them.
               </p>
             </MotionReveal>
           </div>
@@ -497,23 +501,38 @@ export default async function HomePage() {
               ---------------------------------------------------------------- */}
 
           <Reveal delay={80}>
-            <div className="mx-auto mt-9 max-w-3xl">
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-center sm:gap-3">
-                <Link
-                  href="/search"
-                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-electric-600 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-electric-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-100 sm:w-auto"
-                >
+            <div className="mx-auto mt-7 max-w-3xl">
+              {/* Real search input — the homepage is a tool, not a brochure */}
+              <form
+                action="/search"
+                method="GET"
+                role="search"
+                className="flex flex-col gap-2 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl sm:flex-row sm:items-center"
+              >
+                <div className="flex min-h-[52px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-electric-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-electric-100">
                   <Search
-                    size={16}
-                    className="transition-transform duration-200 group-hover:-translate-y-0.5"
+                    size={17}
+                    className="shrink-0 text-blue-500"
                   />
-                  Find my item
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform duration-200 group-hover:translate-x-1"
+
+                  <input
+                    name="q"
+                    type="search"
+                    maxLength={120}
+                    placeholder="What are you looking for? e.g. iPhone, wallet, keys"
+                    aria-label="Search reports"
+                    className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-400"
                   />
-                </Link>
-              </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="group inline-flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-electric-500 to-electric-600 px-8 text-sm font-semibold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_12px_28px_-10px_rgba(15,123,114,0.6)] transition-all duration-200 hover:-translate-y-px hover:from-electric-400 hover:to-electric-500 hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.32),0_18px_36px_-12px_rgba(15,123,114,0.7)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/25 active:translate-y-0 active:scale-[0.98]"
+                >
+                  <Search size={16} className="transition-transform group-hover:scale-110" />
+                  Search
+                </button>
+              </form>
 
               <p className="mt-3 text-center text-[11px] text-slate-500">
                 Search for a report, or tell the community what you
@@ -527,7 +546,7 @@ export default async function HomePage() {
               ---------------------------------------------------------------- */}
 
           <Reveal delay={120}>
-            <div className="mx-auto mt-6 max-w-3xl">
+            <div className="mx-auto mt-5 max-w-3xl">
               <div className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Popular categories
               </div>
@@ -586,27 +605,35 @@ export default async function HomePage() {
               ---------------------------------------------------------------- */}
 
           <Reveal delay={160}>
-            <div className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-2">
+            <div className="mx-auto mt-7 grid max-w-3xl gap-3 sm:grid-cols-2">
               <Link
                 href="/report/lost"
-                className="group relative overflow-hidden rounded-2xl border border-sunrise-200 bg-gradient-to-br from-sunrise-50 to-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-sunrise-300 hover:shadow-lg hover:shadow-sunrise-100/60"
+                className="group relative overflow-hidden rounded-2xl border border-sunrise-200 bg-gradient-to-br from-sunrise-50 via-white to-white p-5 shadow-[0_18px_44px_-22px_rgba(242,116,24,0.35),inset_0_1px_0_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:border-sunrise-300 hover:shadow-[0_28px_56px_-22px_rgba(242,116,24,0.45),inset_0_1px_0_0_rgba(255,255,255,0.9)]"
               >
-                <div className="flex items-start justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-sunrise-200 bg-sunrise-100 text-sunrise-700">
+                {/* Corner sheen — subtle light sweep that reveals on hover */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rotate-12 bg-gradient-to-br from-sunrise-100/0 via-sunrise-100/60 to-sunrise-200/80 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                />
+
+                <div className="relative flex items-start justify-between">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-sunrise-200 bg-sunrise-100 text-sunrise-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-transform duration-300 group-hover:scale-105">
                     <PackageSearch size={20} />
                   </span>
 
-                  <ArrowRight
-                    size={18}
-                    className="text-sunrise-500 transition-transform group-hover:translate-x-1"
-                  />
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-sunrise-200 bg-white/80 text-sunrise-600 opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100">
+                    <ArrowRight
+                      size={15}
+                      className="transition-transform duration-300 group-hover:translate-x-0.5"
+                    />
+                  </span>
                 </div>
 
-                <p className="mt-4 text-base font-semibold text-navy-900">
+                <p className="relative mt-4 text-base font-semibold text-navy-900">
                   I lost something
                 </p>
 
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                <p className="relative mt-1 text-sm leading-relaxed text-slate-600">
                   Search reports or tell the community what you
                   lost.
                 </p>
@@ -614,71 +641,94 @@ export default async function HomePage() {
 
               <Link
                 href="/report/found"
-                className="group relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-100/60"
+                className="group relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-white p-5 shadow-[0_18px_44px_-22px_rgba(32,155,104,0.35),inset_0_1px_0_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300 hover:shadow-[0_28px_56px_-22px_rgba(32,155,104,0.45),inset_0_1px_0_0_rgba(255,255,255,0.9)]"
               >
-                <div className="flex items-start justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-700">
+                {/* Corner sheen — subtle light sweep that reveals on hover */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rotate-12 bg-gradient-to-br from-emerald-100/0 via-emerald-100/60 to-emerald-200/80 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                />
+
+                <div className="relative flex items-start justify-between">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-transform duration-300 group-hover:scale-105">
                     <HeartHandshake size={20} />
                   </span>
 
-                  <ArrowRight
-                    size={18}
-                    className="text-emerald-500 transition-transform group-hover:translate-x-1"
-                  />
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-white/80 text-emerald-600 opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100">
+                    <ArrowRight
+                      size={15}
+                      className="transition-transform duration-300 group-hover:translate-x-0.5"
+                    />
+                  </span>
                 </div>
 
-                <p className="mt-4 text-base font-semibold text-navy-900">
+                <p className="relative mt-4 text-base font-semibold text-navy-900">
                   I found something
                 </p>
 
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                <p className="relative mt-1 text-sm leading-relaxed text-slate-600">
                   Report it and help get it back to its owner.
                 </p>
               </Link>
             </div>
           </Reveal>
         </div>
+
       </section>
 
       {/* ====================================================================
           STATS
           ==================================================================== */}
 
-      <section className="px-4 py-5 sm:px-6 sm:py-8">
+      <section className="px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <Reveal>
-            <div className="grid overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 shadow-soft backdrop-blur-sm sm:grid-cols-3">
-              <Stat
-                value={lostCount}
-                label="Active lost reports"
-              />
+            <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-sm shadow-navy-900/5 backdrop-blur-sm">
+              {/* Stat tiles — hairline-divided like the about page's live counts */}
+              <div className="grid gap-px bg-navy-100/50 sm:grid-cols-3">
+                <Stat
+                  value={lostCount}
+                  label="Active lost reports"
+                  caption="still being looked for"
+                  icon={PackageSearch}
+                />
 
-              <div className="border-t border-slate-100 sm:border-l sm:border-t-0">
                 <Stat
                   value={foundCount}
                   label="Active found reports"
-                  accent
+                  caption="waiting to go home"
+                  icon={HeartHandshake}
                 />
-              </div>
 
-              <div className="border-t border-slate-100 sm:border-l sm:border-t-0">
                 <Stat
                   value={recoveredCount}
                   label="Items recovered"
-                  accent
+                  caption="and counting"
+                  icon={ShieldCheck}
+                  featured
                 />
               </div>
+
+              {/* Warm footer line — the numbers, given a heartbeat */}
+              <div className="border-t border-slate-200/70 bg-white/50 px-6 py-4 text-center sm:px-8">
+                <p className="text-sm leading-relaxed text-slate-600">
+                  Every recovered report is one more item back where it
+                  belongs —{" "}
+                  {recoveredCount > 0 ? (
+                    <>
+                      together we&apos;ve brought{" "}
+                      <span className="font-semibold text-emerald-600">
+                        {recoveredCount}{" "}
+                        {recoveredCount === 1 ? "item" : "items"}
+                      </span>{" "}
+                      home.
+                    </>
+                  ) : (
+                    <>the next one could be yours to return.</>
+                  )}
+                </p>
+              </div>
             </div>
-
-            <p className="mt-4 text-center text-sm leading-relaxed text-slate-600">
-              Every recovered report is one more item back where it belongs —
-              together we&apos;ve brought{" "}
-              <span className="font-semibold text-emerald-600">
-                {recoveredCount}
-              </span>{" "}
-              {recoveredCount === 1 ? "item" : "items"} home.
-            </p>
-
           </Reveal>
         </div>
       </section>
@@ -687,7 +737,7 @@ export default async function HomePage() {
           RECENT REPORTS
           ==================================================================== */}
 
-      <section className="px-4 py-12 sm:px-6 sm:py-16">
+      <section className="px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-7">
         <div className="mx-auto max-w-7xl">
           <Reveal>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -696,7 +746,7 @@ export default async function HomePage() {
                   Community reports
                 </p>
 
-                <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl">
+                <h2 className="display-hero mt-2 text-3xl sm:text-4xl lg:text-5xl">
                   Recently reported
                 </h2>
 
@@ -719,7 +769,7 @@ export default async function HomePage() {
           {/* FILTERS */}
 
           <Reveal delay={60}>
-            <div className="mt-7 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               <Link
                 href="/lost"
                 className="inline-flex items-center gap-2 rounded-full border border-sunrise-200 bg-sunrise-50 px-4 py-2 text-xs font-semibold text-sunrise-700 transition hover:bg-sunrise-100"
@@ -807,32 +857,28 @@ export default async function HomePage() {
           SAFETY
           ==================================================================== */}
 
-      <section className="px-4 pb-16 pt-4 sm:px-6 sm:pb-20">
+      <section className="mt-6 px-4 py-6 sm:px-6">
         <div className="mx-auto max-w-5xl">
           <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border border-electric-100/80 bg-white/90 p-5 shadow-soft sm:p-6">
-              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-electric-50 blur-3xl" />
+            <div className="flex flex-col gap-5 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm shadow-navy-900/5 backdrop-blur-sm sm:flex-row sm:items-center sm:p-7">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-navy-900/10 bg-white/70 text-electric-700 shadow-sm">
+                <ShieldCheck size={22} />
+              </div>
 
-              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-electric-200 bg-electric-50 text-electric-700">
-                  <ShieldCheck size={20} />
-                </div>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold">
+                  Keep your handover safe
+                </h3>
 
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-navy-900">
-                    Keep your handover safe
-                  </h3>
+                <p className="mt-1 max-w-2xl text-sm leading-relaxed">
+                  Keep personal information private and choose a
+                  safe, public place when meeting someone.
+                </p>
+              </div>
 
-                  <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-600 sm:text-sm">
-                    Keep personal information private and choose a
-                    safe, public place when meeting someone.
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-2 text-xs font-medium text-slate-600">
-                  <Lock size={13} />
-                  Privacy focused
-                </div>
+              <div className="flex shrink-0 items-center gap-2 text-xs font-medium text-electric-700">
+                <Lock size={13} />
+                Privacy focused
               </div>
             </div>
           </Reveal>
@@ -849,27 +895,64 @@ export default async function HomePage() {
 function Stat({
   value,
   label,
-  accent = false,
+  caption,
+  icon: Icon,
+  featured = false,
 }: {
   value: number;
   label: string;
-  accent?: boolean;
+  caption?: string;
+  icon?: LucideIcon;
+  featured?: boolean;
 }) {
   return (
-    <div className="px-4 py-5 text-center sm:px-6 sm:py-6">
-      <div
-        className={`font-display text-2xl font-bold tabular-nums sm:text-3xl ${
-          accent ? "text-emerald-600" : "text-navy-900"
-        }`}
-      >
-        <AnimatedNumber
-          value={Math.max(0, Math.round(value))}
+    <div
+      className={`relative px-6 py-7 sm:px-8 sm:py-8 ${
+        featured ? "bg-emerald-50/60" : "bg-white/80"
+      }`}
+    >
+      {featured && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent"
         />
+      )}
+
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          {label}
+        </p>
+
+        {Icon && (
+          <span
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border shadow-sm ${
+              featured
+                ? "border-emerald-200 bg-emerald-100 text-emerald-700"
+                : "border-slate-200 bg-white text-slate-500"
+            }`}
+          >
+            <Icon size={16} aria-hidden="true" />
+          </span>
+        )}
       </div>
 
-      <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs">
-        {label}
-      </p>
+      <div
+        className={`mt-3 display-giant text-4xl sm:text-5xl lg:text-[3.2rem] ${
+          featured ? "text-emerald-600" : "text-navy-900"
+        }`}
+      >
+        <AnimatedNumber value={Math.max(0, Math.round(value))} />
+      </div>
+
+      {caption && (
+        <p
+          className={`mt-1.5 text-xs ${
+            featured ? "font-medium text-emerald-700/80" : "text-slate-400"
+          }`}
+        >
+          {caption}
+        </p>
+      )}
     </div>
   );
 }
@@ -895,21 +978,15 @@ function EmptyReports() {
       </p>
 
       <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
-        <Link
-          href="/report/lost"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-electric-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-electric-500"
-        >
+        <ButtonLink href="/report/lost" size="md">
           <PackageSearch size={15} />
           Report Lost
-        </Link>
+        </ButtonLink>
 
-        <Link
-          href="/report/found"
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-navy-900 transition hover:bg-slate-50"
-        >
+        <ButtonLink href="/report/found" variant="outline" size="md">
           <HeartHandshake size={15} />
           Report Found
-        </Link>
+        </ButtonLink>
       </div>
     </div>
   );

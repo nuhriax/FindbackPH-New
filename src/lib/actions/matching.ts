@@ -5,6 +5,64 @@ import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 
 export type ActionResult = { error: string } | { error?: undefined };
 
+type Db = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * Batches the perceptual photo hashes for the given reports out of
+ * `item_images` (one small query per side). Reports whose photos were uploaded
+ * before phash existed, or with no photos, simply have no hash list — the
+ * matching engine treats the photo factor as "not applicable" for those.
+ */
+async function getPhotoHashes(
+  supabase: Db,
+  opts: { lostIds: string[]; foundIds: string[] }
+): Promise<{ lostMap: Map<string, string[]>; foundMap: Map<string, string[]> }> {
+  const lostMap = new Map<string, string[]>();
+  const foundMap = new Map<string, string[]>();
+  const jobs: Promise<void>[] = [];
+
+  if (opts.lostIds.length > 0) {
+    jobs.push(
+      (async () => {
+        const { data } = await supabase
+          .from("item_images")
+          .select("lost_item_id, phash")
+          .in("lost_item_id", opts.lostIds)
+          .not("phash", "is", null);
+        for (const row of data ?? []) {
+          if (row.lost_item_id && row.phash) {
+            const list = lostMap.get(row.lost_item_id) ?? [];
+            list.push(row.phash);
+            lostMap.set(row.lost_item_id, list);
+          }
+        }
+      })()
+    );
+  }
+
+  if (opts.foundIds.length > 0) {
+    jobs.push(
+      (async () => {
+        const { data } = await supabase
+          .from("item_images")
+          .select("found_item_id, phash")
+          .in("found_item_id", opts.foundIds)
+          .not("phash", "is", null);
+        for (const row of data ?? []) {
+          if (row.found_item_id && row.phash) {
+            const list = foundMap.get(row.found_item_id) ?? [];
+            list.push(row.phash);
+            foundMap.set(row.found_item_id, list);
+          }
+        }
+      })()
+    );
+  }
+
+  await Promise.all(jobs);
+  return { lostMap, foundMap };
+}
+
 /**
  * Runs the matching engine for a newly-posted found item against all active
  * lost items. This is the reverse direction of `runMatchingForLostItem`: a
@@ -55,8 +113,16 @@ export async function runMatchingForFoundItem(foundItemId: string): Promise<Acti
 
   const matches: { lost_item_id: string; found_item_id: string; score: number }[] = [];
 
+  const { lostMap, foundMap } = await getPhotoHashes(supabase, {
+    lostIds: (lostItems ?? []).map((l) => l.id),
+    foundIds: [foundItemId],
+  });
+
   for (const lost of lostItems ?? []) {
-    const score = computeMatchScore(lost, foundItem);
+    const score = computeMatchScore(
+      { ...lost, photoHashes: lostMap.get(lost.id) ?? null },
+      { ...foundItem, photoHashes: foundMap.get(foundItemId) ?? null }
+    );
     if (score > MATCH_THRESHOLD) {
       matches.push({
         lost_item_id: lost.id,
@@ -174,8 +240,16 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
   // Compute scores
   const matches: { lost_item_id: string; found_item_id: string; score: number }[] = [];
 
+  const { lostMap, foundMap } = await getPhotoHashes(supabase, {
+    lostIds: [lostItemId],
+    foundIds: (foundItems ?? []).map((f) => f.id),
+  });
+
   for (const found of foundItems ?? []) {
-    const existingScore = computeMatchScore(lostItem, found);
+    const existingScore = computeMatchScore(
+      { ...lostItem, photoHashes: lostMap.get(lostItemId) ?? null },
+      { ...found, photoHashes: foundMap.get(found.id) ?? null }
+    );
     if (existingScore > MATCH_THRESHOLD) {
       matches.push({
         lost_item_id: lostItemId,

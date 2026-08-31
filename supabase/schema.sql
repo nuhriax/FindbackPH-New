@@ -179,6 +179,9 @@ create table if not exists public.item_images (
   found_item_id uuid references public.found_items(id) on delete cascade,
   storage_path text not null, -- path within the 'item-images' Storage bucket
   position integer not null default 0,
+  -- Client-computed 64-bit perceptual hash (16 hex chars) used by the matching
+  -- engine's photo-similarity factor. Nullable: older uploads have no hash.
+  phash text,
   created_at timestamptz not null default now(),
   constraint item_images_one_parent check (
     (lost_item_id is not null and found_item_id is null) or
@@ -188,6 +191,9 @@ create table if not exists public.item_images (
 
 create index if not exists item_images_lost_idx on public.item_images (lost_item_id);
 create index if not exists item_images_found_idx on public.item_images (found_item_id);
+
+-- Migration for existing deployments: add the phash column idempotently.
+alter table public.item_images add column if not exists phash text;
 
 -- ----------------------------------------------------------------------------
 -- ROW LEVEL SECURITY
