@@ -454,7 +454,7 @@ export default function ReportLostPage() {
           <div id="step-4" className={step === STEPS ? "space-y-5" : "space-y-5 hidden"}>
               {review && (
                 <dl className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white/80">
-                  {[
+                  {([
                     ["Item", review.title],
                     ["Category", CATEGORY_LABELS[review.category as keyof typeof CATEGORY_LABELS] ?? review.category],
                     ["Description", review.description],
@@ -467,7 +467,7 @@ export default function ReportLostPage() {
                       ? [["Pinned location", review.pinned]]
                       : []),
                     ["Photos", images.length === 0 ? "None yet" : `${images.length} photo${images.length > 1 ? "s" : ""}`],
-                  ].map(([label, value]) => (
+                  ] as [string, string][]).filter(([, value]) => value && value.trim() !== "").map(([label, value]) => (
                     <div key={label} className="flex gap-3 px-4 py-3">
                       <dt className="w-40 shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</dt>
                       <dd className="whitespace-pre-wrap text-sm text-navy-900">{value}</dd>
