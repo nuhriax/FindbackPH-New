@@ -1497,7 +1497,12 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
       const marker = new maplibregl.Marker({
         element: pickPinElement(),
         draggable: true,
-      }).addTo(map);
+      });
+      // MapLibre v6 requires a lngLat before addTo() — without it the marker's
+      // first _update() reads `.lng` of undefined and crashes the page.
+      if (pickLat !== null && pickLng !== null) marker.setLngLat([pickLng, pickLat]);
+      marker.addTo(map);
+
       marker.on("dragend", async () => {
         const lngLat = marker.getLngLat();
         const valid = await isPhilippinesCoordinate(lngLat.lat, lngLat.lng);
