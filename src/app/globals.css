@@ -120,11 +120,17 @@
   }
 
   a:focus-visible,
-  button:focus-visible,
+  button:focus-visible {
+    @apply ring-2 ring-electric-500 ring-offset-2 ring-offset-white;
+  }
+
+  /* Text inputs handle their own focus styling (pill search forms highlight
+     their container border; auth/report inputs change border color). The
+     global green ring+offset made every input show a clashing double box. */
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    @apply ring-2 ring-electric-500 ring-offset-2 ring-offset-white;
+    @apply outline-none;
   }
 
   @media (prefers-reduced-motion: reduce) {
