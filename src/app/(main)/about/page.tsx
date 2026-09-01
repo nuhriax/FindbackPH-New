@@ -215,7 +215,7 @@ export default async function AboutPage() {
         </div>
         <MotionReveal direction="up" className="mt-10 text-center">
           <Link
-            href="/explore"
+            href="/discover"
             className="group inline-flex items-center gap-2 text-sm font-semibold text-electric-700"
           >
             <HeartHandshake size={16} aria-hidden="true" />

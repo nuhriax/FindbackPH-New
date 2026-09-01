@@ -14,5 +14,5 @@ export default async function FindsRedirect({
     if (v) params.set(key, v);
   }
   const query = params.toString();
-  redirect(query ? `/explore?${query}` : "/explore");
+  redirect(query ? `/discover?${query}` : "/discover");
 }

@@ -311,7 +311,7 @@ export default async function FoundItemDetailPage({ params }: Props) {
       <div className="mx-auto w-full max-w-[1380px] px-4 pt-5 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
-            { label: "Discover", href: "/explore" },
+            { label: "Discover", href: "/discover" },
             { label: "Found items", href: "/found" },
             { label: raw.title },
           ]}

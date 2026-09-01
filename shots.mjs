@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 
 const pages = [
   { url: "http://localhost:3000", name: "home" },
-  { url: "http://localhost:3000/explore", name: "explore" },
+  { url: "http://localhost:3000/discover", name: "explore" },
   { url: "http://localhost:3000/report/lost", name: "report" },
   { url: "http://localhost:3000/about", name: "about" },
 ];

@@ -4,7 +4,7 @@ import { Logo } from "@/components/logo";
 
 const EXPLORE = [
   { label: "Search", href: "/search" },
-  { label: "Discover", href: "/explore" },
+  { label: "Discover", href: "/discover" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
   { label: "How It Works", href: "/how-it-works" },

@@ -3,6 +3,6 @@
 // The listing pages were merged into the combined "Finds" feed at /finds.
 // /found deep-links to the Found tab (detail pages remain at /found/[id]).
 export default function FoundPage() {
-  redirect("/explore?type=found");
+  redirect("/discover?type=found");
 }
 
