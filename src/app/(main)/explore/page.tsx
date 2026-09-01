@@ -6,12 +6,16 @@ import type { ItemCategory } from "@/types/database";
 import { Reveal } from "@/components/reveal";
 import { ListingResultsHeader } from "@/components/listing/listing-results-header";
 import { ListingEmptyState } from "@/components/listing/listing-empty-state";
+import { PhilippinesMap } from "@/components/map/philippines-map";
+import type { MapPoint } from "@/components/map/philippines-map-impl";
+import { lookupCityCoords } from "@/lib/ph-locations";
 
 import {
   ArrowLeft,
   ArrowRight,
   AlertTriangle,
   HeartHandshake,
+  Search,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -60,6 +64,8 @@ type FeedItem = {
   created_at: string;
   updated_at?: string | null;
   view_count?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 /* ==========================================================================
@@ -103,6 +109,35 @@ function reportedLabel(value: string): string {
   const date = new Date(value);
   if (!isValid(date)) return "Reported recently";
   return `Reported ${formatDistanceToNow(date, { addSuffix: true })}`;
+}
+
+/**
+ * Build the points plotted on the Explore page's Philippines map. A report is
+ * placed at its saved pin when it has one, otherwise at its city's approximate
+ * centroid (static lookup). Reports with neither are simply not plotted —
+ * consistent with never exposing exact locations (mirrors /search).
+ */
+function buildMapPoints(items: FeedItem[]): MapPoint[] {
+  const points: MapPoint[] = [];
+  for (const item of items) {
+    const coords =
+      typeof item.latitude === "number" && typeof item.longitude === "number"
+        ? ([item.latitude, item.longitude] as [number, number])
+        : lookupCityCoords(item.city);
+    if (!coords) continue;
+    points.push({
+      id: `${item.kind}-${item.id}`,
+      kind: item.kind,
+      lat: coords[0],
+      lng: coords[1],
+      title: item.title,
+      city: item.city,
+      province: item.province,
+      href: `/${item.kind}/${item.id}`,
+      date: item.created_at,
+    });
+  }
+  return points;
 }
 
 function buildPageHref({
@@ -229,13 +264,13 @@ export default async function ExplorePage({
   const [lostRes, foundRes] = await Promise.all([
     applyFilters(
       supabase.from("lost_items").select(
-        "id, title, category, city, province, description, created_at, updated_at, view_count",
+        "id, title, category, city, province, description, created_at, updated_at, view_count, latitude, longitude",
       ),
       filters,
     ),
     applyFilters(
       supabase.from("found_items").select(
-        "id, title, category, city, province, description, created_at, updated_at, view_count",
+        "id, title, category, city, province, description, created_at, updated_at, view_count, latitude, longitude",
       ),
       filters,
     ),
@@ -343,99 +378,70 @@ export default async function ExplorePage({
     { label: "Found", value: "found", count: foundCount },
   ];
 
+  // Map markers for the current feed (pins first, city centroids as fallback).
+  const mapPoints = buildMapPoints(pool);
+
   return (
     <main className="flex-1">
       {/* ================= HERO — SPLIT IDENTITY ================= */}
-      <section aria-label="Explore community reports">
-        <div className="mx-auto max-w-7xl px-4 pb-10 pt-12 sm:px-6 sm:pt-16 lg:px-8">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-cream-300 bg-white/80 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ice-600 backdrop-blur">
-              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-sunrise-500" />
-              Explore community reports
-            </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.08] tracking-tight text-navy-900 sm:text-5xl">
-              Explore{" "}
-              <span className="bg-gradient-to-r from-sunrise-600 to-sunrise-400 bg-clip-text text-transparent">
-                every
-              </span>{" "}
-              <span className="bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent">
-                report
+      <section aria-label="Explore community reports" className="relative">
+        <div className="mx-auto max-w-7xl px-4 pb-12 pt-14 text-center sm:px-6 sm:pt-20 lg:px-8">
+          <div className="mx-auto max-w-3xl">
+            <Reveal>
+              <span className="inline-flex items-center gap-2 rounded-full border border-cream-300 bg-white/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ice-600 backdrop-blur">
+                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-sunrise-500" />
+                Explore community reports
               </span>
-            </h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-ice-600 sm:text-lg">
-              One live feed of everything people across the Philippines have
-              lost — and everything waiting to be returned.
-            </p>
-          </div>
+            </Reveal>
 
-          {/* Two doors */}
-          <div className="mt-10 grid overflow-hidden rounded-3xl border border-cream-300 bg-white shadow-card sm:grid-cols-2">
-            {/* Lost door */}
-            <div className="relative border-b border-cream-200 p-6 sm:border-b-0 sm:border-r sm:p-8">
-              <div
-                aria-hidden="true"
-                className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-sunrise-500 to-sunrise-300"
-              />
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-sunrise-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-sunrise-700">
-                  <span
-                    aria-hidden="true"
-                    className="h-1.5 w-1.5 rounded-full bg-sunrise-500"
-                  />
-                  Lost
+            <Reveal delay={70}>
+              <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-navy-900 sm:text-5xl lg:text-6xl">
+                Every lost item,{" "}
+                <span className="bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent">
+                  one step closer
                 </span>
-                <span className="text-xs font-medium tabular-nums text-ice-500">
-                  {lostCount} active {lostCount === 1 ? "report" : "reports"}
-                </span>
-              </div>
-              <h2 className="mt-4 font-display text-xl font-bold tracking-tight text-navy-900 sm:text-2xl">
-                Lost something?
-              </h2>
-              <p className="mt-1.5 text-sm leading-6 text-ice-600">
-                Post it in seconds — someone out there may already be holding
-                it.
-              </p>
-              <Link
-                href={ROUTES.reportLost}
-                className="mt-5 inline-flex h-11 items-center gap-2 rounded-xl bg-sunrise-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-sunrise-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sunrise-500/40 active:scale-[0.98]"
-              >
-                Report a lost item
-                <ArrowRight aria-hidden="true" size={15} />
-              </Link>
-            </div>
+              </h1>
+            </Reveal>
 
-            {/* Found door */}
-            <div className="relative p-6 sm:p-8">
-              <div
-                aria-hidden="true"
-                className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-emerald-500 to-emerald-300"
-              />
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-                  <span
-                    aria-hidden="true"
-                    className="h-1.5 w-1.5 rounded-full bg-emerald-500"
-                  />
-                  Found
-                </span>
-                <span className="text-xs font-medium tabular-nums text-ice-500">
-                  {foundCount} active {foundCount === 1 ? "report" : "reports"}
-                </span>
-              </div>
-              <h2 className="mt-4 font-display text-xl font-bold tracking-tight text-navy-900 sm:text-2xl">
-                Found something?
-              </h2>
-              <p className="mt-1.5 text-sm leading-6 text-ice-600">
-                Return it to its owner — and make someone&apos;s whole week.
+            <Reveal delay={140}>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-ice-600 sm:text-lg">
+                Browse a live feed of reports from across the Philippines —
+                items people have lost, and items waiting to be returned.
               </p>
-              <Link
-                href={ROUTES.reportFound}
-                className="mt-5 inline-flex h-11 items-center gap-2 rounded-xl border border-emerald-600 bg-emerald-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-600/40 active:scale-[0.98]"
+            </Reveal>
+
+            {/* Search */}
+            <Reveal delay={210}>
+              <form
+                action="/explore"
+                method="get"
+                className="mx-auto mt-8 flex max-w-xl items-center rounded-full border border-cream-300 bg-white/90 pl-5 pr-1.5 shadow-sm backdrop-blur transition focus-within:border-electric-400 focus-within:ring-4 focus-within:ring-electric-500/10"
               >
-                Report a found item
-                <ArrowRight aria-hidden="true" size={15} />
-              </Link>
-            </div>
+                <input type="hidden" name="type" value={type === "all" ? "" : type} />
+                <span aria-hidden="true" className="text-ice-400">
+                  <Search size={18} />
+                </span>
+                <label htmlFor="explore-search" className="sr-only">
+                  Search reports
+                </label>
+                <input
+                  id="explore-search"
+                  type="search"
+                  name="q"
+                  defaultValue={q}
+                  maxLength={MAX_SEARCH_LENGTH}
+                  placeholder="Search by item, brand, or keyword…"
+                  className="h-10 min-w-0 flex-1 bg-transparent text-sm text-navy-900 placeholder:text-ice-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-electric-600 text-white shadow-sm transition hover:bg-electric-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/40 active:scale-[0.98]"
+                >
+                  <Search size={16} aria-hidden="true" />
+                </button>
+              </form>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -529,19 +535,31 @@ export default async function ExplorePage({
             })}
           </div>
         </div>
-
-        {/* Search tool link */}
-        <p className="mt-3 pb-2 text-sm text-ice-600">
-          Looking for something specific?{" "}
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-1 font-medium text-electric-700 underline-offset-4 transition hover:text-electric-600 hover:underline"
-          >
-            Search reports
-            <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
-          </Link>
-        </p>
       </div>
+
+      {/* ================= MAP VIEW ================= */}
+      {!error && mapPoints.length > 0 && (
+        <section
+          aria-label="Map view"
+          className="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8"
+        >
+          <div>
+            <h2 className="font-display text-xl font-bold text-navy-900 sm:text-2xl">
+              Map view
+            </h2>
+            <p className="mt-2 text-sm text-ice-600">
+              Explore Lost &amp; Found reports across the Philippines.
+              Approximate locations of {mapPoints.length}{" "}
+              {mapPoints.length === 1 ? "report" : "reports"} — click a marker
+              for details.
+            </p>
+          </div>
+
+          <div className="mt-6 h-[420px] overflow-hidden rounded-2xl border border-cream-300 shadow-card sm:h-[520px]">
+            <PhilippinesMap mode="view" points={mapPoints} />
+          </div>
+        </section>
+      )}
 
       {/* ================= MAIN ================= */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

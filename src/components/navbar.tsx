@@ -16,6 +16,7 @@ import { NotificationDropdown, MessagesDropdown } from "@/components/navbar/nav-
 // so the navbar doesn't overflow or bury the main CTAs.
 const PRIMARY_LINKS = [
   { label: "Home", href: "/" },
+  { label: "Discover", href: "/explore" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
 ];

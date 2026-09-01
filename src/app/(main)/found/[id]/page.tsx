@@ -308,13 +308,15 @@ export default async function FoundItemDetailPage({ params }: Props) {
         }}
       />
 
-      <Breadcrumbs
-        items={[
-          { label: "Discover", href: "/explore" },
-          { label: "Found items", href: "/found" },
-          { label: raw.title },
-        ]}
-      />
+      <div className="mx-auto w-full max-w-[1380px] px-4 pt-5 sm:px-6 lg:px-8">
+        <Breadcrumbs
+          items={[
+            { label: "Discover", href: "/explore" },
+            { label: "Found items", href: "/found" },
+            { label: raw.title },
+          ]}
+        />
+      </div>
 
       <ReportDetail
         kind="found"

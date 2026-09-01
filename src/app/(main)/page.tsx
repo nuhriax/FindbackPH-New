@@ -300,12 +300,20 @@ export default async function HomePage() {
     recoveredCountResult.error,
     lostResult.error,
     foundResult.error,
-  ].filter(Boolean);
+  ].filter((e): e is NonNullable<typeof e> => Boolean(e));
 
   if (errors.length > 0) {
+    // PostgREST error objects are class instances and get collapsed to
+    // "[{...}]" in the browser dev overlay — log the plain fields so the
+    // actual cause (code / message / hint) is always visible.
     console.error(
       "FindBack homepage database error:",
-      errors
+      errors.map((error) => ({
+        message: error.message,
+        code: "code" in error ? error.code : undefined,
+        details: "details" in error ? error.details : undefined,
+        hint: "hint" in error ? error.hint : undefined,
+      }))
     );
   }
 

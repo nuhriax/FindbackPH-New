@@ -1,10 +1,10 @@
 ﻿import Link from "next/link";
-import { Facebook, HeartHandshake, Instagram, Mail, MapPin, Sparkles } from "lucide-react";
+import { HeartHandshake, Mail, MapPin, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const EXPLORE = [
   { label: "Search", href: "/search" },
-  { label: "Explore", href: "/explore" },
+  { label: "Discover", href: "/explore" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
   { label: "How It Works", href: "/how-it-works" },
@@ -19,11 +19,7 @@ const INFORMATION = [
   { label: "Terms", href: "/terms" },
 ];
 
-const SOCIALS = [
-  { icon: Facebook, label: "Facebook", href: "#" },
-  { icon: Instagram, label: "Instagram", href: "#" },
-  { icon: Mail, label: "Email", href: "mailto:findback.support@gmail.com" },
-];
+
 
 import { RouteRule } from "@/components/ui/journey-band";
 
@@ -56,8 +52,8 @@ export function Footer() {
             <RouteRule className="mt-6 max-w-[220px]" />
           </div>
 
-          {/* Explore */}
-          <FooterColumn title="Explore" links={EXPLORE} />
+          {/* Discover */}
+          <FooterColumn title="Discover" links={EXPLORE} />
 
           {/* Information */}
           <FooterColumn title="Information" links={INFORMATION} />
@@ -91,22 +87,6 @@ export function Footer() {
                 >
                   <b.icon size={12} /> {b.label}
                 </span>
-              ))}
-            </div>
-
-            {/* Socials */}
-            <div className="mt-4 flex items-center gap-2.5">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  aria-label={s.label}
-                  target={s.href.startsWith("http") ? "_blank" : undefined}
-                  rel={s.href.startsWith("http") ? "noreferrer" : undefined}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/10 hover:text-white"
-                >
-                  <s.icon size={16} />
-                </a>
               ))}
             </div>
           </div>
