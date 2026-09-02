@@ -86,7 +86,7 @@ export function UserReportButton({ targetUserId }: { targetUserId: string }) {
 
       {open && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-navy-900/40 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-navy-900/40 p-4 backdrop-blur-sm sm:items-center"
           onClick={() => setOpen(false)}
           role="presentation"
         >

@@ -219,6 +219,21 @@
       text-navy-900 shadow-sm transition-all focus:border-electric-400 focus:ring-4 focus:ring-electric-500/10;
   }
 
+  /* Native <select> popups inherit color-scheme from the page; in the dark
+     ink theme they'd render as near-invisible dark-on-dark options inside
+     the white modal. Force the light picker everywhere a styled input lives. */
+  .site-ink .input,
+  .site-ink .select {
+    color-scheme: light;
+  }
+  .site-ink select.input option,
+  .site-ink select.select option,
+  .site-ink select option {
+    color-scheme: light;
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+
   .label {
     @apply mb-1.5 block text-sm font-medium text-navy-800;
   }
