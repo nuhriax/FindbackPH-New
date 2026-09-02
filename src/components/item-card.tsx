@@ -43,7 +43,7 @@ export function ItemCard({
     <>
     <Link
       href={href}
-      className="group relative flex h-full flex-col overflow-hidden rounded-card border border-white/60 bg-white/80 shadow-soft backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-white hover:bg-white hover:shadow-card-hover"
+      className="item-card group relative flex h-full flex-col overflow-hidden rounded-card border border-white/60 bg-white/80 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-white hover:bg-white hover:shadow-card-hover"
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
@@ -65,8 +65,8 @@ export function ItemCard({
 
         {/* Status badge */}
         <span
-          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-md ${
-            kind === "lost" ? "bg-sunrise-100/90 text-sunrise-700" : "bg-emerald-100/90 text-emerald-700"
+          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+            kind === "lost" ? "bg-red-100/90 text-red-700" : "bg-emerald-100/90 text-emerald-700"
           }`}
         >
           {kind === "lost" ? "Lost" : "Found"}
@@ -85,7 +85,7 @@ export function ItemCard({
             className="
               absolute right-3 top-3 z-10 flex h-8 w-8 items-center
               justify-center rounded-full bg-slate-900/70 text-white
-              shadow-md ring-1 ring-white/40 backdrop-blur transition-all
+              shadow-md ring-1 ring-white/40 transition-all
               hover:bg-slate-900 focus:opacity-100 opacity-90
               md:opacity-0 md:group-hover:opacity-100
             "
@@ -95,7 +95,7 @@ export function ItemCard({
         )}
 
         {/* Category chip */}
-        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-medium text-slate-600 shadow-sm backdrop-blur-md [&_svg]:h-3 [&_svg]:w-3">
+        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-medium text-slate-600 shadow-sm [&_svg]:h-3 [&_svg]:w-3">
           {CATEGORY_ICONS[category]}
           {CATEGORY_LABELS[category]}
         </span>

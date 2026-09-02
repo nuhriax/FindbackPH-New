@@ -124,10 +124,10 @@ export function BackgroundEffects({
           BASE ATMOSPHERE
       ============================================================ */}
 
-      <div className="absolute inset-0 bg-[#fbf6ef]" />
+      <div className="site-bg-base absolute inset-0 bg-[#fbf6ef]" />
 
       <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_42%,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.9)_38%,rgba(238,245,255,0.5)_70%,rgba(214,233,255,0.22)_100%)]"
+        className="site-bg-glow absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_42%,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.9)_38%,rgba(238,245,255,0.5)_70%,rgba(214,233,255,0.22)_100%)]"
       />
 
       {/* ============================================================
@@ -458,6 +458,7 @@ export function BackgroundEffects({
         />
 
         <ellipse
+          className="fb-center-light-shape"
           cx="720"
           cy="420"
           rx="500"
@@ -764,6 +765,7 @@ export function BackgroundEffects({
         {/* CENTER HAZE */}
 
         <ellipse
+          className="fb-center-light-shape"
           cx="720"
           cy="400"
           rx="430"
@@ -776,6 +778,7 @@ export function BackgroundEffects({
         {/* VIGNETTE */}
 
         <rect
+          className="fb-vignette-shape"
           width="1440"
           height="900"
           fill="none"
@@ -843,7 +846,7 @@ export function BackgroundEffects({
       {/* FOREGROUND HAZE */}
 
       <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_42%_35%_at_50%_45%,rgba(255,255,255,0.58),rgba(255,255,255,0.12)_55%,transparent_80%)]"
+        className="site-bg-haze absolute inset-0 bg-[radial-gradient(ellipse_42%_35%_at_50%_45%,rgba(255,255,255,0.58),rgba(255,255,255,0.12)_55%,transparent_80%)]"
       />
 
       {/* ANIMATIONS */}

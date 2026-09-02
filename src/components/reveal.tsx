@@ -53,8 +53,12 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
     <div
       ref={ref}
       className={clsx(
-        "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform]",
-        visible ? "translate-y-0 opacity-100" : "translate-y-7 opacity-0",
+        "transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        // Only hint compositing while animating — keeping will-change applied
+        // after the reveal makes hover transforms on children render blurry.
+        visible
+          ? "translate-y-0 opacity-100"
+          : "translate-y-7 opacity-0 will-change-[opacity,transform]",
         className
       )}
       style={{ transitionDelay: `${delay}ms` }}

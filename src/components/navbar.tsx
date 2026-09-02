@@ -11,6 +11,7 @@ import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
 import { Logo } from "@/components/logo";
 import { NotificationDropdown, MessagesDropdown } from "@/components/navbar/nav-dropdowns";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Primary actions stay in the top bar; secondary info pages live under "More"
 // so the navbar doesn't overflow or bury the main CTAs.
@@ -135,10 +136,10 @@ export function Navbar({
         {/* Floating pill shell */}
         <div
           className={clsx(
-            "mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
+            "navbar-pill mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
             scrolled
-              ? "border-ice-200/80 bg-white/90 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
-              : "border-white/80 bg-white/85 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-xl"
+              ? "border-ice-200/80 bg-white/95 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
+              : "border-white/80 bg-white/95 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-2xl"
           )}
         >
           <Logo className="justify-self-start" />
@@ -304,6 +305,7 @@ export function Navbar({
                         <Settings size={17} className="text-slate-500" />
                         Settings
                       </Link>
+                      <ThemeToggle onClose={() => setAccountOpen(false)} />
                       <div className="my-1 h-px bg-navy-100" />
                       <form action={logoutAction}>
                         <button
@@ -452,6 +454,7 @@ export function Navbar({
                   <Link href="/dashboard/settings" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                     Settings
                   </Link>
+                  <ThemeToggle onClose={() => setOpen(false)} />
                   <form action={logoutAction}>
                     <button type="submit" className="btn-ghost w-full justify-start text-slate-500">
                       <LogOut size={16} /> Log out

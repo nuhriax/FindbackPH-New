@@ -448,7 +448,7 @@ export default async function HomePage() {
             />
           </svg>
 
-          <Aurora opacity={0.3} blur={72} />
+          <Aurora className="hero-aurora" opacity={0.3} blur={72} />
         </div>
 
         <PaperNotes />
@@ -780,11 +780,11 @@ export default async function HomePage() {
             <div className="mt-5 flex flex-wrap gap-2">
               <Link
                 href="/lost"
-                className="inline-flex items-center gap-2 rounded-full border border-sunrise-200 bg-sunrise-50 px-4 py-2 text-xs font-semibold text-sunrise-700 transition hover:bg-sunrise-100"
+                className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-100 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50"
               >
                 <PackageSearch size={13} />
                 Lost
-                <span className="text-sunrise-500/70">
+                <span className="text-rose-600/80">
                   {lostCount}
                 </span>
               </Link>

@@ -1649,7 +1649,7 @@ export default function PhilippinesMapImpl(props: PhilippinesMapProps) {
   }
 
     const mapArea = (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative z-0 isolate h-full w-full overflow-hidden">
       {/* Premium map chrome (popups, controls, pin animations). */}
       <style dangerouslySetInnerHTML={{ __html: MAP_CSS }} />
       {/* MapLibre canvas. */}

@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -704,7 +704,7 @@ html {
 
    Semantic accents are deliberately preserved (per the brand hierarchy):
      • blue / electric   → actions, links, active nav, focus (brand)
-     • orange (sunrise)  → “lost” status
+     • red (sunrise)     → “lost” status
      • green (emerald)   → “found” / returned status
      • white             → text on colored buttons / badges / avatars
 
@@ -858,10 +858,10 @@ p {
    and Tailwind utilities without needing !important.
    =========================================================================== */
 .site-ink {
-  --text-heading: #eef6f4;
-  --text-body: #eef6f4;
-  --text-muted: rgba(238, 246, 244, 0.72);
-  --text-faint: rgba(238, 246, 244, 0.55);
+  --text-heading: #f4fbf9;
+  --text-body: #f0f8f6;
+  --text-muted: rgba(240, 248, 246, 0.92);
+  --text-faint: rgba(240, 248, 246, 0.80);
   --background: 12 43 41;
   --foreground: 238 246 244;
   --card: 22 58 55;
@@ -902,27 +902,120 @@ p {
 }
 .site-ink .text-slate-500,
 .site-ink .text-slate-600 {
-  color: rgba(238, 246, 244, 0.72);
+  color: rgba(240, 248, 246, 0.92);
 }
 .site-ink .text-slate-300,
 .site-ink .text-slate-400 {
-  color: rgba(238, 246, 244, 0.55);
+  color: rgba(240, 248, 246, 0.82);
 }
 
-/* White surfaces → frosted dark glass (footer-card treatment). */
+/* White surfaces → near-opaque dark ink panels. Kept strongly opaque so the
+   animated background glows and page content never bleed through under text —
+   translucent glass surfaces were making letters shimmer / look blurry. */
 .site-ink .bg-white,
 .site-ink .bg-white\/80,
 .site-ink .bg-white\/85,
 .site-ink .bg-white\/90,
 .site-ink .bg-white\/95 {
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: rgba(17, 51, 49, 0.94);
 }
 .site-ink .bg-white\/40,
 .site-ink .bg-white\/45,
 .site-ink .bg-white\/50,
 .site-ink .bg-white\/60,
 .site-ink .bg-white\/70 {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(17, 51, 49, 0.86);
+}
+/* Faint white washes (bg-white/10–/35, /75) — these kept their full light
+   alpha and bleached whole page bands (e.g. the /search hero section). */
+.site-ink .bg-white\/10,
+.site-ink .bg-white\/15,
+.site-ink .bg-white\/20,
+.site-ink .bg-white\/25,
+.site-ink .bg-white\/30,
+.site-ink .bg-white\/35 {
+  background-color: rgba(17, 51, 49, 0.72);
+}
+.site-ink .bg-white\/75 {
+  background-color: rgba(17, 51, 49, 0.86);
+}
+
+/* Alpha-variant fills the base rules missed — these stayed at full light
+   color (e.g. bg-navy-100/60 cream at 0.6 alpha bleeding through the About
+   live-count tiles, bg-slate-50/70 in the contact email box). */
+.site-ink .bg-navy-100\/60,
+.site-ink .bg-navy-100\/70,
+.site-ink .bg-navy-100\/80,
+.site-ink .bg-slate-50\/60,
+.site-ink .bg-slate-50\/70,
+.site-ink .bg-slate-50\/80,
+.site-ink .bg-slate-100\/45,
+.site-ink .bg-slate-100\/50,
+.site-ink .bg-slate-100\/60,
+.site-ink .bg-slate-100\/70 {
+  background-color: rgba(17, 51, 49, 0.88);
+}
+.site-ink .bg-emerald-50\/60,
+.site-ink .bg-emerald-50\/70,
+.site-ink .bg-emerald-100 {
+  background-color: rgba(52, 211, 153, 0.12);
+}
+
+/* Item listing cards — the generic ink rules left these half-light (white
+   surface + cream text), making the body copy invisible. Give the whole card
+   an explicit dark glass treatment so every line is readable on the ink
+   theme. Scoped to the `item-card` hook class so nothing else shifts. */
+.site-ink .item-card {
+  background-color: rgba(12, 43, 41, 0.94);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.site-ink .item-card:hover {
+  background-color: rgba(14, 49, 47, 1);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+/* Title + secondary copy inside the card. */
+.site-ink .item-card .text-navy-900 {
+  color: #eef6f4;
+}
+.site-ink .item-card .text-slate-500,
+.site-ink .item-card .text-slate-600 {
+  color: rgba(238, 246, 244, 0.88);
+}
+.site-ink .item-card .text-slate-400 {
+  color: rgba(238, 246, 244, 0.74);
+}
+/* "View details" affordance: neutral by default, light teal on hover. */
+.site-ink .item-card .group-hover\:text-electric-700 {
+  color: rgba(238, 246, 244, 0.78);
+}
+.site-ink .item-card:hover .group-hover\:text-electric-700 {
+  color: #7dd3cc;
+}
+/* Empty-photo placeholder gradient → subtle dark tint. */
+.site-ink .item-card .bg-gradient-to-br {
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+}
+/* Category chip on the photo → dark pill with light text. */
+.site-ink .item-card .bg-white\/90 {
+  background-color: rgba(12, 43, 41, 0.78);
+  color: rgba(238, 246, 244, 0.85);
+}
+/* Lost / Found status badges → dark pills so the tinted text stays readable. */
+.site-ink .item-card .bg-red-100\/90 {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ff8a8a;
+}
+.site-ink .item-card .bg-emerald-100\/90 {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+}
+
+/* The floating navbar pill needs a nearly-opaque dark surface: generic dark
+   glass (6% white) lets map tiles bleed through and make links unreadable.
+   Uses the page's own ink base (#0c2b29) so it blends with the background. */
+.site-ink .navbar-pill,
+.site-ink .navbar-pill.bg-white\/95 {
+  background-color: rgba(12, 43, 41, 0.94);
 }
 
 /* Soft neutral fills → translucent ink tints. */
@@ -1062,11 +1155,11 @@ p {
 }
 .site-ink .text-sunrise-600,
 .site-ink .text-sunrise-700 {
-  color: #fdba74;
+  color: #ff8a8a;
 }
 .site-ink .text-ice-500,
 .site-ink .text-ice-600 {
-  color: rgba(238, 246, 244, 0.72);
+  color: rgba(238, 246, 244, 0.84);
 }
 
 /* Cream borders → light hairlines. */
@@ -1084,13 +1177,362 @@ p {
 /* Placeholders (placeholder: variants are distinct classes from text:*). */
 .site-ink .placeholder\:text-slate-400::placeholder,
 .site-ink .placeholder\:text-slate-500::placeholder {
-  color: rgba(238, 246, 244, 0.42);
+  color: rgba(238, 246, 244, 0.55);
 }
 
 /* Intentional white buttons inside dark CTA bands stay white. */
 .site-ink .bg-white.text-electric-800 {
   background-color: #f6fbfa;
   color: #0b4f4a;
+}
+
+/* Arbitrary hex ink tones used in the CTABand (page-kit/section.tsx): the
+   ghost "Report a found item" button was dark text (#17322f) on dark glass.
+   Brighten both the title/body hexes and give the ghost button a visible
+   translucent surface. */
+.site-ink .text-\[\#17322f\],
+.site-ink .text-\[\#3d2f22\] {
+  color: #eef6f4;
+}
+.site-ink .text-\[\#3d2f22\]\/75 {
+  color: rgba(238, 246, 244, 0.75);
+}
+.site-ink .border-electric-800\/25 {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.site-ink .bg-white\/60.text-\[\#17322f\] {
+  background-color: rgba(17, 51, 49, 0.86);
+}
+.site-ink .hover\:bg-white:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+/* ===========================================================================
+   DARK MODE — BackgroundEffects (site-wide fixed backdrop)
+   It paints an OPAQUE cream base + 98%-white radial wash + white haze in a
+   `fixed inset-0 z-0` layer that covers the whole page — this was the light
+   "fade" over the ink theme. Neutralize the light layers in dark mode; the
+   teal particle/radar art stays visible on top of the ink canvas.
+   =========================================================================== */
+.site-ink .site-bg-base {
+  background-color: transparent;
+}
+/* Kill the white washes entirely — opacity alone still lets the huge
+   0.98-alpha white radial bleed through and wash out the hero. */
+.site-ink .site-bg-glow,
+.site-ink .site-bg-haze {
+  background-image: none;
+  background-color: transparent;
+  opacity: 0;
+}
+
+/* AmbientGlow pastel blobs (background-system GLOW_BG) → faint teal tints. */
+.site-ink .bg-electric-400\/25 {
+  background-color: rgba(32, 148, 143, 0.12);
+}
+.site-ink .bg-lavender-200\/50 {
+  background-color: rgba(124, 201, 198, 0.07);
+}
+.site-ink .bg-sky-200\/45 {
+  background-color: rgba(37, 156, 167, 0.09);
+}
+.site-ink .bg-blue-200\/50 {
+  background-color: rgba(37, 156, 167, 0.06);
+}
+.site-ink .bg-ice-100\/55 {
+  background-color: rgba(45, 212, 191, 0.07);
+}
+
+/* Gradient stops that pass through solid white (CTA cards, banners, sheens)
+   → near-opaque ink tints so text on them stays crisp and readable on dark. */
+.site-ink .from-white {
+  --tw-gradient-from: rgba(17, 51, 49, 0.92) var(--tw-gradient-from-position);
+}
+.site-ink .from-orange-50,
+.site-ink .from-amber-50 {
+  --tw-gradient-from: rgba(244, 167, 36, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-sunrise-50 {
+  --tw-gradient-from: rgba(239, 68, 68, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-emerald-50,
+.site-ink .from-leaf-50,
+.site-ink .from-electric-50,
+.site-ink .from-teal-50 {
+  --tw-gradient-from: rgba(45, 212, 191, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-sky-50,
+.site-ink .from-blue-50 {
+  --tw-gradient-from: rgba(124, 201, 246, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-violet-50,
+.site-ink .from-lavender-50 {
+  --tw-gradient-from: rgba(167, 139, 250, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-slate-50 {
+  --tw-gradient-from: rgba(255, 255, 255, 0.05) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+/* via/to white must come AFTER the from-* rules so the rebuilt stop list wins. */
+.site-ink .via-white {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(17, 51, 49, 0.92)
+      var(--tw-gradient-via-position), var(--tw-gradient-to, transparent);
+}
+.site-ink .to-white {
+  --tw-gradient-to: rgba(17, 51, 49, 0.92) var(--tw-gradient-to-position);
+}
+
+/* Pastel solid fills → near-opaque dark panels (translucent washes made the
+   copy sitting on them look blurry as background art bled through). */
+.site-ink .bg-emerald-50,
+.site-ink .bg-leaf-50,
+.site-ink .bg-electric-50,
+.site-ink .bg-teal-50,
+.site-ink .bg-sky-50,
+.site-ink .bg-blue-50,
+.site-ink .bg-violet-50,
+.site-ink .bg-sunrise-50,
+.site-ink .bg-orange-50,
+.site-ink .bg-amber-50 {
+  background-color: rgba(17, 51, 49, 0.9);
+}
+/* Sunrise ("lost") surfaces → red tints on dark instead of orange. */
+.site-ink .bg-sunrise-50 {
+  background-color: rgba(239, 68, 68, 0.14);
+}
+.site-ink .bg-emerald-100,
+.site-ink .bg-leaf-100 {
+  background-color: rgba(52, 211, 153, 0.16);
+}
+.site-ink .bg-sunrise-100,
+.site-ink .bg-orange-100,
+.site-ink .bg-amber-100 {
+  background-color: rgba(244, 167, 36, 0.16);
+}
+.site-ink .bg-sunrise-100 {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+.site-ink .bg-electric-100 {
+  background-color: rgba(32, 148, 143, 0.18);
+}
+
+/* Pastel borders → light tinted hairlines. */
+.site-ink .border-emerald-200,
+.site-ink .border-leaf-200,
+.site-ink .border-teal-200 {
+  border-color: rgba(52, 211, 153, 0.28);
+}
+.site-ink .border-sunrise-200,
+.site-ink .border-orange-200,
+.site-ink .border-amber-200 {
+  border-color: rgba(244, 167, 36, 0.28);
+}
+.site-ink .border-sunrise-200 {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+.site-ink .border-electric-200,
+.site-ink .border-sky-200 {
+  border-color: rgba(124, 201, 198, 0.3);
+}
+
+/* Bright accent text → readable light tints on ink. */
+.site-ink .text-emerald-600,
+.site-ink .text-emerald-700 {
+  color: #6ee7b7;
+}
+.site-ink .text-sunrise-600,
+.site-ink .text-sunrise-700 {
+  color: #ff8a8a;
+}
+.site-ink .text-electric-600,
+.site-ink .text-electric-700 {
+  color: #8fe0da;
+}
+.site-ink .text-blue-500 {
+  color: #7cc9f8;
+}
+.site-ink .text-violet-600,
+.site-ink .text-violet-700 {
+  color: #c4b5fd;
+}
+
+/* ===========================================================================
+   DARK MODE — FULL-SITE READABILITY SWEEP
+   Every remaining light-theme utility used across pages/components, remapped
+   to readable ink values. Declared last so it wins the cascade.
+   =========================================================================== */
+
+/* --- Text: navy family ---------------------------------------------------- */
+.site-ink .text-navy-500,
+.site-ink .text-navy-600,
+.site-ink .text-navy-700 {
+  color: rgba(238, 246, 244, 0.78);
+}
+.site-ink .text-navy-800,
+.site-ink .text-navy-900 {
+  color: #eef6f4;
+}
+.site-ink .hover\:text-navy-800:hover,
+.site-ink .hover\:text-navy-900:hover,
+.site-ink .hover\:text-navy-600:hover {
+  color: #eef6f4;
+}
+
+/* --- Text: warning / error / success accents ------------------------------- */
+.site-ink .text-amber-600,
+.site-ink .text-amber-700,
+.site-ink .text-orange-600,
+.site-ink .text-orange-700 {
+  color: #fdba74;
+}
+.site-ink .text-amber-800,
+.site-ink .text-amber-900 {
+  color: #fde68a;
+}
+.site-ink .text-red-500,
+.site-ink .text-red-600,
+.site-ink .text-red-700,
+.site-ink .text-rose-600,
+.site-ink .text-rose-700 {
+  color: #ff8a8a;
+}
+/* Opacity-suffixed reds (e.g. the count inside the home "Lost" pill uses
+   text-rose-600/80). Without an explicit override the dark-mode sweep misses
+   them, leaving dark red text on the dark teal canvas — unreadable. */
+.site-ink .text-rose-600\/80,
+.site-ink .text-red-600\/80 {
+  color: #ff8a8a;
+}
+.site-ink .text-green-600,
+.site-ink .text-green-700,
+.site-ink .text-green-800 {
+  color: #86efac;
+}
+.site-ink .text-yellow-600,
+.site-ink .text-yellow-700,
+.site-ink .text-yellow-800 {
+  color: #fde68a;
+}
+.site-ink .text-indigo-600,
+.site-ink .text-indigo-700 {
+  color: #a5b4fc;
+}
+.site-ink .text-purple-600,
+.site-ink .text-purple-700 {
+  color: #d8b4fe;
+}
+.site-ink .text-cyan-600,
+.site-ink .text-cyan-700 {
+  color: #67e8f9;
+}
+.site-ink .text-electric-500 {
+  color: #8fe0da;
+}
+.site-ink .text-ice-700,
+.site-ink .text-ice-800 {
+  color: rgba(238, 246, 244, 0.6);
+}
+
+/* --- Text: hover variants --------------------------------------------------- */
+.site-ink .hover\:text-electric-600:hover,
+.site-ink .hover\:text-electric-700:hover {
+  color: #8fe0da;
+}
+.site-ink .hover\:text-blue-600:hover,
+.site-ink .hover\:text-blue-700:hover {
+  color: #93c5fd;
+}
+.site-ink .hover\:text-emerald-600:hover,
+.site-ink .hover\:text-emerald-700:hover {
+  color: #6ee7b7;
+}
+.site-ink .hover\:text-sunrise-600:hover,
+.site-ink .hover\:text-sunrise-700:hover,
+.site-ink .hover\:text-amber-700:hover {
+  color: #fca5a5;
+}
+.site-ink .hover\:text-red-600:hover,
+.site-ink .hover\:text-red-700:hover,
+.site-ink .hover\:text-rose-600:hover,
+.site-ink .hover\:text-rose-700:hover {
+  color: #fca5a5;
+}
+.site-ink .hover\:text-slate-700:hover,
+.site-ink .hover\:text-slate-900:hover,
+.site-ink .hover\:text-navy-700:hover {
+  color: #eef6f4;
+}
+
+
+/* ===========================================================================
+   DARK-MODE DECOR WASHES — the light pastel "background glow" decorations
+   (fixed blobs, aurora blooms, hero gradient + SVG waves) read as a blinding
+   white haze over the ink canvas. Retint them to faint teal/ink glows.
+   =========================================================================== */
+.site-ink .bg-electric-100\/\[0\.55\] {
+  background-color: rgba(32, 148, 143, 0.10);
+}
+.site-ink .bg-sky-200\/\[0\.35\] {
+  background-color: rgba(37, 156, 167, 0.09);
+}
+.site-ink .bg-lavender-200\/\[0\.45\] {
+  background-color: rgba(124, 201, 198, 0.06);
+}
+.site-ink .bg-ice-200\/\[0\.5\] {
+  background-color: rgba(45, 212, 191, 0.07);
+}
+/* Homepage's own FIXED blob backdrop (page.tsx) — pastel circles with
+   arbitrary opacities that stay glued to the viewport while scrolling and
+   wash out the hero text. → faint teal tints on the ink canvas. */
+.site-ink .bg-electric-100\/\[0\.55\] {
+  background-color: rgba(32, 148, 143, 0.10);
+}
+.site-ink .bg-sky-200\/\[0\.35\] {
+  background-color: rgba(37, 156, 167, 0.08);
+}
+.site-ink .bg-lavender-200\/\[0\.45\] {
+  background-color: rgba(124, 201, 198, 0.07);
+}
+/* The fixed SVG backdrop's white CENTER LIGHT ellipses (98%-white radial
+   core) and cream vignette — CSS opacity overrides their SVG attributes. */
+.site-ink .fb-center-light-shape {
+  opacity: 0.05;
+}
+.site-ink .fb-vignette-shape {
+  opacity: 0.04;
+}
+
+/* Hero bottom gradient (from-emerald-50/80 via transparent) → ink fade. */
+.site-ink .from-emerald-50\/80 {
+  --tw-gradient-from: rgba(12, 43, 41, 0.85) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+
+/* Hero decorative SVG waves (inline light fills) → faint teal ink strokes. */
+.site-ink path[fill="#cde8d4"] {
+  fill: rgba(45, 212, 191, 0.10);
+}
+.site-ink path[fill="#e5f0e7"] {
+  fill: rgba(45, 212, 191, 0.05);
+}
+
+/* Aurora blooms use inline background colors — dim the whole field instead. */
+.site-ink .hero-aurora {
+  opacity: 0.3;
+}
+
+/* Misc dropdown/mobile-menu utilities the ink theme missed. */
+.site-ink .hover\:bg-navy-50:hover,
+.site-ink .hover\:bg-red-50:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.site-ink .bg-navy-100 {
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 
@@ -1117,3 +1559,529 @@ p {
     color: rgba(61, 47, 34, 0.75);
   }
 
+
+/* --- Backgrounds: cream / navy / pastel fills ------------------------------- */
+.site-ink .bg-cream-50,
+.site-ink .bg-cream-100,
+.site-ink .bg-cream-100\/70,
+.site-ink .bg-ice-50 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.site-ink .bg-navy-100,
+.site-ink .bg-navy-100\/50 {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+.site-ink .hover\:bg-navy-50:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.site-ink .hover\:bg-emerald-50:hover,
+.site-ink .hover\:bg-emerald-100:hover,
+.site-ink .hover\:bg-leaf-50:hover {
+  background-color: rgba(52, 211, 153, 0.12);
+}
+.site-ink .hover\:bg-sunrise-50:hover,
+.site-ink .hover\:bg-amber-50:hover,
+.site-ink .hover\:bg-orange-50:hover {
+  background-color: rgba(244, 167, 36, 0.12);
+}
+.site-ink .hover\:bg-sunrise-50:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+}
+.site-ink .hover\:bg-electric-100:hover {
+  background-color: rgba(32, 148, 143, 0.22);
+}
+.site-ink .bg-sky-100,
+.site-ink .bg-blue-100 {
+  background-color: rgba(124, 201, 246, 0.14);
+}
+.site-ink .bg-rose-50,
+.site-ink .bg-rose-100,
+.site-ink .bg-red-50,
+.site-ink .hover\:bg-red-50:hover,
+.site-ink .hover\:bg-rose-50:hover,
+.site-ink .hover\:bg-rose-100:hover {
+  background-color: rgba(248, 113, 113, 0.14);
+}
+.site-ink .bg-green-50,
+.site-ink .bg-yellow-50 {
+  background-color: rgba(17, 51, 49, 0.9);
+}
+.site-ink .bg-violet-100,
+.site-ink .bg-purple-100 {
+  background-color: rgba(87, 63, 145, 0.28);
+}
+
+/* --- Borders ----------------------------------------------------------------- */
+.site-ink .border-slate-300,
+.site-ink .border-slate-300\/70,
+.site-ink .border-navy-200,
+.site-ink .border-cream-100 {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.site-ink .border-electric-100,
+.site-ink .border-sky-100,
+.site-ink .border-blue-100 {
+  border-color: rgba(124, 201, 198, 0.22);
+}
+.site-ink .border-emerald-100,
+.site-ink .border-leaf-100,
+.site-ink .border-leaf-300,
+.site-ink .border-green-200 {
+  border-color: rgba(52, 211, 153, 0.26);
+}
+.site-ink .border-amber-100,
+.site-ink .border-sunrise-100,
+.site-ink .border-sunrise-300,
+.site-ink .border-orange-200 {
+  border-color: rgba(244, 167, 36, 0.26);
+}
+.site-ink .border-sunrise-100,
+.site-ink .border-sunrise-300 {
+  border-color: rgba(248, 113, 113, 0.3);
+}
+.site-ink .border-rose-100,
+.site-ink .border-rose-200,
+.site-ink .border-red-200 {
+  border-color: rgba(248, 113, 113, 0.3);
+}
+.site-ink .hover\:border-electric-200:hover,
+.site-ink .hover\:border-electric-300:hover,
+.site-ink .hover\:border-slate-300:hover {
+  border-color: rgba(124, 201, 198, 0.45);
+}
+.site-ink .hover\:border-emerald-300:hover,
+.site-ink .hover\:border-leaf-300:hover {
+  border-color: rgba(52, 211, 153, 0.45);
+}
+.site-ink .hover\:border-sunrise-300:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+/* --- Gradient end-stops that land on pastel-100 ------------------------------ */
+.site-ink .to-blue-100 {
+  --tw-gradient-to: rgba(124, 201, 246, 0.12) var(--tw-gradient-to-position);
+}
+.site-ink .to-emerald-100,
+.site-ink .to-leaf-100 {
+  --tw-gradient-to: rgba(52, 211, 153, 0.12) var(--tw-gradient-to-position);
+}
+.site-ink .to-violet-100,
+.site-ink .to-purple-100 {
+  --tw-gradient-to: rgba(167, 139, 250, 0.12) var(--tw-gradient-to-position);
+}
+.site-ink .to-slate-100 {
+  --tw-gradient-to: rgba(17, 51, 49, 0.86) var(--tw-gradient-to-position);
+}
+.site-ink .to-amber-100,
+.site-ink .to-orange-100 {
+  --tw-gradient-to: rgba(244, 167, 36, 0.12) var(--tw-gradient-to-position);
+}
+.site-ink .to-emerald-50,
+.site-ink .to-leaf-50,
+.site-ink .to-electric-50,
+.site-ink .to-teal-50 {
+  --tw-gradient-to: rgba(45, 212, 191, 0.06) var(--tw-gradient-to-position);
+}
+.site-ink .to-sky-50,
+.site-ink .to-blue-50 {
+  --tw-gradient-to: rgba(124, 201, 246, 0.06) var(--tw-gradient-to-position);
+}
+.site-ink .to-violet-50,
+.site-ink .to-lavender-50 {
+  --tw-gradient-to: rgba(167, 139, 250, 0.06) var(--tw-gradient-to-position);
+}
+.site-ink .to-orange-50,
+.site-ink .to-amber-50 {
+  --tw-gradient-to: rgba(244, 167, 36, 0.06) var(--tw-gradient-to-position);
+}
+
+/* --- Focus ------------------------------------------------------------------- */
+
+/* --- Focus ------------------------------------------------------------------- */
+.site-ink .focus\:bg-white:focus {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Opacity-suffixed gradient stops (e.g. from-emerald-50/90) --------------- */
+.site-ink .from-emerald-50\/90,
+.site-ink .from-emerald-50\/80,
+.site-ink .from-electric-50\/80 {
+  --tw-gradient-from: rgba(45, 212, 191, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-amber-50\/90 {
+  --tw-gradient-from: rgba(244, 167, 36, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .from-sunrise-50\/90,
+.site-ink .from-sunrise-50\/80,
+.site-ink .from-sunrise-50\/70 {
+  --tw-gradient-from: rgba(239, 68, 68, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .to-electric-50\/50,
+.site-ink .to-orange-50\/60 {
+  --tw-gradient-to: rgba(45, 212, 191, 0.06) var(--tw-gradient-to-position);
+}
+
+/* --- Solid navy / dark surfaces that must stay dark -------------------------- */
+.site-ink .bg-navy-700,
+.site-ink .bg-navy-800,
+.site-ink .bg-navy-900 {
+  background-color: rgba(9, 32, 30, 0.85);
+}
+/* --- Semi-transparent white surfaces not caught above ----------------------- */
+.site-ink .bg-white\/75 {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* --- Buttons — keep labels full-brightness on the ink canvas ---------------- */
+.site-ink .btn-primary {
+  /* Deep teal gradient in dark mode — vivid, and white label ≥4.5:1. */
+  --tw-gradient-from: #0d7a72 var(--tw-gradient-from-position);
+  --tw-gradient-to: #0b6b64 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  color: #ffffff;
+}
+.site-ink .btn-primary:hover {
+  --tw-gradient-from: #0f8a81 var(--tw-gradient-from-position);
+  --tw-gradient-to: #0d7a72 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.site-ink .btn-ghost {
+  color: rgba(240, 248, 246, 0.92);
+}
+.site-ink .btn-ghost:hover {
+  color: #ffffff;
+}
+
+/* --- Shared secondary button (glass white surface) -------------------------- */
+.site-ink .btn-secondary {
+  border-color: rgba(124, 201, 198, 0.25);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #eef6f4;
+}
+.site-ink .btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.10);
+  border-color: rgba(124, 201, 198, 0.45);
+}
+
+/* border-slate-200 not covered by the slate-300 border group above */
+.site-ink .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* --- Opacity-suffixed accent text (e.g. text-emerald-700/80) --------------- */
+.site-ink .text-emerald-700\/\[0\.8\],   /* Tailwind v3 escape for text-emerald-700/80 */
+.site-ink .text-emerald-700\/80 {
+  color: rgba(110, 231, 183, 0.85);
+}
+
+/* Solid rose/leaf active pills (e.g. the Safety page tab switcher) used their
+   light-mode fills; rose-500 with white text failed contrast on ink. */
+.site-ink .bg-rose-500.text-white {
+  background-color: #be123c;
+}
+.site-ink .bg-leaf-600.text-white {
+  background-color: #15803d;
+}
+
+/* Mid-teal solid fills (search button, filter chips) — darkened so their white
+   labels reach ≥4.5:1 on the ink canvas. */
+.site-ink .bg-electric-500,
+.site-ink .bg-electric-500\/90 {
+  background-color: #0d7a72;
+}
+
+/* --- MapLibre chrome (zoom / navigation / attribution) --------------------- */
+.site-ink .maplibregl-ctrl-group {
+  background-color: rgba(9, 32, 30, 0.82);
+  border: 1px solid rgba(124, 201, 198, 0.25);
+}
+.site-ink .maplibregl-ctrl-group button,
+.site-ink .maplibregl-ctrl button {
+  background-color: transparent;
+}
+.site-ink .maplibregl-ctrl-group button:hover,
+.site-ink .maplibregl-ctrl button:hover {
+  background-color: rgba(255, 255, 255, 0.10);
+}
+/* glyphs are dark-on-light SVGs -> invert to light-on-dark */
+.site-ink .maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.4);
+}
+.site-ink .maplibregl-ctrl-attrib {
+  background-color: rgba(9, 32, 30, 0.6);
+  color: rgba(238, 246, 244, 0.55);
+}
+.site-ink .maplibregl-ctrl-attrib a {
+  color: #8fe0da;
+}
+
+/* --- Status badge pills on the item detail hero (over bright photos) --------
+   bg-red-50/emerald-50 + ring tones sit on top of photos; translucent light
+   tints turn pink/mint mush there. Give the ringed badges an opaque dark
+   surface so "Still missing" / "Returned" stay readable anywhere. */
+.site-ink .ring-red-200 {
+  background-color: rgba(127, 29, 29, 0.72);
+  color: #fecaca;
+  --tw-ring-color: rgba(252, 165, 165, 0.35);
+}
+.site-ink .ring-emerald-200 {
+  background-color: rgba(6, 78, 59, 0.72);
+  color: #a7f3d0;
+  --tw-ring-color: rgba(110, 231, 183, 0.35);
+}
+.site-ink .ring-slate-200 {
+  background-color: rgba(255, 255, 255, 0.08);
+  --tw-ring-color: rgba(255, 255, 255, 0.18);
+}
+/* Safety-panel body copy (text-emerald-700/90) was nearly invisible. */
+.site-ink .text-emerald-700\/90 {
+  color: rgba(110, 231, 183, 0.92);
+}
+
+/* Bright white frames (border-white/80 etc.) → hairline light strokes so
+   cards don't get a glowing white outline on the ink canvas. */
+.site-ink .border-white\/60,
+.site-ink .border-white\/70,
+.site-ink .border-white\/80,
+.site-ink .border-white\/90 {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* --- Item-detail image panel + status chip ---------------------------------- */
+/* Panel fill gradient (from-slate-100 → to-blue-50/70) stayed light and made
+   the whole left panel glow white behind the photo. */
+.site-ink .from-slate-100 {
+  --tw-gradient-from: rgba(17, 51, 49, 0.9) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.site-ink .to-blue-50\/70 {
+  --tw-gradient-to: rgba(45, 212, 191, 0.08) var(--tw-gradient-to-position);
+}
+/* Status chip ("Still missing") — white glass over a bright photo read as a
+   blank white pill with washed-out text. Dark chip + bright label instead. */
+.site-ink .status-chip {
+  background-color: rgba(12, 43, 41, 0.78);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.site-ink .status-chip .text-red-700 {
+  color: #ff8a8a;
+}
+.site-ink .status-chip .text-emerald-700 {
+  color: #6ee7b7;
+}
+.site-ink .status-chip .text-slate-500 {
+  color: rgba(238, 246, 244, 0.75);
+}
+/* ===========================================================================
+   DARK-MODE READABILITY PASS — crisp, high-contrast letterforms.
+   Activated by the `site-ink` class on <html>. Declared LAST so these win the
+   cascade over the earlier ink-theme rules and every Tailwind utility.
+   
+   These target the actual root causes of "eyes hurt / text blurry / letters
+   hard to read" in dark mode, rather than papering over symptoms:
+     (1)  Glass blur (backdrop-filter) keeps re-sampling the animated particle
+            / radar art BEHIND the translucent panels — every frame the glyphs sit on
+            a moving, re-blurred backdrop, which makes them shimmer and look soft/fuzzy.
+            In a dark theme every text-bearing surface is already near-opaque, so there's
+            nothing useful left to blur. We turn the blur OFF site-wide, which crisps the
+            letters instantly and also reduces motion/eye strain.
+
+            (2)  Several muted/faint ink tones were still drawn at very low opacity
+            (alpha 0.5x-0.8x) — washed-out light-gray mush that strains the eyes
+
+            (3)  Some text-bearing panels were still semi-transparent, so the moving
+            background art bled through just behind the letters, smearing them.
+   
+   Light mode is untouched — everything here is scoped to .site-ink.
+
+   =========================================================================== */
+
+/* 1) Kill glass blur site-wide on the ink theme. No re-filtering of moving art
+      behind letters → instantly sharper, calmer text. */
+.site-ink *,
+.site-ink *::before,
+.site-ink *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 2) Text-bearing surfaces → (near opaque so the animated art can't bleed
+      through behind the glyphs. If a panel holds text it now has a firm, solid
+      dark bed for the letters to sit on. */
+.site-ink .bg-white,
+.site-ink .bg-white\/80,
+.site-ink .bg-white\/85,
+.site-ink .bg-white\/90,
+.site-ink .bg-white\/95 {
+  background-color: rgba(14, 49, 47, 0.985);
+}
+.site-ink .bg-white\/40,
+.site-ink .bg-white\/45,
+.site-ink .bg-white\/50,
+.site-ink .bg-white\/60,
+.site-ink .bg-white\/70 {
+  background-color: rgba(14, 49, 47, 0.97);
+}
+.site-ink .bg-white\/10,
+.site-ink .bg-white\/15,
+.site-ink .bg-white\/20,
+.site-ink .bg-white\/25,
+.site-ink .bg-white\/30,
+.site-ink .bg-white\/35,
+.site-ink .bg-white\/75 {
+  background-color: rgba(14, 49, 47,  ​0.95);
+}
+/* The floating navbar pill and sat in the nav late item-content readers. */
+.site-ink .navbar-pill,
+.site-ink .item-card {
+  background-color: rgba(14, 49, 47,  ​0.985);
+}
+.site-ink .navbar-glass {
+  background-color: rgba(14, 49,  ​47,  ​0.93);
+}
+.site-ink .navbar-glass-scrolled {
+  background-color: rgba(14, 49,  ​47,  ​0.96);
+}
+.site-ink .bg-emerald-50,
+.site-ink .bg-leaf-50,
+.site-ink .bg-electric-50,
+.site-ink .bg-teal-50,
+.site-ink .bg-sky-50,
+.site-ink .bg-blue-50,
+.site-ink .bg-violet-50,
+.site-ink .bg-sunrise-50,
+.site-ink .bg-orange-50,
+.site-ink .bg-amber-50 {
+  background-color: rgba(14, 49,  47,  ​0.95);
+}
+/* Auth card + its glass surfaces (the auth.css backdrop blur(14px) on .auth-card
+   in neutralized by rule (1) above; give the panel a firm bed too.) */
+.site-ink .auth-root {
+  --auth-panel: rgba(13, 28, 26,  ​0.97);
+  --auth-glass: rgba(13, 28, 26,  ​0.96);
+}
+
+/* 3) Brighter, firmer ink — lift the washed-out low-opacity grays to clearly
+      readable light tones. (High-opacity light text on a dark bed is what makes
+      dark-mode copy crisp instead of fuzzy and eye-straining.) */
+.site-ink {
+  --text-muted: #eaf5f2;
+  --text-faint: #d8ece6;
+}
+.site-ink .text-slate-500,
+.site-ink .text-slate-600 {
+  color: rgba(242, 250,  248,  ​0.98);
+}
+.site-ink .text-slate-300,
+.site-ink .text-slate-400 {
+  color: rgba(238, 246,  244,  ​0.93);
+}
+.site-ink .text-ice-400,
+.site-ink .text-ice-500,
+.site-ink .text-ice-600 {
+  color: rgba(238,  246,  244,  ​0.95);
+}
+.site-ink .text-navy-500,
+.site-ink .text-navy-600,
+.site-ink .text-navy-700 {
+  color: rgba(238,  246,  244,  ​0.85);
+}
+/* Item-card secondary copy — the most-read list text on the site. */
+.site-ink .item-card .text-slate-500,
+.site-ink .item-card .text-slate-600 {
+  color: rgba(242,  250,  248,  ​0.97);
+}
+.site-ink .item-card .text-slate-400 {
+  color: rgba(238,  246,  244,  ​​0.88);
+}
+/* Status chip labels (on the item detail photo). */
+.site-ink .status-chip .text-slate-500 {
+  color: rgba(238,  246,  244,  ​​0.88);
+}
+/* Placeholders + map attribution → readable, not invisible. */
+.site-ink .placeholder\:text-slate-400::placeholder,
+.site-ink .placeholder\:text-slate-500::placeholder {
+  color: rgba(238,  246,  244,  ​​0.8);
+}
+.site-ink .maplibregl-ctrl-attrib {
+  color: rgba(238,  246,  244,  ​​0.85);
+}
+.site-ink .text-\[\#3d2f22\]\/75 {
+  color: rgba(238,  246,  244,  ​​0.9);
+}
+/* Auth copy — faint/muted/placeholder lifted to clearly legible. */
+.site-ink .auth-root {
+  --auth-muted: rgba(238,  246,  244,  ​​0.96);
+  --auth-faint: rgba(238,  246,   ​244,  ​​0.86);
+  --auth-placeholder: rgba(238,  246,  244,  ​​0.78);
+}
+
+/* 4) Guarantee crisp glyph rendering on dark for the most common text nodes. */
+.site-ink body,
+.site-ink p,
+.site-ink span,
+.site-ink a,
+.site-ink button,
+.site-ink li,
+.site-ink label,
+.site-ink td,
+.site-ink th,
+.site-ink input,
+.site-ink textarea,
+.site-ink select,
+.site-ink dd,
+.site-ink dt {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+/* ===========================================================================
+   GUARANTEED INK TEXT — force the washed-out muted/faint grays to crisp,
+   clearly readable light tones everywhere on the ink theme, no matter what
+   higher-specificity (component-level, light-theme) rule may have set them.
+
+   Declared last AND with !important, scoped only to .site-ink (light mode
+   is completely untouched. Safe to override: only these neutral muted tones,
+   never the brand/accent text colors, which keep their vibrant tints.).
+   =========================================================================== */
+.site-ink .text-slate-500,
+.site-ink .text-slate-600 {
+  color: rgba(242, 250, 248, 0.98) !important;
+}
+.site-ink .text-slate-300,
+.site-ink .text-slate-400 {
+  color: rgba(238, 246, 244, 0.93) !important;
+}
+.site-ink .text-ice-400,
+.site-ink .text-ice-500,
+.site-ink .text-ice-600 {
+  color: rgba(238, 246, 244, 0.95) !important;
+}
+.site-ink .text-navy-500,
+.site-ink .text-navy-600,
+.site-ink .text-navy-700 {
+  color: rgba(238, 246, 244, 0.85) !important;
+}
+.site-ink .item-card .text-slate-500,
+.site-ink .item-card .text-slate-600 {
+  color: rgba(242, 250, 248,  0.97) !important;
+}
+.site-ink .item-card .text-slate-400 {
+  color: rgba(238,  246,  244,  0.88) !important;
+}
+.site-ink .status-chip .text-slate-500 {
+  color: rgba(238,  246,  244,  0.88) !important;
+}
+.site-ink .placeholder\:text-slate-400::placeholder,
+.site-ink .placeholder\:text-slate-500::placeholder {
+  color: rgba(238,  246,  244,  0.8) !important;
+}
+.site-ink .maplibregl-ctrl-attrib {
+  color: rgba(238,  246,  244,   ​0.85) !important;
+}
+.site-ink .text-\[\#3d2f22\]\/75 {
+  color: rgba(238,  246,  244,   ​0.9) !important;
+}

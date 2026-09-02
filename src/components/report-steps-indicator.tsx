@@ -20,7 +20,7 @@ export function ReportStepsIndicator({
   current: number;
   /** Descriptive line shown under the route, e.g. "Step 2 · Where & when". */
   caption: string;
-  /** Teal (lost flow) or emerald (found flow) accent. */
+  /** Red (lost flow) or emerald/green (found flow) accent. */
   accent?: "teal" | "emerald";
 }) {
   const colors =
@@ -32,17 +32,17 @@ export function ReportStepsIndicator({
           line: "#209b68",
         }
       : {
-          doneDot: "bg-electric-500",
-          activeRing: "border-electric-500 text-electric-700",
-          activeText: "text-electric-700",
-          line: "#0f7b72",
+          doneDot: "bg-red-500",
+          activeRing: "border-red-500 text-red-700",
+          activeText: "text-red-700",
+          line: "#dc2626",
         };
 
   return (
     <div className="mt-8">
       <ol
         aria-label="Report progress"
-        className="mx-auto flex max-w-md items-start justify-between"
+        className="mx-auto flex max-w-md items-start"
       >
         {STEP_LABELS.map((label, i) => {
           const n = i + 1;
@@ -51,19 +51,24 @@ export function ReportStepsIndicator({
           const lineDone = n <= current;
 
           return (
-            <li key={label} className="relative flex min-w-0 flex-col items-center">
-              {/* Route connector — sits behind the nodes */}
+            <li key={label} className="relative flex min-w-0 flex-1 flex-col items-center">
+              {/* Route connector — sits behind the nodes, spanning from the
+                  previous node's center (-50%) to this node's center. Requires
+                  equal-width (flex-1) columns to line up with the node dots. */}
               {i > 0 && (
                 <span
                   aria-hidden="true"
-                  className="absolute right-1/2 top-[7px] -z-10 h-[2px] w-full translate-x-1/2 rounded-full sm:top-[9px]"
                   style={{
                     backgroundImage: isDone
                       ? `linear-gradient(90deg, ${colors.line} 0%, ${colors.line} 100%)`
                       : undefined,
-                    backgroundColor: isDone ? undefined : "#e2e8f0",
-                    opacity: isDone ? 0.55 : 1,
                   }}
+                  // Inactive segment uses the bg-slate-200 utility (NOT an
+                  // inline color) so the site-ink dark theme can re-theme it.
+                  className={
+                    (isDone ? "opacity-60 " : "bg-slate-200 ") +
+                    "absolute left-[-50%] top-[7px] -z-10 h-[2px] w-full rounded-full sm:top-[9px]"
+                  }
                 />
               )}
 

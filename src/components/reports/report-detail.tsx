@@ -158,6 +158,7 @@ function StatusBadge({
   return (
     <span
       className="
+        status-chip
         inline-flex
         items-center
         gap-2

@@ -440,6 +440,71 @@
   color: var(--auth-muted);
 }
 
+/* ===========================================================================
+   DARK MODE — FindBack PH auth pages (`.site-ink` on <html>)
+   Every auth surface flows from the `.auth-root` custom properties below, so
+   the whole login / register / signup / report / verify experience re-tints to
+   frosted ink glass by remapping only these tokens. Declared last to win the
+   cascade over the light `color-scheme: light` defaults above.
+   =========================================================================== */
+.site-ink .auth-root {
+  --auth-panel: rgba(13, 28, 26, 0.86);
+  --auth-panel-solid: #0d1c1a;
+  --auth-panel-border: rgba(124, 201, 198, 0.22);
+  --auth-glass: rgba(9, 32, 30, 0.55);
+
+  --auth-fg: #eef6f4;              /* secondary text */
+  --auth-heading: #ffffff;         /* headings + brand */
+  --auth-muted: rgba(238, 246, 244, 0.92);
+  --auth-faint: rgba(238, 246, 244, 0.72);
+  --auth-placeholder: rgba(238, 246, 244, 0.55);
+
+  --auth-input-bg: rgba(9, 32, 30, 0.92);
+  --auth-input-border: rgba(124, 201, 198, 0.30);
+  --auth-input-focus: #8fe0da;     /* light electric — readable on dark */
+  --auth-focus-ring: rgba(143, 224, 218, 0.16);
+
+  --auth-accent: #8fe0da;          /* links + focus + icons */
+  --auth-accent-hover: #aee9e4;
+  --auth-accent-soft: rgba(143, 224, 218, 0.12);
+  --auth-accent-ink: #8fe0da;
+
+  --auth-danger: #fca5a5;
+  --auth-danger-soft: rgba(252, 165, 165, 0.14);
+  --auth-danger-ink: #fecaca;
+
+  --auth-success: #6ee7b7;
+  --auth-success-soft: rgba(110, 231, 183, 0.14);
+  --auth-success-ink: #a7f3d0;
+  --auth-success-btn-a: #059669;   /* keep dark enough for white button text */
+  --auth-success-btn-b: #047857;
+
+  --auth-warn: #fbbf24;
+  --auth-warn-soft: rgba(251, 191, 36, 0.14);
+  --auth-warn-ink: #fde68a;
+
+  --auth-glow1: rgba(143, 224, 218, 0.28);
+  --auth-glow2: rgba(245, 176, 100, 0.20);
+  --auth-glow3: rgba(110, 190, 190, 0.24);
+  --auth-shadow: 0 18px 50px -24px rgba(0, 0, 0, 0.55);
+
+  color-scheme: dark;
+}
+
+/* The submit button inherits --auth-accent which is now a light teal; re-paint
+   its face a darker teal so the white button label stays high-contrast. */
+.site-ink .auth-submit {
+  background: linear-gradient(135deg, #147d78, #0f6b66);
+  box-shadow: 0 12px 30px -12px rgba(15, 123, 122, 0.55);
+}
+.site-ink .auth-submit-success {
+  background: linear-gradient(135deg, var(--auth-success-btn-a), var(--auth-success-btn-b));
+}
+
+/* Feedback blocks hardcode a faint tinted surface; keep the light ink text. */
+.site-ink .auth-error-block { background: rgba(252, 165, 165, 0.08); }
+.site-ink .auth-success-block { background: rgba(110, 231, 183, 0.08); }
+
 /* ----------------------- Reduced motion -------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .auth-page, .auth-shake { animation: none !important; }
