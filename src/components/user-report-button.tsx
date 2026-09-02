@@ -86,7 +86,7 @@ export function UserReportButton({ targetUserId }: { targetUserId: string }) {
 
       {open && (
         <div
-          className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-navy-900/40 p-4 backdrop-blur-sm sm:items-center"
+          className="fixed inset-0 z-[80] flex justify-center overflow-y-auto bg-navy-900/40 p-4 backdrop-blur-sm"
           onClick={() => setOpen(false)}
           role="presentation"
         >
@@ -96,7 +96,7 @@ export function UserReportButton({ targetUserId }: { targetUserId: string }) {
             aria-modal="true"
             aria-label="Report this user"
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-card border border-slate-200/70 bg-white p-6 shadow-soft fade-in"
+            className="my-auto w-full max-w-md rounded-card border border-slate-200/70 bg-white p-6 shadow-soft fade-in"
           >
             <div className="flex items-start justify-between gap-3">
               <div>

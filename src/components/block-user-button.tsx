@@ -110,32 +110,27 @@ export function BlockUserButton({ targetUserId }: { targetUserId: string }) {
             aria-modal="true"
             aria-label="Block this user"
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm rounded-card border border-slate-200/70 bg-white p-6 shadow-soft fade-in"
+            className="my-auto w-full max-w-xs rounded-card border border-slate-200/70 bg-white p-5 text-center shadow-soft fade-in"
           >
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
-                <Ban size={18} aria-hidden="true" />
-              </span>
-              <div>
-                <h3 className="font-display text-lg font-semibold text-navy-900">Block this user?</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Are you sure you want to block this person? They will no longer be able to message you. You can
-                  unblock them anytime.
-                </p>
-              </div>
-            </div>
+            <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <Ban size={20} aria-hidden="true" />
+            </span>
+            <h3 className="mt-3 font-display text-base font-semibold text-navy-900">Block this user?</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
+              They won't be able to message you anymore. You can unblock them anytime.
+            </p>
 
-            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <div className="mt-5 flex flex-col gap-2">
+              <button type="button" onClick={performBlock} disabled={isPending} className="btn-destructive w-full">
+                {isPending ? "Blocking…" : "Yes, block this person"}
+              </button>
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}
                 disabled={isPending}
-                className="btn-secondary"
+                className="btn-secondary w-full"
               >
                 Cancel
-              </button>
-              <button type="button" onClick={performBlock} disabled={isPending} className="btn-destructive">
-                {isPending ? "Blocking…" : "Yes, block this person"}
               </button>
             </div>
           </div>
