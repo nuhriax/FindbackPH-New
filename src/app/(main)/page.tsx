@@ -820,26 +820,7 @@ export default async function HomePage() {
                   delay={(index % 3) * 60}
                   className="h-full"
                 >
-                  <div className="relative h-full">
-                    <div className="pointer-events-none absolute left-4 top-4 z-10">
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider shadow-sm backdrop-blur-md ${
-                          item.kind === "lost"
-                            ? "border-sunrise-200 bg-white/90 text-sunrise-700"
-                            : "border-emerald-200 bg-white/90 text-emerald-700"
-                        }`}
-                      >
-                        {item.kind === "lost" ? (
-                          <PackageSearch size={11} />
-                        ) : (
-                          <HeartHandshake size={11} />
-                        )}
-
-                        {item.kind}
-                      </span>
-                    </div>
-
-                    <ItemCard
+                  <ItemCard
                       href={item.href}
                       title={item.title}
                       category={item.category}
@@ -851,8 +832,7 @@ export default async function HomePage() {
                       imageUrl={item.imageUrl}
                       views={item.views}
                     />
-                  </div>
-                </MotionReveal>
+                  </MotionReveal>
               ))}
             </div>
           ) : (

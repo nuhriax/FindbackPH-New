@@ -36,22 +36,22 @@ export function BadgesCard({
   return (
     <div>
       {hero && (
-        <div className="mb-5 rounded-2xl border border-emerald-200/70 bg-gradient-to-r from-emerald-50 via-white to-sunrise-50 p-4">
+        <div className="mb-5 rounded-2xl border border-emerald-200/70 bg-gradient-to-r from-emerald-50 via-white to-sunrise-50 p-4 dark:border-emerald-900/60 dark:from-emerald-950/60 dark:via-[#0d2b23] dark:to-[#0d2b23]">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-2xl shadow-sm">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-2xl shadow-sm dark:bg-emerald-900/50">
               {hero.emoji}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-display text-sm font-semibold text-navy-900">
+              <p className="font-display text-sm font-semibold text-navy-900 dark:text-emerald-50">
                 Level {hero.level} · {hero.name}
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70">
                 {hero.nextAt !== null
                   ? `${successfulReturns ?? 0} of ${hero.nextAt} returns to the next level`
                   : "The highest level — thank you for everything you've returned."}
               </p>
               {heroProgress !== null && (
-                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-emerald-950">
                   <div
                     className="h-full rounded-full bg-emerald-500 transition-all"
                     style={{ width: `${heroProgress}%` }}

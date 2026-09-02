@@ -1118,7 +1118,7 @@ function pointPopupHtml(point: MapPoint): string {
   return (
     `<div style="width:244px;font-family:inherit;border-top:4px solid ${accent}">` +
     `<div style="padding:13px 16px 15px;background:linear-gradient(180deg,${isLost ? "#fff5f6" : "#f2fbf7"},#ffffff)">` +
-    `<span style="display:inline-flex;align-items:center;gap:4px;border-radius:9999px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.08em;box-shadow:inset 0 0 0 1px ${accent}22;${badge}">${isLost ? "🔴" : "🟢"} ${label}</span>` +
+    `<span style="display:inline-flex;align-items:center;border-radius:9999px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.08em;box-shadow:inset 0 0 0 1px ${accent}22;${badge}">${label}</span>` +
     `<p style="margin:11px 0 0;font-size:15px;line-height:1.4;font-weight:700;color:#0f172a">${escapeHtml(point.title)}</p>` +
     `<p style="margin:6px 0 0;font-size:12px;color:#475569">📍 ${escapeHtml(place)}</p>` +
     (when

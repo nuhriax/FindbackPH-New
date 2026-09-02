@@ -65,7 +65,7 @@ export function ItemCard({
 
         {/* Status badge */}
         <span
-          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
             kind === "lost" ? "bg-red-100/90 text-red-700" : "bg-emerald-100/90 text-emerald-700"
           }`}
         >

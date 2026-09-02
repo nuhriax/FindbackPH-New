@@ -415,7 +415,7 @@ export default async function DiscoverPage({
               <form
                 action="/discover"
                 method="get"
-                className="mx-auto mt-8 flex max-w-xl items-center rounded-full border border-cream-300 bg-white/90 pl-5 pr-1.5 shadow-sm backdrop-blur transition focus-within:border-electric-400 focus-within:ring-4 focus-within:ring-electric-500/10"
+                className="mx-auto mt-8 flex max-w-xl items-center rounded-full border border-cream-300 bg-white/90 pl-5 pr-0 shadow-sm backdrop-blur transition focus-within:border-electric-400 focus-within:ring-4 focus-within:ring-electric-500/10"
               >
                 <input type="hidden" name="type" value={type === "all" ? "" : type} />
                 <span aria-hidden="true" className="text-ice-400">
@@ -431,12 +431,12 @@ export default async function DiscoverPage({
                   defaultValue={q}
                   maxLength={MAX_SEARCH_LENGTH}
                   placeholder="Search by item, brand, or keyword…"
-                  className="h-10 min-w-0 flex-1 bg-transparent text-sm text-navy-900 placeholder:text-ice-400 focus:outline-none"
+                  className="h-12 min-w-0 flex-1 bg-transparent pl-3 pr-3 text-[15px] text-navy-900 placeholder:text-slate-400 focus:outline-none"
                 />
                 <button
                   type="submit"
                   aria-label="Search"
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-electric-600 text-white shadow-sm transition hover:bg-electric-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/40 active:scale-[0.98]"
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-electric-600 text-white shadow-sm transition hover:bg-electric-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/40 active:scale-[0.98]"
                 >
                   <Search size={16} aria-hidden="true" />
                 </button>

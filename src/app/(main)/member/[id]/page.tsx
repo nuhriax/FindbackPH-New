@@ -110,27 +110,24 @@ return (
     <div className="py-16 lg:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Profile card — identity + facts in one */}
-        <section className="card overflow-hidden">
-          <div className="h-28 bg-gradient-to-br from-electric-500/15 via-ice-50 to-emerald-50/60" />
-          <div className="flex flex-col gap-4 px-6 sm:flex-row sm:items-end sm:px-8">
-            <div className="-mt-10">
-              {profile.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={getAvatarPublicUrl(profile.avatar_url)}
-                  alt={`${fullName}'s avatar`}
-                  referrerPolicy="no-referrer"
-                  className="h-24 w-24 rounded-2xl border-4 border-white object-cover shadow-soft"
-                />
-              ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white bg-gradient-to-br from-electric-500 to-electric-600 font-display text-3xl font-bold text-white shadow-soft">
-                  {initial}
-                </div>
-              )}
-            </div>
+        <section className="card p-6 sm:p-8">
+          <div className="flex items-center gap-4">
+            {profile.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={getAvatarPublicUrl(profile.avatar_url)}
+                alt={`${fullName}'s avatar`}
+                referrerPolicy="no-referrer"
+                className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-soft"
+              />
+            ) : (
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-electric-500 to-electric-600 font-display text-2xl font-bold text-white shadow-soft">
+                {initial}
+              </div>
+            )}
 
-            <div className="min-w-0 flex-1 sm:pb-1">
-              <h1 className="font-display text-2xl font-bold tracking-tight text-navy-900">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-xl font-bold tracking-tight text-navy-900">
                 {fullName}
               </h1>
               <p className="text-sm text-slate-500">@{profile.username}</p>
@@ -148,31 +145,31 @@ return (
             </div>
 
             {isOwn && (
-              <Link href="/dashboard/profile" className="btn-secondary sm:pb-1">
+              <Link href="/dashboard/profile" className="btn-secondary">
                 Edit profile
               </Link>
             )}
           </div>
 
           {/* Facts strip — same card, divided from the identity block */}
-          <div className="mt-5 grid grid-cols-2 divide-x divide-slate-200/70 border-t border-slate-200/70 bg-ice-50/40">
-            <div className="flex items-center gap-3 px-6 py-4 sm:px-8">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <HeartHandshake size={18} />
+          <div className="mt-6 grid grid-cols-2 divide-x divide-slate-200/70 border-t border-slate-200/70 pt-5">
+            <div className="flex items-center gap-3 pr-4">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <HeartHandshake size={16} />
               </span>
               <div>
-                <p className="font-display text-xl font-bold text-navy-900">
+                <p className="font-display text-lg font-bold text-navy-900">
                   {profile.successful_returns}
                 </p>
                 <p className="text-xs text-slate-500">items reunited</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-6 py-4 sm:px-8">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ice-50 text-electric-600">
-                <MapPin size={18} />
+            <div className="flex items-center gap-3 pl-4">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ice-50 text-electric-600">
+                <MapPin size={16} />
               </span>
               <div>
-                <p className="font-display text-xl font-bold text-navy-900">
+                <p className="font-display text-lg font-bold text-navy-900">
                   {joined ?? "—"}
                 </p>
                 <p className="text-xs text-slate-500">member since</p>
