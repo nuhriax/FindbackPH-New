@@ -117,7 +117,7 @@ export function BlockUserButton({ targetUserId }: { targetUserId: string }) {
             </span>
             <h3 className="mt-3 font-display text-base font-semibold text-navy-900">Block this user?</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
-              They won't be able to message you anymore. You can unblock them anytime.
+              They won&apos;t be able to message you anymore. You can unblock them anytime.
             </p>
 
             <div className="mt-5 flex flex-col gap-2">
