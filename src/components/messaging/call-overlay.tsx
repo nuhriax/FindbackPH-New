@@ -1,22 +1,21 @@
-"use client";
+﻿"use client";
 
 /**
  * FindBack PH — in-chat voice / video calling (WebRTC).
  *
- * Signaling runs over a Supabase Realtime broadcast channel scoped to the
- * conversation (`call:<conversationId>`), so both callers must have the chat
- * thread open — the same constraint as the typing indicator. Media flows
- * peer-to-peer after the handshake; only free STUN servers are used.
+ * Signaling runs over a Supabase Realtime broadcast channel keyed on the
+ * CALLEE's user id (`call:u:<calleeId>`), so an incoming call rings the other
+ * user anywhere in the app — not just inside the chat thread. The
+ * <IncomingCallManager> listens on the current user's channel globally and
+ * mounts this overlay to answer.
  *
- * Events on the channel:
- *   call-offer  { from, mode, sdp }   — caller → callee (starts ringing)
- *   call-answer { from, sdp }         — callee → caller (accepted)
- *   call-decline{ from }              — callee declined
- *   ice         { from, candidate }   — trickle ICE both ways
- *   hangup      { from }              — either side ended the call
+ * When a call ends, a 📞 call-log message is posted into the conversation so
+ * the thread keeps a Messenger-style history ("📞 Voice call · 1:23").
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { sendMessageAction } from "@/lib/actions/messaging";
+import { startRingtone, stopRingtone } from "@/lib/ringtone";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
   Mic,
@@ -25,10 +24,17 @@ import {
   PhoneOff,
   Video,
   VideoOff,
-  X,
 } from "lucide-react";
 
 export type CallMode = "audio" | "video";
+
+export type IncomingOffer = {
+  from: string;
+  mode: CallMode;
+  sdp: RTCSessionDescriptionInit;
+  callerName?: string;
+  callerAvatar?: string | null;
+};
 
 type CallPhase =
   | "idle"
@@ -50,42 +56,84 @@ function fmt(sec: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+/** Fire-and-forget call-log entry written into the conversation. */
+function logCall(conversationId: string, body: string) {
+  void sendMessageAction(conversationId, body).catch(() => {
+    /* call log is best-effort */
+  });
+}
+
 export function CallOverlay({
   conversationId,
   currentUserId,
+  calleeId,
   displayName,
   avatarUrl,
   requestedMode,
+  incomingOffer,
+  selfName,
+  selfAvatar,
   onClosed,
 }: {
   conversationId: string;
   currentUserId: string;
+  /** The user id of the person being called (signaling channel key). */
+  calleeId: string;
   displayName: string;
   avatarUrl: string | null;
-  /** Non-null when the local user pressed a call button; null = listen only. */
+  /** Set when the local user placed the call. */
   requestedMode: CallMode | null;
+  /** Set when answering an offer received by the global listener. */
+  incomingOffer: IncomingOffer | null;
+  /** Local user's identity — included in the offer so the callee sees who's calling. */
+  selfName?: string;
+  selfAvatar?: string | null;
   onClosed: () => void;
 }) {
   const supabase = useMemoClient();
-  const [phase, setPhase] = useState<CallPhase>(requestedMode ? "calling" : "idle");
-  const [mode, setMode] = useState<CallMode | null>(requestedMode);
+  const isCaller = !!requestedMode && !incomingOffer;
+  const [phase, setPhase] = useState<CallPhase>(requestedMode ? "calling" : incomingOffer ? "ringing" : "idle");
+  const [mode, setMode] = useState<CallMode | null>(requestedMode ?? incomingOffer?.mode ?? null);
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [incomingMode, setIncomingMode] = useState<CallMode | null>(null);
 
   const channelRef = useRef<RealtimeChannel | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
   const remoteDescSetRef = useRef(false);
-  const pendingOfferRef = useRef<{ from: string; sdp: RTCSessionDescriptionInit } | null>(null);
+  const pendingOfferRef = useRef<IncomingOffer | null>(incomingOffer);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const roleRef = useRef<"caller" | "callee" | null>(requestedMode ? "caller" : null);
+  const roleRef = useRef<"caller" | "callee" | null>(isCaller ? "caller" : incomingOffer ? "callee" : null);
+  const secondsRef = useRef(0);
+  const modeRef = useRef<CallMode | null>(mode);
+  const loggedRef = useRef(false);
 
-  /** Tear down media + peer connection (keeps the channel open). */
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+
+  /** Write the thread call-log entry (once per call, caller side only). */
+  const writeLog = useCallback(
+    (kind: "ended" | "missed") => {
+      if (loggedRef.current || !isCaller || !conversationId) return;
+      loggedRef.current = true;
+      const label = modeRef.current === "video" ? "Video call" : "Voice call";
+      if (kind === "ended" && secondsRef.current > 0) {
+        logCall(conversationId, `📞 ${label} · ${fmt(secondsRef.current)}`);
+      } else if (kind === "missed") {
+        logCall(conversationId, `📞 Missed ${label.toLowerCase()}`);
+      } else {
+        logCall(conversationId, `📞 ${label} ended`);
+      }
+    },
+    [conversationId, isCaller]
+  );
+
+  /** Tear down media + peer connection. */
   const teardown = useCallback(() => {
     pcRef.current?.getSenders().forEach((s) => s.track?.stop());
     pcRef.current?.close();
@@ -97,6 +145,7 @@ export function CallOverlay({
     pendingOfferRef.current = null;
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    stopRingtone();
   }, []);
 
   const hangup = useCallback(
@@ -108,19 +157,20 @@ export function CallOverlay({
           payload: { from: currentUserId },
         });
       }
+      writeLog(secondsRef.current > 0 ? "ended" : "missed");
       teardown();
       setPhase("ended");
       window.setTimeout(() => onClosed(), 1200);
     },
-    [currentUserId, onClosed, teardown]
+    [currentUserId, onClosed, teardown, writeLog]
   );
 
   /** Build the peer connection and wire media + ICE. */
   const createPeer = useCallback(
-    async (chatMode: CallMode) => {
+    async (callMode: CallMode) => {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: chatMode === "video" ? { width: { ideal: 1280 } } : false,
+        video: callMode === "video" ? { width: { ideal: 1280 }, facingMode: "user" } : false,
       });
       localStreamRef.current = stream;
 
@@ -130,11 +180,8 @@ export function CallOverlay({
       pc.ontrack = (ev) => {
         const remote = ev.streams[0];
         if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remote;
-        // Audio-only: also feed the hidden <audio> element.
-        const audioEl = document.getElementById(
-          "call-remote-audio"
-        ) as HTMLAudioElement | null;
-        if (audioEl && chatMode === "audio") audioEl.srcObject = remote;
+        const audioEl = document.getElementById("call-remote-audio") as HTMLAudioElement | null;
+        if (audioEl && callMode === "audio") audioEl.srcObject = remote;
       };
 
       pc.onicecandidate = (ev) => {
@@ -148,7 +195,10 @@ export function CallOverlay({
       };
 
       pc.onconnectionstatechange = () => {
-        if (pc.connectionState === "connected") setPhase("connected");
+        if (pc.connectionState === "connected") {
+          stopRingtone();
+          setPhase("connected");
+        }
         if (["failed", "closed"].includes(pc.connectionState) && pcRef.current) {
           hangup();
         }
@@ -173,26 +223,14 @@ export function CallOverlay({
     pendingCandidatesRef.current = [];
   }, []);
 
-  // Signaling channel lifecycle.
+  // Signaling channel — keyed on the callee's user id so it works app-wide.
   useEffect(() => {
-    const channel = supabase.channel(`call:${conversationId}`, {
+    const channel = supabase.channel(`call:u:${calleeId}`, {
       config: { broadcast: { self: false } },
     });
     channelRef.current = channel;
 
     channel
-      .on("broadcast", { event: "call-offer" }, ({ payload }) => {
-        const { from, mode: offerMode, sdp } = payload as {
-          from: string;
-          mode: CallMode;
-          sdp: RTCSessionDescriptionInit;
-        };
-        if (from === currentUserId || pcRef.current) return; // not for us / busy
-        pendingOfferRef.current = { from, sdp };
-        setIncomingMode(offerMode);
-        setMode(offerMode);
-        setPhase("ringing");
-      })
       .on("broadcast", { event: "call-answer" }, async ({ payload }) => {
         const { from, sdp } = payload as { from: string; sdp: RTCSessionDescriptionInit };
         if (from === currentUserId || roleRef.current !== "caller") return;
@@ -201,11 +239,13 @@ export function CallOverlay({
         await pc.setRemoteDescription(new RTCSessionDescription(sdp));
         remoteDescSetRef.current = true;
         await drainCandidates();
+        stopRingtone();
         setPhase("connecting");
       })
       .on("broadcast", { event: "call-decline" }, ({ payload }) => {
         const { from } = payload as { from: string };
         if (from === currentUserId || roleRef.current !== "caller") return;
+        writeLog("missed");
         teardown();
         setError("Call declined");
         setPhase("ended");
@@ -240,12 +280,13 @@ export function CallOverlay({
       void supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationId, currentUserId]);
+  }, [conversationId, currentUserId, calleeId]);
 
   // Caller dials as soon as the overlay mounts with a requested mode.
   useEffect(() => {
     if (!requestedMode || phase !== "calling") return;
     let cancelled = false;
+    startRingtone("outgoing");
     (async () => {
       try {
         const pc = await createPeer(requestedMode);
@@ -255,7 +296,13 @@ export function CallOverlay({
         channelRef.current?.send({
           type: "broadcast",
           event: "call-offer",
-          payload: { from: currentUserId, mode: requestedMode, sdp: offer },
+          payload: {
+            from: currentUserId,
+            mode: requestedMode,
+            sdp: offer,
+            callerName: selfName,
+            callerAvatar: selfAvatar ?? null,
+          },
         });
       } catch (err) {
         console.error("[call] dial failed:", err);
@@ -274,6 +321,12 @@ export function CallOverlay({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedMode]);
 
+  // Callee: ring while the incoming offer waits; always silence on end.
+  useEffect(() => {
+    if (phase === "ringing") startRingtone("incoming");
+    if (phase === "ended") stopRingtone();
+  }, [phase]);
+
   // Auto-miss an unanswered ring after 30s.
   useEffect(() => {
     if (phase !== "calling" && phase !== "ringing") return;
@@ -284,6 +337,7 @@ export function CallOverlay({
           event: "hangup",
           payload: { from: currentUserId },
         });
+        writeLog("missed");
         setError("No answer");
       } else {
         setError("Missed call");
@@ -299,16 +353,23 @@ export function CallOverlay({
   // Connected: start the duration timer + bind the local camera preview.
   useEffect(() => {
     if (phase !== "connected") return;
-    const t = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+    const t = window.setInterval(() => {
+      setSeconds((s) => {
+        secondsRef.current = s + 1;
+        return s + 1;
+      });
+    }, 1000);
     if (localVideoRef.current && localStreamRef.current) {
       localVideoRef.current.srcObject = localStreamRef.current;
     }
     return () => window.clearInterval(t);
   }, [phase]);
 
+
   const acceptCall = async () => {
     const offer = pendingOfferRef.current;
     if (!offer || !mode) return;
+    stopRingtone();
     setPhase("connecting");
     try {
       const pc = await createPeer(mode);
@@ -323,7 +384,6 @@ export function CallOverlay({
         event: "call-answer",
         payload: { from: currentUserId, sdp: answer },
       });
-      setIncomingMode(null);
     } catch (err) {
       console.error("[call] accept failed:", err);
       channelRef.current?.send({
@@ -348,6 +408,7 @@ export function CallOverlay({
       event: "call-decline",
       payload: { from: currentUserId },
     });
+    // The CALLER writes the "Missed" log so both sides never double up.
     teardown();
     onClosed();
   };
@@ -368,7 +429,7 @@ export function CallOverlay({
     }
   };
 
-  if (phase === "idle" && !incomingMode) return null;
+  if (phase === "idle") return null;
 
   const statusLabel =
     phase === "calling"

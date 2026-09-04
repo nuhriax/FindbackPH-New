@@ -77,20 +77,20 @@ export function ChatsRail({ activeId }: { activeId: string }) {
   return (
     <div>
       {/* Search */}
-      <div className="relative px-1 pb-3">
-        <Search size={15} aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+      <div className="relative px-2.5 pb-3">
+        <Search size={15} aria-hidden="true" className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search chats"
           aria-label="Search conversations"
-          className="w-full rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-3 text-sm text-navy-900 placeholder:text-slate-400 transition focus:border-electric-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-electric-200"
+          className="w-full rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-3 text-sm text-navy-900 placeholder:text-slate-400 transition focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
         />
       </div>
 
       {/* Unread filter */}
-      <div className="flex items-center justify-between px-2 pb-2">
+      <div className="flex items-center justify-between px-3.5 pb-2">
         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
           {filtered.length} chat{filtered.length === 1 ? "" : "s"}
         </p>
@@ -101,8 +101,8 @@ export function ChatsRail({ activeId }: { activeId: string }) {
             aria-pressed={showUnreadOnly}
             className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
               showUnreadOnly
-                ? "bg-electric-600 text-white"
-                : "bg-electric-50 text-electric-600 hover:bg-electric-100"
+                ? "msg-gradient text-white"
+                : "bg-blue-50 text-blue-600 hover:bg-blue-100"
             }`}
           >
             Unread {unreadTotal}
@@ -116,18 +116,20 @@ export function ChatsRail({ activeId }: { activeId: string }) {
           <p className="text-sm text-slate-400">No chats match “{query}”</p>
         </div>
       ) : (
-        <ul>
+        <ul className="space-y-0.5 px-2">
           {filtered.map((c) => (
             <li key={c.id}>
               <Link
                 href={`/messages/${c.id}`}
                 aria-current={c.isActive ? "true" : undefined}
-                className={`flex items-center gap-3 rounded-xl px-2.5 py-2.5 transition-colors ${
-                  c.isActive ? "bg-blue-50" : "hover:bg-slate-100/80"
+                className={`flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors ${
+                  c.isActive
+                    ? "bg-blue-50 ring-1 ring-blue-200"
+                    : "hover:bg-slate-100/80"
                 }`}
               >
                 <span className="relative shrink-0">
-                  <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-sm font-semibold text-white">
+                  <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full msg-gradient text-sm font-semibold text-white">
                     {c.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={c.avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -143,7 +145,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
                       {c.displayName}
                     </span>
                     {c.timeLabel && (
-                      <span className={`ml-auto shrink-0 text-[11px] ${c.isUnread ? "font-semibold text-electric-600" : "text-slate-400"}`}>
+                      <span className={`ml-auto shrink-0 text-[11px] ${c.isUnread ? "font-semibold text-blue-600" : "text-slate-400"}`}>
                         {formatTimeLabel(c.timeLabel)}
                       </span>
                     )}
@@ -152,7 +154,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
                     <span className={`min-w-0 flex-1 truncate text-[13px] ${c.isUnread ? "font-semibold text-navy-900" : "text-slate-500"}`}>
                       {c.preview}
                     </span>
-                    {c.isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-electric-500" aria-label="Unread" />}
+                    {c.isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500" aria-label="Unread" />}
                   </span>
                 </span>
               </Link>

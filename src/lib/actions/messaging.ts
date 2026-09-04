@@ -1,4 +1,4 @@
-"use server";
+  "use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -365,7 +365,7 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
     .from("conversations")
     .select(
       `id, item_type, item_id, participant_a, participant_b, updated_at,
-       messages(body, kind, sender_id, read_by_receiver, created_at)`
+       messages(body, sender_id, read_by_receiver, created_at)`
     )
     .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
     .order("updated_at", { ascending: false })
@@ -388,7 +388,6 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
     updated_at: string;
     messages?: Array<{
       body: string;
-      kind?: "text" | "audio" | null;
       sender_id: string;
       read_by_receiver: boolean | null;
       created_at: string;
@@ -396,11 +395,6 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
   };
 
   const rows = data as unknown as PreviewRow[];
-
-  const previewText = (m?: { body: string; kind?: "text" | "audio" | null }) =>
-    m && (m.kind === "audio" || (!m.body.trim() && !!m.kind))
-      ? "🎤 Voice message"
-      : m?.body ?? null;
 
   return Promise.all(
     rows.map(async (row) => {
@@ -426,7 +420,7 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
           ? `${profile.first_name} ${profile.last_name}`.trim()
           : "Someone",
         other_avatar_url: profile?.avatar_url ?? null,
-        latest_body: previewText(latest),
+        latest_body: latest?.body ?? null,
         latest_from_me: latest ? latest.sender_id === user.id : false,
         has_unread: !!latest && latest.sender_id !== user.id && !latest.read_by_receiver,
         updated_at: row.updated_at,
@@ -478,7 +472,7 @@ export async function getRailItems(): Promise<RailItem[]> {
     .from("conversations")
     .select(
       `id, item_type, item_id, participant_a, participant_b, updated_at,
-       messages(body, kind, sender_id, read_by_receiver, created_at)`
+       messages(body, sender_id, read_by_receiver, created_at)`
     )
     .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
     .order("updated_at", { ascending: false })
@@ -515,9 +509,7 @@ export async function getRailItems(): Promise<RailItem[]> {
         avatarUrl: profile?.avatar_url ?? null,
         timeLabel: latest?.created_at ? String(latest.created_at) : "",
         preview: latest
-          ? `${latest.sender_id === user.id ? "You: " : ""}${
-              latest.kind === "audio" ? "🎤 Voice message" : latest.body
-            }`
+          ? `${latest.sender_id === user.id ? "You: " : ""}${latest.body}`
           : itemRes.data
             ? `About ${(itemRes.data as { title: string }).title}`
             : "Say hello — no messages yet",

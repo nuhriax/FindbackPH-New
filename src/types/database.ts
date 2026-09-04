@@ -158,12 +158,16 @@ export type Message = {
   sender_id: string;
   body: string;
   read_by_receiver: boolean;
-  /** 'text' (default) or 'audio' (recorded voice note). */
-  kind: "text" | "audio";
+  /** 'text' (default), 'audio' (voice note), 'image' (photo) or 'video'. */
+  kind: "text" | "audio" | "image" | "video";
   /** voice-messages bucket URL — set when kind = 'audio'. */
   audio_url: string | null;
   /** Voice-note length in seconds. */
   audio_duration: number | null;
+  /** chat-images bucket URL — set when kind = 'image'. */
+  image_url: string | null;
+  /** chat-videos bucket URL — set when kind = 'video'. */
+  video_url: string | null;
   created_at: string;
 };
 
@@ -333,11 +337,13 @@ export interface Database {
         Row: Message;
         Insert: Omit<
           Message,
-          "id" | "created_at" | "read_by_receiver" | "kind" | "audio_url" | "audio_duration"
+          "id" | "created_at" | "read_by_receiver" | "kind" | "audio_url" | "audio_duration" | "image_url" | "video_url"
         > & {
-          kind?: "text" | "audio";
+          kind?: "text" | "audio" | "image" | "video";
           audio_url?: string | null;
           audio_duration?: number | null;
+          image_url?: string | null;
+          video_url?: string | null;
         };
         Update: Partial<Message>;
         Relationships: [];

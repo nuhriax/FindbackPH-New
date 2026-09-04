@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SiteChrome } from "@/components/site-chrome";
 import { NavbarFallback, NavbarShell } from "@/components/navbar/navbar-shell";
+import { IncomingCallManager } from "@/components/messaging/incoming-call-manager";
 
 /**
  * Layout for every `(main)` route (the whole public site plus dashboards).
@@ -28,6 +29,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <main id="main-content" className="relative z-10 flex-1 scroll-mt-24">
         {children}
       </main>
-    </SiteChrome>
+      {/* Global incoming voice/video call listener — rings anywhere in the app */}
+      <IncomingCallManager />
+      </SiteChrome>
   );
 }
