@@ -116,8 +116,7 @@ export async function GET(
     .join(" ")
     .trim();
 
-  const ownerName =
-    fullName || (profile?.username ? `@${profile.username}` : "Community member");
+  const ownerName = fullName || "Community member";
 
   const storedPaths = (images ?? []).map((image) => image.storage_path);
   const signedUrls = await getSignedImageUrls(storedPaths);

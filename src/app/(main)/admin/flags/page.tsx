@@ -96,7 +96,6 @@ export default async function AdminFlagsPage() {
           <div className="mt-8 space-y-3">
             {flags.map((flag: any) => {
               const reporter = flag.profiles as {
-                username: string;
                 first_name?: string;
                 last_name?: string;
               } | null;
@@ -106,7 +105,6 @@ export default async function AdminFlagsPage() {
                     .map((v: string) => v.trim())
                     .filter(Boolean)
                     .join(" ")) ||
-                reporter?.username ||
                 "unknown";
               const href =
                 flag.item_type === "lost_item"

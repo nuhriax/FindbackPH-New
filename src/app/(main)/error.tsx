@@ -14,7 +14,13 @@ export default function MainError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  console.error("[main] route error:", error.digest ?? error.message);
+  console.error(
+    "[main] route error:",
+    error.message,
+    error.digest ? `(digest: ${error.digest})` : "",
+    "\n",
+    error.stack
+  );
 
   return (
     <ErrorState

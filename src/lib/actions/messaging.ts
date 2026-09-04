@@ -22,6 +22,16 @@ export type MessageData = {
   created_at: string;
 };
 
+export type RailItem = {
+  id: string;
+  displayName: string;
+  initial: string;
+  avatarUrl: string | null;
+  timeLabel: string;
+  preview: string;
+  isUnread: boolean;
+};
+
 /**
  * Ensures a conversation exists for the given item between the current user
  * and the item's reporter. Returns the existing or newly-created conversation.
@@ -103,11 +113,13 @@ export async function getOrCreateConversation(
 }
 
 /**
- * Sends a message in an existing conversation.
+ * Sends a message in an existing conversation. Pass `voice` to send a
+ * recorded voice note instead of text (body stays empty).
  */
 export async function sendMessageAction(
   conversationId: string,
-  body: string
+  body: string,
+  voice?: { audioUrl: string; duration: number }
 ): Promise<ActionResult> {
   const supabase = await createClient();
   const {
@@ -119,8 +131,11 @@ export async function sendMessageAction(
   }
 
   const trimmed = body.trim();
-  if (!trimmed) {
+  if (!trimmed && !voice) {
     return { error: "Message cannot be empty" };
+  }
+  if (!trimmed && voice && (!voice.audioUrl || !Number.isFinite(voice.duration) || voice.duration <= 0)) {
+    return { error: "Invalid voice note" };
   }
 
   const { data: convo, error: convoError } = await supabase
@@ -154,6 +169,13 @@ export async function sendMessageAction(
     conversation_id: conversationId,
     sender_id: user.id,
     body: trimmed,
+    ...(voice
+      ? {
+          kind: "audio" as const,
+          audio_url: voice.audioUrl,
+          audio_duration: Math.max(1, Math.round(voice.duration)),
+        }
+      : {}),
   });
 
   if (error) {
@@ -183,6 +205,7 @@ export async function getUserConversations(): Promise<ConversationData[]> {
       messages!inner(
         id,
         body,
+        kind,
         sender_id,
         created_at,
         read_by_receiver
@@ -342,7 +365,7 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
     .from("conversations")
     .select(
       `id, item_type, item_id, participant_a, participant_b, updated_at,
-       messages(body, sender_id, read_by_receiver, created_at)`
+       messages(body, kind, sender_id, read_by_receiver, created_at)`
     )
     .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
     .order("updated_at", { ascending: false })
@@ -365,6 +388,7 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
     updated_at: string;
     messages?: Array<{
       body: string;
+      kind?: "text" | "audio" | null;
       sender_id: string;
       read_by_receiver: boolean | null;
       created_at: string;
@@ -373,19 +397,24 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
 
   const rows = data as unknown as PreviewRow[];
 
+  const previewText = (m?: { body: string; kind?: "text" | "audio" | null }) =>
+    m && (m.kind === "audio" || (!m.body.trim() && !!m.kind))
+      ? "🎤 Voice message"
+      : m?.body ?? null;
+
   return Promise.all(
     rows.map(async (row) => {
       const otherId = row.participant_a === user.id ? row.participant_b : row.participant_a;
 
       const [profileRes, itemRes] = await Promise.all([
-        supabase.from("profiles").select("username, first_name, last_name, avatar_url").eq("id", otherId).single(),
+        supabase.from("profiles").select("first_name, last_name, avatar_url").eq("id", otherId).single(),
         (() => {
           const table = row.item_type === "lost_item" ? "lost_items" : "found_items";
           return supabase.from(table).select("title").eq("id", row.item_id).single();
         })(),
       ]);
 
-      const profile = profileRes.data as { username: string; first_name: string; last_name: string; avatar_url: string | null } | null;
+      const profile = profileRes.data as { first_name: string; last_name: string; avatar_url: string | null } | null;
       const latest = row.messages?.[0];
 
       return {
@@ -394,10 +423,10 @@ export async function getConversationPreviews(limit = 5): Promise<ConversationPr
         item_title: ((itemRes.data as { title: string } | null)?.title ?? null),
         other_id: otherId,
         other_name: profile?.first_name
-          ? `${profile.first_name} ${profile.last_name}`
-          : profile?.username ?? "Someone",
+          ? `${profile.first_name} ${profile.last_name}`.trim()
+          : "Someone",
         other_avatar_url: profile?.avatar_url ?? null,
-        latest_body: latest?.body ?? null,
+        latest_body: previewText(latest),
         latest_from_me: latest ? latest.sender_id === user.id : false,
         has_unread: !!latest && latest.sender_id !== user.id && !latest.read_by_receiver,
         updated_at: row.updated_at,
@@ -430,6 +459,74 @@ export async function getNotifications(): Promise<any[]> {
   }
 
   return data ?? [];
+}
+
+/**
+ * Returns enriched conversation items for the two-pane chat rail.
+ * Server-action shaped so the client <ChatsRail> can fetch it on its own
+ * without crossing the server→client component boundary.
+ */
+export async function getRailItems(): Promise<RailItem[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from("conversations")
+    .select(
+      `id, item_type, item_id, participant_a, participant_b, updated_at,
+       messages(body, kind, sender_id, read_by_receiver, created_at)`
+    )
+    .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
+    .order("updated_at", { ascending: false })
+    .order("created_at", { ascending: false, referencedTable: "messages" })
+    .limit(1, { referencedTable: "messages" })
+    .limit(100);
+
+  if (!data) return [];
+
+  const items = await Promise.all(
+    data.map(async (row: any) => {
+      const otherId = row.participant_a === user.id ? row.participant_b : row.participant_a;
+      const [profileRes, itemRes] = await Promise.all([
+        supabase.from("profiles").select("first_name, last_name, avatar_url").eq("id", otherId).single(),
+        (() => {
+          const table = row.item_type === "lost_item" ? "lost_items" : "found_items";
+          return supabase.from(table).select("title").eq("id", row.item_id).single();
+        })(),
+      ]);
+      const profile = profileRes.data as { first_name: string; last_name: string; avatar_url: string | null } | null;
+      const latest = row.messages?.[0];
+      const unreadCount =
+        (row.messages as any[] | undefined)?.filter(
+          (m) => m && m.sender_id !== user.id && !m.read_by_receiver
+        ).length ?? 0;
+      const displayName = profile?.first_name
+        ? `${profile.first_name} ${profile.last_name ?? ""}`.trim()
+        : "Someone";
+
+      return {
+        id: row.id,
+        displayName,
+        initial: (profile?.first_name?.[0] ?? "S").toUpperCase(),
+        avatarUrl: profile?.avatar_url ?? null,
+        timeLabel: latest?.created_at ? String(latest.created_at) : "",
+        preview: latest
+          ? `${latest.sender_id === user.id ? "You: " : ""}${
+              latest.kind === "audio" ? "🎤 Voice message" : latest.body
+            }`
+          : itemRes.data
+            ? `About ${(itemRes.data as { title: string }).title}`
+            : "Say hello — no messages yet",
+        isUnread: unreadCount > 0,
+      } satisfies Omit<RailItem, "isActive">;
+    })
+  );
+
+  return items;
 }
 
 /**

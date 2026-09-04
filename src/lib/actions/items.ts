@@ -133,7 +133,6 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
     title: parsed.data.title,
     category: parsed.data.category,
     description: parsed.data.description,
-    distinguishing_features: parsed.data.distinguishingFeatures ?? null,
     date_lost: parsed.data.dateLost,
     city: parsed.data.city,
     province: parsed.data.province,
@@ -145,6 +144,25 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };
+  }
+
+  // PRIVATE — verification details go to the owner-only table, never the
+  // publicly-readable lost_items row (supabase/110-trust-safety.sql).
+  if (parsed.data.distinguishingFeatures) {
+    const { error: privateError } = await supabase
+      .from("item_private_details")
+      .upsert(
+        {
+          item_type: "lost_item",
+          item_id: inserted.id,
+          reporter_id: user.id,
+          details: parsed.data.distinguishingFeatures,
+        },
+        { onConflict: "item_type,item_id" },
+      );
+    if (privateError) {
+      console.error("Private details save error:", privateError);
+    }
   }
 
   // Run the matching engine against active found reports
@@ -207,7 +225,6 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
     title: parsed.data.title,
     category: parsed.data.category,
     description: parsed.data.description,
-    distinguishing_features: parsed.data.distinguishingFeatures ?? null,
     date_found: parsed.data.dateFound,
     city: parsed.data.city,
     province: parsed.data.province,
@@ -219,6 +236,25 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
 
   if (error || !inserted) {
     return { error: "We couldn't save your report. Please try again." };
+  }
+
+  // PRIVATE — verification details go to the owner-only table, never the
+  // publicly-readable found_items row (supabase/110-trust-safety.sql).
+  if (parsed.data.distinguishingFeatures) {
+    const { error: privateError } = await supabase
+      .from("item_private_details")
+      .upsert(
+        {
+          item_type: "found_item",
+          item_id: inserted.id,
+          reporter_id: user.id,
+          details: parsed.data.distinguishingFeatures,
+        },
+        { onConflict: "item_type,item_id" },
+      );
+    if (privateError) {
+      console.error("Private details save error:", privateError);
+    }
   }
 
   // Reverse matching: check this new found item against existing active lost

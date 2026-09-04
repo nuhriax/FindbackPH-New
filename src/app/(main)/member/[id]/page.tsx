@@ -12,6 +12,7 @@ import { UserReportButton } from "@/components/user-report-button";
 import {
   VerifiedAccountBadge,
   TrustedMemberBadge,
+  VerifiedSeal,
 } from "@/components/ui/verification-badge";
 import { HeartHandshake, MapPin, PackageSearch, PackageCheck } from "lucide-react";
 
@@ -101,8 +102,8 @@ export default async function MemberProfilePage({ params }: Props) {
   const fullName =
     [profile.first_name ?? "", profile.last_name ?? ""]
       .filter(Boolean)
-      .join(" ") || profile.username || "FindBack member";
-  const initial = (profile.first_name?.[0] ?? profile.username?.[0] ?? "M").toUpperCase();
+      .join(" ") || "FindBack member";
+  const initial = (profile.first_name?.[0] ?? "M").toUpperCase();
   const joined = profile.created_at
     ? format(new Date(profile.created_at), "MMMM yyyy")
     : null;
@@ -112,25 +113,28 @@ return (
         {/* Profile card — identity + facts in one */}
         <section className="card p-6 sm:p-8">
           <div className="flex items-center gap-4">
-            {profile.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={getAvatarPublicUrl(profile.avatar_url)}
-                alt={`${fullName}'s avatar`}
-                referrerPolicy="no-referrer"
-                className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-soft"
-              />
-            ) : (
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-electric-500 to-electric-600 font-display text-2xl font-bold text-white shadow-soft">
-                {initial}
-              </div>
-            )}
+            <div className="relative shrink-0">
+              {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={getAvatarPublicUrl(profile.avatar_url)}
+                  alt={`${fullName}'s avatar`}
+                  referrerPolicy="no-referrer"
+                  className="h-16 w-16 rounded-2xl object-cover shadow-soft"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-electric-500 to-electric-600 font-display text-2xl font-bold text-white shadow-soft">
+                  {initial}
+                </div>
+              )}
+              {trust.emailVerified && <VerifiedSeal />}
+            </div>
 
             <div className="min-w-0 flex-1">
               <h1 className="font-display text-xl font-bold tracking-tight text-navy-900">
                 {fullName}
               </h1>
-              <p className="text-sm text-slate-500">@{profile.username}</p>
+              <p className="text-sm text-slate-500">FindBack member</p>
 
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 {trust.emailVerified && <VerifiedAccountBadge />}

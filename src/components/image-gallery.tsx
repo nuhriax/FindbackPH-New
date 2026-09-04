@@ -179,7 +179,7 @@ export function ImageGallery({
         className={cn(
           "group relative w-full select-none overflow-hidden bg-slate-100",
           fill
-            ? "min-h-0 flex-1 rounded-2xl"
+            ? "min-h-0 flex-1"
             : "aspect-video rounded-2xl border border-slate-200/70"
         )}
         onTouchStart={handleTouchStart}

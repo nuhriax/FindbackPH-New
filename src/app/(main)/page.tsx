@@ -70,6 +70,8 @@ type RecentCard = {
   kind: "lost" | "found";
   imageUrl?: string | null;
   views?: number | null;
+  /** Lost items only — offered reward, shown as a chip on the card. */
+  reward?: number | null;
 };
 
 type LostRow = Pick<
@@ -82,6 +84,7 @@ type LostRow = Pick<
   | "province"
   | "created_at"
   | "view_count"
+  | "reward_amount"
 >;
 
 type FoundRow = Pick<
@@ -149,6 +152,7 @@ function buildRecentCards(
     kind: "lost",
     imageUrl: lostImageMap.get(item.id) ?? null,
     views: item.view_count ?? null,
+    reward: item.reward_amount ?? null,
   }));
 
   const foundCards: RecentCard[] = foundItems.map((item) => ({
@@ -270,7 +274,7 @@ export default async function HomePage() {
     supabase
       .from("lost_items")
       .select(
-        "id, title, category, description, city, province, created_at, view_count"
+        "id, title, category, description, city, province, created_at, view_count, reward_amount"
       )
       .eq("status", "active")
       .order("created_at", {
@@ -435,7 +439,7 @@ export default async function HomePage() {
           <svg
             viewBox="0 0 1200 140"
             preserveAspectRatio="none"
-            className="absolute -bottom-1 left-0 h-32 w-full opacity-70"
+            className="hero-waves absolute -bottom-1 left-0 h-32 w-full opacity-70"
           >
             <path
               d="M0 118 C 200 66, 420 108, 620 90 C 840 70, 1020 96, 1200 68 V140 H0 Z"
@@ -453,9 +457,9 @@ export default async function HomePage() {
 
         <PaperNotes />
 
-        <CommunityMotif className="absolute bottom-1 left-0 hidden w-64 opacity-70 lg:block" />
+        <CommunityMotif className="hero-motif absolute bottom-1 left-0 hidden w-64 opacity-70 lg:block" />
 
-        <CommunityMotif className="absolute bottom-1 right-8 hidden w-64 opacity-70 lg:block" />
+        <CommunityMotif className="hero-motif absolute bottom-1 right-8 hidden w-64 opacity-70 lg:block" />
 
         <div className="relative z-10 mx-auto max-w-5xl">
           {/* ----------------------------------------------------------------
@@ -515,7 +519,7 @@ export default async function HomePage() {
                 action="/search"
                 method="GET"
                 role="search"
-                className="flex flex-col gap-2 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl sm:flex-row sm:items-center"
+                className="hero-search flex flex-col gap-2 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl sm:flex-row sm:items-center"
               >
                 <div className="flex min-h-[52px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-electric-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-electric-100">
                   <Search
@@ -831,6 +835,7 @@ export default async function HomePage() {
                       kind={item.kind}
                       imageUrl={item.imageUrl}
                       views={item.views}
+                      reward={item.reward}
                     />
                   </MotionReveal>
               ))}

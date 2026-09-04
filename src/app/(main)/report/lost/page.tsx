@@ -12,6 +12,7 @@ import { MotionReveal } from "@/components/effects/motion-reveal";
 import { ReportStepsIndicator } from "@/components/report-steps-indicator";
 import { DraftAutoSave } from "@/components/reports/draft-autosave";
 import { SimilarReportsHint } from "@/components/reports/similar-reports-hint";
+import { SensitiveCategoryHint } from "@/components/reports/sensitive-category-hint";
 
 // MapLibre + tile layers are the heaviest dependency on this page — load the
 // map lazily so the wizard's first paint never waits on it.
@@ -336,19 +337,24 @@ export default function ReportLostPage() {
                     <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
                   ))}
                 </select>
+                <SensitiveCategoryHint selectId="category" />
               </div>
 
               <div>
                 <label htmlFor="description" className="label">Description</label>
                 <textarea id="description" name="description" required minLength={10} maxLength={2000} rows={4} className="input" />
-                <p className="mt-1 text-xs text-slate-500">At least 10 characters — include brand, color, and other details.</p>
+                <p className="mt-1 text-xs text-slate-500">At least 10 characters — brand, color, and the general area help matching. Keep one-of-a-kind details for the private field below.</p>
               </div>
 
               <div>
                 <label htmlFor="distinguishingFeatures" className="label">
-                  Distinguishing features <span className="font-normal text-slate-500">(optional)</span>
+                  Private identifying details <span className="font-normal text-slate-500">(optional)</span>
                 </label>
-                <textarea id="distinguishingFeatures" name="distinguishingFeatures" rows={2} className="input" />
+                <textarea id="distinguishingFeatures" name="distinguishingFeatures" rows={2} className="input" placeholder="e.g. Small crack beside the rear camera; blue case with a scratch on the bottom-right" />
+                <p className="mt-1 flex items-start gap-1 text-xs text-slate-500">
+                  <Lock size={12} className="mt-0.5 shrink-0" aria-hidden="true" />
+                  Hidden from the public listing — used to confirm a claimant really knows the item.
+                </p>
               </div>
             </div>
 

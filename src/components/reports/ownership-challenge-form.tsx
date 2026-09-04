@@ -41,9 +41,11 @@ export function OwnershipChallengeForm({
         setError(
           res.error === "too_many_attempts"
             ? "Too many incorrect attempts. Contact the reporter through messages instead."
-            : res.error === "mismatch" || !res.error
-              ? "That doesn't match. Please check your answers and try again."
-              : "Verification failed. Please try again."
+            : res.error === "claiming_restricted"
+              ? "Claiming is temporarily limited on this account because of repeated unsuccessful attempts. This is a safety measure — you can still browse and message. If you think this is a mistake, contact support to review it."
+              : res.error === "mismatch" || !res.error
+                ? "That doesn't match. Please check your answers and try again."
+                : "Verification failed. Please try again."
         );
       }
     });

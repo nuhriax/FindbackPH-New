@@ -82,7 +82,7 @@ export function ReportFlagButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 text-xs font-medium text-slate-600 transition-colors hover:text-red-600"
+        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:text-red-600"
       >
         <Flag size={14} aria-hidden="true" />
         Report this listing

@@ -66,14 +66,16 @@ export function SaveButton({
         onClick={handleToggle}
         disabled={isPending}
         aria-pressed={isSaved}
-        className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-all duration-200 ${
+        title={isSaved ? "Saved — click to remove" : "Save this report"}
+        aria-label={isSaved ? "Remove from saved reports" : "Save this report"}
+        className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border px-5 py-2 text-[13px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-400 focus-visible:ring-offset-2 active:translate-y-px ${
           isSaved
-            ? "border-electric-400/60 bg-electric-50 text-electric-700"
-            : "border-slate-200 bg-white/75 text-navy-900 shadow-sm hover:border-blue-300 hover:bg-blue-50/50"
+            ? "border-electric-500/40 bg-electric-500/10 text-electric-700"
+            : "border-slate-200/80 bg-transparent text-slate-500 hover:bg-slate-50"
         }`}
       >
         <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
-        {isPending ? "Saving…" : isSaved ? "Saved" : "Save report"}
+        {isPending ? "Saving…" : isSaved ? "Saved" : "Save Item"}
       </button>
       {error && <p className="field-error">{error}</p>}
     </div>

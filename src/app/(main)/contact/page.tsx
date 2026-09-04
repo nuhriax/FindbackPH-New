@@ -364,7 +364,7 @@ export default function ContactPage() {
 
               <a
                 href={composeHref}
-                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-navy-900 px-3 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-navy-800"
+                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-colors duration-200 hover:border-slate-300 hover:text-navy-900"
               >
                 <Mail size={13} aria-hidden="true" />
                 Send us an email

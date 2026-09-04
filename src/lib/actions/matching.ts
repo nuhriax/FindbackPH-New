@@ -1,11 +1,41 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 
 export type ActionResult = { error: string } | { error?: undefined };
 
 type Db = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * PRIVATE — verification details live in item_private_details (owner-only
+ * RLS, supabase/110-trust-safety.sql). The matching engine is a server-only
+ * operation, so it reads them through the service-role key, which never
+ * reaches the client. If the key is not configured the engine degrades
+ * gracefully to scoring without the features factor.
+ */
+async function getPrivateFeatures(
+  itemType: "lost_item" | "found_item",
+  ids: string[]
+): Promise<Map<string, string | null>> {
+  const map = new Map<string, string | null>();
+  if (ids.length === 0) return map;
+  try {
+    const service = createServiceRoleClient();
+    const { data, error } = await service
+      .from("item_private_details")
+      .select("item_id, details")
+      .eq("item_type", itemType)
+      .in("item_id", ids);
+    if (error) throw error;
+    for (const row of data ?? []) {
+      map.set(row.item_id, row.details);
+    }
+  } catch (e) {
+    console.error("Private features fetch error:", e);
+  }
+  return map;
+}
 
 /**
  * Batches the perceptual photo hashes for the given reports out of
@@ -118,10 +148,27 @@ export async function runMatchingForFoundItem(foundItemId: string): Promise<Acti
     foundIds: [foundItemId],
   });
 
+  // PRIVATE — merge verification details from the owner-only table.
+  const lostFeatures = await getPrivateFeatures(
+    "lost_item",
+    (lostItems ?? []).map((l) => l.id)
+  );
+  const ownFeatures = (
+    await getPrivateFeatures("found_item", [foundItemId])
+  ).get(foundItemId) ?? null;
+
   for (const lost of lostItems ?? []) {
     const score = computeMatchScore(
-      { ...lost, photoHashes: lostMap.get(lost.id) ?? null },
-      { ...foundItem, photoHashes: foundMap.get(foundItemId) ?? null }
+      {
+        ...lost,
+        distinguishing_features: lostFeatures.get(lost.id) ?? null,
+        photoHashes: lostMap.get(lost.id) ?? null,
+      },
+      {
+        ...foundItem,
+        distinguishing_features: ownFeatures,
+        photoHashes: foundMap.get(foundItemId) ?? null,
+      }
     );
     if (score > MATCH_THRESHOLD) {
       matches.push({
@@ -245,10 +292,27 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
     foundIds: (foundItems ?? []).map((f) => f.id),
   });
 
+  // PRIVATE — merge verification details from the owner-only table.
+  const foundFeatures = await getPrivateFeatures(
+    "found_item",
+    (foundItems ?? []).map((f) => f.id)
+  );
+  const ownFeatures = (
+    await getPrivateFeatures("lost_item", [lostItemId])
+  ).get(lostItemId) ?? null;
+
   for (const found of foundItems ?? []) {
     const existingScore = computeMatchScore(
-      { ...lostItem, photoHashes: lostMap.get(lostItemId) ?? null },
-      { ...found, photoHashes: foundMap.get(found.id) ?? null }
+      {
+        ...lostItem,
+        distinguishing_features: ownFeatures,
+        photoHashes: lostMap.get(lostItemId) ?? null,
+      },
+      {
+        ...found,
+        distinguishing_features: foundFeatures.get(found.id) ?? null,
+        photoHashes: foundMap.get(found.id) ?? null,
+      }
     );
     if (existingScore > MATCH_THRESHOLD) {
       matches.push({

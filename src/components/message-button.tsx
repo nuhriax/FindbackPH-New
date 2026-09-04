@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { getOrCreateConversation } from "@/lib/actions/messaging";
+import {
+  getOrCreateConversation,
+} from "@/lib/actions/messaging";
 import { MessageSquare } from "lucide-react";
 
 export function MessageButton({
@@ -44,7 +46,11 @@ export function MessageButton({
 
   return (
     <div>
-      <button className="btn-primary w-full" disabled={isPending} onClick={handleClick}>
+      <button
+        className="btn-primary w-full"
+        disabled={isPending}
+        onClick={handleClick}
+      >
         <MessageSquare size={16} />
         {isPending ? "Opening…" : label}
       </button>

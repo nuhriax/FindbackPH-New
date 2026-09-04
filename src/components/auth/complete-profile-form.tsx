@@ -6,22 +6,20 @@ import { completeOnboardingAction } from "@/lib/actions/profile";
 import { TriangleAlert } from "lucide-react";
 import { AuthField } from "@/components/auth/form-field";
 import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
-import { User, UserRound, AtSign } from "lucide-react";
+import { User, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
  * "Complete your profile" gate for Google/Facebook sign-ups. Providers only
- * give us an email + display handle, so new social members choose their real
- * name and username here before reaching the dashboard.
+ * give us an email + display handle, so new social members enter their real
+ * name here before reaching the dashboard.
  */
 export function CompleteProfileForm({
   defaultFirstName,
   defaultLastName,
-  defaultUsername,
 }: {
   defaultFirstName: string;
   defaultLastName: string;
-  defaultUsername: string;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<SubmitStatus>("idle");
@@ -57,8 +55,7 @@ export function CompleteProfileForm({
     <div className={cn("auth-form", shake && "auth-shake")}>
       <h1 className="auth-title">Almost there</h1>
       <p className="auth-subtitle">
-        Add your real name and pick a username so other members know who
-        they&apos;re talking to.
+        Add your real name so other members know who they&apos;re talking to.
       </p>
 
       <form action={handleSubmit} className="auth-form-body" noValidate>
@@ -80,18 +77,6 @@ export function CompleteProfileForm({
             required
           />
         </div>
-
-        <AuthField
-          label="Username"
-          name="username"
-          icon={AtSign}
-          autoComplete="username"
-          defaultValue={defaultUsername}
-          required
-        />
-        <p className="-mt-2 text-xs text-slate-500">
-          Letters, numbers, and underscores only (3–30 characters).
-        </p>
 
         {error && (
           <p className="auth-error-block" role="alert">

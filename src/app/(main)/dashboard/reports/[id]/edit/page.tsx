@@ -38,6 +38,15 @@ export default async function EditReportPage({
   // Ownership enforced server-side — a non-owner simply never sees this page.
   if (item.reporter_id !== user.id) notFound();
 
+  // PRIVATE — verification details come from the owner-only table
+  // (supabase/110-trust-safety.sql); the public item row no longer carries them.
+  const { data: privateRow } = await supabase
+    .from("item_private_details")
+    .select("details")
+    .eq("item_type", kind)
+    .eq("item_id", reportId)
+    .maybeSingle();
+
   // Existing photos so they can be removed inline while editing.
   const imageCol = lost ? "lost_item_id" : "found_item_id";
   const { data: images } = await supabase
@@ -62,7 +71,7 @@ export default async function EditReportPage({
     title: item.title,
     category: item.category,
     description: item.description,
-    distinguishingFeatures: item.distinguishing_features ?? null,
+    distinguishingFeatures: privateRow?.details ?? null,
     city: item.city ?? "",
     province: item.province ?? "",
     approximateLocation: item.approximate_location ?? null,

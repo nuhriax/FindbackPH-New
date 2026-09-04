@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
-import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import { ReportDetail, type DetailItem, type DetailMatch, type SimilarItem } from "@/components/reports/report-detail";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { ReportViewer } from "@/components/reports/report-viewers";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
@@ -129,7 +129,7 @@ export default async function FoundItemDetailPage({ params }: Props) {
       p_item_id: id,
     });
     viewers = (viewerRows ?? []).map((row) => ({
-      displayName: row.display_name ?? row.username ?? "Someone",
+      displayName: row.display_name ?? "Someone",
       username: row.username,
       avatarUrl: row.avatar_url,
       isMember: row.is_member,
@@ -252,12 +252,123 @@ export default async function FoundItemDetailPage({ params }: Props) {
     });
   }
 
+  // Similar reports — other ACTIVE found items with the same category. Same
+  // province is ranked first; one thumbnail each, capped at 4 cards.
+  const similarItems: SimilarItem[] = [];
+  {
+    const { data: similarRows } = await supabase
+      .from("found_items")
+      .select("id, title, category, city, province, created_at")
+      .eq("status", "active")
+      .eq("category", raw.category)
+      .neq("id", id)
+      .order("created_at", { ascending: false })
+      .limit(12);
+
+    const ranked = (similarRows ?? [])
+      .sort(
+        (a, b) =>
+          Number(b.province === raw.province) -
+          Number(a.province === raw.province),
+      )
+      .slice(0, 4);
+
+    if (ranked.length > 0) {
+      const ids = ranked.map((r) => r.id);
+      const { data: thumbs } = await supabase
+        .from("item_images")
+        .select("found_item_id, storage_path, position")
+        .in("found_item_id", ids)
+        .order("position", { ascending: true });
+
+      const firstByItem = new Map<string, string>();
+      for (const t of thumbs ?? []) {
+        if (t.found_item_id && !firstByItem.has(t.found_item_id)) {
+          firstByItem.set(t.found_item_id, t.storage_path);
+        }
+      }
+
+      const paths = ranked
+        .map((r) => firstByItem.get(r.id))
+        .filter(Boolean) as string[];
+      const urls = await getSignedImageUrls(paths);
+      const urlByPath = new Map(paths.map((p, i) => [p, urls[i]]));
+
+      for (const r of ranked) {
+        const p = firstByItem.get(r.id);
+        similarItems.push({
+          id: r.id,
+          kind: "found",
+          title: r.title,
+          category: r.category,
+          city: r.city ?? null,
+          province: r.province ?? null,
+          createdAt: r.created_at ?? null,
+          imageUrl: p ? (urlByPath.get(p) ?? getImagePublicUrl(p)) : null,
+        });
+      }
+    }
+  }
+
+  // PRIVATE — verification details live in the owner-only item_private_details
+  // table (supabase/110-trust-safety.sql). RLS returns null for non-owners, so
+  // private text never reaches the client for anyone but the finder.
+  const { data: privateRow } = await supabase
+    .from("item_private_details")
+    .select("details")
+    .eq("item_type", "found_item")
+    .eq("item_id", id)
+    .maybeSingle();
+  const privateFeatures = isOwner ? privateRow?.details ?? null : null;
+
+  // Trust & Safety (110) — two-sided return confirmation state. Only signed-in
+  // participants (reporter or conversation party) get a non-null state.
+  let returnConfirm: {
+    canConfirm: boolean;
+    viewerConfirmed: boolean;
+    reporterConfirmed: boolean;
+    total: number;
+    status: string;
+  } | null = null;
+  if (user) {
+    const { data: confirmations } = await supabase
+      .from("return_confirmations")
+      .select("user_id")
+      .eq("item_type", "found_item")
+      .eq("item_id", id);
+
+    const total = (confirmations ?? []).length;
+    if (total > 0 || isOwner) {
+      const { data: convo } = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("item_type", "found_item")
+        .eq("item_id", id)
+        .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
+        .limit(1)
+        .maybeSingle();
+
+      const canConfirm = isOwner || Boolean(convo);
+      if (canConfirm) {
+        returnConfirm = {
+          canConfirm,
+          viewerConfirmed: (confirmations ?? []).some((c) => c.user_id === user.id),
+          reporterConfirmed: (confirmations ?? []).some(
+            (c) => c.user_id === raw.reporter_id,
+          ),
+          total,
+          status: raw.status,
+        };
+      }
+    }
+  }
+
   const item: DetailItem = {
     id,
     title: raw.title,
     category: raw.category,
     description: raw.description ?? null,
-    distinguishingFeatures: raw.distinguishing_features ?? null,
+    distinguishingFeatures: privateFeatures,
     city: raw.city ?? null,
     province: raw.province ?? null,
     approximateLocation: raw.approximate_location ?? null,
@@ -325,9 +436,11 @@ export default async function FoundItemDetailPage({ params }: Props) {
         reporter={reporter}
         trust={trust}
         ownership={ownership}
+        returnConfirm={returnConfirm}
         isOwner={isOwner}
         savedItemId={savedItemId}
         matches={matches}
+        similarItems={similarItems}
         viewers={viewers}
         backHref="/found"
         backLabel="Back to found items"

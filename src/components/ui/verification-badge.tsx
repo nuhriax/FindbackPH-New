@@ -22,6 +22,37 @@ export function VerifiedAccountBadge({ subtle = false }: { subtle?: boolean }) {
   );
 }
 
+/**
+ * Blue verified seal (BadgeCheck) — an avatar overlay shown on profiles once
+ * the member's email is verified. Sits on the avatar's bottom-right corner
+ * like a social-platform verification seal.
+ */
+export function VerifiedSeal({
+  className = "",
+  size = 22,
+  wrapperClassName = "",
+}: {
+  className?: string;
+  size?: number;
+  wrapperClassName?: string;
+}) {
+  return (
+    <span
+      title="Verified account"
+      aria-label="Verified account"
+      className={`absolute -bottom-1 -right-1 flex items-center justify-center rounded-full bg-white shadow-sm ${wrapperClassName} ${className}`}
+      style={wrapperClassName ? undefined : { width: size + 6, height: size + 6 }}
+    >
+      <BadgeCheck
+        size={size}
+        className="text-blue-500"
+        strokeWidth={2.2}
+        aria-hidden
+      />
+    </span>
+  );
+}
+
 export function VerifiedReportBadge() {
   return (
     <span

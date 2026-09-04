@@ -21,7 +21,11 @@ const REASONS: { label: string; value: string }[] = [
  * listing. Mirrors ReportFlagButton's look and flow. Server actions validate
  * everything again (auth, not-self target, reason enum).
  */
-export function UserReportButton({ targetUserId }: { targetUserId: string }) {
+export function UserReportButton({
+  targetUserId,
+}: {
+  targetUserId: string;
+}) {
   const [open, setOpen] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);

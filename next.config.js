@@ -52,7 +52,9 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(self), payment=()",
+            // microphone/camera are needed by in-chat voice notes and calls;
+            // scoped to same-origin only (no third-party embeds get them).
+            value: "camera=(self), microphone=(self), geolocation=(self), payment=()",
           },
           {
             key: "Strict-Transport-Security",
@@ -79,6 +81,10 @@ const nextConfig = {
               // maplibre-gl-csp-worker.js under /_next/), so it MUST be
               // allowed by 'self'; blob: kept for older fallback paths.
               "worker-src 'self' blob:",
+              // media-src — recorded voice notes in chat play from Supabase
+              // Storage via <audio>/<video>; without this the default-src
+              // 'self' fallback blocks playback of every voice message.
+              "media-src 'self' blob: https://*.supabase.co",
               "script-src-attr 'none'",
             ].join("; "),
           },

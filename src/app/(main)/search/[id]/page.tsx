@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
-import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import { ReportDetail, type DetailItem, type DetailMatch, type SimilarItem } from "@/components/reports/report-detail";
 
 export const dynamic = "force-dynamic";
 
@@ -113,6 +113,70 @@ export default async function ReportDetailPage({ params }: Props) {
     }
   }
 
+  // Similar reports — other ACTIVE reports with the same category. Same
+  // province is ranked first; one thumbnail each, capped at 4 cards.
+  const similarItems: SimilarItem[] = [];
+  {
+    const table = kind === "lost" ? "lost_items" : "found_items";
+    const imgCol = kind === "lost" ? "lost_item_id" : "found_item_id";
+
+    const { data: similarRows } = await supabase
+      .from(table)
+      .select("id, title, category, city, province, created_at")
+      .eq("status", "active")
+      .eq("category", raw.category)
+      .neq("id", id)
+      .order("created_at", { ascending: false })
+      .limit(12);
+
+    const ranked = (similarRows ?? [])
+      .sort(
+        (a, b) =>
+          Number(b.province === raw.province) -
+          Number(a.province === raw.province),
+      )
+      .slice(0, 4);
+
+    if (ranked.length > 0) {
+      const ids = ranked.map((r) => r.id);
+      const { data: thumbs } = await supabase
+        .from("item_images")
+        .select(`${imgCol}, storage_path, position`)
+        .in(imgCol, ids)
+        .order("position", { ascending: true });
+
+      type ThumbRow = Record<string, string | number | null>;
+
+      const firstByItem = new Map<string, string>();
+      for (const t of (thumbs ?? []) as unknown as ThumbRow[]) {
+        const itemId = t[imgCol] as string | null;
+        if (itemId && !firstByItem.has(itemId)) {
+          firstByItem.set(itemId, String(t.storage_path));
+        }
+      }
+
+      const paths = ranked
+        .map((r) => firstByItem.get(r.id))
+        .filter(Boolean) as string[];
+      const urls = await getSignedImageUrls(paths);
+      const urlByPath = new Map(paths.map((p, i) => [p, urls[i]]));
+
+      for (const r of ranked) {
+        const p = firstByItem.get(r.id);
+        similarItems.push({
+          id: r.id,
+          kind,
+          title: r.title,
+          category: r.category,
+          city: r.city ?? null,
+          province: r.province ?? null,
+          createdAt: r.created_at ?? null,
+          imageUrl: p ? (urlByPath.get(p) ?? getImagePublicUrl(p)) : null,
+        });
+      }
+    }
+  }
+
   const dateVal = kind === "lost" ? raw.date_lost : raw.date_found;
   const item: DetailItem = {
     id,
@@ -142,6 +206,7 @@ export default async function ReportDetailPage({ params }: Props) {
       isOwner={isOwner}
       savedItemId={savedItemId}
       matches={matches}
+      similarItems={similarItems}
     />
   );
 }

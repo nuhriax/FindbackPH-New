@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
-import { ReportDetail, type DetailItem, type DetailMatch } from "@/components/reports/report-detail";
+import { ReportDetail, type DetailItem, type DetailMatch, type SimilarItem } from "@/components/reports/report-detail";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { ReportViewer } from "@/components/reports/report-viewers";
 import { computeTrustSignals, isEmailVerified, isVerifiedReport, type OwnershipChallengeState } from "@/lib/trust";
@@ -89,7 +89,7 @@ export default async function LostItemDetailPage({ params }: Props) {
       p_item_id: id,
     });
     viewers = (viewerRows ?? []).map((row) => ({
-      displayName: row.display_name ?? row.username ?? "Someone",
+      displayName: row.display_name ?? "Someone",
       username: row.username,
       avatarUrl: row.avatar_url,
       isMember: row.is_member,
@@ -187,6 +187,59 @@ export default async function LostItemDetailPage({ params }: Props) {
     }
   }
 
+  // PRIVATE — verification details live in the owner-only item_private_details
+  // table (supabase/110-trust-safety.sql). RLS returns null for non-owners, so
+  // private text never reaches the client for anyone but the reporter.
+  const { data: privateRow } = await supabase
+    .from("item_private_details")
+    .select("details")
+    .eq("item_type", "lost_item")
+    .eq("item_id", id)
+    .maybeSingle();
+  const privateFeatures = isOwner ? privateRow?.details ?? null : null;
+
+  // Trust & Safety (110) — two-sided return confirmation state. Only signed-in
+  // participants (reporter or conversation party) get a non-null state.
+  let returnConfirm: {
+    canConfirm: boolean;
+    viewerConfirmed: boolean;
+    reporterConfirmed: boolean;
+    total: number;
+    status: string;
+  } | null = null;
+  if (user) {
+    const { data: confirmations } = await supabase
+      .from("return_confirmations")
+      .select("user_id")
+      .eq("item_type", "lost_item")
+      .eq("item_id", id);
+
+    const total = (confirmations ?? []).length;
+    if (total > 0 || isOwner) {
+      const { data: convo } = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("item_type", "lost_item")
+        .eq("item_id", id)
+        .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
+        .limit(1)
+        .maybeSingle();
+
+      const canConfirm = isOwner || Boolean(convo);
+      if (canConfirm) {
+        returnConfirm = {
+          canConfirm,
+          viewerConfirmed: (confirmations ?? []).some((c) => c.user_id === user.id),
+          reporterConfirmed: (confirmations ?? []).some(
+            (c) => c.user_id === raw.reporter_id,
+          ),
+          total,
+          status: raw.status,
+        };
+      }
+    }
+  }
+
   // Live fallback: also compute candidates that were never stored in the
   // `matches` table (e.g. reports posted before the engine ran, or a failed
   // matching run). Uses the exact same real scoring algorithm — no invented
@@ -197,6 +250,25 @@ export default async function LostItemDetailPage({ params }: Props) {
       .from("found_items")
       .select("id, title, category, city, province, date_found, description, distinguishing_features, approximate_location")
       .eq("status", "active");
+
+    // PRIVATE — candidate features for scoring, server-side only (110).
+    const candidateIds = (candidates ?? []).map((c) => c.id);
+    const candidateFeatures = new Map<string, string | null>();
+    if (candidateIds.length > 0) {
+      try {
+        const service = createServiceRoleClient();
+        const { data: privateRows } = await service
+          .from("item_private_details")
+          .select("item_id, details")
+          .eq("item_type", "found_item")
+          .in("item_id", candidateIds);
+        for (const r of privateRows ?? []) {
+          candidateFeatures.set(r.item_id, r.details);
+        }
+      } catch (e) {
+        console.error("Candidate private features fetch error:", e);
+      }
+    }
 
     const liveMatches = (candidates ?? [])
       .filter((c) => !knownIds.has(c.id))
@@ -212,7 +284,7 @@ export default async function LostItemDetailPage({ params }: Props) {
             date_lost: raw.date_lost ?? null,
             title: raw.title,
             description: raw.description ?? "",
-            distinguishing_features: raw.distinguishing_features ?? null,
+            distinguishing_features: privateFeatures,
           },
           {
             category: c.category,
@@ -223,7 +295,7 @@ export default async function LostItemDetailPage({ params }: Props) {
             date_found: c.date_found ?? null,
             title: c.title,
             description: c.description ?? "",
-            distinguishing_features: c.distinguishing_features ?? null,
+            distinguishing_features: candidateFeatures.get(c.id) ?? null,
           },
         ),
       }))
@@ -248,12 +320,70 @@ export default async function LostItemDetailPage({ params }: Props) {
     matches.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
 
+  // Similar reports — other ACTIVE lost items with the same category. Same
+  // province is ranked first; one thumbnail each, capped at 4 cards.
+  const similarItems: SimilarItem[] = [];
+  {
+    const { data: similarRows } = await supabase
+      .from("lost_items")
+      .select("id, title, category, city, province, created_at")
+      .eq("status", "active")
+      .eq("category", raw.category)
+      .neq("id", id)
+      .order("created_at", { ascending: false })
+      .limit(12);
+
+    const ranked = (similarRows ?? [])
+      .sort(
+        (a, b) =>
+          Number(b.province === raw.province) -
+          Number(a.province === raw.province),
+      )
+      .slice(0, 4);
+
+    if (ranked.length > 0) {
+      const ids = ranked.map((r) => r.id);
+      const { data: thumbs } = await supabase
+        .from("item_images")
+        .select("lost_item_id, storage_path, position")
+        .in("lost_item_id", ids)
+        .order("position", { ascending: true });
+
+      const firstByItem = new Map<string, string>();
+      for (const t of thumbs ?? []) {
+        if (t.lost_item_id && !firstByItem.has(t.lost_item_id)) {
+          firstByItem.set(t.lost_item_id, t.storage_path);
+        }
+      }
+
+      const paths = ranked
+        .map((r) => firstByItem.get(r.id))
+        .filter(Boolean) as string[];
+      const urls = await getSignedImageUrls(paths);
+      const urlByPath = new Map(paths.map((p, i) => [p, urls[i]]));
+
+      for (const r of ranked) {
+        const p = firstByItem.get(r.id);
+        similarItems.push({
+          id: r.id,
+          kind: "lost",
+          title: r.title,
+          category: r.category,
+          city: r.city ?? null,
+          province: r.province ?? null,
+          createdAt: r.created_at ?? null,
+          imageUrl: p ? (urlByPath.get(p) ?? getImagePublicUrl(p)) : null,
+        });
+      }
+    }
+  }
+
   const item: DetailItem = {
     id,
     title: raw.title,
     category: raw.category,
     description: raw.description,
-    distinguishingFeatures: raw.distinguishing_features ?? null,
+    distinguishingFeatures: privateFeatures,
     city: raw.city ?? null,
     province: raw.province ?? null,
     approximateLocation: raw.approximate_location ?? null,
@@ -320,9 +450,11 @@ export default async function LostItemDetailPage({ params }: Props) {
         reporter={reporter}
         trust={trust}
         ownership={ownership}
+        returnConfirm={returnConfirm}
         isOwner={isOwner}
         savedItemId={savedItemId}
         matches={matches}
+        similarItems={similarItems}
         viewers={viewers}
         backHref="/lost"
         backLabel="Back to lost items"

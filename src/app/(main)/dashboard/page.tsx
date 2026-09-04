@@ -5,6 +5,7 @@ import {
   BellRing,
   Bookmark,
   HeartHandshake,
+  ListChecks,
   PackageCheck,
   PackageSearch,
   PackageX,
@@ -92,18 +93,24 @@ export default async function DashboardPage() {
   const lastName = profile?.last_name?.trim() || "";
   const displayName =
     [firstName, lastName].filter(Boolean).join(" ") ||
-    profile?.username?.trim() ||
     "Member";
-  const displayInitial = (profile?.first_name || profile?.username || "M").charAt(0).toUpperCase();
+  const displayInitial = (firstName || "M").charAt(0).toUpperCase();
   const greeting = `Welcome back, ${displayName}`;
   const hasContent =
     (lostItems ?? []).length > 0 || (foundItems ?? []).length > 0 || (savedItems ?? []).length > 0 || undismissedMatches.length > 0;
 
   const stats = [
-    { label: "Active lost", value: activeLost, icon: PackageX, tone: "sunrise" },
-    { label: "Active found", value: activeFound, icon: PackageCheck, tone: "emerald" },
-    { label: "Recovered", value: recovered, icon: HeartHandshake, tone: "leaf" },
-    { label: "Saved", value: savedCount, icon: Bookmark, tone: "violet" },
+    { label: "Active lost", value: activeLost, icon: PackageX, tone: "sunrise", href: "/dashboard/reports?tab=lost" },
+    { label: "Active found", value: activeFound, icon: PackageCheck, tone: "emerald", href: "/dashboard/reports?tab=found" },
+    { label: "Recovered", value: recovered, icon: HeartHandshake, tone: "leaf", href: "/dashboard/reports" },
+    { label: "Saved", value: savedCount, icon: Bookmark, tone: "violet", href: "/saved" },
+  ] as const;
+
+  const quickActions = [
+    { label: "Report a lost item", hint: "Post what went missing so spotters can find it", href: "/report/lost", icon: PackageSearch, primary: true },
+    { label: "Report a found item", hint: "Help someone reunite with their belonging", href: "/report/found", icon: HeartHandshake, primary: true },
+    { label: "Browse lost & found", hint: "Search reports across the community", href: "/discover", icon: PackageCheck, primary: false },
+    { label: "View my reports", hint: "Track the status of everything you posted", href: "/dashboard/reports", icon: ListChecks, primary: false },
   ] as const;
 
   return (
@@ -128,11 +135,9 @@ export default async function DashboardPage() {
               <h1 className="mt-1.5 font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900">
                 {greeting}
               </h1>
-              {profile?.username && (
-                <p className="mt-0.5 text-sm text-slate-500">
-                  @{profile.username} · Here&apos;s what&apos;s happening with your reports.
-                </p>
-              )}
+              <p className="mt-0.5 text-sm text-slate-500">
+                Here&apos;s what&apos;s happening with your reports.
+              </p>
             </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -146,6 +151,34 @@ export default async function DashboardPage() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Quick actions — shortcuts to the two things users come here to do */}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {quickActions.map((a) => {
+          const Icon = a.icon;
+          return (
+            <Link
+              key={a.label}
+              href={a.href}
+              className="card group flex items-start gap-3 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
+            >
+              <span
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition group-hover:scale-105 ${
+                  a.primary
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-600"
+                    : "border-blue-200 bg-blue-50 text-blue-600"
+                }`}
+              >
+                <Icon size={18} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-navy-900">{a.label}</span>
+                <span className="mt-0.5 block text-xs leading-snug text-slate-500">{a.hint}</span>
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Match candidates — the retention loop: surface waiting matches
@@ -200,7 +233,7 @@ export default async function DashboardPage() {
       {/* Stat tiles */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
-          <StatTile key={s.label} icon={s.icon} tone={s.tone} label={s.label} value={s.value} />
+          <StatTile key={s.label} icon={s.icon} tone={s.tone} label={s.label} value={s.value} href={s.href} />
         ))}
       </div>
 
@@ -265,14 +298,20 @@ function StatTile({
   tone,
   label,
   value,
+  href,
 }: {
   icon: React.ComponentType<{ size?: number | string; className?: string }>;
   tone: keyof typeof STAT_TONES;
   label: string;
   value: number;
+  href: string;
 }) {
   return (
-    <div className="card group relative overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg">
+    <Link
+      href={href}
+      aria-label={`${label}: ${value} — view details`}
+      className="card group relative block overflow-hidden p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
+    >
       <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${STAT_ACCENT[tone]}`} />
       <div className="relative flex items-center justify-between gap-2">
         <div>
@@ -283,6 +322,6 @@ function StatTile({
           <Icon size={18} />
         </span>
       </div>
-    </div>
+    </Link>
   );
 }

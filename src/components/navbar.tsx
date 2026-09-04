@@ -32,7 +32,7 @@ function getInitials(profile: Profile | null) {
   if (!profile) return "U";
   const first = profile.first_name?.[0] ?? "";
   const last = profile.last_name?.[0] ?? "";
-  return (first + last).toUpperCase() || (profile.username?.[0] ?? "U").toUpperCase();
+  return (first + last).toUpperCase() || "U";
 }
 
 export function Navbar({
@@ -139,7 +139,7 @@ export function Navbar({
             "navbar-pill mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
             scrolled
               ? "border-ice-200/80 bg-white/95 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
-              : "border-white/80 bg-white/95 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-2xl"
+              : "border-ice-200/60 bg-white/95 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-2xl"
           )}
         >
           <Logo className="justify-self-start" />
@@ -248,7 +248,9 @@ export function Navbar({
                       </span>
                     )}
                     <span className="hidden max-w-[8rem] truncate text-sm font-medium text-navy-900 xl:block">
-                      {profile?.username ?? user.email}
+                      {profile?.first_name
+                        ? `${profile.first_name} ${profile.last_name ?? ""}`.trim()
+                        : user.email}
                     </span>
                     <ChevronDown
                       size={16}

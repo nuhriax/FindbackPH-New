@@ -41,6 +41,17 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ avatarUr
   const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
   const fileName = `${user.id}.${safeExt}`;
 
+  // Delete any previously stored avatar first (see /api/avatars route — an
+  // upsert onto an existing object needs UPDATE permission on Storage, which
+  // insert-only policy setups reject).
+  await supabase.storage.from("avatars").remove([
+    `${user.id}.jpg`,
+    `${user.id}.jpeg`,
+    `${user.id}.png`,
+    `${user.id}.webp`,
+    `${user.id}.gif`,
+  ]);
+
   const { error: uploadError } = await supabase.storage
     .from("avatars")
     .upload(fileName, file, {
@@ -54,7 +65,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ avatarUr
     return { error: "Could not upload your photo. Please try again." };
   }
 
-  return { avatarUrl: getAvatarPublicUrl(fileName) };
+  return { avatarUrl: `${getAvatarPublicUrl(fileName)}?v=${Date.now()}` };
 }
 
 /**
@@ -105,7 +116,6 @@ export async function completeOnboardingAction(formData: FormData): Promise<Acti
   const raw = {
     firstName: formData.get("firstName")?.toString().trim() ?? "",
     lastName: formData.get("lastName")?.toString().trim() ?? "",
-    username: formData.get("username")?.toString().trim() ?? "",
   };
 
   const parsed = profileSchema.safeParse(raw);
@@ -113,23 +123,11 @@ export async function completeOnboardingAction(formData: FormData): Promise<Acti
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("username", parsed.data.username)
-    .neq("id", user.id)
-    .maybeSingle();
-
-  if (existing) {
-    return { error: "That username is already taken" };
-  }
-
   const { error } = await supabase
     .from("profiles")
     .update({
       first_name: parsed.data.firstName,
       last_name: parsed.data.lastName,
-      username: parsed.data.username,
     })
     .eq("id", user.id);
 
@@ -145,7 +143,7 @@ export async function completeOnboardingAction(formData: FormData): Promise<Acti
 
 /**
  * Updates the signed-in user's public profile. Derives the target id from the
- * session (never trusts a client-supplied id) and enforces a unique username.
+ * session (never trusts a client-supplied id).
  */
 export async function updateProfileAction(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient();
@@ -160,7 +158,6 @@ export async function updateProfileAction(formData: FormData): Promise<ActionRes
   const raw = {
     firstName: formData.get("firstName")?.toString() ?? "",
     lastName: formData.get("lastName")?.toString() ?? "",
-    username: formData.get("username")?.toString() ?? "",
     location: formData.get("location")?.toString() || undefined,
     bio: formData.get("bio")?.toString() || undefined,
     avatarUrl: formData.get("avatarUrl")?.toString() || undefined,
@@ -171,24 +168,11 @@ export async function updateProfileAction(formData: FormData): Promise<ActionRes
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  // If the username changed, make sure it isn't taken by someone else.
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("username", parsed.data.username)
-    .neq("id", user.id)
-    .maybeSingle();
-
-  if (existing) {
-    return { error: "That username is already taken" };
-  }
-
   const { error } = await supabase
     .from("profiles")
     .update({
       first_name: parsed.data.firstName,
       last_name: parsed.data.lastName,
-      username: parsed.data.username,
       location: parsed.data.location ?? null,
       bio: parsed.data.bio ?? null,
       avatar_url: parsed.data.avatarUrl || null,

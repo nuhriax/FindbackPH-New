@@ -17,16 +17,16 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarSaved, setAvatarSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
 
   const [firstName, setFirstName] = useState(profile.first_name ?? "");
   const [lastName, setLastName] = useState(profile.last_name ?? "");
-  const [username, setUsername] = useState(profile.username ?? "");
   const [location, setLocation] = useState(profile.location ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
 
-  const filled = [firstName.trim(), lastName.trim(), username.trim(), location.trim(), bio.trim()].filter(Boolean).length;
-  const completion = Math.round((filled / 5) * 100);
-  const initial = (firstName || username || "U").charAt(0).toUpperCase();
+  const filled = [firstName.trim(), lastName.trim(), location.trim(), bio.trim()].filter(Boolean).length;
+  const completion = Math.round((filled / 4) * 100);
+  const initial = (firstName || "U").charAt(0).toUpperCase();
 
   function handleSubmit(formData: FormData) {
     setError(null);
@@ -45,14 +45,32 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     if (!file) return;
     setAvatarError(null);
     setUploading(true);
+
+    // Instant local preview — show the chosen photo immediately via an object
+    // URL while the real upload runs, so the user sees the change right away.
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    const previewUrl = URL.createObjectURL(file);
+    previewUrlRef.current = previewUrl;
+    setAvatarUrl(previewUrl);
+
     // Upload through the route handler — Server Actions can't accept File args.
     const result = await uploadAvatarClient(file);
     setUploading(false);
     if (result?.error) {
+      // Upload failed — fall back to the previously saved photo.
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
+      setAvatarUrl(profile.avatar_url ?? "");
       setAvatarError(result.error);
       return;
     }
     if (result.avatarUrl) {
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
       setAvatarUrl(result.avatarUrl);
       setAvatarSaved(true);
       window.setTimeout(() => setAvatarSaved(false), 2500);
@@ -91,7 +109,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             <p className="font-display text-lg font-semibold text-navy-900">
               {firstName || lastName ? `${firstName} ${lastName}`.trim() : "Your full name"}
             </p>
-            <p className="truncate text-sm text-slate-500">@{username || "yourname"}</p>
+            <p className="truncate text-sm text-slate-500">FindBack member</p>
             <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{bio || "Add a short bio…"}</p>
           </div>
         </div>
@@ -203,24 +221,6 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             onChange={(e) => setLastName(e.target.value)}
           />
         </div>
-      </div>
-
-      <div className="mt-5">
-        <label htmlFor="username" className="label">Username</label>
-        <input
-          id="username"
-          name="username"
-          type="text"
-          required
-          minLength={3}
-          maxLength={30}
-          className="input"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <p className="mt-1.5 text-xs text-slate-500">
-          Letters, numbers, and underscores only. Others may see this on your reports.
-        </p>
       </div>
 
       <div className="mt-5">

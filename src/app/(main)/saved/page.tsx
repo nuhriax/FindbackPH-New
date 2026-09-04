@@ -7,6 +7,7 @@ import { CATEGORY_LABELS } from "@/lib/validation";
 import { RemoveSavedButton } from "@/components/saved/remove-saved-button";
 import { BackButton } from "@/components/back-button";
 import Image from "next/image";
+import { getSignedImageUrls } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,52 @@ export default async function SavedItemsPage() {
   }
 
   const savedItems = await getUserSavedItems();
+
+  /* Fetch the first photo of every saved item so each card can show a
+     thumbnail (same pattern as the discover page: position-0 rows from
+     item_images, signed via getSignedImageUrls). */
+
+  const lostIds = savedItems
+    .map((s) => s.lost_item_id)
+    .filter((id): id is string => Boolean(id));
+  const foundIds = savedItems
+    .map((s) => s.found_item_id)
+    .filter((id): id is string => Boolean(id));
+
+  const [lostImageRes, foundImageRes] = await Promise.all([
+    lostIds.length
+      ? supabase
+          .from("item_images")
+          .select("lost_item_id, storage_path")
+          .in("lost_item_id", lostIds)
+          .eq("position", 0)
+      : Promise.resolve({ data: null }),
+    foundIds.length
+      ? supabase
+          .from("item_images")
+          .select("found_item_id, storage_path")
+          .in("found_item_id", foundIds)
+          .eq("position", 0)
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const lostPaths = (lostImageRes.data ?? []) as Array<{ lost_item_id: string; storage_path: string }>;
+  const foundPaths = (foundImageRes.data ?? []) as Array<{ found_item_id: string; storage_path: string }>;
+
+  const signedUrls = await getSignedImageUrls([
+    ...lostPaths.map((r) => r.storage_path),
+    ...foundPaths.map((r) => r.storage_path),
+  ]);
+
+  const imageUrlByItem = new Map<string, string>();
+  lostPaths.forEach((r, i) => {
+    if (signedUrls[i]) imageUrlByItem.set(r.lost_item_id, signedUrls[i]);
+  });
+  foundPaths.forEach((r, i) => {
+    if (signedUrls[lostPaths.length + i]) {
+      imageUrlByItem.set(r.found_item_id, signedUrls[lostPaths.length + i]);
+    }
+  });
 
   return (
     <div className="py-16 lg:py-24">
@@ -61,38 +108,71 @@ export default async function SavedItemsPage() {
               const foundItem = saved.found_items ?? null;
               const item = lostItem ?? foundItem ?? null;
               const isLost = !!lostItem;
+              const image = imageUrlByItem.get(
+                isLost ? saved.lost_item_id! : saved.found_item_id!
+              ) ?? null;
               const href = isLost ? `/lost/${saved.lost_item_id}` : `/found/${saved.found_item_id}`;
               const statusColor = item?.status === "recovered" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700";
 
               return (
-                <div key={saved.id} className="card card-hover group flex flex-col p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <Link href={href} className="flex-1">
-                      <h3 className="font-display text-lg font-semibold text-navy-900 transition-colors group-hover:text-blue-600">
-                        {item?.title ?? "Unknown item"}
-                      </h3>
-                    </Link>
-                    <RemoveSavedButton savedId={saved.id} title={item?.title ?? "Unknown item"} />
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">
-                    {item?.description ?? "No description"}
-                  </p>
-                  <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-                    <MapPin size={13} className="text-blue-500" />
-                    <span>{item?.city}, {item?.province}</span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`rounded-full border px-2.5 py-0.5 text-xs capitalize ${statusColor}`}>
-                        {item?.status ?? "active"}
-                      </span>
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs text-slate-600">
-                        {CATEGORY_LABELS[(item?.category as keyof typeof CATEGORY_LABELS)] ?? "Other"}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                <div key={saved.id} className="card card-hover group flex flex-col overflow-hidden">
+                  {/* First photo banner — falls back to a bookmark tile when
+                      the report has no images yet. */}
+
+                  <Link href={href} className="relative block aspect-[16/9] overflow-hidden bg-slate-100">
+                    {image ? (
+                      <Image
+                        src={image}
+                        alt={item?.title ?? "Saved item"}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-electric-50 via-ice-50 to-lavender-50 text-slate-400">
+                        <Bookmark size={26} />
+                      </div>
+                    )}
+
+                    <span
+                      className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+                        isLost ? "bg-red-100/90 text-red-700" : "bg-emerald-100/90 text-emerald-700"
+                      }`}
+                    >
                       {isLost ? "Lost" : "Found"}
                     </span>
+                  </Link>
+
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <Link href={href} className="flex-1">
+                        <h3 className="font-display text-lg font-semibold text-navy-900 transition-colors group-hover:text-blue-600">
+                          {item?.title ?? "Unknown item"}
+                        </h3>
+                      </Link>
+                      <RemoveSavedButton savedId={saved.id} title={item?.title ?? "Unknown item"} />
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">
+                      {item?.description ?? "No description"}
+                    </p>
+                    <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+                      <MapPin size={13} className="text-blue-500" />
+                      <span>{item?.city}, {item?.province}</span>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`rounded-full border px-2.5 py-0.5 text-xs capitalize ${statusColor}`}>
+                          {item?.status ?? "active"}
+                        </span>
+                        <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs text-slate-600">
+                          {CATEGORY_LABELS[(item?.category as keyof typeof CATEGORY_LABELS)] ?? "Other"}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                        {isLost ? "Lost" : "Found"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );

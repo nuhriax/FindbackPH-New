@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
  * Onboarding gate for Google/Facebook sign-ups. Signed-in members whose
  * profile is missing a real name must complete this before the dashboard.
  * Prefills whatever the provider gave us (given_name / family_name / full_name)
- * so most people only have to confirm and pick a username.
+ * so most people only have to confirm their real name.
  */
 export default async function CompleteProfilePage() {
   const supabase = await createClient();
@@ -20,7 +20,7 @@ export default async function CompleteProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("username, first_name, last_name")
+    .select("first_name, last_name")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -49,7 +49,6 @@ export default async function CompleteProfilePage() {
     <CompleteProfileForm
       defaultFirstName={defaultFirstName}
       defaultLastName={defaultLastName}
-      defaultUsername={profile?.username ?? ""}
     />
   );
 }

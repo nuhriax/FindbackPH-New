@@ -4,7 +4,10 @@ import { clsx } from "clsx";
 export function LogoMark({ className }: { className?: string }) {
   return (
     <span
-      className={clsx("inline-flex h-9 w-9 shrink-0 items-center justify-center", className)}
+      className={clsx(
+        "logo-mark inline-flex h-9 w-9 shrink-0 items-center justify-center",
+        className,
+      )}
       aria-hidden="true"
     >
       <img

@@ -55,7 +55,6 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
         title: d.title,
         category: d.category,
         description: d.description,
-        distinguishing_features: d.distinguishingFeatures ?? null,
         date_lost: d.dateLost,
         city: d.city,
         province: d.province,
@@ -66,7 +65,6 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
         title: d.title,
         category: d.category,
         description: d.description,
-        distinguishing_features: d.distinguishingFeatures ?? null,
         date_found: d.dateFound,
         city: d.city,
         province: d.province,
@@ -78,6 +76,24 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
 
   if (error) {
     console.error("Report update error:", error);
+    return { error: "Couldn't update this report. Please try again." };
+  }
+
+  // PRIVATE — verification details live in the owner-only table
+  // (supabase/110-trust-safety.sql), never in the public item row.
+  const { error: privateError } = await supabase
+    .from("item_private_details")
+    .upsert(
+      {
+        item_type: isLost ? "lost_item" : "found_item",
+        item_id: id,
+        reporter_id: user.id,
+        details: d.distinguishingFeatures ?? null,
+      },
+      { onConflict: "item_type,item_id" },
+    );
+  if (privateError) {
+    console.error("Private details update error:", privateError);
     return { error: "Couldn't update this report. Please try again." };
   }
 

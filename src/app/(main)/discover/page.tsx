@@ -66,6 +66,8 @@ type FeedItem = {
   view_count?: number | null;
   latitude?: number | null;
   longitude?: number | null;
+  /** Lost items only — offered reward, shown as a chip on the card. */
+  reward_amount?: number | null;
 };
 
 /* ==========================================================================
@@ -264,7 +266,7 @@ export default async function DiscoverPage({
   const [lostRes, foundRes] = await Promise.all([
     applyFilters(
       supabase.from("lost_items").select(
-        "id, title, category, city, province, description, created_at, updated_at, view_count, latitude, longitude",
+        "id, title, category, city, province, description, created_at, updated_at, view_count, latitude, longitude, reward_amount",
       ),
       filters,
     ),
@@ -657,6 +659,7 @@ export default async function DiscoverPage({
                     kind={item.kind}
                     imageUrl={imageMap.get(item.id)}
                     views={item.view_count}
+                    reward={item.kind === "lost" ? item.reward_amount : null}
                   />
                 </Reveal>
               ))}

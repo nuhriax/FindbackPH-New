@@ -156,8 +156,9 @@ export function EditReportForm({
       </div>
 
       <div className="mt-5">
-        <label htmlFor="distinguishingFeatures" className="label">Distinguishing features (optional)</label>
+        <label htmlFor="distinguishingFeatures" className="label">Private verification details (optional)</label>
         <textarea id="distinguishingFeatures" name="distinguishingFeatures" maxLength={1000} rows={3} className="input resize-y" defaultValue={item.distinguishingFeatures ?? ""} />
+        <p className="mt-1 text-xs text-slate-500">Hidden from the public listing — only someone who passes your ownership questions can see these.</p>
       </div>
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2">

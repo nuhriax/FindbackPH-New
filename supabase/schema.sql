@@ -138,12 +138,13 @@ create index if not exists found_items_city_idx on public.found_items (city);
 create index if not exists found_items_search_idx on public.found_items using gin (search_vector);
 
 -- Keep search_vector in sync
+-- PRIVACY: distinguishing_features is deliberately NOT indexed — it holds
+-- private verification details that must never be publicly searchable.
 create or replace function public.lost_items_search_trigger() returns trigger as $$
 begin
   new.search_vector :=
     setweight(to_tsvector('english', coalesce(new.title, '')), 'A') ||
-    setweight(to_tsvector('english', coalesce(new.description, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(new.distinguishing_features, '')), 'C');
+    setweight(to_tsvector('english', coalesce(new.description, '')), 'B');
   new.updated_at := now();
   return new;
 end;
@@ -158,8 +159,7 @@ create or replace function public.found_items_search_trigger() returns trigger a
 begin
   new.search_vector :=
     setweight(to_tsvector('english', coalesce(new.title, '')), 'A') ||
-    setweight(to_tsvector('english', coalesce(new.description, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(new.distinguishing_features, '')), 'C');
+    setweight(to_tsvector('english', coalesce(new.description, '')), 'B');
   new.updated_at := now();
   return new;
 end;
@@ -336,6 +336,11 @@ create table if not exists public.messages (
   sender_id uuid not null references public.profiles(id) on delete cascade,
   body text not null,
   read_by_receiver boolean not null default false,
+  -- 'text' (default) or 'audio' (recorded voice note — body is empty and
+  -- audio_url points at the voice-messages bucket, audio_duration in seconds).
+  kind text not null default 'text' check (kind in ('text', 'audio')),
+  audio_url text,
+  audio_duration integer,
   created_at timestamptz not null default now()
 );
 

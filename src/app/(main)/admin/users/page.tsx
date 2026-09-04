@@ -63,7 +63,7 @@ export default async function AdminUsersPage() {
                         {user.first_name} {user.last_name}
                       </span>
                       <span className="block text-xs text-slate-500">
-                        @{user.username}
+                        {user.email}
                       </span>
                     </td>
                     <td className="px-4 py-3 capitalize">{user.role}</td>

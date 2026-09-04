@@ -24,11 +24,6 @@ export const registerSchema = z
   .object({
     firstName: z.string().min(1, "First name is required").max(60),
     lastName: z.string().min(1, "Last name is required").max(60),
-    username: z
-      .string()
-      .min(3, "Username must be at least 3 characters")
-      .max(30)
-      .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
     email: z.string().email("Enter a valid email address"),
     password: z
       .string()
@@ -145,11 +140,6 @@ export type SaveItemInput = z.infer<typeof saveItemSchema>;
 export const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(60),
   lastName: z.string().min(1, "Last name is required").max(60),
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(30)
-    .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
   location: z.string().max(120, "Location is too long").optional(),
   bio: z.string().max(500, "Bio is too long (max 500 characters)").optional(),
   avatarUrl: z.string().url("Enter a valid image URL").max(500).optional().or(z.literal("")),

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AtSign, Lock, Mail, TriangleAlert, User, UserRound } from "lucide-react";
+import { Lock, Mail, TriangleAlert, User, UserRound } from "lucide-react";
 import { registerAction } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 import { AuthField } from "@/components/auth/form-field";
@@ -99,14 +99,6 @@ export default function RegisterPage() {
             placeholder="Dela Cruz"
           />
         </div>
-
-        <AuthField
-          label="Username"
-          name="username"
-          icon={AtSign}
-          autoComplete="username"
-          placeholder="juan.dc"
-        />
 
         <AuthField
           label="Email"

@@ -37,7 +37,7 @@ export default async function ProfilePage() {
   const earnedBadges = computeBadges(stats);
 
   const name = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
-  const initial = (name || profile.username || "U").charAt(0).toUpperCase();
+  const initial = (name || "U").charAt(0).toUpperCase();
 
   return (
     <div>
@@ -60,7 +60,7 @@ export default async function ProfilePage() {
         </span>
         <div>
           <p className="font-display text-lg font-semibold text-navy-900">{name || "FindBack member"}</p>
-          <p className="text-sm text-slate-500">@{profile.username}</p>
+          <p className="text-sm text-slate-500">FindBack member</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {(() => {
               const trust = computeTrustSignals({

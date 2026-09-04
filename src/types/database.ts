@@ -113,12 +113,57 @@ export type Conversation = {
   updated_at: string;
 };
 
+/**
+ * Trust & Safety (110) — private verification details ("small crack beside the
+ * rear camera"). Lives OUTSIDE lost_items/found_items so no public query can
+ * ever read it: RLS is reporter-only, anon has no grants. The server-side
+ * matching engine reads it through the service-role key.
+ */
+export type ItemPrivateDetails = {
+  item_type: ConversationItemType;
+  item_id: string;
+  reporter_id: string;
+  details: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Trust & Safety (110) — one confirmation per user per returned report. */
+export type ReturnConfirmation = {
+  id: string;
+  item_type: ConversationItemType;
+  item_id: string;
+  user_id: string;
+  note: string | null;
+  created_at: string;
+};
+
+/**
+ * Trust & Safety (110) — claim-attempt audit log written ONLY by the
+ * verify_ownership_answers RPC. No client grants exist; powers the
+ * claiming-restricted guard (10+ failures in 30 days).
+ */
+export type ClaimAttempt = {
+  id: string;
+  user_id: string;
+  item_type: string;
+  item_id: string;
+  passed: boolean;
+  created_at: string;
+};
+
 export type Message = {
   id: string;
   conversation_id: string;
   sender_id: string;
   body: string;
   read_by_receiver: boolean;
+  /** 'text' (default) or 'audio' (recorded voice note). */
+  kind: "text" | "audio";
+  /** voice-messages bucket URL — set when kind = 'audio'. */
+  audio_url: string | null;
+  /** Voice-note length in seconds. */
+  audio_duration: number | null;
   created_at: string;
 };
 
@@ -286,7 +331,14 @@ export interface Database {
       };
       messages: {
         Row: Message;
-        Insert: Omit<Message, "id" | "created_at" | "read_by_receiver">;
+        Insert: Omit<
+          Message,
+          "id" | "created_at" | "read_by_receiver" | "kind" | "audio_url" | "audio_duration"
+        > & {
+          kind?: "text" | "audio";
+          audio_url?: string | null;
+          audio_duration?: number | null;
+        };
         Update: Partial<Message>;
         Relationships: [];
       };
@@ -418,6 +470,27 @@ export interface Database {
           rating?: number | null;
         };
         Update: Partial<ReuniteFeedback>;
+        Relationships: [];
+      };
+      item_private_details: {
+        Row: ItemPrivateDetails;
+        Insert: Omit<ItemPrivateDetails, "created_at" | "updated_at"> & {
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<ItemPrivateDetails>;
+        Relationships: [];
+      };
+      return_confirmations: {
+        Row: ReturnConfirmation;
+        Insert: Omit<ReturnConfirmation, "id" | "created_at">;
+        Update: Partial<ReturnConfirmation>;
+        Relationships: [];
+      };
+      claim_attempts: {
+        Row: ClaimAttempt;
+        Insert: Omit<ClaimAttempt, "id" | "created_at">;
+        Update: Partial<ClaimAttempt>;
         Relationships: [];
       };
     };

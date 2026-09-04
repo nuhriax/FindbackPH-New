@@ -58,6 +58,8 @@ type SearchItem = {
   longitude?: number | null;
   // Denormalized page-view counter (optional until the 104 migration runs).
   view_count?: number | null;
+  // Lost items only — offered reward, shown as a chip on the card.
+  reward_amount?: number | null;
 };
 
 const SEARCH_LIMIT = 30;
@@ -238,7 +240,10 @@ async function searchTable(
   // appended when the deployed DB has the 103 migration applied.
   const BASE_COLUMNS =
     "id, title, category, city, province, description, created_at, view_count";
-  const COLUMNS = `${BASE_COLUMNS}, latitude, longitude`;
+  // reward_amount only exists on lost_items — appending it for found_items
+  // would make the whole query fail with "column does not exist".
+  const REWARD_COLUMN = table === "lost_items" ? ", reward_amount" : "";
+  const COLUMNS = `${BASE_COLUMNS}${REWARD_COLUMN}, latitude, longitude`;
 
   async function fetchRows(
     columns: string
@@ -454,7 +459,7 @@ export default async function SearchPage({
             <form
               action="/search"
               method="GET"
-              className="mt-6 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl"
+              className="hero-search mt-6 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl"
             >
               <div className="grid gap-2 lg:grid-cols-[1.4fr_1fr_0.8fr_auto]">
                 {/* Item */}
@@ -839,6 +844,7 @@ function SearchGroup({
               kind={kind}
               imageUrl={imageMap.get(item.id) ?? null}
               views={item.view_count}
+              reward={kind === "lost" ? item.reward_amount : null}
             />
           </div>
         ))}

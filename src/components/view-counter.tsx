@@ -41,11 +41,15 @@ export function ViewCounter({
   itemType,
   itemId,
   initialCount,
+  countVisible = true,
 }: {
   itemType: "lost_item" | "found_item";
   itemId: string;
   /** Server-fetched view_count; null/undefined hides the pill. */
   initialCount?: number | null;
+  /** When false the view is still counted, but the pill is hidden —
+      used so only the report owner sees how many people viewed. */
+  countVisible?: boolean;
 }) {
   const [count, setCount] = useState<number | null>(initialCount ?? null);
 
@@ -69,21 +73,14 @@ export function ViewCounter({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemType, itemId]);
 
-  if (count === null) return null;
+  if (count === null || !countVisible) return null;
 
   return (
     <span
-      className="
-        inline-flex
-        items-center
-        gap-2
-        text-sm
-        font-medium
-        text-slate-400
-      "
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500"
       title={`${count.toLocaleString()} ${count === 1 ? "person has" : "people have"} viewed this report`}
     >
-      <Eye size={15} />
+      <Eye size={13} aria-hidden="true" className="text-slate-400" />
       {count.toLocaleString()} {count === 1 ? "view" : "views"}
     </span>
   );

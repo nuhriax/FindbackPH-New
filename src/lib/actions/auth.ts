@@ -14,7 +14,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
   const raw = {
     firstName: formData.get("firstName")?.toString() ?? "",
     lastName: formData.get("lastName")?.toString() ?? "",
-    username: formData.get("username")?.toString() ?? "",
     email: formData.get("email")?.toString() ?? "",
     password: formData.get("password")?.toString() ?? "",
     confirmPassword: formData.get("confirmPassword")?.toString() ?? "",
@@ -33,17 +32,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
 
   const supabase = await createClient();
 
-  // Enforce unique username server-side before creating the auth user.
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("username", parsed.data.username)
-    .maybeSingle();
-
-  if (existing) {
-    return { error: "That username is already taken" };
-  }
-
   // Canonicalize Gmail-style aliases (dots / +tags) BEFORE creating the auth
   // user so one physical Gmail inbox can't register multiple accounts under
   // lookalike addresses. See normalizeEmail in lib/validation.ts.
@@ -58,7 +46,6 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
       data: {
         first_name: parsed.data.firstName,
         last_name: parsed.data.lastName,
-        username: parsed.data.username,
       },
       // Route the email-confirmation link through this app's PKCE callback page
       // (the same handler already used by OAuth + password reset) so signup
@@ -110,12 +97,17 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
   // the trigger fired yet. `onConflict: "id"` keeps it idempotent with the trigger.
   if (data.user?.id) {
     const service = createServiceRoleClient();
+    // The profiles table still has a NOT NULL username column (legacy schema).
+    // We no longer ask users for one — derive it from the email like the
+    // handle_new_user trigger does, so the row satisfies the constraint while
+    // the UI only ever shows first + last name.
+    const derivedUsername = `${email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "") || "member"}_${data.user.id.slice(0, 4)}`;
     const { error: profileError } = await service
       .from("profiles")
       .upsert(
         {
           id: data.user.id,
-          username: parsed.data.username,
+          username: derivedUsername,
           first_name: parsed.data.firstName,
           last_name: parsed.data.lastName,
         },

@@ -23,6 +23,25 @@ begin
     return jsonb_build_object('passed', false, 'error', 'auth_required');
   end if;
 
+  -- Suspicious-activity guard: suspended/banned accounts can never claim, and
+  -- accounts with 10+ failed claim attempts in the last 30 days are claiming-
+  -- restricted (appeal via support). One failure alone NEVER restricts anyone.
+  if exists (
+    select 1 from public.profiles p
+    where p.id = v_caller and (p.is_suspended or p.is_banned)
+  ) then
+    return jsonb_build_object('passed', false, 'error', 'claiming_restricted');
+  end if;
+
+  if (
+    select count(*) from public.claim_attempts a
+    where a.user_id = v_caller
+      and a.passed = false
+      and a.created_at > now() - interval '30 days'
+  ) >= 10 then
+    return jsonb_build_object('passed', false, 'error', 'claiming_restricted');
+  end if;
+
   select * into v_row
   from public.ownership_verifications
   where item_type = p_item_type::ownership_item_type
@@ -50,6 +69,8 @@ begin
     update public.ownership_verifications
       set attempts = attempts + 1, updated_at = now()
       where id = v_row.id;
+    insert into public.claim_attempts (user_id, item_type, item_id, passed)
+      values (v_caller, p_item_type, p_item_id, false);
     return jsonb_build_object('passed', false, 'error', 'mismatch');
   end if;
 
@@ -75,6 +96,9 @@ begin
       end
     );
   end if;
+
+  insert into public.claim_attempts (user_id, item_type, item_id, passed)
+    values (v_caller, p_item_type, p_item_id, true);
 
   return jsonb_build_object('passed', true, 'error', null);
 end;

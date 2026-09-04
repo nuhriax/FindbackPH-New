@@ -73,6 +73,21 @@ export async function POST(req: NextRequest) {
     : "jpg";
   const fileName = `${user.id}.${safeExt}`;
 
+  // Delete any previously stored avatar first. Uploading over an existing
+  // object is an UPDATE for Storage policies — setups that only grant INSERT
+  // (the documented default) reject it with "resource already exists", which
+  // surfaced as an error every time the photo was changed after the first
+  // upload. Removing first keeps every upload a plain INSERT.
+  await supabase.storage
+    .from("avatars")
+    .remove([
+      `${user.id}.jpg`,
+      `${user.id}.jpeg`,
+      `${user.id}.png`,
+      `${user.id}.webp`,
+      `${user.id}.gif`,
+    ]);
+
   const { error: uploadError } = await supabase.storage
     .from("avatars")
     .upload(fileName, file, {
@@ -92,5 +107,9 @@ export async function POST(req: NextRequest) {
   revalidatePath("/dashboard/profile");
   revalidatePath("/dashboard");
 
-  return NextResponse.json({ avatarUrl: getAvatarPublicUrl(fileName) });
+  // Cache-buster: the filename never changes, so browsers/CDN would otherwise
+  // keep showing the previous photo for up to an hour (cacheControl: 3600).
+  return NextResponse.json({
+    avatarUrl: `${getAvatarPublicUrl(fileName)}?v=${Date.now()}`,
+  });
 }
