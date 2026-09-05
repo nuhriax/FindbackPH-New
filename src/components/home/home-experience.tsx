@@ -1,4 +1,4 @@
-ï»¿import Link from "next/link";
+import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -188,7 +188,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
               <Reveal delay={130}>
                 <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
                   FindBack PH connects people who lost something with people
-                  who found it â€” safely, quickly, and locally.
+                  who found it — safely, quickly, and locally.
                 </p>
               </Reveal>
 
@@ -478,7 +478,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
       </section>
 
       {/* =========================================================
-          HOW IT WORKS â€” 3 STEPS
+          HOW IT WORKS — 3 STEPS
       ========================================================= */}
 
       <section className="relative py-14 sm:py-16" aria-labelledby="how-heading">
@@ -508,7 +508,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                 step: "1",
                 icon: FileText,
                 title: "Post a report",
-                text: "Describe your item, add a photo, and drop a pin. Takes under two minutes â€” and your contact details stay hidden.",
+                text: "Describe your item, add a photo, and drop a pin. Takes under two minutes — and your contact details stay hidden.",
                 href: "/report/lost",
                 cta: "Report an item",
               },
@@ -963,7 +963,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
                     {/* Large number */}
 
-                    <div className="absolute right-5 top-5 font-display text-[52px] font-bold leading-none tracking-[-0.08em] text-slate-100 transition duration-500 group-hover:scale-110 group-hover:text-slate-200">
+                    <div className="absolute right-5 top-5 font-display text-[40px] font-bold leading-none tracking-[-0.08em] sm:text-[52px] text-slate-100 transition duration-500 group-hover:scale-110 group-hover:text-slate-200">
                       {String(index + 1).padStart(2, "0")}
                     </div>
 

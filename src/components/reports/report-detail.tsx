@@ -407,7 +407,7 @@ export function ReportDetail({
               {/* KEY INFORMATION STRIP — location · date · reward.
                   One unified component with vertical dividers. */}
               <div className="grid grid-cols-3 divide-x divide-slate-200/70 rounded-2xl bg-slate-50/80 py-3 ring-1 ring-inset ring-slate-200/50">
-                <div className="min-w-0 pl-4 pr-3">
+                <div className="min-w-0 pl-3 pr-2 sm:pl-4 sm:pr-3">
                   <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                     <MapPin size={11} aria-hidden="true" />
                     Location
@@ -425,7 +425,7 @@ export function ReportDetail({
                   </p>
                 </div>
 
-                <div className="min-w-0 px-4">
+                <div className="min-w-0 px-3 sm:px-4">
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                     {isLost ? "Lost date" : "Found date"}
                   </p>
@@ -439,7 +439,7 @@ export function ReportDetail({
                   </p>
                 </div>
 
-                <div className="min-w-0 pl-4 pr-3">
+                <div className="min-w-0 pl-3 pr-2 sm:pl-4 sm:pr-3">
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                     {isLost ? "Reward" : "Held at"}
                   </p>
