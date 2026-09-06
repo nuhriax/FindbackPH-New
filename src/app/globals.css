@@ -1029,6 +1029,35 @@ p {
   background-color: rgba(52, 211, 153, 0.12);
 }
 
+/* Alpha variants the base + refinement rules missed (home stats band, the
+   gap-px hairline grid between stat cards, the profile "View public profile"
+   pill, and the featured stat's soft caption). */
+.site-ink .bg-slate-50\/50 {
+  background-color: rgba(13, 43, 41, 0.5);
+}
+.site-ink .bg-slate-200\/50 {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+.site-ink .bg-blue-50\/70 {
+  background-color: rgba(14, 49, 47, 0.95);
+}
+.site-ink .text-emerald-700\/80 {
+  color: #6ee7b7;
+}
+
+/* Dashboard first-run onboarding panel — light mode paints a pale
+   teal→white gradient (bg-gradient-to-br from-electric-50/60 to-white/70).
+   Gradient utilities are never matched by the bg-* overrides, so under the
+   ink theme it stayed a bright slab. Repaint via this hook class. */
+.site-ink .onboarding-panel {
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(52, 211, 153, 0.08),
+    rgba(14, 49, 47, 0)
+  );
+  background-color: rgba(14, 49, 47, 0.92);
+}
+
 /* Search input chips (home hero, /search form, listing search) use plain
    bg-slate-50 plus hover:/focus:/focus-within: variants of slate-50/100 and
    white. Those variant class names are distinct from the base utilities, so
@@ -2173,8 +2202,10 @@ p {
 .site-ink .bg-white\/75 {
   background-color: rgba(14, 49, 47,  0.95);
 }
-/* The floating navbar pill and sat in the nav late item-content readers. */
-.site-ink .navbar-pill,
+/* Item-content readers sat in the nav late — navbar pill deliberately EXCLUDED:
+   it must keep the translucent glass from the earlier rule (rgba(12,43,41,0.38)
+   + heavy blur) so the page background tints through it. An opaque slab here
+   severed the pill from the ink canvas behind it. */
 .site-ink .item-card {
   background-color: rgba(14, 49, 47,  0.985);
 }

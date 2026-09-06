@@ -150,7 +150,7 @@ export function JourneyTracks() {
           aria-hidden="true"
           viewBox="0 0 4 100"
           preserveAspectRatio="none"
-          className="absolute left-[27px] top-4 hidden h-[calc(100%-3rem)] w-1 sm:block"
+          className="absolute left-[50px] top-4 hidden h-[calc(100%-3rem)] w-1 sm:block"
         >
           <line
             x1="2"

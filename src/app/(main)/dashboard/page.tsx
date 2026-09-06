@@ -189,7 +189,7 @@ export default async function DashboardPage() {
 
       {/* ── First-run onboarding — only for brand-new accounts ── */}
       {!hasContent && (
-        <div className="mt-6 rounded-2xl border border-electric-200/70 bg-gradient-to-br from-electric-50/60 to-white/70 p-5 shadow-soft backdrop-blur-md sm:p-6">
+        <div className="onboarding-panel mt-6 rounded-2xl border border-electric-200/70 bg-gradient-to-br from-electric-50/60 to-white/70 p-5 shadow-soft backdrop-blur-md sm:p-6">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-electric-600" />
             <h2 className="font-display text-sm font-semibold text-navy-900">Get started on FindBack PH</h2>
