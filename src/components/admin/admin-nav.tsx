@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { FileText, Flag, LayoutDashboard, ScrollText, Settings, Users } from "lucide-react";
+import { FileText, Flag, LayoutDashboard, Mail, ScrollText, Settings, Users } from "lucide-react";
 
 const LINKS = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Reports", href: "/admin/reports?type=lost_item", icon: FileText },
   { label: "Flags", href: "/admin/flags", icon: Flag },
+  { label: "Messages", href: "/admin/messages", icon: Mail },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
   { label: "Settings", href: "/admin/settings", icon: Settings },

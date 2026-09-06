@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { contactSchema } from "@/lib/validation";
 import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
+import { sendContactNotificationEmail } from "@/lib/email";
 
 export type ActionResult = { error?: string; success?: boolean };
 
@@ -43,6 +44,15 @@ export async function submitContactAction(formData: FormData): Promise<ActionRes
     console.error("Contact submission error:", error);
     return { error: "We couldn't send your message. Please try again." };
   }
+
+  // Best-effort email alert to the support inbox. Email failures are logged
+  // inside the helper and never break the user's submission (already saved).
+  await sendContactNotificationEmail({
+    name: parsed.data.name,
+    email: parsed.data.email,
+    subject: parsed.data.subject,
+    message: parsed.data.message,
+  });
 
   return { success: true };
 }
