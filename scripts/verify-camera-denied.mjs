@@ -1,6 +1,7 @@
 // Verify denied-permission error state shows specific guidance.
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
+import { assertSafeForDebugWrites } from "./_guard.mjs";
 
 const env = Object.fromEntries(
   readFileSync(".env.local", "utf8").split(/\r?\n/).filter((l) => l.includes("=") && !l.trim().startsWith("#")).map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1)])
@@ -14,6 +15,7 @@ const site = "http://localhost:3000";
 const url = env.NEXT_PUBLIC_SUPABASE_URL;
 const key = env.SUPABASE_SERVICE_ROLE_KEY;
 const h = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+assertSafeForDebugWrites();
 const email = `fb-debug-${Date.now()}-x@example.com`;
 const u = await (await fetch(`${url}/auth/v1/admin/users`, { method: "POST", headers: h, body: JSON.stringify({ email, password: "Debug-pass-123!", email_confirm: true }) })).json();
 const gl = await (await fetch(`${url}/auth/v1/admin/generate_link`, { method: "POST", headers: h, body: JSON.stringify({ type: "magiclink", email }) })).json();

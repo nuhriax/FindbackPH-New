@@ -1,6 +1,7 @@
 // Verify read receipts: A sends → sees single ✓; B opens thread → A sees blue ✓✓.
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
+import { assertSafeForDebugWrites } from "./_guard.mjs";
 
 const env = Object.fromEntries(
   readFileSync(".env.local", "utf8").split(/\r?\n/).filter((l) => l.includes("=") && !l.trim().startsWith("#")).map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1)])
@@ -10,6 +11,7 @@ const ref = url.replace(/^https:\/\//, "").split(".")[0];
 const key = env.SUPABASE_SERVICE_ROLE_KEY;
 const site = process.env.E2E_SITE ?? "http://localhost:3000";
 const h = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+assertSafeForDebugWrites();
 
 async function makeUser() {
   const email = `fb-debug-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.com`;

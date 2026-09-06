@@ -1,6 +1,7 @@
 // Verify the real camera app: photo mode + video recording, front/back switch, send both.
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
+import { assertSafeForDebugWrites } from "./_guard.mjs";
 
 const env = Object.fromEntries(
   readFileSync(".env.local", "utf8").split(/\r?\n/).filter((l) => l.includes("=") && !l.trim().startsWith("#")).map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1)])
@@ -10,6 +11,7 @@ const ref = url.replace(/^https:\/\//, "").split(".")[0];
 const key = env.SUPABASE_SERVICE_ROLE_KEY;
 const site = process.env.E2E_SITE ?? "http://localhost:3000";
 const h = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+assertSafeForDebugWrites();
 
 const email = `fb-debug-${Date.now()}-cam@example.com`;
 const u = await (await fetch(`${url}/auth/v1/admin/users`, { method: "POST", headers: h, body: JSON.stringify({ email, password: "Debug-pass-123!", email_confirm: true }) })).json();
