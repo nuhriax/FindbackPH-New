@@ -74,3 +74,27 @@ scripts/_apply-temp.sql
 *.tmp
 *.scratch
 
+# Playwright test artifacts
+/playwright-report/
+/test-results/
+/audit-shots/
+
+# One-off debugging / RLS verification scripts (superseded by tests/e2e)
+scripts/_guard*.mjs
+scripts/check-*.cjs
+scripts/rls-*.cjs
+scripts/rls-*.sql
+scripts/audit-*.sql
+scripts/final-verification.sql
+scripts/fix-rls-policies.cjs
+scripts/item-update-tests.sql
+scripts/live-*.sql
+scripts/security-tests.sql
+scripts/test-messaging*.cjs
+scripts/verify-post.sql
+scripts/run-sql.mjs
+shot-nav-responsive.js
+
+# Downloaded installers / personal files that landed in the repo root
+*.exe
+
