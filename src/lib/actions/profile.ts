@@ -72,12 +72,20 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ avatarUr
 
   const ext = (file.name.split(".").pop()?.toLowerCase() ?? "jpg").replace(/[^a-z0-9]/g, "");
   const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
-  const fileName = `${user.id}.${safeExt}`;
+  // MUST live inside the "<user-id>/" folder — the avatars storage policies
+  // scope writes to (storage.foldername(name))[1] = auth.uid(). A flat
+  // "<user-id>.<ext>" path has no folder and is rejected by the policy.
+  const fileName = `${user.id}/avatar.${safeExt}`;
 
   // Delete any previously stored avatar first (see /api/avatars route — an
   // upsert onto an existing object needs UPDATE permission on Storage, which
   // insert-only policy setups reject).
+  const { data: existingFiles } = await supabase.storage
+    .from("avatars")
+    .list(user.id);
   await supabase.storage.from("avatars").remove([
+    ...(existingFiles ?? []).map((f) => `${user.id}/${f.name}`),
+    // Legacy flat paths — best-effort, silently skipped if not permitted.
     `${user.id}.jpg`,
     `${user.id}.jpeg`,
     `${user.id}.png`,
@@ -115,8 +123,19 @@ export async function removeAvatarAction(): Promise<ActionResult> {
   }
 
   // Delete any stored file for this user. Do this first so a failure doesn't
-  // leave a broken reference.
-  await supabase.storage.from("avatars").remove([`${user.id}.jpg`, `${user.id}.jpeg`, `${user.id}.png`, `${user.id}.webp`, `${user.id}.gif`]);
+  // leave a broken reference. Covers both the current "<user-id>/avatar.*"
+  // folder layout and legacy flat "<user-id>.<ext>" paths.
+  const { data: existingFiles } = await supabase.storage
+    .from("avatars")
+    .list(user.id);
+  await supabase.storage.from("avatars").remove([
+    ...(existingFiles ?? []).map((f) => `${user.id}/${f.name}`),
+    `${user.id}.jpg`,
+    `${user.id}.jpeg`,
+    `${user.id}.png`,
+    `${user.id}.webp`,
+    `${user.id}.gif`,
+  ]);
 
   const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
 

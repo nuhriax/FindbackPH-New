@@ -71,22 +71,31 @@ export async function POST(req: NextRequest) {
   const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext)
     ? ext
     : "jpg";
-  const fileName = `${user.id}.${safeExt}`;
+  // IMPORTANT: the file MUST live inside the "<user-id>/" folder — the avatars
+  // storage policies scope every write to (storage.foldername(name))[1] =
+  // auth.uid(). A flat "<user-id>.<ext>" path has no folder, so the policy
+  // evaluates to NULL and uploads are rejected ("Could not upload your photo").
+  const fileName = `${user.id}/avatar.${safeExt}`;
 
   // Delete any previously stored avatar first. Uploading over an existing
   // object is an UPDATE for Storage policies — setups that only grant INSERT
   // (the documented default) reject it with "resource already exists", which
   // surfaced as an error every time the photo was changed after the first
   // upload. Removing first keeps every upload a plain INSERT.
-  await supabase.storage
+  const { data: existingFiles } = await supabase.storage
     .from("avatars")
-    .remove([
-      `${user.id}.jpg`,
-      `${user.id}.jpeg`,
-      `${user.id}.png`,
-      `${user.id}.webp`,
-      `${user.id}.gif`,
-    ]);
+    .list(user.id);
+  await supabase.storage.from("avatars").remove([
+    ...(existingFiles ?? []).map((f) => `${user.id}/${f.name}`),
+    // Legacy flat paths from before the folder-scoped policy fix. Removal is
+    // best-effort — flat paths can't match the folder policy's DELETE check,
+    // so unauthorized ones are silently skipped by Storage.
+    `${user.id}.jpg`,
+    `${user.id}.jpeg`,
+    `${user.id}.png`,
+    `${user.id}.webp`,
+    `${user.id}.gif`,
+  ]);
 
   const { error: uploadError } = await supabase.storage
     .from("avatars")
