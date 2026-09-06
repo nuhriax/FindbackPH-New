@@ -75,7 +75,7 @@ export function ReportViewers({ viewers }: { viewers: ReportViewer[] }) {
             >
               {viewer.avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <img loading="lazy"
                   src={viewer.avatarUrl}
                   alt=""
                   className="h-8 w-8 shrink-0 rounded-full object-cover"

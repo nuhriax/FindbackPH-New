@@ -277,7 +277,7 @@ return createPortal(
             <video src={shot.url} controls autoPlay loop className="flex-1 w-full bg-black object-contain" />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={shot.url} alt="Captured photo" className="flex-1 w-full bg-black object-contain" />
+            <img loading="lazy" src={shot.url} alt="Captured photo" className="flex-1 w-full bg-black object-contain" />
           )}
 
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-4 pb-12 pt-[max(1rem,env(safe-area-inset-top))]">

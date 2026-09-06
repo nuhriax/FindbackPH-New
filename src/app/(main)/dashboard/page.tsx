@@ -2,17 +2,19 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
-  BellRing,
   Bookmark,
+  ChevronRight,
   HeartHandshake,
-  ListChecks,
   PackageCheck,
   PackageSearch,
   PackageX,
+  Sparkles,
 } from "lucide-react";
-import { CommunityMotif } from "@/components/ui/community-motif";
-import { OverviewTabs } from "@/components/dashboard/overview-tabs";
 import { ReuniteFeedback, type ReuniteItem } from "@/components/dashboard/reunite-feedback";
+import { DashboardMatches } from "@/components/dashboard/dashboard-matches";
+import { DashboardMyReports } from "@/components/dashboard/dashboard-my-reports";
+import { DashboardActivity } from "@/components/dashboard/dashboard-activity";
+import { NeedsAttention } from "@/components/dashboard/needs-attention";
 
 type DashboardMatch = {
   id: string;
@@ -37,24 +39,33 @@ export default async function DashboardPage() {
     { data: lostItems = [] },
     { data: foundItems = [] },
     { data: savedItems = [] },
+    { data: notifications = [] },
     { data: profile },
   ] = await Promise.all([
     supabase
       .from("lost_items")
-      .select("id, title, category, status, date_lost")
+      .select("id, title, category, status, date_lost, city, province, created_at")
       .eq("reporter_id", user.id)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(10),
     supabase
       .from("found_items")
-      .select("id, title, category, status, date_found")
+      .select("id, title, category, status, date_found, city, province, created_at")
       .eq("reporter_id", user.id)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(10),
     supabase
       .from("saved_items")
       .select("id, lost_item_id, found_item_id, lost_items(title, status, category), found_items(title, status, category)")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(5),
+    supabase
+      .from("notifications")
+      .select("id, type, title, message, link, read, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
     supabase.from("profiles").select("first_name, last_name, username, avatar_url").eq("id", user.id).maybeSingle(),
   ]);
 
@@ -74,7 +85,6 @@ export default async function DashboardPage() {
   const recovered =
     (lostItems ?? []).filter((i) => i.status === "recovered").length +
     (foundItems ?? []).filter((i) => i.status === "recovered").length;
-  const savedCount = (savedItems ?? []).length;
 
   const recoveredItems: ReuniteItem[] = [
     ...(lostItems ?? [])
@@ -89,190 +99,178 @@ export default async function DashboardPage() {
     (m: any) => !m.dismissed && m.found_items
   );
 
+  const unreadNotifications = (notifications ?? []).filter((n: any) => !n.read);
+
   const firstName = profile?.first_name?.trim() || "";
   const lastName = profile?.last_name?.trim() || "";
   const displayName =
     [firstName, lastName].filter(Boolean).join(" ") ||
     "Member";
-  const displayInitial = (firstName || "M").charAt(0).toUpperCase();
-  const greeting = `Welcome back, ${displayName}`;
+
   const hasContent =
-    (lostItems ?? []).length > 0 || (foundItems ?? []).length > 0 || (savedItems ?? []).length > 0 || undismissedMatches.length > 0;
+    (lostItems?.length ?? 0) > 0 ||
+    (foundItems?.length ?? 0) > 0 ||
+    (savedItems?.length ?? 0) > 0 ||
+    undismissedMatches.length > 0;
 
   const stats = [
-    { label: "Active lost", value: activeLost, icon: PackageX, tone: "sunrise", href: "/dashboard/reports?tab=lost" },
-    { label: "Active found", value: activeFound, icon: PackageCheck, tone: "emerald", href: "/dashboard/reports?tab=found" },
-    { label: "Recovered", value: recovered, icon: HeartHandshake, tone: "leaf", href: "/dashboard/reports" },
-    { label: "Saved", value: savedCount, icon: Bookmark, tone: "violet", href: "/saved" },
-  ] as const;
-
-  const quickActions = [
-    { label: "Report a lost item", hint: "Post what went missing so spotters can find it", href: "/report/lost", icon: PackageSearch, primary: true },
-    { label: "Report a found item", hint: "Help someone reunite with their belonging", href: "/report/found", icon: HeartHandshake, primary: true },
-    { label: "Browse lost & found", hint: "Search reports across the community", href: "/discover", icon: PackageCheck, primary: false },
-    { label: "View my reports", hint: "Track the status of everything you posted", href: "/dashboard/reports", icon: ListChecks, primary: false },
-  ] as const;
+    { label: "Active lost", value: activeLost, icon: PackageX, tone: "sunrise" as const, href: "/dashboard/reports?kind=lost&status=active" },
+    { label: "Active found", value: activeFound, icon: PackageCheck, tone: "emerald" as const, href: "/dashboard/reports?kind=found&status=active" },
+    { label: "Possible matches", value: undismissedMatches.length, icon: Sparkles, tone: "blue" as const, href: "/dashboard" },
+    { label: "Recovered", value: recovered, icon: HeartHandshake, tone: "leaf" as const, href: "/dashboard/reports?status=recovered" },
+  ];
 
   return (
-    <div>
-      {/* Header — professional welcome card */}
-      <div className="rounded-2xl border border-slate-200/70 bg-white/70 p-5 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 text-xl font-semibold text-blue-700">
-              {profile?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
-              ) : (
-                displayInitial
-              )}
-            </span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2.5">
-                <CommunityMotif className="h-5 w-16" />
-                <span className="section-eyebrow">Your FindBack workspace</span>
-              </div>
-              <h1 className="mt-1.5 font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900">
-                {greeting}
-              </h1>
-              <p className="mt-0.5 text-sm text-slate-500">
-                Here&apos;s what&apos;s happening with your reports.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Link href="/report/lost" className="btn-secondary">
-              <PackageSearch size={16} />
-              Report lost
-            </Link>
-            <Link href="/report/found" className="btn-primary">
-              <HeartHandshake size={16} />
-              Report found
-            </Link>
+    <div className="mx-auto w-full max-w-6xl">
+      {/* ── Page header — lean app bar: identity + context left, actions right ── */}
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3.5">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-electric-50 text-lg font-bold text-electric-700">
+            {profile?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img loading="lazy" src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+            ) : (
+              (firstName || displayName).charAt(0).toUpperCase()
+            )}
+          </span>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-electric-600">
+              Dashboard
+            </p>
+            <h1 className="truncate font-display text-xl font-bold tracking-tight text-navy-900 sm:text-2xl">
+              Welcome back, {firstName || displayName}
+            </h1>
+            <p className="mt-0.5 truncate text-sm text-slate-500">
+              {activeLost + activeFound > 0
+                ? `${activeLost + activeFound} active report${activeLost + activeFound === 1 ? "" : "s"} · ${unreadNotifications.length} unread update${unreadNotifications.length === 1 ? "" : "s"}`
+                : "Let's help your lost item find its way home."}
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Quick actions — shortcuts to the two things users come here to do */}
-      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {quickActions.map((a) => {
-          const Icon = a.icon;
-          return (
-            <Link
-              key={a.label}
-              href={a.href}
-              className="card group flex items-start gap-3 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
-            >
-              <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition group-hover:scale-105 ${
-                  a.primary
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-600"
-                    : "border-blue-200 bg-blue-50 text-blue-600"
-                }`}
-              >
-                <Icon size={18} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold text-navy-900">{a.label}</span>
-                <span className="mt-0.5 block text-xs leading-snug text-slate-500">{a.hint}</span>
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Match candidates — the retention loop: surface waiting matches
-          prominently instead of hiding them behind notifications. */}
-      {undismissedMatches.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-electric-50/50 p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-600">
-                <BellRing size={18} aria-hidden="true" />
-              </span>
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-600">
-                  Waiting for you
-                </p>
-                <h2 className="mt-0.5 font-display text-base font-bold text-navy-900 sm:text-lg">
-                  {undismissedMatches.length} possible match
-                  {undismissedMatches.length > 1 ? "es" : ""} on your report
-                  {undismissedMatches.length > 1 ? "s" : ""}
-                </h2>
-                <p className="mt-0.5 text-sm text-slate-600">
-                  Our engine found {undismissedMatches.length > 1 ? "reports" : "a report"} that look
-                  {undismissedMatches.length > 1 ? "" : "s"} like your item. Take a look — one might be it.
-                </p>
-              </div>
-            </div>
-            <Link href="/dashboard" className="btn-primary shrink-0" aria-label="Review possible matches">
-              <HeartHandshake size={16} />
-              Review matches
-            </Link>
-          </div>
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-            {undismissedMatches.slice(0, 4).map((m: DashboardMatch) => (
-              <li key={m.id}>
-                <Link
-                  href={`/found/${m.found_item_id}`}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-white bg-white/80 px-3.5 py-2.5 text-sm shadow-sm transition hover:border-emerald-200 hover:bg-white"
-                >
-                  <span className="min-w-0 truncate font-medium text-navy-900">
-                    {m.found_items?.title ?? "Found item"}
-                  </span>
-                  <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold tabular-nums text-emerald-700">
-                    {m.score != null ? `${Math.round(m.score)}% match` : "match"}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="flex flex-wrap gap-2.5">
+          <Link href="/report/lost" className="btn-primary">
+            <PackageSearch size={16} />
+            Report lost
+          </Link>
+          <Link href="/report/found" className="btn-secondary">
+            <HeartHandshake size={16} />
+            Report found
+          </Link>
         </div>
-      )}
+      </header>
 
-      {/* Stat tiles */}
+      {/* ── KPI strip ── */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
-          <StatTile key={s.label} icon={s.icon} tone={s.tone} label={s.label} value={s.value} href={s.href} />
+          <Link
+            key={s.label}
+            href={s.href}
+            aria-label={`${s.label}: ${s.value}`}
+            className="card group relative block overflow-hidden p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
+          >
+            <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${STAT_ACCENT[s.tone]}`} />
+            <div className="relative flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-sm text-slate-600">{s.label}</p>
+                <p className="mt-1 font-display text-2xl font-semibold tabular-nums text-navy-900">{s.value}</p>
+              </div>
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition ${STAT_TONES[s.tone]} group-hover:scale-105`}>
+                <s.icon size={18} />
+              </span>
+            </div>
+            <ChevronRight
+              size={14}
+              aria-hidden
+              className="absolute bottom-3 right-3 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
+            />
+          </Link>
         ))}
       </div>
 
-      {/* Getting started banner */}
+      {/* ── First-run onboarding — only for brand-new accounts ── */}
       {!hasContent && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-electric-100 bg-gradient-to-br from-electric-50/80 via-white to-emerald-50/40 p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-electric-600">Getting started</p>
-              <h2 className="mt-1 font-display text-lg font-bold text-navy-900 sm:text-xl">Let&apos;s bring one thing home today</h2>
-              <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">Post your first report to start matching with the community.</p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Link href="/report/lost" className="btn-secondary">
-                <PackageSearch size={16} /> I lost something
+        <div className="mt-6 rounded-2xl border border-electric-200/70 bg-gradient-to-br from-electric-50/60 to-white/70 p-5 shadow-soft backdrop-blur-md sm:p-6">
+          <div className="flex items-center gap-2">
+            <Sparkles size={16} className="text-electric-600" />
+            <h2 className="font-display text-sm font-semibold text-navy-900">Get started on FindBack PH</h2>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              {
+                step: "1",
+                title: "Report a lost item",
+                text: "Add photos, a location, and details — takes about 2 minutes.",
+                href: "/report/lost",
+              },
+              {
+                step: "2",
+                title: "Found something?",
+                text: "Post it so the owner can reach you safely through messages.",
+                href: "/report/found",
+              },
+              {
+                step: "3",
+                title: "Browse nearby reports",
+                text: "Search by item, category, and city to find your match.",
+                href: "/discover",
+              },
+            ].map((s) => (
+              <Link
+                key={s.step}
+                href={s.href}
+                className="group rounded-xl border border-slate-200/70 bg-white/80 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-electric-600 text-xs font-bold text-white">
+                  {s.step}
+                </span>
+                <p className="mt-2.5 text-sm font-semibold text-navy-900 group-hover:text-blue-700">{s.title}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">{s.text}</p>
               </Link>
-              <Link href="/report/found" className="btn-primary">
-                <HeartHandshake size={16} /> I found something
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* "Did it reunite?" user signal */}
+      {/* ── Reunite prompt — full-width moment of celebration ── */}
       {recoveredItems.length > 0 && (
-        <div className="mt-5">
+        <div className="mt-6">
           <ReuniteFeedback items={recoveredItems} />
         </div>
       )}
 
-      {/* Tabbed activity panel */}
-      <div className="mt-5">
-        <OverviewTabs
-          matches={undismissedMatches}
-          savedItems={savedItems ?? []}
-          lostItems={lostItems ?? []}
-          foundItems={foundItems ?? []}
-        />
+      {/* ── Main grid: priority content left, monitoring rail right ── */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        {/* Main column — matches are why people come back, so they lead */}
+        <div className="min-w-0 space-y-6 lg:col-span-2">
+          <DashboardMatches matches={undismissedMatches} />
+          <DashboardMyReports lostItems={lostItems} foundItems={foundItems} />
+        </div>
+
+        {/* Right rail — action items and recent happenings */}
+        <aside className="min-w-0 space-y-6">
+          <NeedsAttention
+            unreadNotifications={unreadNotifications}
+            undismissedMatches={undismissedMatches}
+            hasContent={hasContent}
+          />
+          <DashboardActivity notifications={notifications ?? []} />
+
+                <Link
+                  href="/dashboard/saved"
+                  className="card group flex items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600">
+                      <Bookmark size={16} />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-navy-900 group-hover:text-blue-700">Saved reports</p>
+                      <p className="text-xs text-slate-500">{savedItems?.length ?? 0} bookmarked</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-500" />
+                </Link>
+        </aside>
       </div>
     </div>
   );
@@ -282,7 +280,6 @@ const STAT_TONES: Record<string, string> = {
   sunrise: "border-sunrise-200 bg-sunrise-50 text-sunrise-600",
   emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
   blue: "border-blue-200 bg-blue-50 text-blue-600",
-  violet: "border-violet-200 bg-violet-50 text-violet-600",
   leaf: "border-leaf-200 bg-leaf-50 text-leaf-600",
 };
 
@@ -290,38 +287,5 @@ const STAT_ACCENT: Record<string, string> = {
   sunrise: "bg-sunrise-200",
   emerald: "bg-emerald-200",
   blue: "bg-blue-200",
-  violet: "bg-violet-200",
+  leaf: "bg-leaf-200",
 };
-
-function StatTile({
-  icon: Icon,
-  tone,
-  label,
-  value,
-  href,
-}: {
-  icon: React.ComponentType<{ size?: number | string; className?: string }>;
-  tone: keyof typeof STAT_TONES;
-  label: string;
-  value: number;
-  href: string;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-label={`${label}: ${value} — view details`}
-      className="card group relative block overflow-hidden p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
-    >
-      <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${STAT_ACCENT[tone]}`} />
-      <div className="relative flex items-center justify-between gap-2">
-        <div>
-          <p className="text-sm text-slate-600">{label}</p>
-          <p className="mt-1 font-display text-2xl font-semibold tabular-nums text-navy-900">{value}</p>
-        </div>
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition ${STAT_TONES[tone]} group-hover:scale-105`}>
-          <Icon size={18} />
-        </span>
-      </div>
-    </Link>
-  );
-}

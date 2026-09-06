@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { BackButton } from "@/components/back-button";
 import { ConversationsList } from "@/components/messaging/conversations-list";
 import { MessagesSquare } from "lucide-react";
 
@@ -9,7 +8,6 @@ export default function MessagesPage() {
   return (
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <BackButton fallbackHref="/dashboard" />
 
         {/* Header */}
         <div className="mt-4 flex items-start gap-4">

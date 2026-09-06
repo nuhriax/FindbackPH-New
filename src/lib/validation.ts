@@ -167,3 +167,18 @@ export const reportFlagSchema = z.object({
   ]),
   details: z.string().max(1000).optional(),
 });
+
+// --- Search & Discovery Parameters ---
+export const searchParamsSchema = z.object({
+  q: z.string().max(100).optional(),
+  city: z.string().max(100).optional(),
+  category: z.enum(CATEGORIES).optional(),
+  type: z.enum(["lost", "found", "all"]).optional(),
+  when: z.enum(["today", "week", "month"]).optional(),
+  photos: z.enum(["true", "yes", "1"]).optional(),
+  page: z.coerce.number().int().min(1).max(9999).optional(),
+  sort: z.enum(["newest", "oldest", "recently-updated"]).optional(),
+});
+
+export type SearchParamsInput = z.infer<typeof searchParamsSchema>;
+

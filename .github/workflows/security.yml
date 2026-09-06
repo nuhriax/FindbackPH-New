@@ -1,0 +1,78 @@
+name: Security & Quality
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Never let a workflow run with secrets echoed, and fail fast on env issues.
+permissions:
+  contents: read
+
+jobs:
+  # 1) Block accidental production-targeting debug/E2E configuration.
+  #    E2E_ALLOWED must never be set in any committed environment file.
+  env-guard:
+    name: "Env guard (no E2E_ALLOWED / no secrets in config)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure no E2E_ALLOWED in committed env files
+        run: |
+          if grep -rn "E2E_ALLOWED" --include=".env*" --include="*.env" . 2>/dev/null; then
+            echo "::error::E2E_ALLOWED must not be committed. Remove it from tracked env files."
+            exit 1
+          fi
+          echo "OK: no E2E_ALLOWED in committed files"
+
+  # 2) Detect accidentally committed secrets / service-role keys.
+  secrets:
+    name: "Secret scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for likely secrets in tracked files
+        run: |
+          set +e
+          # Suppress matches inside node_modules and lockfiles.
+          HITS=$(grep -rEn \
+            "(SUPABASE_SERVICE_ROLE_KEY|SMTP_PASSWORD|SUPABASE_ACCESS_TOKEN|GOOGLE_CLIENT_SECRET|FACEBOOK_APP_SECRET|eyJhbGciOiJIUzI1Ni|sk_live_[a-zA-Z0-9]{24,}|AIza[0-9A-Za-z_-]{35})" \
+            --include="*.ts" --include="*.tsx" --include="*.js" --include="*.mjs" \
+            --include="*.json" --include="*.md" \
+            --exclude-dir=node_modules --exclude-dir=.next --exclude="package-lock.json" \
+            . 2>/dev/null || true)
+          if [ -n "$HITS" ]; then
+            echo "::error::Possible secret(s) found in tracked files:"
+            echo "$HITS"
+            exit 1
+          fi
+          echo "OK: no obvious secrets in tracked source"
+
+  # 3) Typecheck / lint / build.
+  build:
+    name: "Typecheck, lint & build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+
+  # 4) Run the E2E/debug production-targeting guard scenarios.
+  guard:
+    name: "E2E production-targeting guard"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Run guard scenarios
+        run: node scripts/_guard_scenarios.mjs

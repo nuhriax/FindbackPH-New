@@ -140,7 +140,7 @@ export async function ConversationsList() {
                 <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-sm font-semibold text-white">
                   {other?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={other.avatar_url} alt="" className="h-full w-full object-cover" />
+                    <img loading="lazy" src={other.avatar_url} alt="" className="h-full w-full object-cover" />
                   ) : (
                     initial
                   )}

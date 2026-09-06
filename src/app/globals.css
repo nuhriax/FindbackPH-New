@@ -76,6 +76,37 @@
     overflow-x: clip;
   }
 
+  /* Mobile viewport height: `min-h-dvh` on <body> fills the dynamic viewport so
+     iOS Safari's collapsing/expanding URL bar never leaves a gap below the
+     content. Keep a `100vh` fallback for browsers without `dvh` support. */
+  body {
+    min-height: 100vh;
+  }
+  @supports (min-height: 100dvh) {
+    body {
+      min-height: 100dvh;
+    }
+  }
+
+  /* Remove the grey tap-flash overlay on touch devices so taps feel native on
+     Android / iOS instead of a delayed-looking highlight. */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent iOS Safari auto-zoom on form focus. Safari zooms any input/select/
+     textarea whose computed font-size is under 16px the moment it's focused —
+     a jarring jump on every login/search box. Bumping them to 16px on small
+     screens eliminates the zoom; heights (fixed h-11 etc.) are unchanged so the
+     layout doesn't move. Touch-friendly text is also easier to read. */
+  @media (max-width: 767px) {
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
   h1,
   h2,
   h3,

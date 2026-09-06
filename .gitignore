@@ -58,3 +58,19 @@ safediff.txt
 cfg-dump.txt
 workerUrl-dump.txt
 audit-prod.log
+
+# E2E / debug verification artifacts (screenshots, temp outputs, OAuth metadata)
+scripts/*.png
+scripts/.oauth-written.json
+scripts/*-review.png
+scripts/*-preview.png
+scripts/*-layout.png
+scripts/camera-*.png
+scripts/messenger-*.png
+scripts/composer-*.png
+scripts/_apply-temp.sql
+
+# Temp scratch files
+*.tmp
+*.scratch
+

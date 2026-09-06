@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { notifyUserOnce } from "@/lib/notify";
+
 
 export type ReturnConfirmResult =
   | { ok: true; total: number; reporterConfirmed: boolean; recovered: boolean }
@@ -108,13 +110,13 @@ export async function confirmReturnAction(
       if (!updateError) recovered = true;
     } else if (reporterId) {
       // Counterpart confirmed first — nudge the reporter to confirm/mark it.
-      await supabase.rpc("notify_user_once", {
-        p_user_id: reporterId,
-        p_type: "item_returned",
-        p_title: "Return confirmed by the other party",
-        p_message:
+      await notifyUserOnce({
+        userId: reporterId,
+        type: "item_returned",
+        title: "Return confirmed by the other party",
+        message:
           "The other person confirmed this item was returned successfully. Confirm it on your report to complete the return.",
-        p_link: itemType === "lost_item" ? `/lost/${itemId}` : `/found/${itemId}`,
+        link: itemType === "lost_item" ? `/lost/${itemId}` : `/found/${itemId}`,
       });
     }
   }

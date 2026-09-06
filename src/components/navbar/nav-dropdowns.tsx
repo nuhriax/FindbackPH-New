@@ -369,7 +369,7 @@ export function MessagesDropdown({ initialCount }: { initialCount: number }) {
                   <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-sm font-semibold text-white">
                     {c.other_avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={c.other_avatar_url} alt="" className="h-9 w-9 object-cover" />
+                      <img loading="lazy" src={c.other_avatar_url} alt="" className="h-9 w-9 object-cover" />
                     ) : (
                       (c.other_name[0]?.toUpperCase() ?? "U")
                     )}
@@ -460,7 +460,7 @@ export function SavedDropdown({ initialCount }: { initialCount: number }) {
       </button>
 
       <div role="dialog" aria-label="Saved items" className={clsx(PANEL_BASE, open ? PANEL_OPEN : PANEL_CLOSED)}>
-        <PanelHeader title="Saved items" seeAllHref="/saved" />
+        <PanelHeader title="Saved items" seeAllHref="/dashboard/saved" />
 
         {items === null ? (
           <PanelSkeleton rows={4} />

@@ -12,7 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         "/admin",
         "/messages",
         "/notifications",
-        "/saved",
+        "/dashboard/saved",
         "/forgot-password",
         "/reset-password",
         "/api/",

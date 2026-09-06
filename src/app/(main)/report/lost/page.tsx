@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import { CheckCircle2, Lock } from "lucide-react";
 import { createLostItemAction } from "@/lib/actions/items";
@@ -13,6 +13,7 @@ import { ReportStepsIndicator } from "@/components/report-steps-indicator";
 import { DraftAutoSave } from "@/components/reports/draft-autosave";
 import { SimilarReportsHint } from "@/components/reports/similar-reports-hint";
 import { SensitiveCategoryHint } from "@/components/reports/sensitive-category-hint";
+import { track, flushSync } from "@/lib/analytics-client";
 
 // MapLibre + tile layers are the heaviest dependency on this page — load the
 // map lazily so the wizard's first paint never waits on it.
@@ -55,6 +56,31 @@ export default function ReportLostPage() {
   // step. Kept in state (instead of relying only on the hidden inputs) so the
   // marker and the coordinate readout can render live.
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
+
+  // ── Product analytics: report funnel ──────────────────────────────────────
+  // Answers "where do users abandon reports?". Coarse data only: which step
+  // was reached, validation failures, submit outcome, and an abandon event
+  // (flushed with keepalive) when the wizard is left mid-flow.
+  const submittedRef = useRef(false);
+  useEffect(() => {
+    track("report_started", "reports", { kind: "lost" });
+  }, []);
+  useEffect(() => {
+    track("report_step", "reports", { kind: "lost", step });
+  }, [step]);
+  useEffect(
+    () => () => {
+      if (!submittedRef.current) {
+        track("report_abandoned", "reports", { kind: "lost", last_step: stepRef.current });
+        flushSync();
+      }
+    },
+    []
+  );
+  const stepRef = useRef(1);
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
 
   // Validate the currently visible step before moving forward. Hidden
   // (display:none) fields are skipped by native browser validation, so without
@@ -154,10 +180,12 @@ export default function ReportLostPage() {
       if (result?.error) {
         setError(result.error);
         if (/signed in/i.test(result.error)) setAuthRequired(true);
+        track("report_submit_error", "reports", { kind: "lost", stage: "create" });
         return;
       }
       if (!result?.itemId) {
         setError("We couldn't save your report. Please try again.");
+        track("report_submit_error", "reports", { kind: "lost", stage: "create" });
         return;
       }
 
@@ -175,9 +203,12 @@ export default function ReportLostPage() {
           /* best effort */
         }
         setError(uploadErr);
+        track("report_submit_error", "reports", { kind: "lost", stage: "upload" });
         return;
       }
 
+      submittedRef.current = true;
+      track("report_submitted", "reports", { kind: "lost", photos: images.length });
       setConfirmedId(result.itemId);
     });
   }

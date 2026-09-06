@@ -132,7 +132,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
                   <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full msg-gradient text-sm font-semibold text-white">
                     {c.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={c.avatarUrl} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" src={c.avatarUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
                       c.initial
                     )}

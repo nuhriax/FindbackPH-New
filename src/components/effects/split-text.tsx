@@ -120,7 +120,7 @@ export function SplitText({ segments, className, delay = 0, stagger = 0.07 }: Sp
   const hidden = mounted && !inView && !reduced;
 
   return (
-    <span ref={ref} aria-label={plainText} className={cn("block whitespace-normal", className)}>
+    <span ref={ref} aria-label={plainText} role="text" className={cn("block whitespace-normal", className)}>
       {tokens.map((token, i) => {
         return (
           <span key={i}>

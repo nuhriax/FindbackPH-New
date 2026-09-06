@@ -7,6 +7,39 @@ import { revalidatePath } from "next/cache";
 
 export type ActionResult = { error: string } | { error?: undefined };
 
+/**
+ * Re-sends the Supabase signup confirmation email to the signed-in user so
+ * they can earn the Verified account badge. Rate-limited by Supabase itself
+ * (60s cooldown per address); a non-confirmed address only.
+ */
+export async function resendVerificationAction(): Promise<
+  { error: string } | { error?: undefined; sent: true }
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { error: "You must be signed in to resend the verification email" };
+  }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "");
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email: user.email,
+    options: { emailRedirectTo: `${siteUrl}/auth/callback` },
+  });
+
+  if (error) {
+    if (/rate/i.test(error.message)) {
+      return { error: "Please wait a minute before requesting another email" };
+    }
+    return { error: "Could not send the verification email. Try again later." };
+  }
+  return { sent: true };
+}
+
 const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const AVATAR_MAX_SIZE = 4 * 1024 * 1024; // 4 MB
 

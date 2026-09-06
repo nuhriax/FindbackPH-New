@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { KeyRound } from "lucide-react";
 import { submitOwnershipAnswersAction } from "@/lib/actions/ownership";
+import { track } from "@/lib/analytics-client";
 
 /**
  * Claimant-side form for the private ownership challenge (Phase 7).
@@ -28,6 +29,12 @@ export function OwnershipChallengeForm({
   const [error, setError] = useState<string | null>(null);
   const [passed, setPassed] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Product analytics: the form rendering means a claimant reached the
+  // verification UI — the top of the "do people understand it?" funnel.
+  useEffect(() => {
+    track("verification_viewed", "verification", { has_second_question: hasSecondQuestion });
+  }, [hasSecondQuestion]);
 
   if (passed) return null;
 

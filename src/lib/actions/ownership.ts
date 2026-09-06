@@ -3,6 +3,7 @@
 import { createHash } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { trackServerEvent } from "@/lib/analytics";
 
 export type ActionResult = { error: string } | { error?: undefined };
 
@@ -164,6 +165,19 @@ export async function submitOwnershipAnswersAction(
   }
 
   const result = data as { passed?: boolean; error?: string | null } | null;
+
+  // Product analytics: do claimants understand the verification flow? We track
+  // only the outcome (pass / mismatch / rate-limited) — never the answers.
+  void trackServerEvent("verification_attempted", "verification", {
+    outcome: result?.passed
+      ? "passed"
+      : result?.error === "too_many_attempts"
+        ? "rate_limited"
+        : result?.error === "claiming_restricted"
+          ? "restricted"
+          : "mismatch",
+    has_second_answer: answer2.trim().length > 0,
+  });
 
   if (result?.passed) {
     revalidatePath(`/lost/${itemId}`);

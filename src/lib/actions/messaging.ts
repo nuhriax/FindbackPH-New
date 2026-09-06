@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { trackServerEvent } from "@/lib/analytics";
 
 export type ActionResult = { error: string } | { error?: undefined };
 export type ConversationData = {
@@ -179,8 +180,16 @@ export async function sendMessageAction(
   });
 
   if (error) {
+    trackServerEvent("message_sent", "messaging", { outcome: "error", kind: voice ? "audio" : "text" });
     return { error: "Failed to send message" };
   }
+
+  // Product analytics: message flow works — track volume + medium only.
+  void trackServerEvent("message_sent", "messaging", {
+    outcome: "ok",
+    kind: voice ? "audio" : "text",
+    body_length: trimmed.length,
+  });
 
   revalidatePath(`/messages/${conversationId}`);
   return {};
@@ -580,5 +589,4 @@ export async function markAllNotificationsRead(): Promise<void> {
   await supabase.from("notifications").update({ read: true }).eq("user_id", user.id);
 
   revalidatePath("/notifications");
-  revalidatePath("/dashboard/notifications");
 }

@@ -1,8 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { ItemStatus } from "@/types/database";
+import { notifyUserOnce } from "@/lib/notify";
+
 
 export type ActionResult = { error: string } | { error?: undefined };
 
@@ -63,14 +65,15 @@ export async function updateReportStatusAction(
   }
 
   // Moderation notification — only on a genuine removal, with safe generic
-  // wording. Moderator notes / flag details are NEVER included.
+  // wording. Moderator notes / flag details are NEVER included. Written via
+  // the service-role helper: notification inserts are server-only now.
   if (status === "removed" && existing?.reporter_id) {
-    await supabase.rpc("notify_user_once", {
-      p_user_id: existing.reporter_id,
-      p_type: "moderation_action",
-      p_title: "Your report was removed by moderation",
-      p_message: `Your report "${existing.title ?? ""}" was removed by the FindBack PH moderation team because it did not follow the community guidelines. Contact support if you believe this was a mistake.`,
-      p_link: "/dashboard/reports",
+    await notifyUserOnce({
+      userId: existing.reporter_id,
+      type: "moderation_action",
+      title: "Your report was removed by moderation",
+      message: `Your report "${existing.title ?? ""}" was removed by the FindBack PH moderation team because it did not follow the community guidelines. Contact support if you believe this was a mistake.`,
+      link: "/dashboard/reports",
     });
   }
 
@@ -204,8 +207,12 @@ export async function setUserSuspensionAction(
     return { error: "Not authorized" };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
+  // Suspension writes to ANOTHER user's profile row (RLS correctly blocks
+  // user sessions from that), so this runs on the service role. The caller's
+  // admin/moderator role was verified server-side above; the service key
+  // never leaves the server.
+  const service = createServiceRoleClient();
+  const { error } = await service
     .from("profiles")
     .update({ is_suspended: suspended })
     .eq("id", userId);
@@ -217,13 +224,13 @@ export async function setUserSuspensionAction(
 
   // Real moderation event — generic wording only, never moderator notes.
   if (suspended) {
-    await supabase.rpc("notify_user_once", {
-      p_user_id: userId,
-      p_type: "moderation_action",
-      p_title: "Your account was suspended",
-      p_message:
+    await notifyUserOnce({
+      userId,
+      type: "moderation_action",
+      title: "Your account was suspended",
+      message:
         "Your FindBack PH account has been suspended by the moderation team due to a violation of the community guidelines. Contact support if you believe this was a mistake.",
-      p_link: "/contact",
+      link: "/contact",
     });
   }
 

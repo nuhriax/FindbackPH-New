@@ -11,8 +11,10 @@ import {
   LayoutDashboard,
   ListChecks,
   MessageCircle,
+  Search,
   Settings,
   ShieldCheck,
+  Sparkles,
   User,
 } from "lucide-react";
 
@@ -21,25 +23,27 @@ const LINK_GROUPS: {
   links: { label: string; href: string; icon: typeof LayoutDashboard; hint?: string }[];
 }[] = [
   {
-    heading: "Overview",
+    heading: "Main",
     links: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, hint: "Activity at a glance" },
       { label: "My Reports", href: "/dashboard/reports", icon: ListChecks, hint: "Everything you posted" },
+      { label: "Messages", href: "/messages", icon: MessageCircle, hint: "Your conversations" },
+      { label: "Notifications", href: "/notifications", icon: Bell, hint: "Matches and updates" },
     ],
   },
   {
-    heading: "Activity",
+    heading: "Discover",
     links: [
-      { label: "Messages", href: "/messages", icon: MessageCircle },
-      { label: "Notifications", href: "/notifications", icon: Bell },
-      { label: "Saved", href: "/saved", icon: Bookmark },
+      { label: "Browse Reports", href: "/discover", icon: Search, hint: "Search lost & found" },
+      { label: "Possible Matches", href: "/dashboard", icon: Sparkles, hint: "View your matches" },
+      { label: "Saved", href: "/dashboard/saved", icon: Bookmark, hint: "Bookmarked reports" },
     ],
   },
   {
     heading: "Account",
     links: [
-      { label: "Profile", href: "/dashboard/profile", icon: User },
-      { label: "Settings", href: "/dashboard/settings", icon: Settings },
+      { label: "Profile", href: "/dashboard/profile", icon: User, hint: "Your public profile" },
+      { label: "Settings", href: "/dashboard/settings", icon: Settings, hint: "Account settings" },
     ],
   },
 ];
@@ -70,18 +74,18 @@ export function DashboardNav({ isAdmin, profile }: { isAdmin: boolean; profile: 
       {/* User card */}
       <Link
         href="/dashboard/profile"
-        className="group mb-1 flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/70 p-3 transition-colors hover:border-blue-200 hover:bg-white"
+        className="group mb-1 flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/70 p-3 transition-colors hover:border-electric-200 hover:bg-white"
       >
-        <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-blue-200 bg-blue-50 font-semibold text-blue-700">
+        <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-electric-200 bg-electric-50 font-semibold text-electric-700">
           {profile?.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+            <img loading="lazy" src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
           ) : (
             initial
           )}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-navy-900 group-hover:text-blue-700">{name}</p>
+          <p className="truncate text-sm font-semibold text-navy-900 group-hover:text-electric-700">{name}</p>
           <span
             className={clsx(
               "mt-0.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
@@ -113,14 +117,14 @@ export function DashboardNav({ isAdmin, profile }: { isAdmin: boolean; profile: 
                   className={clsx(
                     "relative inline-flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors lg:w-full",
                     active
-                      ? "bg-blue-50 font-semibold text-blue-700"
-                      : "text-slate-600 hover:bg-white/70 hover:text-blue-700"
+                      ? "bg-electric-50 font-semibold text-electric-700"
+                      : "text-slate-600 hover:bg-white/70 hover:text-electric-700"
                   )}
                 >
                   {active && (
-                    <span aria-hidden className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-blue-600" />
+                    <span aria-hidden className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-electric-500" />
                   )}
-                  <Icon size={16} className={active ? "text-blue-600" : "text-slate-400"} />
+                  <Icon size={16} className={active ? "text-electric-600" : "text-slate-400"} />
                   {link.label}
                 </Link>
               );
@@ -129,39 +133,13 @@ export function DashboardNav({ isAdmin, profile }: { isAdmin: boolean; profile: 
         </div>
       ))}
 
-      {isAdmin && (
-        <div className="mt-1.5">
-          <p className="hidden px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 lg:block">
-            Moderation
-          </p>
-          <div className="flex flex-row gap-1.5 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
-            <Link
-              href="/admin"
-              aria-current={isActive("/admin") ? "page" : undefined}
-              className={clsx(
-                "relative inline-flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors lg:w-full",
-                isActive("/admin")
-                  ? "bg-indigo-50 font-semibold text-indigo-700"
-                  : "text-slate-600 hover:bg-white/70 hover:text-indigo-700"
-              )}
-            >
-              {isActive("/admin") && (
-                <span aria-hidden className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-indigo-600" />
-              )}
-              <ShieldCheck size={16} className={isActive("/admin") ? "text-indigo-600" : "text-slate-400"} />
-              Admin
-            </Link>
-          </div>
-        </div>
-      )}
-
       <div className="mt-3 border-t border-slate-200/60 pt-3">
         <Link
           href="/"
           className="inline-flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white/70 hover:text-navy-900"
         >
           <ArrowLeft size={16} />
-          Back to site
+          Back to FindBackPH
         </Link>
       </div>
     </nav>

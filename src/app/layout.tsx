@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
 import "./auth.css";
@@ -21,6 +21,21 @@ const sora = Sora({
   variable: "--font-sora",
   display: "swap",
 });
+
+/**
+ * Viewport metadata. `viewportFit: "cover"` is REQUIRED for the existing
+ * `env(safe-area-inset-*)` padding used across the app (camera overlay,
+ * chat composer, mobile nav dropdown) to actually take effect on notched iOS /
+ * Android devices — without it the safe-area insets are always 0 and content
+ * sits underneath the notch / home indicator. `themeColor` matches the PWA
+ * manifest so the mobile browser chrome stays on-brand.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#2563eb",
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://findbackph.me"),
@@ -72,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // <html> (data-auth-theme) before React hydrates, by design — without
     // this, React logs a hydration attribute-mismatch warning on every load.
     <html lang="en" className={`${plusJakarta.variable} ${sora.variable}`} suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col font-sans text-navy-900 antialiased">
+      <body className="flex min-h-dvh flex-col font-sans text-navy-900 antialiased">
         {/* Skip link for keyboard / screen-reader users */}
         <a
           href="#main-content"

@@ -110,7 +110,7 @@ export function ImageUpload({
           {images.map((img, i) => (
             <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-slate-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <img loading="lazy"
                 src={img.preview}
                 alt={`Upload preview ${i + 1}`}
                 className="h-full w-full object-cover"

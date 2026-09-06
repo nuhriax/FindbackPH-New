@@ -20,6 +20,12 @@ const nextConfig = {
       dynamic: 30,
       static: 300,
     },
+    // Server Actions body limit (default 1 MB). The profile form posts an
+    // avatar image through the updateProfile server action, which can exceed
+    // 1 MB once base64-encoded — raised to 10 MB to fit it.
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
 
   // Security headers. Narrowest CSP that works with this Next.js + Supabase app:

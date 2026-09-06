@@ -77,16 +77,16 @@ export function BadgesCard({
         earned
       </p>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {badges.map((badge) => (
           <div
             key={badge.id}
-            className={`card flex flex-col items-center gap-3 p-5 text-center ${
-              badge.earned ? "" : "opacity-70"
+            className={`card flex items-center gap-3.5 p-4 text-left ${
+              badge.earned ? "" : "opacity-75"
             }`}
           >
             <span
-              className={`relative flex h-16 w-16 items-center justify-center rounded-2xl text-3xl ${
+              className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl ${
                 badge.earned
                   ? "bg-gradient-to-br from-sunrise-50 via-ice-50 to-emerald-50"
                   : "bg-slate-100 grayscale"
@@ -95,26 +95,26 @@ export function BadgesCard({
               {badge.emoji}
               {badge.earned ? (
                 <CheckCircle2
-                  size={18}
+                  size={16}
                   className="absolute -bottom-1.5 -right-1.5 rounded-full bg-white text-emerald-600"
                 />
               ) : (
                 <Lock
-                  size={13}
+                  size={12}
                   className="absolute -bottom-1.5 -right-1.5 rounded-full bg-white text-slate-400"
                 />
               )}
             </span>
-            <div>
+            <div className="min-w-0">
               <p
-                className={`font-display text-sm font-semibold ${
+                className={`truncate font-display text-sm font-semibold ${
                   badge.earned ? "text-navy-900" : "text-slate-400"
                 }`}
               >
                 {badge.name}
               </p>
               <p
-                className={`mt-1 text-xs leading-5 ${
+                className={`mt-0.5 line-clamp-2 text-xs leading-5 ${
                   badge.earned ? "text-slate-500" : "text-slate-400"
                 }`}
               >

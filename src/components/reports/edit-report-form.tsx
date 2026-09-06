@@ -207,7 +207,7 @@ export function EditReportForm({
                 className="group relative aspect-square overflow-hidden rounded-lg border border-slate-200"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <img loading="lazy"
                   src={img.url}
                   alt="Current report photo"
                   className={`h-full w-full object-cover transition-opacity ${

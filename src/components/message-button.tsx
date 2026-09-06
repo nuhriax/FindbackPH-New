@@ -12,11 +12,13 @@ export function MessageButton({
   itemId,
   isOwner,
   label = "Message",
+  className = "btn-primary w-full",
 }: {
   itemType: "lost_item" | "found_item";
   itemId: string;
   isOwner?: boolean;
   label?: string;
+  className?: string;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -47,7 +49,7 @@ export function MessageButton({
   return (
     <div>
       <button
-        className="btn-primary w-full"
+        className={className}
         disabled={isPending}
         onClick={handleClick}
       >

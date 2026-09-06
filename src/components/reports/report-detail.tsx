@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { format } from "date-fns";
+import { trackServerEvent } from "@/lib/analytics";
 import {
   ArrowLeft,
   Check,
@@ -46,6 +47,16 @@ import type {
 } from "./report-detail-types";
 
 export type { DetailItem, DetailMatch, SimilarItem };
+
+/**
+ * Server-side impression marker: fires once per request when a report detail
+ * page with computed matches is served. Pairing this with `match_clicked`
+ * tells us whether the matching engine surfaces results people act on.
+ */
+async function MatchImpression({ count, kind }: { count: number; kind: string }) {
+  await trackServerEvent("match_impression", "matching", { count, report_kind: kind });
+  return null;
+}
 
 /* ============================================================
    REPORT DETAIL — SPLIT-PANEL ITEM PROFILE
@@ -817,6 +828,7 @@ export function ReportDetail({
             aria-label="Possible matches"
             className="mt-6 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-soft"
           >
+            <MatchImpression count={matches.length} kind={kind} />
             <div className="px-5 py-6 sm:px-7">
               <div className="mb-5 flex items-end justify-between gap-4">
                 <div>

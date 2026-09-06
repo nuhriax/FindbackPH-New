@@ -401,303 +401,62 @@ export default async function HomePage() {
   );
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* ====================================================================
-          LIVE REPORT LISTENER
-          ==================================================================== */}
-
+    <main className="relative min-h-screen">
       <LiveReportsRefresh />
 
-      {/* ====================================================================
-          BACKGROUND
-          ==================================================================== */}
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-      >
-        <div className="absolute -top-44 left-1/2 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-electric-100/[0.55] blur-[130px]" />
-
-        <div className="absolute -left-56 top-[8%] h-[32rem] w-[32rem] rounded-full bg-sky-200/[0.35] blur-3xl" />
-
-        <div className="absolute -right-56 top-[14%] h-[32rem] w-[32rem] rounded-full bg-lavender-200/[0.45] blur-3xl" />
-
-        <div className="absolute -bottom-48 left-1/4 h-[34rem] w-[34rem] rounded-full bg-ice-200/[0.5] blur-[130px]" />
-      </div>
-
-      {/* ====================================================================
-          HERO
-          ==================================================================== */}
-
-      <section className="relative overflow-hidden px-4 pb-10 pt-9 sm:px-6 sm:pb-14 sm:pt-12 lg:pb-16 lg:pt-14">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-        >
-          <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-emerald-50/80 via-transparent to-transparent" />
-
-          <svg
-            viewBox="0 0 1200 140"
-            preserveAspectRatio="none"
-            className="hero-waves absolute -bottom-1 left-0 h-32 w-full opacity-70"
-          >
-            <path
-              d="M0 118 C 200 66, 420 108, 620 90 C 840 70, 1020 96, 1200 68 V140 H0 Z"
-              fill="#cde8d4"
-            />
-
-            <path
-              d="M0 132 C 260 102, 540 128, 780 112 C 980 98, 1120 118, 1200 106 V140 H0 Z"
-              fill="#e5f0e7"
-            />
-          </svg>
-
-          <Aurora className="hero-aurora" opacity={0.3} blur={72} />
-        </div>
-
-        <PaperNotes />
-
-        <CommunityMotif className="hero-motif absolute bottom-1 left-0 hidden w-64 opacity-70 lg:block" />
-
-        <CommunityMotif className="hero-motif absolute bottom-1 right-8 hidden w-64 opacity-70 lg:block" />
-
-        <div className="relative z-10 mx-auto max-w-5xl">
-          {/* ----------------------------------------------------------------
-              TITLE
-              ---------------------------------------------------------------- */}
-
-          <div className="mx-auto max-w-4xl text-center">
-            <MotionReveal>
-              <div className="inline-flex items-center gap-2 rounded-full border border-electric-200 bg-electric-50 px-3.5 py-1.5 text-xs font-semibold text-electric-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_6px_16px_-8px_rgba(15,123,114,0.4)]">
-                <Search size={13} />
-                FindBack PH
-              </div>
-            </MotionReveal>
-
-            <h1 className="display-hero mt-6 text-5xl sm:text-6xl lg:text-[5.25rem]">
-              <SplitText
-                segments={[
-                  {
-                    text: "Find what you ",
-                  },
-                  {
-                    text: "lost",
-                    className: "text-sunrise-500",
-                  },
-                  {
-                    text: ". Return what you ",
-                  },
-                  {
-                    text: "found",
-                    className: "text-emerald-500",
-                  },
-                  {
-                    text: ".",
-                  },
-                ]}
-              />
+      {/* HERO */}
+      <section className="relative px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-12">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center">
+            <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl lg:text-5xl">
+              Lost something? Found something?
             </h1>
-
-            <MotionReveal delay={260}>
-              <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                The Philippines&apos; free community lost-and-found platform.
-                Report what you lost, post what you found, and match safely.
-                Your contact details stay private until <em>you</em> choose to
-                share them.
-              </p>
-            </MotionReveal>
+            <p className="mx-auto mt-3 max-w-xl text-base text-slate-600 sm:text-lg">
+              Search reports from people who found items, or post what you lost.
+              Free, private, and built for the Philippines.
+            </p>
           </div>
 
-          {/* ----------------------------------------------------------------
-              PRIMARY CTAs
-              ---------------------------------------------------------------- */}
+          <div className="mx-auto mt-8 max-w-2xl">
+            <form action="/search" method="GET" role="search" className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center">
+              <div className="flex min-h-[48px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3">
+                <Search size={18} className="shrink-0 text-slate-400" />
+                <input name="q" type="search" maxLength={120} placeholder="e.g. iPhone, wallet, keys, school ID" aria-label="Search reports" className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-400" />
+              </div>
+              <button type="submit" className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-lg bg-electric-500 px-6 text-sm font-semibold text-white transition hover:bg-electric-600">
+                <Search size={16} />
+                Search
+              </button>
+            </form>
+            <p className="mt-3 text-center text-xs text-slate-500">Search by item name, category, or location</p>
+          </div>
 
-          <Reveal delay={80}>
-            <div className="mx-auto mt-7 max-w-3xl">
-              {/* Real search input — the homepage is a tool, not a brochure */}
-              <form
-                action="/search"
-                method="GET"
-                role="search"
-                className="hero-search flex flex-col gap-2 rounded-2xl border border-white/80 bg-white/90 p-2 shadow-card ring-1 ring-slate-200/50 backdrop-blur-xl sm:flex-row sm:items-center"
-              >
-                <div className="flex min-h-[52px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-electric-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-electric-100">
-                  <Search
-                    size={17}
-                    className="shrink-0 text-blue-500"
-                  />
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/report/lost" className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-sunrise-200 bg-sunrise-50 px-5 py-2.5 text-sm font-semibold text-sunrise-700 transition hover:bg-sunrise-100 sm:w-auto">Report Lost Item</Link>
+            <Link href="/report/found" className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:w-auto">Report Found Item</Link>
+          </div>
 
-                  <input
-                    name="q"
-                    type="search"
-                    maxLength={120}
-                    placeholder="What are you looking for? e.g. iPhone, wallet, keys"
-                    aria-label="Search reports"
-                    className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-400"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="group inline-flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-electric-500 to-electric-600 px-8 text-sm font-semibold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_12px_28px_-10px_rgba(15,123,114,0.6)] transition-all duration-200 hover:-translate-y-px hover:from-electric-400 hover:to-electric-500 hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.32),0_18px_36px_-12px_rgba(15,123,114,0.7)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/25 active:translate-y-0 active:scale-[0.98]"
-                >
-                  <Search size={16} className="transition-transform group-hover:scale-110" />
-                  Search
-                </button>
-              </form>
-
-              <p className="mt-3 text-center text-[11px] text-slate-500">
-                Search for a report, or tell the community what you
-                lost or found.
-              </p>
+          <div className="mt-10">
+            <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-slate-500">Popular categories</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Link key={category.value} href={`/search?category=${encodeURIComponent(category.value)}`} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700">
+                    <Icon size={13} />
+                    {category.label}
+                  </Link>
+                );
+              })}
             </div>
-          </Reveal>
-
-          {/* ----------------------------------------------------------------
-              CATEGORIES
-              ---------------------------------------------------------------- */}
-
-          <Reveal delay={120}>
-            <div className="mx-auto mt-5 max-w-3xl">
-              <div className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                Popular categories
-              </div>
-
-              <div className="flex flex-wrap justify-center gap-2">
-                {categories.map((category) => {
-                  const Icon = category.icon;
-
-                  return (
-                    <Link
-                      key={category.value}
-                      href={`/search?category=${encodeURIComponent(
-                        category.value
-                      )}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/85 px-3.5 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700"
-                    >
-                      <Icon size={14} />
-                      {category.label}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              <div className="mt-5 text-center">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Or browse by popular location
-                </span>
-
-                <div className="mt-2 flex flex-wrap justify-center gap-2">
-                  {POPULAR_CITIES.map((city) => (
-                    <Link
-                      key={city}
-                      href={`/search?city=${encodeURIComponent(city)}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/85 px-3.5 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700"
-                    >
-                      <MapPin size={13} />
-                      {city}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-3 text-center">
-                <Link
-                  href="/search"
-                  className="text-xs font-medium text-slate-500 underline-offset-4 transition hover:text-electric-700 hover:underline"
-                >
-                  Browse all 12 categories
-                </Link>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* ----------------------------------------------------------------
-              ACTIONS
-              ---------------------------------------------------------------- */}
-
-          <Reveal delay={160}>
-            <div className="mx-auto mt-7 grid max-w-3xl gap-3 sm:grid-cols-2">
-              <Link
-                href="/report/lost"
-                className="group relative overflow-hidden rounded-2xl border border-sunrise-200 bg-gradient-to-br from-sunrise-50 via-white to-white p-5 shadow-[0_18px_44px_-22px_rgba(242,116,24,0.35),inset_0_1px_0_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:border-sunrise-300 hover:shadow-[0_28px_56px_-22px_rgba(242,116,24,0.45),inset_0_1px_0_0_rgba(255,255,255,0.9)]"
-              >
-                {/* Corner sheen — subtle light sweep that reveals on hover */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rotate-12 bg-gradient-to-br from-sunrise-100/0 via-sunrise-100/60 to-sunrise-200/80 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                />
-
-                <div className="relative flex items-start justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-sunrise-200 bg-sunrise-100 text-sunrise-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-transform duration-300 group-hover:scale-105">
-                    <PackageSearch size={20} />
-                  </span>
-
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-sunrise-200 bg-white/80 text-sunrise-600 opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100">
-                    <ArrowRight
-                      size={15}
-                      className="transition-transform duration-300 group-hover:translate-x-0.5"
-                    />
-                  </span>
-                </div>
-
-                <p className="relative mt-4 text-base font-semibold text-navy-900">
-                  I lost something
-                </p>
-
-                <p className="relative mt-1 text-sm leading-relaxed text-slate-600">
-                  Search reports or tell the community what you
-                  lost.
-                </p>
-              </Link>
-
-              <Link
-                href="/report/found"
-                className="group relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-white p-5 shadow-[0_18px_44px_-22px_rgba(32,155,104,0.35),inset_0_1px_0_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300 hover:shadow-[0_28px_56px_-22px_rgba(32,155,104,0.45),inset_0_1px_0_0_rgba(255,255,255,0.9)]"
-              >
-                {/* Corner sheen — subtle light sweep that reveals on hover */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rotate-12 bg-gradient-to-br from-emerald-100/0 via-emerald-100/60 to-emerald-200/80 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                />
-
-                <div className="relative flex items-start justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-transform duration-300 group-hover:scale-105">
-                    <HeartHandshake size={20} />
-                  </span>
-
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-white/80 text-emerald-600 opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100">
-                    <ArrowRight
-                      size={15}
-                      className="transition-transform duration-300 group-hover:translate-x-0.5"
-                    />
-                  </span>
-                </div>
-
-                <p className="relative mt-4 text-base font-semibold text-navy-900">
-                  I found something
-                </p>
-
-                <p className="relative mt-1 text-sm leading-relaxed text-slate-600">
-                  Report it and help get it back to its owner.
-                </p>
-              </Link>
-            </div>
-          </Reveal>
+          </div>
         </div>
-
       </section>
 
-      {/* ====================================================================
-          STATS
-          ==================================================================== */}
-
-      <section className="px-4 py-12 sm:px-6 sm:py-16">
+      {/* STATS */}
+      <section className="border-y border-slate-200/70 bg-slate-50/50 px-4 py-8 sm:px-6">
         <div className="mx-auto max-w-5xl">
-          <Reveal>
-            <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-sm shadow-navy-900/5 backdrop-blur-sm">
-              {/* Stat tiles — hairline-divided like the about page's live counts */}
-              <div className="grid gap-px bg-navy-100/50 sm:grid-cols-3">
+          <div className="grid gap-px overflow-hidden rounded-xl border border-slate-200/70 bg-slate-200/50 sm:grid-cols-3">
                 <Stat
                   value={lostCount}
                   label="Active lost reports"
@@ -719,125 +478,83 @@ export default async function HomePage() {
                   icon={ShieldCheck}
                   featured
                 />
-              </div>
-
-              {/* Warm footer line — the numbers, given a heartbeat */}
-              <div className="border-t border-slate-200/70 bg-white/50 px-6 py-4 text-center sm:px-8">
-                <p className="text-sm leading-relaxed text-slate-600">
-                  Every recovered report is one more item back where it
-                  belongs —{" "}
-                  {recoveredCount > 0 ? (
-                    <>
-                      together we&apos;ve brought{" "}
-                      <span className="font-semibold text-emerald-600">
-                        {recoveredCount}{" "}
-                        {recoveredCount === 1 ? "item" : "items"}
-                      </span>{" "}
-                      home.
-                    </>
-                  ) : (
-                    <>the next one could be yours to return.</>
-                  )}
-                </p>
-              </div>
-            </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 
-      {/* ====================================================================
-          RECENT REPORTS
-          ==================================================================== */}
-
-      <section className="px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-7">
+      {/* RECENT REPORTS */}
+      <section className="px-4 pb-12 pt-10 sm:px-6 sm:pb-16">
         <div className="mx-auto max-w-7xl">
-          <Reveal>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-electric-600">
-                  Community reports
-                </p>
-
-                <h2 className="display-hero mt-2 text-3xl sm:text-4xl lg:text-5xl">
-                  Recently reported
-                </h2>
-
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
-                  See the latest lost and found reports from the
-                  community.
-                </p>
-              </div>
-
-              <Link
-                href="/search"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-electric-700 transition hover:text-electric-600"
-              >
-                View all reports
-                <ArrowRight size={15} />
-              </Link>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="font-display text-xl font-bold tracking-tight text-navy-900 sm:text-2xl">
+                Latest reports
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Recently reported by the community.
+              </p>
             </div>
-          </Reveal>
 
-          {/* FILTERS */}
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-electric-700 transition hover:text-electric-600"
+            >
+              View all reports
+              <ArrowRight size={15} />
+            </Link>
+          </div>
 
-          <Reveal delay={60}>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Link
-                href="/lost"
-                className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-100 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50"
-              >
-                <PackageSearch size={13} />
-                Lost
-                <span className="text-rose-600/80">
-                  {lostCount}
-                </span>
-              </Link>
+          {/* QUICK FILTERS */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/lost"
+              className="inline-flex items-center gap-2 rounded-full border border-sunrise-200 bg-sunrise-50 px-4 py-2 text-xs font-semibold text-sunrise-700 transition hover:bg-sunrise-100"
+            >
+              <PackageSearch size={13} />
+              Lost
+              <span className="text-sunrise-500/70">{lostCount}</span>
+            </Link>
 
-              <Link
-                href="/found"
-                className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-              >
-                <HeartHandshake size={13} />
-                Found
-                <span className="text-emerald-500/70">
-                  {foundCount}
-                </span>
-              </Link>
+            <Link
+              href="/found"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+            >
+              <HeartHandshake size={13} />
+              Found
+              <span className="text-emerald-500/70">{foundCount}</span>
+            </Link>
 
-              <Link
-                href="/search"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-              >
-                <Search size={13} />
-                Search all
-              </Link>
-            </div>
-          </Reveal>
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+            >
+              <Search size={13} />
+              Search all
+            </Link>
+          </div>
 
           {/* REPORT GRID */}
-
           {latestReports.length > 0 ? (
-            <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {latestReports.map((item, index) => (
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {latestReports.map((item) => (
                 <MotionReveal
                   key={`${item.kind}-${item.id}`}
-                  delay={(index % 3) * 60}
                   className="h-full"
                 >
                   <ItemCard
-                      href={item.href}
-                      title={item.title}
-                      category={item.category}
-                      city={item.city}
-                      province={item.province}
-                      reported={item.dateLabel}
-                      description={item.description}
-                      kind={item.kind}
-                      imageUrl={item.imageUrl}
-                      views={item.views}
-                      reward={item.reward}
-                    />
-                  </MotionReveal>
+                    href={item.href}
+                    title={item.title}
+                    category={item.category}
+                    city={item.city}
+                    province={item.province}
+                    reported={item.dateLabel}
+                    description={item.description}
+                    kind={item.kind}
+                    imageUrl={item.imageUrl}
+                    views={item.views}
+                    reward={item.reward}
+                  />
+                </MotionReveal>
               ))}
             </div>
           ) : (
@@ -846,35 +563,31 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ====================================================================
-          SAFETY
-          ==================================================================== */}
-
-      <section className="mt-6 px-4 py-6 sm:px-6">
-        <div className="mx-auto max-w-5xl">
-          <Reveal>
-            <div className="flex flex-col gap-5 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm shadow-navy-900/5 backdrop-blur-sm sm:flex-row sm:items-center sm:p-7">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-navy-900/10 bg-white/70 text-electric-700 shadow-sm">
-                <ShieldCheck size={22} />
-              </div>
-
-              <div className="flex-1">
-                <h3 className="text-base font-semibold">
-                  Keep your handover safe
-                </h3>
-
-                <p className="mt-1 max-w-2xl text-sm leading-relaxed">
-                  Keep personal information private and choose a
-                  safe, public place when meeting someone.
-                </p>
-              </div>
-
-              <div className="flex shrink-0 items-center gap-2 text-xs font-medium text-electric-700">
-                <Lock size={13} />
-                Privacy focused
-              </div>
+      {/* SAFETY */}
+      <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
+        <div className="rounded-2xl border border-emerald-200/60 bg-emerald-50/50 p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-emerald-200 bg-white text-emerald-600">
+              <ShieldCheck size={20} />
             </div>
-          </Reveal>
+
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-navy-900">
+                Meet in a safe, public place
+              </h3>
+              <p className="mt-0.5 text-sm text-slate-600">
+                Keep personal info private until you&apos;re ready to share. Choose a busy mall, barangay hall, or café for handovers.
+              </p>
+            </div>
+
+            <Link
+              href="/safety"
+              className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800"
+            >
+              Safety guide
+              <ArrowRight size={13} />
+            </Link>
+          </div>
         </div>
       </section>
     </main>

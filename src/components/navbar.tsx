@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
@@ -136,7 +136,7 @@ export function Navbar({
         {/* Floating pill shell */}
         <div
           className={clsx(
-            "navbar-pill mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
+            "navbar-pill mx-auto flex h-14 items-center justify-between gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
             scrolled
               ? "border-ice-200/80 bg-white/95 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
               : "border-ice-200/60 bg-white/95 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-2xl"
@@ -217,7 +217,7 @@ export function Navbar({
             </div>
           </nav>
 
-          <div className="hidden items-center justify-end gap-1 lg:flex">
+          <div className="hidden items-center justify-end gap-1 justify-self-end lg:flex">
             <Link
               href="/search"
               aria-label="Search"
@@ -241,7 +241,7 @@ export function Navbar({
                   >
                     {profile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+                      <img loading="lazy" src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
                     ) : (
                       <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-xs font-semibold text-white">
                         {getInitials(profile)}
@@ -274,7 +274,7 @@ export function Navbar({
                         Dashboard
                       </Link>
                       <Link
-                        href="/saved"
+                        href="/dashboard/saved"
                         role="menuitem"
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-navy-50"
                         onClick={() => setAccountOpen(false)}
@@ -342,7 +342,7 @@ export function Navbar({
           </div>
 
           {/* Mobile actions — search stays one tap away */}
-          <div className="flex items-center gap-0.5 lg:hidden">
+          <div className="flex items-center justify-self-end gap-0.5 lg:hidden">
             <Link
               href="/search"
               aria-label="Search"
@@ -447,7 +447,7 @@ export function Navbar({
                   <Link href="/notifications" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                     Notifications
                   </Link>
-                  <Link href="/saved" onClick={() => setOpen(false)} className="btn-ghost justify-start">
+                  <Link href="/dashboard/saved" onClick={() => setOpen(false)} className="btn-ghost justify-start">
                     Saved Items
                   </Link>
                   <Link href="/dashboard/profile" onClick={() => setOpen(false)} className="btn-ghost justify-start">

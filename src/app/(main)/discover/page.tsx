@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { trackServerEvent } from "@/lib/analytics";
 import { ItemCard } from "@/components/item-card";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
@@ -27,7 +28,9 @@ import { formatDistanceToNow, isValid } from "date-fns";
 
 const PAGE_SIZE = 24;
 const MAX_SEARCH_LENGTH = 100;
-const MAX_FETCH_ROWS = 999; // both tables merged, paginated in memory
+// Per-table fetch cap per page: page N needs the top N*PAGE_SIZE rows of each
+// table (merged + re-sorted in memory). True totals come from separate
+// count queries, so deep pages stay correct without pulling the whole table.
 
 const ROUTES = {
   explore: "/discover",
@@ -92,6 +95,11 @@ function parsePage(value: SearchParamValue): number {
   const raw = Number.parseInt(getParam(value), 10);
   if (!Number.isFinite(raw) || raw < 1) return 1;
   return Math.min(raw, 9999);
+}
+
+/** Bound how deep pagination will fetch (200 pages ≈ 4,800 rows/table max). */
+function safePageUpperBound(page: number): number {
+  return Math.min(Math.max(page, 1), 200);
 }
 
 function isValidCategory(value: string): value is (typeof CATEGORIES)[number] {
@@ -181,6 +189,7 @@ type FilterBuilder = ReturnType<ReturnType<SupabaseClient["from"]>["select"]>;
 function applyFilters(
   query: FilterBuilder,
   filters: { q: string; category: string; city: string; sort: SortOption },
+  limitCount: number,
 ) {
   let out = query.eq("status", "active");
 
@@ -201,7 +210,21 @@ function applyFilters(
       ascending: filters.sort === "oldest",
       nullsFirst: false,
     })
-    .limit(MAX_FETCH_ROWS);
+    .limit(limitCount);
+}
+
+/** Exact row count for a filtered table — cheap head-only query. */
+async function countRows(
+  supabase: SupabaseClient,
+  table: "lost_items" | "found_items",
+  filters: { q: string; category: string; city: string },
+): Promise<number> {
+  let out = supabase.from(table).select("id", { count: "exact", head: true }).eq("status", "active");
+  if (filters.q) out = out.textSearch("search_vector", filters.q, { type: "websearch" });
+  if (filters.category) out = out.eq("category", filters.category as ItemCategory);
+  if (filters.city) out = out.ilike("city", `%${filters.city}%`);
+  const { count } = await out;
+  return count ?? 0;
 }
 
 type ImageRow = { storage_path: string } & Record<string, string | null>;
@@ -247,6 +270,8 @@ export default async function DiscoverPage({
   const params = await searchParams;
 
   const q = normalizeSearch(getParam(params.q));
+  // Surface silent truncation instead of quietly dropping the user's words.
+  const searchTruncated = getParam(params.q).trim().length > MAX_SEARCH_LENGTH;
   const rawCategory = normalizeSearch(getParam(params.category), 50);
   const category = isValidCategory(rawCategory) ? rawCategory : "";
   const city = normalizeSearch(getParam(params.city));
@@ -260,22 +285,30 @@ export default async function DiscoverPage({
   const filters = { q, category, city, sort };
 
   /* ------------------------------------------------------------------------
-     Query both tables, merge, paginate in memory
+     Query both tables (bounded per page), merge, paginate. Exact totals come
+     from head-only count queries so pagination is correct at any depth.
      ------------------------------------------------------------------------ */
 
-  const [lostRes, foundRes] = await Promise.all([
+  // Page N of the merged feed can draw from the top N*PAGE_SIZE of each table.
+  const perTableLimit = safePageUpperBound(page) * PAGE_SIZE;
+
+  const [lostRes, foundRes, lostCount, foundCount] = await Promise.all([
     applyFilters(
       supabase.from("lost_items").select(
         "id, title, category, city, province, description, created_at, updated_at, view_count, latitude, longitude, reward_amount",
       ),
       filters,
+      perTableLimit,
     ),
     applyFilters(
       supabase.from("found_items").select(
         "id, title, category, city, province, description, created_at, updated_at, view_count, latitude, longitude",
       ),
       filters,
+      perTableLimit,
     ),
+    countRows(supabase, "lost_items", filters),
+    countRows(supabase, "found_items", filters),
   ]);
 
   const error = lostRes.error ?? foundRes.error;
@@ -305,11 +338,25 @@ export default async function DiscoverPage({
       : bKey.localeCompare(aKey);
   });
 
-  const totalCount = pool.length;
+  const totalCount =
+    type === "lost" ? lostCount : type === "found" ? foundCount : lostCount + foundCount;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const rangeStart = (safePage - 1) * PAGE_SIZE;
   const items = pool.slice(rangeStart, rangeStart + PAGE_SIZE);
+
+  // Product analytics: which filters do people use, and do searches return
+  // anything? Only the PRESENCE of a query is recorded — never the query text
+  // itself — so no personal content lands in the analytics table.
+  await trackServerEvent("search_performed", "search", {
+    has_query: Boolean(q),
+    has_category: Boolean(category),
+    has_city: Boolean(city),
+    type,
+    sort,
+    page,
+    result_count: totalCount,
+  });
 
   /* ------------------------------------------------------------------------
      Fetch first image for each result on this page
@@ -357,8 +404,8 @@ export default async function DiscoverPage({
   const isLastPage = safePage >= totalPages;
   const resultStart = totalCount === 0 ? 0 : rangeStart + 1;
   const resultEnd = Math.min(rangeStart + items.length, totalCount);
-  const lostCount = lostItems.length;
-  const foundCount = foundItems.length;
+  const lostResultCount = lostItems.length;
+  const foundResultCount = foundItems.length;
 
   const hrefFor = (overrides: Partial<Parameters<typeof buildPageHref>[0]>) =>
     buildPageHref({ page: safePage, q, category, city, type, sort, ...overrides });
@@ -443,6 +490,11 @@ export default async function DiscoverPage({
                   <Search size={16} aria-hidden="true" />
                 </button>
               </form>
+              {searchTruncated && (
+                <p role="status" className="mx-auto mt-2 max-w-xl text-left text-xs text-amber-700">
+                  Your search was cut to the first {MAX_SEARCH_LENGTH} characters.
+                </p>
+              )}
             </Reveal>
           </div>
         </div>

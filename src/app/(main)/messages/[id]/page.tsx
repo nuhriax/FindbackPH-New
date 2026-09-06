@@ -28,6 +28,7 @@ import {
   Camera,
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
+import { track } from "@/lib/analytics-client";
 
 type Participant = {
   id: string;
@@ -65,6 +66,12 @@ type Conversation = {
 
 export default function MessageThreadPage() {
   const routeParams = useParams<{ id: string }>();
+
+  // Product analytics: top of the messaging funnel — a thread was opened.
+  useEffect(() => {
+    if (routeParams?.id) track("conversation_opened", "messaging", {});
+  }, [routeParams?.id]);
+
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [otherUser, setOtherUser] = useState<Participant | null>(null);
   const [itemTitle, setItemTitle] = useState<string>("Item");
@@ -77,6 +84,7 @@ export default function MessageThreadPage() {
   const [showSafetyReminder, setShowSafetyReminder] = useState(true);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
@@ -109,6 +117,10 @@ export default function MessageThreadPage() {
 
   // Emoji picker popover
   const [showEmoji, setShowEmoji] = useState(false);
+  // Older-history pagination ("Load earlier messages")
+  const [hasOlderMessages, setHasOlderMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const scrollRestoreRef = useRef<number | null>(null);
   // Local user's own identity (used to announce the caller on outgoing calls)
   const [selfName, setSelfName] = useState<string>("Someone");
 
@@ -174,16 +186,20 @@ export default function MessageThreadPage() {
 
       setOtherUser(profile);
 
-      // Fetch messages
+      // Fetch messages — latest page only; older history loads on demand via
+      // the "Load earlier messages" button (see loadOlderMessages).
+      const MESSAGE_PAGE_SIZE = 200;
       const { data: msgs, error: msgError } = await supabase
         .from("messages")
         .select("*")
         .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true })
-        .limit(200);
+        .order("created_at", { ascending: false })
+        .limit(MESSAGE_PAGE_SIZE);
 
       if (msgError) console.error("Error:", msgError);
-      setMessages(msgs ?? []);
+      const oldestFirst = (msgs ?? []).slice().reverse();
+      setMessages(oldestFirst);
+      setHasOlderMessages((msgs ?? []).length === MESSAGE_PAGE_SIZE);
       setConversation(convo);
 
       // Fetch related item
@@ -324,10 +340,53 @@ export default function MessageThreadPage() {
     // container's own scroll height avoids the page lurching down when a new
     // message is sent or received.
     const el = scrollerRef.current;
-    if (el) {
+    if (!el) return;
+
+    // After prepending older history, keep the viewport anchored on the
+    // message the user was reading instead of jumping.
+    if (scrollRestoreRef.current !== null) {
+      const target = el.scrollHeight - scrollRestoreRef.current;
+      scrollRestoreRef.current = null;
+      el.scrollTop = target;
+      return;
+    }
+
+    // Only follow new messages when the user is already at (or near) the
+    // bottom — never yank someone who scrolled up to read older messages.
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distanceFromBottom <= 200) {
       el.scrollTop = el.scrollHeight;
     }
   }, [messages]);
+
+  async function loadOlderMessages() {
+    if (loadingOlder || messages.length === 0) return;
+    setLoadingOlder(true);
+    const el = scrollerRef.current;
+    // Remember the distance from the bottom so we can re-anchor after prepend.
+    if (el) scrollRestoreRef.current = el.scrollHeight - el.scrollTop;
+
+    const oldest = messages[0]?.created_at;
+    if (!oldest) {
+      setLoadingOlder(false);
+      return;
+    }
+    const OLDER_PAGE_SIZE = 100;
+    const { data: older, error } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .lt("created_at", oldest)
+      .order("created_at", { ascending: false })
+      .limit(OLDER_PAGE_SIZE);
+
+    if (error) console.error("Error loading older messages:", error);
+    setHasOlderMessages((older ?? []).length === OLDER_PAGE_SIZE);
+    if ((older ?? []).length > 0) {
+      setMessages((prev) => [...(older ?? []).slice().reverse(), ...prev]);
+    }
+    setLoadingOlder(false);
+  }
 
   const scrollToLatest = () => {
     const el = scrollerRef.current;
@@ -754,7 +813,7 @@ const startRecording = async () => {
             <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full msg-gradient text-sm font-semibold text-white">
               {otherUser?.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
+                <img loading="lazy" src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
               ) : (
                 displayName.charAt(0).toUpperCase()
               )}
@@ -792,14 +851,6 @@ const startRecording = async () => {
               </button>
             </>
           )}
-          {otherUser && (
-            <Link
-              href={`/member/${otherUser.id}`}
-              className="hidden rounded-full px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-50 sm:block"
-            >
-              View profile
-            </Link>
-          )}
           {otherUser && <BlockUserButton targetUserId={otherUser.id} />}
         </div>
       </div>
@@ -826,12 +877,24 @@ const startRecording = async () => {
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Messages list */}
           <div ref={scrollerRef} className="chat-thread-scroll chat-wall-light flex-1 overflow-y-auto px-3 py-4 sm:px-6">
+            {hasOlderMessages && messages.length > 0 && (
+              <div className="mx-auto mb-3 flex max-w-3xl justify-center">
+                <button
+                  type="button"
+                  onClick={loadOlderMessages}
+                  disabled={loadingOlder}
+                  className="rounded-full border border-slate-200 bg-white/90 px-4 py-1.5 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur transition hover:border-slate-300 hover:text-navy-800 disabled:opacity-50"
+                >
+                  {loadingOlder ? "Loading…" : "Load earlier messages"}
+                </button>
+              </div>
+            )}
             {messages.length === 0 ? (
               <div className="mx-auto flex h-full max-w-3xl flex-col items-center justify-center px-6 text-center">
                 <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full msg-gradient text-xl font-semibold text-white shadow-lg shadow-blue-500/20">
                   {otherUser?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
+                    <img loading="lazy" src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
                   ) : (
                     displayName.charAt(0).toUpperCase()
                   )}
@@ -886,7 +949,7 @@ const startRecording = async () => {
                           >
                             {otherUser?.avatar_url ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
+                              <img loading="lazy" src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
                             ) : (
                               displayName.charAt(0).toUpperCase()
                             )}
@@ -927,10 +990,9 @@ const startRecording = async () => {
                               aria-label="Open shared photo"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
+                              <img loading="lazy"
                                 src={msg.image_url}
                                 alt="Shared photo"
-                                loading="lazy"
                                 className="max-h-80 w-auto max-w-[240px] rounded-xl object-cover transition hover:opacity-95 sm:max-w-[300px]"
                               />
                             </a>
@@ -982,7 +1044,7 @@ const startRecording = async () => {
               <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full msg-gradient text-[10px] font-semibold text-white">
                 {otherUser?.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
+                  <img loading="lazy" src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
                 ) : (
                   displayName.charAt(0).toUpperCase()
                 )}
@@ -1068,7 +1130,7 @@ const startRecording = async () => {
                     disabled={sendingVoice || sendingImage}
                     aria-label="Record a voice message"
                     title="Voice message"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 disabled:opacity-40"
                   >
                     <Mic size={18} />
                   </button>
@@ -1078,7 +1140,7 @@ const startRecording = async () => {
                     disabled={sendingImage || sendingVoice}
                     aria-label="Send an image"
                     title="Send an image"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 disabled:opacity-40"
                   >
                     <ImagePlus size={18} />
                   </button>
@@ -1088,7 +1150,7 @@ const startRecording = async () => {
                     disabled={sendingImage || sendingVoice}
                     aria-label="Take a photo"
                     title="Take a photo"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 disabled:opacity-40"
                   >
                     <Camera size={18} />
                   </button>
@@ -1133,7 +1195,7 @@ const startRecording = async () => {
                     <button
                       type="submit"
                       disabled={isPending}
-                      className="flex h-10 w-10 items-center justify-center msg-gradient rounded-full text-white shadow-sm transition hover:opacity-90 disabled:opacity-40"
+                      className="flex h-11 w-11 items-center justify-center msg-gradient rounded-full text-white shadow-sm transition hover:opacity-90 disabled:opacity-40"
                       aria-label="Send message"
                     >
                       <Send size={18} />
@@ -1142,11 +1204,12 @@ const startRecording = async () => {
                     <>
                       <button
                         type="button"
+                        ref={emojiButtonRef}
                         onClick={() => setShowEmoji((v) => !v)}
                         aria-label="Choose an emoji"
                         aria-expanded={showEmoji}
                         title="Stickers & emoji"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
                       >
                         <Smile size={18} />
                       </button>
@@ -1160,7 +1223,7 @@ const startRecording = async () => {
                           if (input) input.value = "❤️";
                           formRef.current?.requestSubmit();
                         }}
-                        className="flex h-10 w-10 items-center justify-center rounded-full text-rose-500 transition hover:bg-rose-50"
+                        className="flex h-11 w-11 items-center justify-center rounded-full text-rose-500 transition hover:bg-rose-50"
                         aria-label="Send a heart"
                         title="Send a heart"
                       >
@@ -1173,7 +1236,11 @@ const startRecording = async () => {
                       onPick={(emoji) => {
                         setNewMessage((prev) => prev + emoji);
                       }}
-                      onClose={() => setShowEmoji(false)}
+                      onClose={() => {
+                        setShowEmoji(false);
+                        // Return keyboard focus to the opener button.
+                        emojiButtonRef.current?.focus();
+                      }}
                     />
                   )}
                 </div>

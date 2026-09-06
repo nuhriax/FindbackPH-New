@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-
 import { CATEGORY_LABELS } from "@/lib/validation";
+import { TrackLink } from "@/components/analytics/track-link";
 import type { DetailMatch } from "../report-detail-types";
 import { getMatchInfo } from "./match-helpers";
 
@@ -42,8 +41,8 @@ function MatchGrid({
         xl:grid-cols-3
       "
     >
-      {matches.map((match) => (
-        <MatchCard key={match.id} match={match} matchHref={matchHref} />
+      {matches.map((match, index) => (
+        <MatchCard key={match.id} match={match} matchHref={matchHref} position={index + 1} />
       ))}
     </div>
   );
@@ -52,9 +51,11 @@ function MatchGrid({
 function MatchCard({
   match,
   matchHref,
+  position,
 }: {
   match: DetailMatch;
   matchHref?: (id: string) => string;
+  position: number;
 }) {
   const matchInfo = getMatchInfo(match.score);
   const href = matchHref ? matchHref(match.id) : `/search/${match.id}`;
@@ -82,7 +83,13 @@ function MatchCard({
         hover:shadow-sm
       "
     >
-      <Link href={href} className="group flex items-start justify-between gap-3">
+      <TrackLink
+        href={href}
+        eventName="match_clicked"
+        area="matching"
+        props={{ score: match.score ?? null, target_kind: match.kind, position }}
+        className="group flex items-start justify-between gap-3"
+      >
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span
@@ -149,7 +156,7 @@ function MatchCard({
             group-hover:text-blue-600
           "
         />
-      </Link>
+      </TrackLink>
 
       {/* Match confidence bar */}
       {match.score != null && (
@@ -180,13 +187,16 @@ function MatchCard({
             : "Possible match"}
         </span>
 
-        <Link
+        <TrackLink
           href={href}
+          eventName="match_clicked"
+          area="matching"
+          props={{ score: match.score ?? null, target_kind: match.kind, cta: "might-be-mine" }}
           className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition-colors hover:bg-blue-700"
         >
           This might be mine
           <ArrowRight size={11} />
-        </Link>
+        </TrackLink>
       </div>
     </div>
   );

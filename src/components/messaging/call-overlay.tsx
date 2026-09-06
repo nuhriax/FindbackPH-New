@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 /**
  * FindBack PH — in-chat voice / video calling (WebRTC).
@@ -9,8 +9,8 @@
  * <IncomingCallManager> listens on the current user's channel globally and
  * mounts this overlay to answer.
  *
- * When a call ends, a 📞 call-log message is posted into the conversation so
- * the thread keeps a Messenger-style history ("📞 Voice call · 1:23").
+ * When a call ends, a ?? call-log message is posted into the conversation so
+ * the thread keeps a Messenger-style history ("📞 Voice call — 1:23").
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -468,7 +468,7 @@ export function CallOverlay({
             <span className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-electric-500 to-electric-600 text-4xl font-semibold text-white ring-4 ring-white/10">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                <img loading="lazy" src={avatarUrl} alt="" className="h-full w-full object-cover" />
               ) : (
                 (displayName[0] ?? "?").toUpperCase()
               )}

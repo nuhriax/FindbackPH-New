@@ -99,18 +99,23 @@ export default async function MyReportsPage({
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span className="section-eyebrow">Your reports</span>
-          <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy-900">
+          <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900 sm:text-3xl">
             My Reports
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
-            Track, update, or close out the reports you&apos;ve published.
+            Track and manage the items you&apos;ve reported.
           </p>
         </div>
-        <Link href="/report/lost" className="btn-primary shrink-0">
-          <Plus size={16} />
-          New report
-        </Link>
+        <div className="flex shrink-0 gap-3">
+          <Link href="/report/lost" className="btn-primary">
+            <Plus size={16} />
+            Report Lost
+          </Link>
+          <Link href="/report/found" className="btn-secondary">
+            <Plus size={16} />
+            Report Found
+          </Link>
+        </div>
       </div>
 
       {/* Summary stats */}

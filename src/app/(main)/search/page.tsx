@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ItemCard } from "@/components/item-card";
-import { CATEGORIES, CATEGORY_LABELS } from "@/lib/validation";
+import { CATEGORIES, CATEGORY_LABELS, searchParamsSchema } from "@/lib/validation";
 import { getSignedImageUrls, getImagePublicUrl } from "@/lib/storage";
 import { formatDistanceToNow, isValid } from "date-fns";
 import {
@@ -23,17 +23,6 @@ export const metadata = {
   title: "Search Lost & Found Items",
   description:
     "Search lost and found reports across the Philippines by keyword, category, and city to find a match for what you've lost or found.",
-};
-
-type SearchPageProps = {
-  searchParams: Promise<{
-    q?: string;
-    city?: string;
-    category?: string;
-    type?: string;
-    when?: string;
-    photos?: string;
-  }>;
 };
 
 const WHEN_FILTERS = ["today", "week", "month"] as const;
@@ -330,8 +319,25 @@ async function searchTable(
 }
 export default async function SearchPage({
   searchParams,
-}: SearchPageProps) {
-  const sp = await searchParams;
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const rawParams = await searchParams;
+  
+  // Validate and sanitize search params with Zod (gracefully handle invalid input)
+  const validated = searchParamsSchema.safeParse({
+    q: typeof rawParams.q === "string" ? rawParams.q : undefined,
+    city: typeof rawParams.city === "string" ? rawParams.city : undefined,
+    category: typeof rawParams.category === "string" ? rawParams.category : undefined,
+    type: typeof rawParams.type === "string" ? rawParams.type : undefined,
+    when: typeof rawParams.when === "string" ? rawParams.when : undefined,
+    photos: typeof rawParams.photos === "string" ? rawParams.photos : undefined,
+    page: typeof rawParams.page === "string" ? rawParams.page : undefined,
+    sort: typeof rawParams.sort === "string" ? rawParams.sort : undefined,
+  });
+  
+  // Use validated data if successful, otherwise fall back to raw params
+  const sp = validated.success ? validated.data : {};
   const supabase = await createClient();
 
   const q = normalizeQuery(sp.q);

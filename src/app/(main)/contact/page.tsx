@@ -124,17 +124,17 @@ export default function ContactPage() {
                 ].map(({ icon: Icon, value, label }) => (
                   <div
                     key={label}
-                    className="flex flex-col items-center px-2 py-2 text-center sm:px-4"
+                    className="flex flex-col items-center px-1 py-2 text-center sm:px-4"
                   >
                     <Icon
                       aria-hidden="true"
-                      className="h-5 w-5 text-slate-400"
+                      className="h-4 w-4 text-slate-400 sm:h-5 sm:w-5"
                       strokeWidth={1.75}
                     />
-                    <dt className="mt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                    <dt className="mt-2 text-[9px] font-medium uppercase tracking-[0.1em] text-slate-500 sm:mt-3 sm:text-[11px] sm:tracking-[0.16em]">
                       {label}
                     </dt>
-                    <dd className="mt-1 text-xs font-semibold text-navy-900 sm:text-sm">
+                    <dd className="mt-1 text-[10px] font-semibold text-navy-900 sm:text-xs">
                       {value}
                     </dd>
                   </div>
@@ -288,7 +288,7 @@ export default function ContactPage() {
                           type="submit"
                           disabled={isPending}
                           aria-disabled={isPending}
-                          className="btn-primary min-w-[145px] justify-center disabled:cursor-not-allowed disabled:opacity-60"
+                          className="btn-primary w-full min-w-0 justify-center disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[145px]"
                         >
                           {isPending ? (
                             <>
@@ -329,12 +329,12 @@ export default function ContactPage() {
                 </h2>
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50/70 py-2 pl-3 pr-1.5">
+              <div className="mt-4 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50/70 py-2 pl-3 pr-1.5 min-w-0">
                 <button
                   type="button"
                   onClick={copyEmail}
                   title="Click to copy email address"
-                  className="min-w-0 flex-1 cursor-pointer truncate text-left text-sm font-medium text-slate-700 transition-colors hover:text-navy-900"
+                  className="min-w-0 flex-1 cursor-pointer truncate text-left text-xs font-medium text-slate-700 transition-colors hover:text-navy-900 sm:text-sm"
                 >
                   {supportEmail}
                 </button>
@@ -342,21 +342,21 @@ export default function ContactPage() {
                   type="button"
                   onClick={copyEmail}
                   aria-live="polite"
-                  className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:border-slate-300 hover:text-navy-900"
+                  className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600 transition-colors duration-200 hover:border-slate-300 hover:text-navy-900 sm:gap-1.5 sm:px-2.5 sm:py-1.5 sm:text-xs"
                 >
                   {copied ? (
                     <>
                       <CheckCircle2
-                        size={13}
+                        size={12}
                         aria-hidden="true"
-                        className="text-emerald-600"
+                        className="text-emerald-600 sm:size-[13]"
                       />
-                      Copied
+                      <span className="hidden sm:inline">Copied</span>
                     </>
                   ) : (
                     <>
-                      <Copy size={13} aria-hidden="true" />
-                      Copy
+                      <Copy size={12} aria-hidden="true" className="sm:size-[13]" />
+                      <span className="hidden sm:inline">Copy</span>
                     </>
                   )}
                 </button>

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { Footer } from "@/components/footer";
+import { ProductAnalyticsMonitor } from "@/components/analytics/product-monitor";
 
 /** Routes that render their own full-screen chrome (no Navbar/Footer). */
 const CHROME_FREE = new Set([
@@ -31,13 +32,20 @@ export function SiteChrome({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  if (CHROME_FREE.has(pathname)) return <>{children}</>;
-
+  // Site-wide UX monitor (page views, device class, JS errors, rage clicks).
+  // Rendered in both branches so auth pages are measured too.
   return (
     <>
-      {navbar}
-      {children}
-      <Footer />
+      <ProductAnalyticsMonitor />
+      {CHROME_FREE.has(pathname) ? (
+        <>{children}</>
+      ) : (
+        <>
+          {navbar}
+          {children}
+          <Footer />
+        </>
+      )}
     </>
   );
 }

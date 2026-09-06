@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SiteChrome } from "@/components/site-chrome";
-import { NavbarFallback, NavbarShell } from "@/components/navbar/navbar-shell";
+import { NavbarShell } from "@/components/navbar/navbar-shell";
+import { NavbarFallback } from "@/components/navbar/navbar-fallback";
 import { IncomingCallManager } from "@/components/messaging/incoming-call-manager";
 
 /**

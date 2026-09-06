@@ -37,33 +37,31 @@ export default async function AdminReportsPage({
   }
 
   return (
-    <div className="py-16 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <span className="section-eyebrow">Moderation queue</span>
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">
-              {type === "lost_item" ? "Lost" : "Found"} Reports
-            </h1>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              href="/admin/reports?type=lost_item"
-              className={`btn-secondary !py-2 ${type === "lost_item" ? "!border-electric-500/50" : ""}`}
-            >
-              Lost
-            </Link>
-            <Link
-              href="/admin/reports?type=found_item"
-              className={`btn-secondary !py-2 ${type === "found_item" ? "!border-electric-500/50" : ""}`}
-            >
-              Found
-            </Link>
-            <Link href="/admin" className="btn-ghost">
-              Back
-            </Link>
-          </div>
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-xl font-semibold tracking-tight text-navy-900">
+            {type === "lost_item" ? "Lost" : "Found"} Reports
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {type === "lost_item" ? "Lost" : "Found"} item reports submitted by the community.
+          </p>
         </div>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/reports?type=lost_item"
+            className={`btn-secondary !py-2 ${type === "lost_item" ? "!border-electric-500/50" : ""}`}
+          >
+            Lost
+          </Link>
+          <Link
+            href="/admin/reports?type=found_item"
+            className={`btn-secondary !py-2 ${type === "found_item" ? "!border-electric-500/50" : ""}`}
+          >
+            Found
+          </Link>
+        </div>
+      </div>
 
         {!items || items.length === 0 ? (
           <div className="mt-8 card p-10 text-center">
@@ -74,7 +72,7 @@ export default async function AdminReportsPage({
             {items.map((item: any) => (
               <div key={item.id} className="card card-hover flex flex-wrap items-center justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
-                  <Link href={`/${type}/${item.id}`} className="font-medium text-navy-900 transition-colors hover:text-blue-700">
+                  <Link href={`/${type === "lost_item" ? "lost" : "found"}/${item.id}`} className="font-medium text-navy-900 transition-colors hover:text-blue-700">
                     {item.title}
                   </Link>
                   <p className="mt-0.5 text-sm text-slate-600">
@@ -133,7 +131,6 @@ export default async function AdminReportsPage({
 
         {/* Likely duplicate titles in the current page of results */}
         <PotentialDuplicates type={type} items={(items ?? []) as any[]} />
-      </div>
     </div>
   );
 }

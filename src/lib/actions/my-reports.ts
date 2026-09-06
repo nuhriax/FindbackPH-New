@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { lostItemSchema, foundItemSchema, type LostItemInput, type FoundItemInput } from "@/lib/validation";
+import { notifyUserOnce } from "@/lib/notify";
+
 
 export type ActionResult = { error: string } | { error?: undefined };
 
@@ -128,14 +130,15 @@ async function notifyReturnedParticipants(itemType: "lost_item" | "found_item", 
 
   for (const userId of targets) {
     // Dedupe-safe insert: participants who were already told this report is
-    // returned (and haven't read it yet) are not notified again.
-    await supabase.rpc("notify_user_once", {
-      p_user_id: userId,
-      p_type: "item_returned",
-      p_title: "A report you contacted was marked as returned",
-      p_message:
+    // returned (and haven't read it yet) are not notified again. Written via
+    // the service-role helper — notification inserts are server-only now.
+    await notifyUserOnce({
+      userId,
+      type: "item_returned",
+      title: "A report you contacted was marked as returned",
+      message:
         "The person you reached out to has marked this report as returned. You can review the report for reference.",
-      p_link: `/search/${itemId}`,
+      link: `/search/${itemId}`,
     });
   }
 }

@@ -6,7 +6,7 @@ const config: Config = {
             colors: {
         electric: {
           50:  "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
-          500: "#20948F", 600: "#0F7B72", 700: "#0C6262", 800: "#0A4E55", 900: "#083B46", 950: "#052A33",
+          500: "#0F7B72", 600: "#0C6262", 700: "#0A4E55", 800: "#083B46", 900: "#052A33", 950: "#031B22",
         },
         navy: {
           50: "#FBF6EE", 100: "#F6EDE0", 200: "#EFE0CF", 300: "#E0CFAC", 400: "#CDB081",
@@ -14,7 +14,7 @@ const config: Config = {
         },
         sunrise: {
           50: "#FEF2F2", 100: "#FEE2E2", 200: "#FECACA", 300: "#FCA5A5", 400: "#F87171",
-          500: "#EF4444", 600: "#DC2626", 700: "#B91C1C", 800: "#991B1B", 900: "#7F1D1D",
+          500: "#DC2626", 600: "#B91C1C", 700: "#991B1B", 800: "#7F1D1D", 900: "#5C1515",
         },
         ice: {
           50: "#FDF6EE", 100: "#F7EFE3", 200: "#F0E3D0", 300: "#E6CEB7", 400: "#D7BF97", 500: "#C4A878",
@@ -46,7 +46,7 @@ const config: Config = {
         },
         emerald: {
           50: "#EDF9F0", 100: "#D5F1DF", 200: "#A9E3C2", 300: "#7BD1A4", 400: "#46B687",
-          500: "#209B68", 600: "#1B8956", 700: "#11683F", 800: "#0E5734", 900: "#0A4026",
+          500: "#1B8956", 600: "#11683F", 700: "#0E5734", 800: "#0A4026", 900: "#072B1B",
         },
         /* Leaf — nature accents used for organic highlights, badges and the
            "coming home" moments. Teal stays the primary action color; leaf

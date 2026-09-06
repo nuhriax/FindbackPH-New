@@ -26,23 +26,19 @@ export default async function AdminUsersPage() {
   }
 
   return (
-    <div className="py-16 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <span className="section-eyebrow">Member management</span>
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Users</h1>
-          </div>
-          <Link href="/admin" className="btn-ghost">
-            Back
-          </Link>
-        </div>
+    <div>
+      <div className="mb-5">
+        <h1 className="font-display text-xl font-semibold tracking-tight text-navy-900">Users</h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Manage community members, suspensions, and account status.
+        </p>
+      </div>
 
-        {!users || users.length === 0 ? (
-          <div className="mt-8 card p-10 text-center">
-            <p className="font-display text-lg font-semibold text-navy-900">No users found</p>
-          </div>
-        ) : (
+      {!users || users.length === 0 ? (
+        <div className="card p-10 text-center">
+          <p className="font-display text-lg font-semibold text-navy-900">No users found</p>
+        </div>
+      ) : (
           <div className="mt-8 card overflow-hidden">
             <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
@@ -63,7 +59,7 @@ export default async function AdminUsersPage() {
                         {user.first_name} {user.last_name}
                       </span>
                       <span className="block text-xs text-slate-500">
-                        {user.email}
+                        {user.email ? `${user.email.slice(0, 2)}${"*".repeat(Math.min(8, Math.max(3, user.email.indexOf("@") - 2)))}@${user.email.split("@")[1] || ""}` : "—"}
                       </span>
                     </td>
                     <td className="px-4 py-3 capitalize">{user.role}</td>
@@ -110,7 +106,6 @@ export default async function AdminUsersPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }

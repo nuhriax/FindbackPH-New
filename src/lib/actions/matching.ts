@@ -2,6 +2,8 @@
 
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
+import { notifyUserOnce } from "@/lib/notify";
+
 
 export type ActionResult = { error: string } | { error?: undefined };
 
@@ -222,12 +224,12 @@ export async function runMatchingForFoundItem(foundItemId: string): Promise<Acti
       }
 
       for (const [ownerId, link] of linkByOwner) {
-        await supabase.rpc("notify_user_once", {
-          p_user_id: ownerId,
-          p_type: "possible_match",
-          p_title: "Possible match found",
-          p_message: `A newly reported found item may match your lost item "${foundItem.title}".`,
-          p_link: link,
+        await notifyUserOnce({
+          userId: ownerId,
+          type: "possible_match",
+          title: "Possible match found",
+          message: `A newly reported found item may match your lost item "${foundItem.title}".`,
+          link,
         });
       }
     }
@@ -355,12 +357,12 @@ export async function runMatchingForLostItem(lostItemId: string): Promise<Action
     // One notification per run (not one per match), only when new matches were
     // actually created. `notify_user_once` re-checks duplicates at the DB level.
     if (newMatches.length > 0) {
-      await supabase.rpc("notify_user_once", {
-        p_user_id: lostItem.reporter_id,
-        p_type: "possible_match",
-        p_title: "Possible match found",
-        p_message: `We found ${newMatches.length} possible match${newMatches.length > 1 ? "es" : ""} for your lost item "${lostItem.title}".`,
-        p_link: `/lost/${lostItemId}`,
+      await notifyUserOnce({
+        userId: lostItem.reporter_id,
+        type: "possible_match",
+        title: "Possible match found",
+        message: `We found ${newMatches.length} possible match${newMatches.length > 1 ? "es" : ""} for your lost item "${lostItem.title}".`,
+        link: `/lost/${lostItemId}`,
       });
     }
   }

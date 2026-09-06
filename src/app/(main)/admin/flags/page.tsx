@@ -67,22 +67,18 @@ export default async function AdminFlagsPage() {
     (userFlags?.filter((f) => f.status === "pending").length ?? 0);
 
   return (
-    <div className="py-16 lg:py-24">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <span className="section-eyebrow">Community reports</span>
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-900">Report Flags</h1>
-          </div>
-          <Link href="/admin" className="btn-ghost">
-            Back
-          </Link>
-        </div>
+    <div>
+      <div className="mb-5">
+        <h1 className="font-display text-xl font-semibold tracking-tight text-navy-900">Flagged Content</h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Review reports filed by the community against listings and user behavior.
+        </p>
+      </div>
 
-        <div className="mt-4 flex gap-2">
-          <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-medium text-red-700 ring-1 ring-red-200">
-            {pendingCount} pending
-          </span>
+      <div className="flex gap-2">
+        <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-medium text-red-700 ring-1 ring-red-200">
+          {pendingCount} pending
+        </span>
           <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-200">
             {flags?.filter((f) => f.status === "under_review").length ?? 0} listings under review
           </span>
@@ -255,7 +251,6 @@ export default async function AdminFlagsPage() {
             })}
           </div>
         )}
-      </div>
     </div>
   );
 }

@@ -11,8 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function SettingsPage() {
   return (
     <div className="max-w-2xl">
-      <span className="section-eyebrow">Your account</span>
-      <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy-900">
+      <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-900 sm:text-3xl">
         Settings
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
