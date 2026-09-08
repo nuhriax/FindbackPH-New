@@ -105,10 +105,12 @@ const sections: LegalSection[] = [
   {
     id: "choices",
     number: "07",
-    title: "Your choices",
+    title: "Your choices & your rights (Philippine Data Privacy Act)",
     blocks: [
       { type: "p", text: "You can edit or delete your reports where those features are available. You can also manage notification preferences through the settings provided by the service." },
-      { type: "p", text: "Depending on applicable law, you may request access, correction, updating, or deletion of certain personal information." },
+      { type: "p", text: "You may permanently delete your account yourself at any time through Dashboard → Settings → Delete account. Deleting your account removes your profile, reports, and uploaded photos and videos from our systems." },
+      { type: "p", text: "Under the Philippine Data Privacy Act (Republic Act No. 10173), you have the right to be informed, to access and correct your personal information, to have it erased, to object to its processing, to data portability, and to be compensated for damages. To exercise any of these rights, contact us through our contact page or email us at Findbackph.support@gmail.com." },
+      { type: "p", text: "If you believe your rights under the Data Privacy Act have been violated, you may file a complaint with the National Privacy Commission (privacy.gov.ph)." },
     ],
   },
   {

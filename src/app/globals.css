@@ -259,6 +259,14 @@
       text-navy-900 shadow-sm transition-all focus:border-electric-400 focus:ring-4 focus:ring-electric-500/10;
   }
 
+  /* Visible dropdown chevron — appearance-none strips the native arrow, so
+     paint a matching slate chevron into the reserved pr-9 space. */
+  .select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+  }
+
   /* Native <select> popups inherit color-scheme from the page; in the dark
      ink theme they'd render as near-invisible dark-on-dark options inside
      the white modal. Force the light picker everywhere a styled input lives. */
@@ -2786,4 +2794,450 @@ p {
 }
 .site-ink .chat-thread-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(96, 165, 250, 0.38);
+}
+/* ===========================================================================
+   LOST-REPORT WIZARD (steps 1–2) — theme-adaptive panel.
+   Light mode: the standard white `.card`. Dark ("site-ink") mode: the deep
+   teal gradient panel. The JSX is light-first; this block restores the
+   original ink look when the panel carries the `.report-panel-dark` class.
+   =========================================================================== */
+.site-ink .report-panel-dark {
+  background-image: linear-gradient(to bottom, #0d423c, #062622);
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px -28px rgba(4, 32, 28, 0.7);
+}
+.site-ink .report-panel-dark label {
+  color: #ffffff;
+}
+.site-ink .report-panel-dark input,
+.site-ink .report-panel-dark textarea {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.site-ink .report-panel-dark input[type="checkbox"] {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.4);
+  color: inherit;
+}
+.site-ink .report-panel-dark input[type="date"] {
+  color-scheme: dark;
+}
+.site-ink .report-panel-dark ::placeholder {
+  color: rgba(204, 251, 241, 0.4);
+  opacity: 1;
+}
+.site-ink .report-panel-dark .report-help {
+  color: rgba(204, 251, 241, 0.7);
+}
+.site-ink .report-panel-dark .report-faint {
+  color: rgba(204, 251, 241, 0.55);
+}
+.site-ink .report-panel-dark .report-field-icon {
+  color: rgba(153, 246, 228, 0.7);
+}
+.site-ink .report-panel-dark .report-clear-pin {
+  background-color: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.4);
+  color: #99f6e4;
+}
+.site-ink .report-panel-dark .report-clear-pin:hover {
+  background-color: rgba(45, 212, 191, 0.2);
+}
+.site-ink .report-panel-dark .report-chip {
+  background-color: rgba(45, 212, 191, 0.15);
+  color: #99f6e4;
+}
+.site-ink .report-panel-dark .report-map-placeholder {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(204, 251, 241, 0.5);
+}
+
+/* CategoryDropdown inside the ink panel → dark glass styling. */
+.site-ink .report-panel-dark .category-dropdown-trigger {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.site-ink .report-panel-dark .category-dropdown-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+.site-ink .report-panel-dark .category-listbox {
+  background-color: #0d3a35;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.65);
+}
+.site-ink .report-panel-dark .category-listbox li {
+  background-color: transparent;
+  color: rgba(240, 253, 250, 0.9);
+}
+.site-ink .report-panel-dark .category-listbox li[data-active] {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+.site-ink .report-panel-dark .category-listbox li[aria-selected="true"] {
+  background-color: rgba(45, 212, 191, 0.25);
+  color: #ffffff;
+}
+.site-ink .report-panel-dark .category-listbox li[aria-selected="true"] .report-field-icon,
+.site-ink .report-panel-dark .category-listbox li svg {
+  color: rgba(153, 246, 228, 0.6);
+}
+.site-ink .report-panel-dark .category-listbox li[aria-selected="true"] svg {
+  color: #5eead4;
+}
+
+/* City / Province native selects inside the ink panel → dark glass styling.
+   The option popups stay light (color-scheme: light) so they remain readable
+   on every OS, matching the site-ink .input convention. */
+.site-ink .report-panel-dark select {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.site-ink .report-panel-dark select:disabled {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(204, 251, 241, 0.4);
+}
+
+/* ===========================================================================
+   REPORT-STEPS INDICATOR — keep step labels readable in both themes.
+   In light mode they inherit text-slate-400/600; in dark mode (site-ink) the
+   generic remap turns them light enough — but the accent-colored active label
+   + the empty connector render as faint dark text on the deep teal canvas
+   and disappear. Force explicit values here so both themes look correct.
+   =========================================================================== */
+.report-step-label {
+  color: #334155; /* slate-700, default done — strong enough on white */
+}
+.report-step-label-done {
+  color: #334155; /* slate-700, done */
+}
+.report-step-label-upcoming {
+  color: #64748b; /* slate-500, upcoming */
+}
+.report-step-caption {
+  color: #64748b;
+}
+
+.site-ink .report-step-label,
+.site-ink .report-step-label-done {
+  color: rgba(204, 251, 241, 0.78);
+}
+.site-ink .report-step-label-upcoming,
+.site-ink .report-step-caption {
+  color: rgba(204, 251, 241, 0.5);
+}
+
+/* Active step accent colors look washed-out on dark teal — bump them to
+   the brighter teal-300/emerald-300 equivalents so the ring + text pop. */
+.site-ink .text-teal-700 {
+  color: #5eead4 !important;
+}
+.site-ink .text-emerald-700 {
+  color: #6ee7b7 !important;
+}
+
+/* Empty (inactive) connector segment in dark mode — slate-200 disappears on
+   the teal canvas. Re-theme to a faint ink tone. */
+.site-ink .report-steps-connector {
+  background-color: rgba(204, 251, 241, 0.15) !important;
+}
+
+/* ===========================================================================
+   REPORT WIZARD — nested subsection cards.
+   The active step uses `.report-panel-dark` (teal gradient). Inside it, our
+   FieldGroup/WhereSection/WhenSection cards use `bg-white/70` + slate borders.
+   In site-ink mode the white surface already remaps to dark glass, but the
+   border stays too dark to read. Lift the borders + give the cards a faint
+   teal-tinted glass surface so they sit on the gradient panel cleanly.
+   =========================================================================== */
+.site-ink .report-panel-dark .report-subcard {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(153, 246, 228, 0.18);
+}
+.site-ink .report-panel-dark .report-subcard-header {
+  color: rgba(153, 246, 228, 0.85);
+}
+
+/* ===========================================================================
+   WIZARD HEADER — eyebrow + trust strip.
+   Light: white pill with slate-500 text. Dark: keep the pill but make the
+   surface + border + text theme-appropriate.
+   =========================================================================== */
+.site-ink .eyebrow,
+.site-ink .report-trust-strip {
+  background-color: rgba(17, 51, 49, 0.7);
+  border-color: rgba(153, 246, 228, 0.25);
+  color: rgba(204, 251, 241, 0.85);
+}
+
+/* ===========================================================================
+   WIZARD NAV — sticky bottom bar.
+   =========================================================================== */
+.site-ink .report-wizard-nav {
+  background-color: rgba(17, 51, 49, 0.92);
+  border-color: rgba(153, 246, 228, 0.2);
+}
+
+/* ===========================================================================
+   REVIEW list — Public card + Privacy check + final confirmation card.
+   Same nested-card treatment as the subcards above.
+   =========================================================================== */
+.site-ink .report-panel-dark .report-review-card,
+.site-ink .report-panel-dark .report-review-row,
+.site-ink .report-panel-dark .report-privacy-check,
+.site-ink .report-panel-dark .report-confirm-card {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(153, 246, 228, 0.18);
+}
+.site-ink .report-panel-dark .report-review-row {
+  border-color: rgba(153, 246, 228, 0.12);
+}
+
+/* Eyebrow / section labels inside the dark panel. */
+.site-ink .report-panel-dark .report-eyebrow {
+  color: rgba(153, 246, 228, 0.85);
+}
+
+/* The Photo tip card (amber) — re-theme as a teal-tinted tip in dark mode. */
+.site-ink .report-panel-dark .report-photo-tip {
+  background-color: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.32);
+  color: rgba(204, 251, 241, 0.85);
+}
+.site-ink .report-panel-dark .report-photo-tip-icon {
+  color: #5eead4;
+}
+
+/* Reward chip "active" state — light uses teal-50, dark needs a stronger fill. */
+.site-ink .report-reward-chip-active {
+  border-color: rgba(45, 212, 191, 0.55) !important;
+  background-color: rgba(45, 212, 191, 0.18) !important;
+  color: #99f6e4 !important;
+}
+
+/* ===========================================================================
+   WIZARD ANIMATIONS & TRANSITIONS
+   =========================================================================== */
+
+/* Smooth fade-in for step transitions */
+@keyframes wizard-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wizard-step-enter {
+  animation: wizard-fade-in 0.4s ease-out forwards;
+}
+
+/* Button press effect */
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Card hover lift effect */
+.report-subcard,
+.report-review-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-subcard:hover,
+.report-review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.1);
+}
+
+/* Photo upload zone animation */
+.photo-upload-zone {
+  transition: all 0.3s ease;
+}
+
+.photo-upload-zone.drag-active {
+  border-color: #0d9488;
+  background-color: rgba(13, 148, 136, 0.05);
+  transform: scale(1.01);
+}
+
+/* Success animation */
+@keyframes success-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.success-icon {
+  animation: success-pulse 2s ease-in-out infinite;
+}
+
+/* Gradient animation for success title */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.05) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+.site-ink .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+}
+
+
+/* ===========================================================================
+   REPORT WIZARD — dark-mode re-tints (report lost / report found).
+   The wizard's note cards use light pastel gradients (from-blue-50,
+   from-emerald-50, ...) and deep accent text (text-teal-900, text-teal-800,
+   text-blue-700, ...) that the generic retints above miss — gradients paint
+   as background-image, and the deep accent shades were never remapped. That
+   produced light-on-light cards ("Report quality", "Private verification
+   detail") and dark-on-dark chips (the active "When & where" step).
+   Light mode is untouched — everything here is scoped to .site-ink.
+   =========================================================================== */
+
+/* 1) Pastel gradient note cards → solid dark ink beds. The gradient stops
+      only appear on the big note/notice cards, never on small accents. */
+.site-ink .from-blue-50,
+.site-ink .from-emerald-50,
+.site-ink .from-teal-50,
+.site-ink .from-amber-50 {
+  background-image: none;
+  background-color: rgba(14, 49, 47, 0.95);
+}
+
+/* 2) Faint pastel washes the exact-match .bg-teal-50 rule misses. */
+.site-ink .bg-teal-50\/70,
+.site-ink .bg-teal-50\/60,
+.site-ink .bg-teal-50\/50,
+.site-ink .bg-emerald-50\/70,
+.site-ink .bg-emerald-50\/60,
+.site-ink .bg-emerald-50\/50,
+.site-ink .bg-blue-50\/70,
+.site-ink .bg-blue-50\/60,
+.site-ink .bg-blue-50\/50,
+.site-ink .bg-amber-50\/70,
+.site-ink .bg-amber-50\/60,
+.site-ink .bg-amber-50\/50 {
+  background-color: rgba(14, 49, 47, 0.95);
+}
+
+/* 3) Tinted icon chips / step circles (bg-blue-100, bg-slate-100, ...) →
+      translucent white over the ink bed so the numerals & glyphs read. */
+.site-ink .bg-blue-100,
+.site-ink .bg-emerald-100,
+.site-ink .bg-teal-100,
+.site-ink .bg-amber-100,
+.site-ink .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 4) Pastel borders → faint white hairlines. */
+.site-ink .border-blue-200,
+.site-ink .border-emerald-200,
+.site-ink .border-teal-200,
+.site-ink .border-amber-200 {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* 5) Deep accent text → light tints (the dark-on-dark / light-on-light fixes). */
+.site-ink .text-teal-900,
+.site-ink .text-teal-800 {
+  color: #99f6e4;
+}
+.site-ink .text-teal-700,
+.site-ink .text-teal-600 {
+  color: #5eead4;
+}
+.site-ink .text-emerald-900,
+.site-ink .text-emerald-800 {
+  color: #a7f3d0;
+}
+.site-ink .text-emerald-700 {
+  color: #6ee7b7;
+}
+.site-ink .text-blue-900,
+.site-ink .text-blue-800,
+.site-ink .text-blue-700 {
+  color: #93c5fd;
+}
+.site-ink .text-amber-900,
+.site-ink .text-amber-800,
+.site-ink .text-amber-700 {
+  color: #fcd34d;
+}
+
+/* 6) Wizard-scoped chrome: the "Your report" sidebar card, its step circles,
+      hover washes, hairline dividers, and the form fields' dark glass. */
+.site-ink .report-wizard .border-slate-200,
+.site-ink .report-wizard .border-slate-200\/80,
+.site-ink .report-wizard .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.site-ink .report-wizard .hover\:bg-slate-50:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+.site-ink .report-wizard input,
+.site-ink .report-wizard textarea {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #eef6f4;
+}
+.site-ink .report-wizard input::placeholder,
+.site-ink .report-wizard textarea::placeholder {
+  color: rgba(238, 246, 244, 0.55);
+}
+
+/* 7) Remaining light-only surfaces: faint slate washes (photo dropzone idle,
+      review-list rows) and slate-300 borders (step swatches, mobile
+      indicator dots) that the rules above don't match. */
+.site-ink .report-wizard .bg-slate-50,
+.site-ink .report-wizard .bg-slate-50\/50 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.site-ink .report-wizard .border-slate-300 {
+  border-color: rgba(255, 255, 255, 0.22);
 }

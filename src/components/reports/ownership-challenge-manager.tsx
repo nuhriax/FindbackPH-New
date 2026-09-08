@@ -6,6 +6,11 @@ import {
   deleteOwnershipChallengeAction,
   saveOwnershipChallengeAction,
 } from "@/lib/actions/ownership";
+import {
+  OWNERSHIP_HINTS,
+  OWNERSHIP_QUESTION_EXAMPLES,
+} from "@/lib/category-examples";
+import type { ItemCategory } from "@/types/database";
 
 /**
  * Owner-side control for the private ownership challenge (Phase 7).
@@ -19,11 +24,14 @@ export function OwnershipChallengeManager({
   itemId,
   initialQuestion1 = "",
   initialQuestion2 = "",
+  category,
 }: {
   itemType: "lost_item" | "found_item";
   itemId: string;
   initialQuestion1?: string;
   initialQuestion2?: string;
+  /** Item category — powers the category-aware example question & hints. */
+  category?: ItemCategory | string | null;
 }) {
   const [open, setOpen] = useState(false);
   const [q1, setQ1] = useState(initialQuestion1);
@@ -33,6 +41,15 @@ export function OwnershipChallengeManager({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Category-aware examples: fall back to the generic "hidden detail" phrasing
+  // whenever the category is unknown (e.g. older reports before the field).
+  const suggestedQuestion =
+    (category && OWNERSHIP_QUESTION_EXAMPLES[category as ItemCategory]) ||
+    OWNERSHIP_QUESTION_EXAMPLES.other;
+  const categoryHint =
+    (category && OWNERSHIP_HINTS[category as ItemCategory]) ||
+    OWNERSHIP_HINTS.other;
 
   function save() {
     setError(null);
@@ -84,16 +101,35 @@ export function OwnershipChallengeManager({
       </div>
 
       <ul className="mt-2 space-y-1 text-xs leading-5 text-slate-500">
-        <li>• Ask something only the true owner knows (wallpaper, case, sticker, contents…).</li>
+        <li>• Ask something only the true owner knows {categoryHint}</li>
         <li>• Answers are hashed before storage and can never be read back — not even by you.</li>
         <li>• Claimants get 5 attempts; results are pass/fail only.</li>
       </ul>
+
+      {/* Category-aware quick-fill: one tap inserts a strong question pattern
+          for this item's category instead of leaving a blank text field. */}
+      {suggestedQuestion && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-medium text-slate-400">Try:</span>
+          <button
+            type="button"
+            onClick={() => {
+              if (!q1.trim()) setQ1(suggestedQuestion);
+              else if (!q2.trim()) setQ2(suggestedQuestion);
+              else setQ1(suggestedQuestion);
+            }}
+            className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+          >
+            {suggestedQuestion}
+          </button>
+        </div>
+      )}
 
       <div className="mt-3 space-y-3">
         <input
           value={q1}
           onChange={(e) => setQ1(e.target.value)}
-          placeholder="Question 1 (e.g. What wallpaper is on the phone?)"
+          placeholder={`Question 1 (e.g. ${suggestedQuestion})`}
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
         />
         <input

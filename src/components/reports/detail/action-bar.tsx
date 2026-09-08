@@ -90,6 +90,9 @@ export function ActionCard({
             savedItemId={savedItemId}
             isOwner={isOwner}
           />
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+            Stay safe: verify a private detail first, keep communication in FindBack, meet in a public place, and never send an OTP, ID photo, or payment in advance.
+          </p>
         </div>
       ) : item.status !== "recovered" ? (
         <ReportEditToggle
@@ -99,6 +102,7 @@ export function ActionCard({
             id: item.id,
             title: item.title,
             category: item.category,
+            color: item.color,
             description: item.description ?? "",
             distinguishingFeatures: item.distinguishingFeatures,
             city: item.city ?? "",

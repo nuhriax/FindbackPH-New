@@ -7,13 +7,27 @@ const SENSITIVE_CATEGORIES = new Set(["ids", "documents"]);
 
 /**
  * Contextual privacy hint for sensitive report categories (IDs, documents).
- * Watches the category <select> and shows a calm reminder only when a
- * sensitive category is chosen — progressive disclosure, no permanent banner.
+ * Shows a calm reminder only when a sensitive category is chosen —
+ * progressive disclosure, no permanent banner.
+ *
+ * Pass either `category` (controlled value, e.g. from CategoryDropdown)
+ * or `selectId` (id of a native <select> to watch via DOM events).
  */
-export function SensitiveCategoryHint({ selectId }: { selectId: string }) {
+export function SensitiveCategoryHint({
+  category,
+  selectId,
+}: {
+  category?: string;
+  selectId?: string;
+}) {
   const [sensitive, setSensitive] = useState(false);
 
   useEffect(() => {
+    if (category !== undefined) {
+      setSensitive(SENSITIVE_CATEGORIES.has(category));
+      return;
+    }
+    if (!selectId) return;
     const select = document.getElementById(selectId) as HTMLSelectElement | null;
     if (!select) return;
 
@@ -21,7 +35,7 @@ export function SensitiveCategoryHint({ selectId }: { selectId: string }) {
     update();
     select.addEventListener("change", update);
     return () => select.removeEventListener("change", update);
-  }, [selectId]);
+  }, [category, selectId]);
 
   if (!sensitive) return null;
 

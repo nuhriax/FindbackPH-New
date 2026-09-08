@@ -1,6 +1,7 @@
 "use client";
 
 import { computePhotoHash } from "@/lib/phash-client";
+import { compressImages, compressImageFile } from "@/lib/image-compress";
 
 /**
  * Client-side helpers for uploading files (report photos / profile photo).
@@ -14,9 +15,11 @@ import { computePhotoHash } from "@/lib/phash-client";
  * Uploads one or more report photos. Returns an error string on failure,
  * otherwise null on success.
  *
- * Before uploading, a perceptual hash (pHash) is computed for every photo in
- * the browser. Hashes are stored alongside the image rows so the matching
- * engine can compare lost vs. found photos without re-downloading images.
+ * Before uploading, each photo is downsized/re-encoded in the browser (see
+ * image-compress.ts) and a perceptual hash (pHash) is computed from the
+ * compressed image in parallel. Hashes are stored alongside the image rows so
+ * the matching engine can compare lost vs. found photos without re-downloading
+ * images.
  */
 export async function uploadItemImagesClient(
   itemType: "lost_item" | "found_item",
@@ -27,8 +30,11 @@ export async function uploadItemImagesClient(
   formData.set("itemType", itemType);
   formData.set("itemId", itemId);
 
-  const hashes = await Promise.all(files.map((file) => computePhotoHash(file)));
-  for (const file of files) formData.append("images", file);
+  // Compress first (smaller, faster uploads), then hash the compressed files
+  // in parallel — a pHash of the downsized image is equally perceptual.
+  const compressed = await compressImages(files);
+  const hashes = await Promise.all(compressed.map((file) => computePhotoHash(file)));
+  for (const file of compressed) formData.append("images", file);
   formData.set("phashes", JSON.stringify(hashes));
 
   try {
@@ -50,8 +56,10 @@ export async function uploadItemImagesClient(
 export async function uploadAvatarClient(
   file: File
 ): Promise<{ avatarUrl?: string; error?: string }> {
+  // Avatars display small — compress to shrink storage use and upload time.
+  const compressed = await compressImageFile(file);
   const formData = new FormData();
-  formData.set("avatar", file);
+  formData.set("avatar", compressed);
 
   try {
     const res = await fetch("/api/avatars", { method: "POST", body: formData });

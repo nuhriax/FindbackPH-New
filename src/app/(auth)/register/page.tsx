@@ -10,6 +10,7 @@ import { AuthField } from "@/components/auth/form-field";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { SubmitButton, type SubmitStatus } from "@/components/auth/submit-button";
 import { SocialAuthButtons } from "@/components/auth/social-auth";
+import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
@@ -19,6 +20,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const timerRef = useRef<number | null>(null);
   const submittingRef = useRef(false);
+  const turnstileTokenRef = useRef<string | null>(null);
+  const turnstileResetRef = useRef<(() => void) | null>(null);
   const [, startTransition] = useTransition();
   const router = useRouter();
 
@@ -48,6 +51,11 @@ export default function RegisterPage() {
     submittingRef.current = true;
     setError(null);
     setStatus("loading");
+    // Attach the Turnstile token (null when Turnstile isn't configured — the
+    // server side is env-gated and no-ops in that case).
+    if (turnstileTokenRef.current) {
+      formData.set("turnstileToken", turnstileTokenRef.current);
+    }
     startTransition(async () => {
       const result = await registerAction(formData);
       if (result?.error) {
@@ -55,6 +63,9 @@ export default function RegisterPage() {
         setError(result.error);
         setStatus("idle");
         setShake(true);
+        // A spent Turnstile token cannot be reused — reset for the retry.
+        turnstileTokenRef.current = null;
+        turnstileResetRef.current?.();
         if (timerRef.current) window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => setShake(false), 550);
       } else {
@@ -128,6 +139,21 @@ export default function RegisterPage() {
           type="password"
           icon={Lock}
           autoComplete="new-password"
+        />
+
+        <TurnstileWidget
+          onVerify={(token) => {
+            turnstileTokenRef.current = token;
+          }}
+          onError={() => {
+            turnstileTokenRef.current = null;
+          }}
+          onExpire={() => {
+            turnstileTokenRef.current = null;
+          }}
+          resetRef={(reset) => {
+            turnstileResetRef.current = reset;
+          }}
         />
 
         {error && (

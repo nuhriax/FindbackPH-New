@@ -382,6 +382,7 @@ export default async function LostItemDetailPage({ params }: Props) {
     id,
     title: raw.title,
     category: raw.category,
+    color: raw.color ?? null,
     description: raw.description,
     distinguishingFeatures: privateFeatures,
     city: raw.city ?? null,
@@ -394,6 +395,7 @@ export default async function LostItemDetailPage({ params }: Props) {
       : "recently",
     reward: raw.reward_amount ?? null,
     dateOccurred: raw.date_lost ?? null,
+    timeWindow: raw.time_window ?? null,
     reporterId: raw.reporter_id,
     viewCount: raw.view_count ?? null,
   };

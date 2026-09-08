@@ -32,10 +32,10 @@ export function ReportStepsIndicator({
           line: "#209b68",
         }
       : {
-          doneDot: "bg-red-500",
-          activeRing: "border-red-500 text-red-700",
-          activeText: "text-red-700",
-          line: "#dc2626",
+          doneDot: "bg-teal-500",
+          activeRing: "border-teal-500 text-teal-700",
+          activeText: "text-teal-700",
+          line: "#0d9488",
         };
 
   return (
@@ -67,7 +67,7 @@ export function ReportStepsIndicator({
                   // inline color) so the site-ink dark theme can re-theme it.
                   className={
                     (isDone ? "opacity-60 " : "bg-slate-200 ") +
-                    "absolute left-[-50%] top-[7px] -z-10 h-[2px] w-full rounded-full sm:top-[9px]"
+                    "report-steps-connector absolute left-[-50%] top-[7px] -z-10 h-[2px] w-full rounded-full sm:top-[9px]"
                   }
                 />
               )}
@@ -101,12 +101,12 @@ export function ReportStepsIndicator({
               </span>
 
               <span
-                className={`mt-2 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.14em] transition-colors duration-300 sm:text-[10px] ${
+                className={`mt-2 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.14em] transition-colors duration-300 sm:text-[10px] report-step-label ${
                   isActive
                     ? colors.activeText
                     : isDone
-                      ? "text-slate-600"
-                      : "text-slate-400"
+                      ? "report-step-label-done"
+                      : "report-step-label-upcoming"
                 }`}
               >
                 {label}
@@ -116,7 +116,7 @@ export function ReportStepsIndicator({
         })}
       </ol>
 
-      <p className="mt-3 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">
+      <p className="report-step-caption mt-3 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">
         {caption}
       </p>
     </div>

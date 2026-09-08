@@ -3,11 +3,18 @@
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { loginSchema, registerSchema, normalizeEmail } from "@/lib/validation";
 import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
+import { verifyTurnstileAction } from "@/lib/actions/turnstile";
 import { redirect } from "next/navigation";
 
 export type ActionResult = { error?: string; ok?: true; autoSignIn?: boolean };
 
 export async function registerAction(formData: FormData): Promise<ActionResult> {
+  // Bot protection (env-gated: no-ops until TURNSTILE keys are configured).
+  const turnstile = await verifyTurnstileAction(formData.get("turnstileToken"));
+  if (!turnstile.ok) {
+    return { error: "Please complete the security challenge and try again." };
+  }
+
   const rl = await consumeRateLimit("register", 5, 15 * 60 * 1000);
   if (!rl.ok) return { error: RATE_LIMIT_MESSAGE };
 

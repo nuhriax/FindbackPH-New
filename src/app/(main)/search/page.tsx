@@ -95,8 +95,9 @@ function buildMapPoints(
     points.push({
       id: `${kind}-${item.id}`,
       kind,
-      lat: coords[0],
-      lng: coords[1],
+      // Public maps show a roughly 1 km area, not the reporter's exact pin.
+      lat: Math.round(coords[0] * 100) / 100,
+      lng: Math.round(coords[1] * 100) / 100,
       title: item.title,
       city: item.city,
       province: item.province,

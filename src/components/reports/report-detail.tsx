@@ -152,6 +152,12 @@ export function ReportDetail({
   const occurredDate = occurredIso
     ? format(new Date(occurredIso), "MMM d, yyyy")
     : item.dateLabel;
+  const needsCheckIn = Boolean(
+    isOwner &&
+      item.status === "active" &&
+      item.createdAt &&
+      Date.now() - new Date(item.createdAt).getTime() > 30 * 24 * 60 * 60 * 1000,
+  );
 
   /* ---------------- LEDE ---------------- */
 
@@ -197,11 +203,17 @@ export function ReportDetail({
 
   /* ---------------- STATUS STEPPER ---------------- */
 
+  /* Steps fill in ORDER — a step can only be done when every step before it
+     is done. Returned implies the matching stage was passed (or skipped),
+     so Matching is always complete once the item is recovered. */
+  const returned = item.status === "recovered";
+  const matched = matches.length > 0 || returned;
+
   const steps = [
     { label: isLost ? "Lost" : "Found", done: true },
     { label: "Posted", done: true },
-    { label: "Matching", done: matches.length > 0 },
-    { label: "Returned", done: item.status === "recovered" },
+    { label: "Matching", done: matched },
+    { label: "Returned", done: returned },
   ];
 
   /* The furthest completed step is the report's current state. */
@@ -425,15 +437,17 @@ export function ReportDetail({
                   </p>
 
                   <p
-                    className="mt-1 truncate text-[15px] font-bold leading-6 text-slate-900"
+                    className="mt-1 break-words text-[15px] font-bold leading-6 text-slate-900"
                     title={location}
                   >
                     {location}
                   </p>
 
-                  <p className="mt-0.5 truncate text-[11px] leading-4 text-slate-500">
-                    {cityProvince ?? "Not specified"}
-                  </p>
+                  {cityProvince && cityProvince !== location && (
+                    <p className="mt-0.5 break-words text-[11px] leading-4 text-slate-500">
+                      {cityProvince}
+                    </p>
+                  )}
                 </div>
 
                 <div className="min-w-0 px-3 sm:px-4">
@@ -692,6 +706,7 @@ export function ReportDetail({
                     id: item.id,
                     title: item.title,
                     category: item.category,
+                    color: item.color,
                     description: item.description ?? "",
                     distinguishingFeatures: item.distinguishingFeatures,
                     city: item.city ?? "",
@@ -791,6 +806,13 @@ export function ReportDetail({
           />
         )}
 
+        {needsCheckIn && (
+          <section className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:px-7" aria-label="Report check-in">
+            <p className="text-sm font-semibold text-amber-950">Is this report still active?</p>
+            <p className="mt-1 text-xs leading-5 text-amber-900">This report is over 30 days old. Please update its details, archive it if it is no longer relevant, or mark it returned to keep search results trustworthy.</p>
+          </section>
+        )}
+
         {/* Owner protection — challenge manager */}
         {ownership && isOwner && (
           <section className="mt-6 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-soft">
@@ -804,6 +826,7 @@ export function ReportDetail({
                 itemId={ownership.itemId}
                 initialQuestion1={ownership.questions?.question1 ?? ""}
                 initialQuestion2={ownership.questions?.question2 ?? ""}
+                category={item.category}
               />
             </div>
           </section>

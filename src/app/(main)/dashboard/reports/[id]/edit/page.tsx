@@ -70,6 +70,7 @@ export default async function EditReportPage({
     id: reportId,
     title: item.title,
     category: item.category,
+    color: item.color ?? null,
     description: item.description,
     distinguishingFeatures: privateRow?.details ?? null,
     city: item.city ?? "",

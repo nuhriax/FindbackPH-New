@@ -1,6 +1,7 @@
-import { Banknote, Calendar, Lock, MapPin, Smartphone } from "lucide-react";
+import { Banknote, Calendar, Clock3, Lock, MapPin, Palette, Smartphone } from "lucide-react";
 
 import type { DetailItem } from "../report-detail-types";
+import { COLORS, COLOR_LABELS } from "@/lib/validation";
 
 /* ============================================================
    KEY FACTS — compact location · date · reward chips under the
@@ -32,6 +33,31 @@ export function FactsRow({
           value={item.title}
           title={item.title}
         />
+
+        {item.timeWindow && (
+          <MetricTile
+            icon={<Clock3 size={13} className="shrink-0 text-violet-600" />}
+            label="Approx. time"
+            value={item.timeWindow}
+            title={item.timeWindow}
+          />
+        )}
+        {item.color && (
+          <MetricTile
+            icon={<Palette size={13} className="shrink-0 text-slate-500" />}
+            label="Color"
+            value={
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="inline-block h-3.5 w-3.5 rounded-full border border-slate-300"
+                  style={{ backgroundColor: COLORS.find((c) => c.value === item.color)?.hex }}
+                  aria-hidden="true"
+                />
+                {COLOR_LABELS[item.color as keyof typeof COLOR_LABELS] ?? item.color}
+              </span>
+            }
+          />
+        )}
         <MetricTile
           icon={<MapPin size={13} className="shrink-0 text-sky-600" />}
           label="Location"

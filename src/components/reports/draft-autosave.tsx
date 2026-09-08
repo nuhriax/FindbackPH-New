@@ -11,7 +11,7 @@ import { useEffect } from "react";
  * steps of typing to a phone-browser reload is the #1 wizard abandonment
  * cause, so this quietly has the user's back.
  *
- * Files are intentionally NOT persisted — only text/select values.
+ * Files are intentionally NOT persisted - only text/select values.
  */
 export function DraftAutoSave({
   formId,
@@ -20,7 +20,7 @@ export function DraftAutoSave({
 }: {
   formId: string;
   storageKey: string;
-  /** false once the report is submitted — clears the stored draft. */
+  /** false once the report is submitted - clears the stored draft. */
   active: boolean;
 }) {
   // Restore on mount (only fills empty fields so it never clobbers defaults).
@@ -34,42 +34,55 @@ export function DraftAutoSave({
       if (!(form instanceof HTMLFormElement)) return;
       for (const el of Array.from(form.elements)) {
         const field = el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-        if (!field.name || field.type === "file" || field.type === "hidden") continue;
+        if (!field.name || field.type === "file") continue;
         const value = draft[field.name];
-        if (typeof value === "string" && value && !field.value) {
+        if (typeof value === "string" && !field.value) {
           field.value = value;
         }
       }
     } catch {
-      /* corrupted draft — ignore */
+      /* corrupted draft - ignore */
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [active, storageKey]);
 
-  // Save on input (debounced).
+  // Save on input (debounced write of a synchronous snapshot).
   useEffect(() => {
     if (!active) return;
     const form = document.getElementById(formId);
     if (!(form instanceof HTMLFormElement)) return;
 
     let timer: ReturnType<typeof setTimeout> | undefined;
+    // Capture values SYNCHRONOUSLY in the event handler. Steps unmount as the
+    // user advances, so serializing inside the debounced timer can read an
+    // already-unmounted step - emptying the draft (and the Review snapshot)
+    // whenever the user clicks "Continue" within the debounce window.
+    let pending: string | null = null;
     const onInput = () => {
+      try {
+        const draft: Record<string, string> = {};
+        for (const el of Array.from(form.elements)) {
+          const field = el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+          if (!field.name || field.type === "file") continue;
+          if (field instanceof HTMLInputElement && field.type === "checkbox") {
+            if (field.checked) draft[field.name] = field.value;
+          } else {
+            draft[field.name] = field.value;
+          }
+        }
+        // Merge over the previous snapshot: earlier steps unmount as the user
+        // advances, so a fresh capture only contains the fields still mounted.
+        const prev = pending ? (JSON.parse(pending) as Record<string, string>) : {};
+        pending = JSON.stringify({ ...prev, ...draft });
+      } catch {
+        pending = null;
+      }
       clearTimeout(timer);
       timer = setTimeout(() => {
+        if (pending === null) return;
         try {
-          const draft: Record<string, string> = {};
-          for (const el of Array.from(form.elements)) {
-            const field = el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-            if (!field.name || field.type === "file" || field.type === "hidden") continue;
-            if (field instanceof HTMLInputElement && field.type === "checkbox") {
-              if (field.checked) draft[field.name] = field.value;
-            } else {
-              draft[field.name] = field.value;
-            }
-          }
-          window.localStorage.setItem(storageKey, JSON.stringify(draft));
+          window.localStorage.setItem(storageKey, pending);
         } catch {
-          /* quota or private mode — best effort */
+          /* quota or private mode - best effort */
         }
       }, 400);
     };

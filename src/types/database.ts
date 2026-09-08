@@ -50,11 +50,16 @@ export type LostItem = {
   city: string;
   province: string;
   approximate_location: string | null;
+  time_window: string | null;
   // Optional map-pin coordinates (Philippines-only picker). Nullable for
   // reports created before the map feature or without a pin.
   latitude: number | null;
   longitude: number | null;
   reward_amount: number | null;
+  // Optional primary color (fixed palette, see validation.ts COLORS). Powers
+  // the "Color matched" matching signal + swatch filter. Nullable for reports
+  // created before this feature.
+  color: string | null;
   // Denormalized page-view counter ("👁 N views"), RPC-managed only
   // (supabase/104-item-views.sql). Present after that migration runs.
   view_count?: number | null;
@@ -81,10 +86,13 @@ export type FoundItem = {
   city: string;
   province: string;
   approximate_location: string | null;
+  time_window: string | null;
   // Optional map-pin coordinates (see LostItem).
   latitude: number | null;
   longitude: number | null;
   current_holding_info: string | null;
+  // Optional primary color (see LostItem.color).
+  color: string | null;
   // Denormalized page-view counter, RPC-managed only (see LostItem).
   view_count?: number | null;
   status: ItemStatus | string;

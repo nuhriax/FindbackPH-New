@@ -57,8 +57,28 @@ export async function recordReuniteFeedbackAction(
     if (error.code === "23505") {
       return { ok: false, error: "You already gave feedback for this report" };
     }
-    console.error("Reunite feedback error:", error);
-    return { ok: false, error: "Could not save your feedback. Please try again." };
+    console.error("Reunite feedback error:", error.code, error.message, error);
+    // 42P01 — relation does not exist: the reunite_feedback table was never
+    // created (supabase/101-engagement-alerts.sql not applied to this project).
+    if (error.code === "42P01") {
+      return {
+        ok: false,
+        error:
+          "Feedback storage isn't set up yet. Run supabase/101-engagement-alerts.sql in the Supabase SQL editor, then try again.",
+      };
+    }
+    // 42501 — RLS rejected the insert (session/auth issue).
+    if (error.code === "42501") {
+      return {
+        ok: false,
+        error:
+          "Your session may have expired. Please sign in again and try saving the feedback.",
+      };
+    }
+    return {
+      ok: false,
+      error: `Could not save your feedback (database error ${error.code ?? "unknown"}). Please try again.`,
+    };
   }
 
   return { ok: true };

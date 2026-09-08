@@ -2,14 +2,21 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowRight,
+  BadgeCheck,
+  Briefcase,
+  FileText,
+  GraduationCap,
   HeartHandshake,
   type LucideIcon,
   KeyRound,
   Laptop,
   Lock,
   MapPin,
+  Package,
   PackageSearch,
+  PawPrint,
   Search,
+  Shirt,
   ShieldCheck,
   Smartphone,
   WalletCards,
@@ -189,32 +196,26 @@ function buildRecentCards(
    CATEGORIES
    ============================================================================ */
 
-const categories = [
-  {
-    label: "Phones",
-    value: "phone",
-    icon: Smartphone,
-  },
-  {
-    label: "Wallets",
-    value: "wallet",
-    icon: WalletCards,
-  },
-  {
-    label: "Keys",
-    value: "keys",
-    icon: KeyRound,
-  },
-  {
-    label: "Electronics",
-    value: "electronics",
-    icon: Laptop,
-  },
-  {
-    label: "Jewelry",
-    value: "jewelry",
-    icon: Watch,
-  },
+/**
+ * Full browse grid — ALL categories the platform supports, using the exact
+ * values `searchParamsSchema` validates against (`src/lib/validation.ts`).
+ * The old "popular" chip list linked to invalid singular values
+ * (`phone`, `wallet`, `jewelry`) that the search schema rejected, so those
+ * filters silently did nothing. Every tile here filters correctly.
+ */
+const categories: { label: string; value: string; icon: LucideIcon }[] = [
+  { label: "Phones & Tablets", value: "phones", icon: Smartphone },
+  { label: "Wallets", value: "wallets", icon: WalletCards },
+  { label: "IDs", value: "ids", icon: BadgeCheck },
+  { label: "Bags", value: "bags", icon: Briefcase },
+  { label: "Keys", value: "keys", icon: KeyRound },
+  { label: "Jewelry & Watches", value: "jewelry", icon: Watch },
+  { label: "Electronics", value: "electronics", icon: Laptop },
+  { label: "Documents", value: "documents", icon: FileText },
+  { label: "Clothing", value: "clothing", icon: Shirt },
+  { label: "Pets", value: "pets", icon: PawPrint },
+  { label: "School Items", value: "school_items", icon: GraduationCap },
+  { label: "Other", value: "other", icon: Package },
 ];
 
 /** Popular Philippine search destinations, linked to the search page. */
@@ -412,8 +413,9 @@ export default async function HomePage() {
               Lost something? Found something?
             </h1>
             <p className="mx-auto mt-3 max-w-xl text-base text-slate-600 sm:text-lg">
-              Search reports from people who found items, or post what you lost.
-              Free, private, and built for the Philippines.
+              From phones and wallets to IDs, bags, pets, and documents — search
+              community reports or post your own. Free, private, and built for
+              the Philippines.
             </p>
           </div>
 
@@ -432,23 +434,42 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/report/lost" className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-sunrise-200 bg-sunrise-50 px-5 py-2.5 text-sm font-semibold text-sunrise-700 transition hover:bg-sunrise-100 sm:w-auto">Report Lost Item</Link>
-            <Link href="/report/found" className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:w-auto">Report Found Item</Link>
+            <Link href="/report/lost" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-sunrise-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sunrise-600 sm:w-auto">
+              <PackageSearch size={16} />
+              I lost something
+            </Link>
+            <Link href="/report/found" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 sm:w-auto">
+              <HeartHandshake size={16} />
+              I found something
+            </Link>
           </div>
+        </div>
+      </section>
 
-          <div className="mt-10">
-            <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-slate-500">Popular categories</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <Link key={category.value} href={`/search?category=${encodeURIComponent(category.value)}`} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-electric-200 hover:bg-electric-50 hover:text-electric-700">
-                    <Icon size={13} />
+      {/* BROWSE BY CATEGORY — full 12-category grid, all filters valid */}
+      <section aria-labelledby="browse-categories" className="px-4 pb-12 sm:px-6">
+        <div className="mx-auto max-w-5xl">
+          <p id="browse-categories" className="mb-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500">
+            Browse by category
+          </p>
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+            {categories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <Link
+                  key={category.value}
+                  href={`/search?category=${encodeURIComponent(category.value)}`}
+                  className="group flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-electric-300 hover:shadow-md"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500 transition group-hover:border-electric-200 group-hover:bg-electric-50 group-hover:text-electric-600">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <span className="text-xs font-semibold leading-tight text-navy-900">
                     {category.label}
-                  </Link>
-                );
-              })}
-            </div>
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

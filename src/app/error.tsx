@@ -1,5 +1,7 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 import { ErrorState } from "@/components/ui/error-state";
 
 /**
@@ -18,13 +20,21 @@ export default function RootError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  console.error(
-    "[root] route error:",
-    error.message,
-    error.digest ? `(digest: ${error.digest})` : "",
-    "\n",
-    error.stack
-  );
+  useEffect(() => {
+    console.error(
+      "[root] route error:",
+      error.message,
+      error.digest ? `(digest: ${error.digest})` : "",
+      "\n",
+      error.stack
+    );
+    // Report to Sentry (no-op unless NEXT_PUBLIC_SENTRY_DSN is configured).
+    // The digest is what users see on-screen, so it is attached to correlate
+    // user support requests with the captured stack trace.
+    Sentry.captureException(error, {
+      extra: { digest: error.digest ?? null },
+    });
+  }, [error]);
 
   return (
     <ErrorState

@@ -33,6 +33,7 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
   const raw = {
     title: formData.get("title")?.toString() ?? "",
     category: formData.get("category")?.toString() ?? "",
+    color: formData.get("color")?.toString() || undefined,
     description: formData.get("description")?.toString() ?? "",
     distinguishingFeatures: formData.get("distinguishingFeatures")?.toString() || undefined,
     city: formData.get("city")?.toString() ?? "",
@@ -56,6 +57,7 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
     ? {
         title: d.title,
         category: d.category,
+        color: d.color ?? null,
         description: d.description,
         date_lost: d.dateLost,
         city: d.city,
@@ -66,6 +68,7 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
     : {
         title: d.title,
         category: d.category,
+        color: d.color ?? null,
         description: d.description,
         date_found: d.dateFound,
         city: d.city,

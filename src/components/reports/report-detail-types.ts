@@ -4,6 +4,7 @@ export type DetailItem = {
   id: string;
   title: string;
   category: string;
+  color: string | null;
   description: string;
   distinguishingFeatures: string | null;
   city: string | null;
@@ -15,6 +16,8 @@ export type DetailItem = {
   reward: number | null;
   /** Raw date (YYYY-MM-DD…) used to prefill the inline edit form. */
   dateOccurred?: string | null;
+  /** Optional approximate time supplied by the reporter. */
+  timeWindow?: string | null;
   /** Found items only — where the item is currently being kept. */
   holdingInfo?: string | null;
   /** Phase 12 — enables "Report this user" against the listing's reporter. */

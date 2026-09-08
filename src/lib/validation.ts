@@ -6,19 +6,45 @@ export const CATEGORIES = [
 ] as const;
 
 export const CATEGORY_LABELS: Record<(typeof CATEGORIES)[number], string> = {
-  phones: "Phones",
+  phones: "Phones & Tablets",
   wallets: "Wallets",
   ids: "IDs",
-  bags: "Bags",
+  bags: "Bags & Backpacks",
   keys: "Keys",
-  jewelry: "Jewelry",
+  jewelry: "Jewelry & Accessories",
   electronics: "Electronics",
   documents: "Documents",
   clothing: "Clothing",
   pets: "Pets",
-  school_items: "School Items",
+  school_items: "School / Work Items",
   other: "Other",
 };
+
+// ── Color palette for the report wizard's visual swatch picker ───────────────
+// A fixed palette keeps stored values consistent (better matching + search) and
+// gives users a fast tap-to-pick UI instead of a free-text field.
+export const COLORS = [
+  { value: "black", label: "Black", hex: "#1c1c1e" },
+  { value: "white", label: "White", hex: "#f2f2f7" },
+  { value: "gray", label: "Gray", hex: "#8e8e93" },
+  { value: "silver", label: "Silver", hex: "#c7c7cc" },
+  { value: "red", label: "Red", hex: "#ff3b30" },
+  { value: "orange", label: "Orange", hex: "#ff9500" },
+  { value: "yellow", label: "Yellow", hex: "#ffcc00" },
+  { value: "green", label: "Green", hex: "#34c759" },
+  { value: "blue", label: "Blue", hex: "#0a84ff" },
+  { value: "purple", label: "Purple", hex: "#af52de" },
+  { value: "pink", label: "Pink", hex: "#ff2d55" },
+  { value: "brown", label: "Brown", hex: "#a2845e" },
+  { value: "gold", label: "Gold", hex: "#d4a017" },
+] as const;
+
+export type ColorValue = (typeof COLORS)[number]["value"];
+
+export const COLOR_LABELS: Record<ColorValue, string> = COLORS.reduce(
+  (acc, c) => ({ ...acc, [c.value]: c.label }),
+  {} as Record<ColorValue, string>
+);
 
 export const registerSchema = z
   .object({
@@ -76,6 +102,10 @@ const baseItemFields = {
     .min(3, "Item name must be at least 3 characters (spaces don't count)")
     .max(120),
   category: z.enum(CATEGORIES),
+  // Optional primary color — powers the "Color matched" matching signal and
+  // the swatch filter on search/discovery. Free-text color is intentionally
+  // NOT accepted: a fixed palette keeps values consistent for matching.
+  color: z.enum(COLORS.map((c) => c.value) as [ColorValue, ...ColorValue[]]).optional(),
   description: z
     .string()
     .trim()
@@ -85,6 +115,7 @@ const baseItemFields = {
   city: z.string().trim().min(1, "City is required"),
   province: z.string().trim().min(1, "Province is required"),
   approximateLocation: z.string().trim().max(200).optional(),
+  timeWindow: z.string().trim().max(100).optional(),
 };
 
 // Dates must parse AND must not be in the future — a lost/found report can't
@@ -114,6 +145,12 @@ export const foundItemSchema = z.object({
     .refine((d) => !Number.isNaN(Date.parse(d)), "Enter a valid date")
     .refine(isNotFutureDate, "The date can't be in the future"),
   currentHoldingInfo: z.string().max(500).optional(),
+}).refine((data) => {
+  const verificationRequired = new Set(["phones", "wallets", "ids", "documents", "jewelry", "electronics"]);
+  return !verificationRequired.has(data.category) || Boolean(data.distinguishingFeatures?.trim());
+}, {
+  path: ["distinguishingFeatures"],
+  message: "Add one private verification detail so you can safely confirm the owner of this sensitive item.",
 });
 
 export type FoundItemInput = z.infer<typeof foundItemSchema>;

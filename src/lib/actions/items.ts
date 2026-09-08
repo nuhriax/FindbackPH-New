@@ -52,8 +52,17 @@ async function insertItemRow(
     "code" in result.error &&
     (result.error as { code?: string }).code === "42703"
   ) {
-    const { latitude: _lat, longitude: _lng, ...withoutCoords } = payload;
-    result = await insert(withoutCoords);
+    const { time_window: _timeWindow, ...withoutTimeWindow } = payload;
+    result = await insert(withoutTimeWindow);
+    if (
+      result.error &&
+      typeof result.error === "object" &&
+      "code" in result.error &&
+      (result.error as { code?: string }).code === "42703"
+    ) {
+      const { latitude: _lat, longitude: _lng, ...withoutCoordinates } = withoutTimeWindow;
+      result = await insert(withoutCoordinates);
+    }
   }
   return result as { data: { id: string } | null; error: unknown };
 }
@@ -105,12 +114,14 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
   const raw = {
     title: formData.get("title")?.toString() ?? "",
     category: formData.get("category")?.toString() ?? "",
+    color: formData.get("color")?.toString() || undefined,
     description: formData.get("description")?.toString() ?? "",
     distinguishingFeatures: formData.get("distinguishingFeatures")?.toString() || undefined,
     dateLost: formData.get("dateLost")?.toString() ?? "",
     city: formData.get("city")?.toString() ?? "",
     province: formData.get("province")?.toString() ?? "",
     approximateLocation: formData.get("approximateLocation")?.toString() || undefined,
+    timeWindow: formData.get("timeWindow")?.toString() || undefined,
     rewardAmount: formData.get("rewardAmount")?.toString() || undefined,
   };
 
@@ -132,12 +143,14 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
     reporter_id: user.id,
     title: parsed.data.title,
     category: parsed.data.category,
+    color: parsed.data.color ?? null,
     description: parsed.data.description,
     date_lost: parsed.data.dateLost,
     city: parsed.data.city,
     province: parsed.data.province,
     approximate_location: parsed.data.approximateLocation ?? null,
     reward_amount: parsed.data.rewardAmount ?? null,
+    time_window: parsed.data.timeWindow ?? null,
     // Coordinates are only stored as a pair — never one without the other.
     ...(latitude !== null && longitude !== null ? { latitude, longitude } : {}),
   });
@@ -197,13 +210,18 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
   const raw = {
     title: formData.get("title")?.toString() ?? "",
     category: formData.get("category")?.toString() ?? "",
+    color: formData.get("color")?.toString() || undefined,
     description: formData.get("description")?.toString() ?? "",
     distinguishingFeatures: formData.get("distinguishingFeatures")?.toString() || undefined,
     dateFound: formData.get("dateFound")?.toString() ?? "",
     city: formData.get("city")?.toString() ?? "",
     province: formData.get("province")?.toString() ?? "",
     approximateLocation: formData.get("approximateLocation")?.toString() || undefined,
-    currentHoldingInfo: formData.get("currentHoldingInfo")?.toString() || undefined,
+    timeWindow: formData.get("timeWindow")?.toString() || undefined,
+    currentHoldingInfo: formatHoldingInfo(
+      formData.get("custody")?.toString(),
+      formData.get("currentHoldingInfo")?.toString()
+    ),
   };
 
   const parsed = foundItemSchema.safeParse(raw);
@@ -224,12 +242,14 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
     reporter_id: user.id,
     title: parsed.data.title,
     category: parsed.data.category,
+    color: parsed.data.color ?? null,
     description: parsed.data.description,
     date_found: parsed.data.dateFound,
     city: parsed.data.city,
     province: parsed.data.province,
     approximate_location: parsed.data.approximateLocation ?? null,
     current_holding_info: parsed.data.currentHoldingInfo ?? null,
+    time_window: parsed.data.timeWindow ?? null,
     // Coordinates are only stored as a pair — never one without the other.
     ...(latitude !== null && longitude !== null ? { latitude, longitude } : {}),
   });
@@ -267,6 +287,16 @@ export async function createFoundItemAction(formData: FormData): Promise<ActionR
 
   revalidatePath("/found");
   return { itemId: inserted.id };
+}
+
+function formatHoldingInfo(custody: string | undefined, note: string | undefined) {
+  const labels: Record<string, string> = {
+    with_me: "Kept safely by finder",
+    official: "Handed to an official lost-and-found",
+    public_meetup: "Public handover can be arranged",
+  };
+  const label = custody ? labels[custody] : undefined;
+  return [label, note?.trim()].filter(Boolean).join(" — ") || undefined;
 }
 
 export async function markLostItemRecoveredAction(itemId: string): Promise<ActionResult> {

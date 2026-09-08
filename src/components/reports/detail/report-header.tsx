@@ -38,6 +38,22 @@ export function ReportHeader({
     [/\bnike\b/gi, "Nike"],
     [/\bgucci\b/gi, "Gucci"],
     [/\blouis vuitton\b/gi, "Louis Vuitton"],
+    // Beyond phones — bags, watches, footwear, PH banks/wallets.
+    [/\bjansport\b/gi, "JanSport"],
+    [/\bkipling\b/gi, "Kipling"],
+    [/\blongchamp\b/gi, "Longchamp"],
+    [/\bsamsonite\b/gi, "Samsonite"],
+    [/\bherschel\b/gi, "Herschel"],
+    [/\buniqlo\b/gi, "Uniqlo"],
+    [/\bskechers\b/gi, "Skechers"],
+    [/\bcrocs\b/gi, "Crocs"],
+    [/\badidas\b/gi, "Adidas"],
+    [/\bseiko\b/gi, "Seiko"],
+    [/\bcasio\b/gi, "Casio"],
+    [/\brolex\b/gi, "Rolex"],
+    [/\bpandora\b/gi, "Pandora"],
+    [/\bswarovski\b/gi, "Swarovski"],
+    [/\bgcash\b/gi, "GCash"],
   ];
 
   const displayTitle = BRANDS.reduce(

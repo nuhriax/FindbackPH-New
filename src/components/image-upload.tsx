@@ -14,9 +14,15 @@ type SelectedImage = {
 export function ImageUpload({
   onChange,
   max = 4,
+  coverIndex = 0,
+  onCoverChange,
 }: {
   onChange: (files: File[]) => void;
   max?: number;
+  /** Index of the current cover photo (the one shown as the report cover). */
+  coverIndex?: number;
+  /** Called when the user picks a different photo as the cover. */
+  onCoverChange?: (index: number) => void;
 }) {
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -78,15 +84,16 @@ export function ImageUpload({
           handleFiles(e.dataTransfer.files);
         }}
       >
-        <ImagePlus size={28} className="mb-2 text-slate-500" />
+        <ImagePlus size={28} className="mb-2 text-slate-500" aria-hidden="true" />
+        <p className="text-sm font-semibold text-navy-900">Add photos</p>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="text-sm font-medium text-blue-600 hover:underline"
+          className="mt-1 text-sm font-medium text-blue-600 hover:underline"
         >
-          Click to upload photos
+          Click to upload or drag and drop
         </button>
-        <p className="mt-1 text-xs text-slate-500">or drag &amp; drop</p>
+        <p className="mt-1 text-xs text-slate-500">Up to {max} photos · JPEG, PNG, WebP, GIF · max 5 MB each</p>
         <input
           ref={inputRef}
           type="file"
@@ -98,33 +105,54 @@ export function ImageUpload({
         />
       </div>
 
-      <p className="mt-2 text-xs text-slate-500">
-        Photos help others recognize the item. Avoid uploading sensitive documents or personal
-        information.
+      <p className="mt-2 flex items-start gap-1 text-xs text-slate-500">
+        <ImagePlus size={12} className="mt-0.5 shrink-0" aria-hidden="true" />
+        Photos help people recognize the item. The first photo becomes the report&apos;s cover.
+      </p>
+      <p className="mt-1 flex items-start gap-1 text-xs font-medium text-amber-700">
+        <X size={12} className="mt-0.5 shrink-0" aria-hidden="true" />
+        Don&apos;t upload IDs, documents, passwords, or other sensitive personal information.
       </p>
 
       {error && <p className="field-error">{error}</p>}
 
       {images.length > 0 && (
         <div className="mt-3 grid grid-cols-4 gap-2">
-          {images.map((img, i) => (
-            <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-slate-200">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img loading="lazy"
-                src={img.preview}
-                alt={`Upload preview ${i + 1}`}
-                className="h-full w-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(i)}
-                aria-label={`Remove image ${i + 1}`}
-                className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          ))}
+          {images.map((img, i) => {
+            const isCover = i === coverIndex;
+            return (
+              <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-slate-200">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img loading="lazy"
+                  src={img.preview}
+                  alt={`Upload preview ${i + 1}`}
+                  className="h-full w-full object-cover"
+                />
+                {isCover && (
+                  <span className="absolute left-1 top-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                    Cover
+                  </span>
+                )}
+                {!isCover && onCoverChange && (
+                  <button
+                    type="button"
+                    onClick={() => onCoverChange(i)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] font-semibold uppercase tracking-wide text-white opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    Set as cover
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  aria-label={`Remove image ${i + 1}`}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 p-1.5 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

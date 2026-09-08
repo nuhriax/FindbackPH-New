@@ -182,7 +182,7 @@ function detectColors(item: MatchableItem): Set<string> {
    ============================================================================ */
 
 const BRAND_WORDS: Record<string, string> = {
-  iphone: "apple", apple: "apple", airpods: "apple", macbook: "apple", ipad: "apple",
+  iphone: "apple", apple: "apple", airpods: "apple", macbook: "apple", ipad: "apple", airtag: "apple",
   samsung: "samsung", galaxy: "samsung",
   xiaomi: "xiaomi", redmi: "xiaomi", poco: "xiaomi",
   oppo: "oppo", vivo: "vivo", realme: "realme",
@@ -199,6 +199,14 @@ const BRAND_WORDS: Record<string, string> = {
   uniqlo: "uniqlo", gucci: "gucci", coach: "coach", longchamp: "longchamp",
   seiko: "seiko", casio: "casio", rolex: "rolex", swatch: "swatch",
   bpi: "bpi", bdo: "bdo", gcash: "gcash", landbank: "landbank",
+  // ── Beyond phones: bags, watches, pets gear, bikes, stationery ─────────
+  // Common in PH lost & found reports; matching must work for ALL categories.
+  jansport: "jansport", kipling: "kipling", oakley: "oakley",
+  underarmour: "underarmour", puma: "puma", fila: "fila",
+  pandora: "pandora", swarovski: "swarovski",
+  citizen: "citizen", fossil: "fossil", garmin: "garmin", timex: "timex",
+  trinx: "trinx", giant: "giant", trek: "trek", bmx: "bmx",
+  mongol: "mongol", titus: "titus", stabilo: "stabilo",
 };
 
 function detectBrands(item: MatchableItem): Set<string> {
