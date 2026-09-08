@@ -36,7 +36,12 @@ env:
 
 jobs:
   backup:
+    # Postgres 17 client: pg_dump must be >= the server version, and Supabase
+    # runs Postgres 17. The ubuntu-latest default client (16) aborts with
+    # "server version mismatch". The postgres:17 image ships the matching
+    # pg_dump plus gzip.
     runs-on: ubuntu-latest
+    container: postgres:17
     steps:
       - name: Dump database
         env:
