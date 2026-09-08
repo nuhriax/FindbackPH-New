@@ -6,19 +6,18 @@
 # stores it as a GitHub Actions artifact (retained 30 days).
 #
 # One-time setup (GitHub repo → Settings → Secrets and variables → Actions):
-#   1. SUPABASE_DB_URL — the full Session Pooler connection string:
-#      Supabase Dashboard → Connect → Session pooler, e.g.
-#      postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
-#      (Use the pooler host, NOT db.<ref>.supabase.co — GitHub runners cannot
-#      reach Supabase's direct IPv6-only database host.)
-#   2. Add the same connection string to Supabase Auth's allowed list if you
-#      restrict access (otherwise nothing else is needed).
+#   SUPABASE_DB_PASSWORD — ONLY the database password
+#   (Supabase dashboard → Settings → Database → Reset database password to get
+#   a known-good one). The host, username (postgres.<project-ref>), and
+#   database name are hardcoded below because they are not secrets — passing a
+#   full connection URL proved error-prone (wrong host / missing project ref
+#   in the username caused repeated auth failures).
 #
 # Restore drill (do this once before relying on it):
 #   pg_restore or psql the downloaded dump into a scratch Supabase project.
 #
 # Note: this backs up the DATABASE only. Report photos live in Supabase
-# Storage (findbackph Storage bucket) and are not included in pg_dump.
+# Storage and are not included in pg_dump.
 
 name: Weekly database backup
 
@@ -27,16 +26,24 @@ on:
     - cron: "0 1 * * 0" # every Sunday 01:00 UTC = 09:00 PH time
   workflow_dispatch: {} # allow manual runs to test the pipeline
 
+env:
+  PGHOST: aws-0-ap-southeast-1.pooler.supabase.com
+  PGPORT: "5432"
+  PGDATABASE: postgres
+  # Session pooler usernames MUST be "postgres.<project-ref>" — a bare
+  # "postgres" fails authentication at the pooler.
+  PGUSER: postgres.llmxwvclxiiwczcnbsrt
+
 jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
       - name: Dump database
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          if [ -z "$SUPABASE_DB_URL" ]; then
-            echo "::error::SUPABASE_DB_URL secret is not set. See comments at the top of this file."
+          if [ -z "$PGPASSWORD" ]; then
+            echo "::error::SUPABASE_DB_PASSWORD secret is not set. See comments at the top of this file."
             exit 1
           fi
           pg_dump --version
@@ -46,7 +53,7 @@ jobs:
             --exclude-schema='^pg_*' \
             --format=custom \
             --file=findbackph-db.dump \
-            "$SUPABASE_DB_URL"
+            "$PGDATABASE"
           gzip -9 findbackph-db.dump
           ls -lh findbackph-db.dump.gz
 
@@ -57,3 +64,4 @@ jobs:
           path: findbackph-db.dump.gz
           retention-days: 30
           if-no-files-found: error
+
