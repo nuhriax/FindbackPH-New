@@ -41,6 +41,35 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Onboarding gate — Google/Facebook sign-ups have no real name yet, so they
+  // must complete the "Almost there" step before using ANY part of the site,
+  // not just the dashboard. Rules that keep this safe:
+  //   • GET navigations only — a redirect on POST would swallow server actions
+  //     (e.g. logging out from the complete-profile page itself).
+  //   • Auth pages (/complete-profile, /auth callback, /login, /register) are
+  //     exempt so the gate can never loop back onto itself.
+  //   • Only fires when the profile row EXISTS and is missing names, matching
+  //     the dashboard gate — a not-yet-created row never traps a new user.
+  const AUTH_PAGES = ["/complete-profile", "/auth", "/login", "/register"];
+  if (
+    user &&
+    request.method === "GET" &&
+    !AUTH_PAGES.some((p) => path.startsWith(p))
+  ) {
+    const { data: onboardingProfile } = await supabase
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (
+      onboardingProfile &&
+      (!onboardingProfile.first_name?.trim() || !onboardingProfile.last_name?.trim())
+    ) {
+      return NextResponse.redirect(new URL("/complete-profile", request.url));
+    }
+  }
+
   // Server-side gate on /admin — actual role check happens again in the page itself
   // and in every admin server action, since middleware alone must never be trusted
   // as the sole authorization boundary.
