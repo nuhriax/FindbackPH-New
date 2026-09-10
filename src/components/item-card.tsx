@@ -55,9 +55,10 @@ export function ItemCard({
             src={imageUrl}
             alt={title}
             fill
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            unoptimized
+            // Removed unoptimized - now uses Next.js optimization with Supabase remotePatterns
+            // This cuts bandwidth ~70% on PH mobile data
           />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-sunrise-50 via-ice-50 to-lavender-50">

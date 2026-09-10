@@ -46,11 +46,11 @@ import type {
    METADATA
    ============================================================================ */
 
-// The homepage data is refreshed in real time via `LiveReportsRefresh`
-// (Supabase Realtime → `router.refresh()`). Dynamic rendering keeps the
-// homepage's Supabase queries from being cached in Next's Data Cache so that
-// `router.refresh()` always re-fetches the latest reports from the database.
-export const dynamic = "force-dynamic";
+// ISR 60s + Realtime refresh: homepage is cached at edge for 60s (fast),
+// but `LiveReportsRefresh` (Supabase Realtime → router.refresh()) still
+// pushes live updates when new reports arrive. Previously `force-dynamic`
+// forced 7 DB queries on EVERY page load with no CDN cache.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: {
@@ -442,6 +442,39 @@ export default async function HomePage() {
               <HeartHandshake size={16} />
               I found something
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST STRIP — privacy + free + safe, critical for lost & found conversion */}
+      <section className="mx-auto max-w-5xl px-4 pb-10 sm:px-6">
+        <div className="grid gap-3 rounded-2xl border border-slate-200/70 bg-white/70 p-3 shadow-sm backdrop-blur-sm sm:grid-cols-3 sm:p-4">
+          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-4 py-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-electric-50 text-electric-600 ring-1 ring-inset ring-electric-200/60">
+              <Lock size={14} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-navy-900">Private by default</p>
+              <p className="text-[11px] leading-tight text-slate-500">Contact hidden until you choose to share</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-4 py-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-200/60">
+              <BadgeCheck size={14} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-navy-900">Free forever</p>
+              <p className="text-[11px] leading-tight text-slate-500">No fees, community-powered for PH</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-4 py-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200/60">
+              <ShieldCheck size={14} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-navy-900">Safe handover</p>
+              <p className="text-[11px] leading-tight text-slate-500">Meet at mall, barangay hall, café</p>
+            </div>
           </div>
         </div>
       </section>

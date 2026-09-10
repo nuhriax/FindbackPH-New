@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
 import "./auth.css";
-import { BackgroundEffects } from "@/components/ui/background-effects";
+import { MarketingBackground } from "@/components/ui/marketing-background";
 import { ToastProvider } from "@/components/ui/toast";
 import { PwaRegister } from "@/components/pwa/pwa-register";
 
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var t=localStorage.getItem('fb-auth-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}t=t||'light';var r=document.documentElement;r.setAttribute('data-auth-theme',t);r.classList.toggle('site-ink',t==='dark');}catch(e){document.documentElement.setAttribute('data-auth-theme','light');}})();`,
           }}
         />
-        <BackgroundEffects />
+        <MarketingBackground />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

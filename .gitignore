@@ -98,3 +98,25 @@ shot-nav-responsive.js
 # Downloaded installers / personal files that landed in the repo root
 *.exe
 
+# Root debug artifacts - screenshots & dumps from local debugging
+/card.png
+/diag-map.png
+/map-diag.png
+/page-diag.png
+/report-step1.png
+/search-map.png
+/diag-map.js
+/dark-audit.js
+/probe.js
+/shots.mjs
+/shot-dark.js
+/filelist.txt
+/devlog.txt
+/workerUrl-dump.txt
+/cfg-dump.txt
+/hwdiff.txt
+/safediff.txt
+
+# Keep shots/ folder but ignore any new root pngs
+/*.png
+
