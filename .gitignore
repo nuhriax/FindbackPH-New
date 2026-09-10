@@ -98,3 +98,13 @@ shot-nav-responsive.js
 # Downloaded installers / personal files that landed in the repo root
 *.exe
 
+# Root-level debug scripts & screenshot artifacts (UI v3 work-in-progress)
+/audit-wizard.js
+/fix-report*.js
+/shot-v3.js
+/fin-*.png
+/imp-*.png
+/pol-*.png
+/r2-full.png
+/v3-*.png
+
