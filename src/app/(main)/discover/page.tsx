@@ -746,14 +746,22 @@ export default async function DiscoverPage({
   const mapPoints = buildMapPoints(pool);
 
   return (
-    <main id="discover-top" className="flex-1">
+    <main
+      id="discover-top"
+      className="relative flex-1 bg-[linear-gradient(to_bottom,#f0fdfa_0%,rgba(240,253,250,0.6)_20rem,rgba(240,253,250,0.15)_34rem,rgba(240,253,250,0)_46rem)]"
+    >
       {/* ================= SEARCH BAND — compact, content-first ================= */}
       <section
         aria-label="Search community reports"
         className="relative overflow-hidden"
       >
-        {/* Ambient layer — slim glows + a dot grid keep depth without a tall hero */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        {/* Ambient layer — slim glows + a dot grid keep depth without a tall hero.
+            A bottom mask feathers the glows out so the teal tint blends into the
+            warm-sand page background instead of stopping at a hard edge. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black_55%,transparent_98%)]"
+        >
           <div className="absolute -left-32 -top-44 h-[22rem] w-[22rem] rounded-full bg-teal-200/45 blur-3xl animate-glow-drift" />
           <div className="absolute -right-24 top-6 h-64 w-64 rounded-full bg-amber-200/35 blur-3xl" />
           <div
