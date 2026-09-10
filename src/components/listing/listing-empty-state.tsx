@@ -15,6 +15,9 @@ export function ListingEmptyState({
   clearHref,
   reportHref,
   reportLabel,
+  secondaryHref,
+  secondaryLabel,
+  secondaryNote,
 }: {
   accent: Accent;
   title: string;
@@ -23,6 +26,9 @@ export function ListingEmptyState({
   clearHref: string;
   reportHref: string;
   reportLabel: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  secondaryNote?: string;
 }) {
   const a = ACCENT[accent];
 
@@ -48,6 +54,12 @@ export function ListingEmptyState({
         {description}
       </p>
 
+      {secondaryNote && (
+        <p className="mt-2 max-w-sm text-xs leading-5 text-slate-500">
+          {secondaryNote}
+        </p>
+      )}
+
       {/* Warm community line + jeepney — Filipino texture, kept quiet */}
       <JeepneyMotif className="mt-4 h-8 w-32 opacity-70" />
       <p className="mt-1 text-[11px] font-medium italic text-leaf-700/80">
@@ -71,6 +83,16 @@ export function ListingEmptyState({
           <Plus aria-hidden="true" className="h-3.5 w-3.5" />
           {reportLabel}
         </Link>
+
+        {secondaryHref && secondaryLabel && (
+          <Link
+            href={secondaryHref}
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-navy-900"
+          >
+            <Plus aria-hidden="true" className="h-3.5 w-3.5" />
+            {secondaryLabel}
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -83,42 +83,42 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // suppressHydrationWarning: the inline theme script below mutates
-    // <html> (data-auth-theme) before React hydrates, by design — without
-    // this, React logs a hydration attribute-mismatch warning on every load.
-    <html lang="en" className={`${plusJakarta.variable} ${sora.variable}`} suppressHydrationWarning>
-      <body className="flex min-h-dvh flex-col font-sans text-navy-900 antialiased">
-        {/* Skip link for keyboard / screen-reader users */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-navy-900 focus:shadow-xl"
+   // suppressHydrationWarning: the inline theme script below mutates
+   // <html> (data-auth-theme) before React hydrates, by design — without
+   // this, React logs a hydration attribute-mismatch warning on every load.
+   (<html lang="en" className={`${plusJakarta.variable} ${sora.variable}`} suppressHydrationWarning>
+    <body className="flex min-h-dvh flex-col font-sans text-navy-900 antialiased">
+      {/* Skip link for keyboard / screen-reader users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-navy-900 focus:shadow-xl"
         >
-          Skip to main content
+        Skip to main content
         </a>
         {/* Apply the saved auth theme before first paint to avoid a dark-mode flash.
-            Sets an attribute on <html>; CSS + useTheme read it (no hydration clash). */}
+        Sets an attribute on <html>; CSS + useTheme read it (no hydration clash). */}
         <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('fb-auth-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}t=t||'light';var r=document.documentElement;r.setAttribute('data-auth-theme',t);r.classList.toggle('site-ink',t==='dark');}catch(e){document.documentElement.setAttribute('data-auth-theme','light');}})();`,
-          }}
+        dangerouslySetInnerHTML={{
+        __html: `(function(){try{var t=localStorage.getItem('fb-auth-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}t=t||'light';var r=document.documentElement;r.setAttribute('data-auth-theme',t);r.classList.toggle('site-ink',t==='dark');}catch(e){document.documentElement.setAttribute('data-auth-theme','light');}})();`,
+        }}
         />
         <BackgroundEffects />
         <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "FindBack PH",
-              url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://findbackph.me",
-              description:
-                "FindBack PH connects people who lost something with people who found it — safely, quickly, and locally.",
-            }),
-          }}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "FindBack PH",
+        url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://findbackph.me",
+        description:
+        "FindBack PH connects people who lost something with people who found it — safely, quickly, and locally.",
+        }),
+        }}
         />
         <ToastProvider>{children}</ToastProvider>
-        <PwaRegister />
-      </body>
-    </html>
+      <PwaRegister />
+    </body>
+   </html>)
   );
 }

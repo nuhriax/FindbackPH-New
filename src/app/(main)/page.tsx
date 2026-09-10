@@ -423,7 +423,7 @@ export default async function HomePage() {
             <form action="/search" method="GET" role="search" className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center">
               <div className="flex min-h-[48px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3">
                 <Search size={18} className="shrink-0 text-slate-400" />
-                <input name="q" type="search" maxLength={120} placeholder="e.g. iPhone, wallet, keys, school ID" aria-label="Search reports" className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-400" />
+                <input name="q" type="search" maxLength={120} placeholder="e.g. iPhone, wallet, keys, school ID" aria-label="Search reports" className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-500" />
               </div>
               <button type="submit" className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-lg bg-electric-500 px-6 text-sm font-semibold text-white transition hover:bg-electric-600">
                 <Search size={16} />

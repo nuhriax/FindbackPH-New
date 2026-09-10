@@ -482,7 +482,7 @@ export default async function SearchPage({
                     defaultValue={q}
                     placeholder="What are you looking for?"
                     aria-label="Search item"
-                    className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-400"
+                    className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-500"
                   />
                 </div>
 
@@ -501,7 +501,7 @@ export default async function SearchPage({
                     defaultValue={city}
                     placeholder="City or location"
                     aria-label="Search location"
-                    className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-400"
+                    className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-500"
                   />
                 </div>
 

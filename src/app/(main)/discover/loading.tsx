@@ -1,56 +1,77 @@
 export default function DiscoverLoading() {
   return (
-    <main className="mx-auto max-w-7xl px-4 pb-24 pt-16 sm:px-6 lg:px-8">
-      {/* Hero heading */}
-      <div className="mx-auto max-w-3xl text-center">
-        <div className="mx-auto h-10 w-72 max-w-full skeleton" />
-        <div className="mx-auto mt-4 h-5 w-96 max-w-full skeleton" />
-        <div className="mx-auto mt-2 h-5 w-64 max-w-full skeleton" />
+    <>
+      {/* Search band — compact */}
+      <div className="bg-white/50">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="w-full max-w-xl">
+              <div className="h-5 w-56 rounded-full skeleton" />
+              <div className="mt-3 h-10 w-80 max-w-full rounded skeleton" />
+              <div className="mt-2 h-4 w-72 max-w-full rounded skeleton" />
+            </div>
+            <div className="h-24 w-full max-w-2xl rounded-2xl skeleton lg:max-w-xl" />
+          </div>
+        </div>
       </div>
 
-      {/* Search bar */}
-      <div className="mx-auto mt-8 max-w-2xl">
-        <div className="h-14 w-full rounded-2xl skeleton" />
+      {/* Sticky control dock */}
+      <div className="px-4 pt-2 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 rounded-2xl border border-slate-200/70 bg-white/60 p-2.5 pl-3">
+          <div className="h-9 w-full rounded-xl skeleton sm:w-64" />
+          <div className="h-9 w-20 rounded-lg skeleton" />
+          <div className="h-9 w-20 rounded-lg skeleton" />
+          <div className="ml-auto hidden h-9 w-24 rounded-lg skeleton sm:block" />
+          <div className="order-last flex w-full gap-2 overflow-hidden py-1">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-10 w-24 shrink-0 rounded-lg skeleton" />
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Filter chips */}
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-9 w-20 rounded-full skeleton" />
-        ))}
-      </div>
-
-      {/* Results header */}
-      <div className="mt-8 flex items-center justify-between">
-        <div className="h-5 w-32 skeleton" />
-        <div className="h-9 w-28 rounded-lg skeleton" />
-      </div>
-
-      {/* Item grid — matches the discover layout */}
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70">
-            {/* Image placeholder */}
-            <div className="aspect-[4/3] w-full skeleton" />
-            <div className="p-4">
-              <div className="h-5 w-3/4 skeleton" />
-              <div className="mt-2 h-4 w-1/2 skeleton" />
-              <div className="mt-3 flex items-center justify-between">
-                <div className="h-4 w-20 skeleton" />
-                <div className="h-6 w-16 rounded-full skeleton" />
+      {/* Split workspace — feed + map rail */}
+      <div className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:gap-7">
+          <div className="min-w-0 flex-1">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <div className="h-6 w-40 rounded skeleton" />
+                <div className="mt-1.5 h-3 w-24 rounded skeleton" />
               </div>
+              <div className="h-10 w-28 rounded-full skeleton" />
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70"
+                >
+                  <div className="aspect-[4/3] w-full skeleton" />
+                  <div className="p-4">
+                    <div className="h-5 w-3/4 rounded skeleton" />
+                    <div className="mt-2 h-4 w-1/2 rounded skeleton" />
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="h-4 w-20 rounded skeleton" />
+                      <div className="h-6 w-16 rounded-full skeleton" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 flex items-center justify-center gap-2">
+              <div className="h-10 w-10 rounded-lg skeleton" />
+              <div className="h-10 w-10 rounded-lg skeleton" />
+              <div className="h-10 w-10 rounded-lg skeleton" />
+              <div className="h-10 w-10 rounded-lg skeleton" />
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Pagination */}
-      <div className="mt-10 flex items-center justify-center gap-2">
-        <div className="h-10 w-10 rounded-lg skeleton" />
-        <div className="h-10 w-10 rounded-lg skeleton" />
-        <div className="h-10 w-10 rounded-lg skeleton" />
-        <div className="h-10 w-10 rounded-lg skeleton" />
+          <div className="hidden h-[560px] w-[360px] shrink-0 rounded-2xl skeleton xl:block" />
+        </div>
       </div>
-    </main>
+    </>
   );
 }

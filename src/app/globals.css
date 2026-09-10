@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -33,7 +33,7 @@
     --glow-medium: 124 201 198; /* teal-300 */
     --glow-bright: 15 123 122; /* brand teal */
     --glow-warm: 255 116 24; /* sunset coral */
-    --glow-leaf: 38 138 86; /* leaf-600 — nature accent, used for organic highlights */
+    --glow-leaf: 38 138 86; /* leaf-600 â€” nature accent, used for organic highlights */
 
     /* --- Typography ------------------------------------------------ */
     /* One font family site-wide. `--font-mono` is mapped to the same Plus
@@ -95,7 +95,7 @@
   }
 
   /* Prevent iOS Safari auto-zoom on form focus. Safari zooms any input/select/
-     textarea whose computed font-size is under 16px the moment it's focused —
+     textarea whose computed font-size is under 16px the moment it's focused â€”
      a jarring jump on every login/search box. Bumping them to 16px on small
      screens eliminates the zoom; heights (fixed h-11 etc.) are unchanged so the
      layout doesn't move. Touch-friendly text is also easier to read. */
@@ -186,7 +186,7 @@
     }
   }
 
-  /* Fixed backgrounds are ignored on iOS and cause jank on Android —
+  /* Fixed backgrounds are ignored on iOS and cause jank on Android â€”
      fall back to normal scrolling attachment on small screens. */
   @media (max-width: 767px) {
     body {
@@ -245,7 +245,7 @@
       placeholder:text-slate-400 transition-all focus:border-electric-400 focus:bg-white focus:ring-4 focus:ring-electric-500/10;
   }
 
-  /* Hide the browser's native clear ("✕") button on type="search" inputs —
+  /* Hide the browser's native clear ("âœ•") button on type="search" inputs â€”
      it clashes with custom submit buttons sitting inside the same pill and
      renders inconsistently across themes. */
   input[type="search"]::-webkit-search-cancel-button,
@@ -259,7 +259,7 @@
       text-navy-900 shadow-sm transition-all focus:border-electric-400 focus:ring-4 focus:ring-electric-500/10;
   }
 
-  /* Visible dropdown chevron — appearance-none strips the native arrow, so
+  /* Visible dropdown chevron â€” appearance-none strips the native arrow, so
      paint a matching slate chevron into the reserved pr-9 space. */
   .select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -313,7 +313,7 @@
     background-size: 56px 56px;
   }
 
-  /* Extremely subtle technical grid for the luminous background — faded at the
+  /* Extremely subtle technical grid for the luminous background â€” faded at the
      edges via the mask applied by the GridBackground component. */
   .bg-grid-soft {
     background-image:
@@ -760,16 +760,16 @@ html {
 
 /* ===========================================================================
    UNIFIED SITE-WIDE FONT COLOR
-   Every page now renders text in one single color — the brand Deep Navy
+   Every page now renders text in one single color â€” the brand Deep Navy
    #12347B. The neutral slate/navy utility shades are all remapped to it so
    headings, paragraphs, captions, muted notes and labels read identically
    across the whole site.
 
    Semantic accents are deliberately preserved (per the brand hierarchy):
-     • blue / electric   → actions, links, active nav, focus (brand)
-     • red (sunrise)     → “lost” status
-     • green (emerald)   → “found” / returned status
-     • white             → text on colored buttons / badges / avatars
+     â€¢ blue / electric   â†’ actions, links, active nav, focus (brand)
+     â€¢ red (sunrise)     â†’ â€œlostâ€ status
+     â€¢ green (emerald)   â†’ â€œfoundâ€ / returned status
+     â€¢ white             â†’ text on colored buttons / badges / avatars
 
    These rules are declared last so they win the cascade over Tailwind's
    generated utilities without needing !important.
@@ -813,7 +813,7 @@ p {
 }
 
 /* ===========================================================================
-   PREMIUM UTILITIES — FindBack PH design system
+   PREMIUM UTILITIES â€” FindBack PH design system
    Small, composable helpers that give every page the same "high-tier" feel:
    glass surfaces, gradient headline accents, quiet hairline dividers and a
    consistent focus treatment. Prefer these over re-rolling class strings.
@@ -838,7 +838,7 @@ p {
     color: transparent;
   }
 
-  /* Hairline divider that fades at the edges — softer than border-solid. */
+  /* Hairline divider that fades at the edges â€” softer than border-solid. */
   .hairline-x {
     height: 1px;
     background: linear-gradient(
@@ -850,7 +850,7 @@ p {
     );
   }
 
-  /* Warm glass navbar pill — tinted toward the sand page color so the bar
+  /* Warm glass navbar pill â€” tinted toward the sand page color so the bar
      reads as part of the page, not a floating white box. */
   .navbar-glass {
     background: rgba(253, 251, 245, 0.82);
@@ -866,7 +866,7 @@ p {
     border: 1px solid rgba(15, 123, 122, 0.16);
   }
 
-  /* Light-mode floating pill — same soft-glass treatment as the dark ink
+  /* Light-mode floating pill â€” same soft-glass treatment as the dark ink
      theme: translucent warm sand + heavy blur so the pill tints with the page
      instead of reading as an opaque white slab with a hard white edge (the
      bright white frame used to read as a white line along the pill's bottom).
@@ -887,7 +887,7 @@ p {
   }
 }
   /* ==========================================================================
-     EDITORIAL TYPE — oversized display scale for hero / section moments
+     EDITORIAL TYPE â€” oversized display scale for hero / section moments
      ========================================================================== */
   .display-hero {
     font-family: var(--font-display, var(--font-pjs)), system-ui, sans-serif;
@@ -905,7 +905,7 @@ p {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Footer ink — warmed toward the sand page color, with a soft "dawn" fade
+  /* Footer ink â€” warmed toward the sand page color, with a soft "dawn" fade
      at the top so the dark band emerges from the page instead of cutting off. */
   .footer-ink {
     position: relative;
@@ -928,7 +928,7 @@ p {
   }
 
 /* ===========================================================================
-   SITE-WIDE INK THEME — the footer's deep teal-ink palette, everywhere.
+   SITE-WIDE INK THEME â€” the footer's deep teal-ink palette, everywhere.
    Activated by the `site-ink` class on <html> (see layout.tsx). These rules
    are declared LAST so they win the cascade over the light-theme defaults
    and Tailwind utilities without needing !important.
@@ -945,7 +945,7 @@ p {
   color-scheme: dark;
 }
 
-/* Page canvas — the footer's ink base with its dawn glows. */
+/* Page canvas â€” the footer's ink base with its dawn glows. */
 .site-ink body {
   background-color: #0c2b29;
   background-image:
@@ -956,7 +956,7 @@ p {
   color: #eef6f4;
 }
 
-/* Headings + body copy → light ink tones. */
+/* Headings + body copy â†’ light ink tones. */
 .site-ink h1,
 .site-ink h2,
 .site-ink h3,
@@ -967,7 +967,7 @@ p {
   color: var(--text-heading);
 }
 
-/* Neutral text utilities → light ink tones. */
+/* Neutral text utilities â†’ light ink tones. */
 .site-ink .text-navy-700,
 .site-ink .text-navy-800,
 .site-ink .text-navy-900,
@@ -985,8 +985,8 @@ p {
   color: rgba(240, 248, 246, 0.82);
 }
 
-/* White surfaces → near-opaque dark ink panels. Kept strongly opaque so the
-   animated background glows and page content never bleed through under text —
+/* White surfaces â†’ near-opaque dark ink panels. Kept strongly opaque so the
+   animated background glows and page content never bleed through under text â€”
    translucent glass surfaces were making letters shimmer / look blurry. */
 .site-ink .bg-white,
 .site-ink .bg-white\/80,
@@ -1002,7 +1002,7 @@ p {
 .site-ink .bg-white\/70 {
   background-color: rgba(17, 51, 49, 0.86);
 }
-/* Faint white washes (bg-white/10–/35, /75) — these kept their full light
+/* Faint white washes (bg-white/10â€“/35, /75) â€” these kept their full light
    alpha and bleached whole page bands (e.g. the /search hero section). */
 .site-ink .bg-white\/10,
 .site-ink .bg-white\/15,
@@ -1016,7 +1016,7 @@ p {
   background-color: rgba(17, 51, 49, 0.86);
 }
 
-/* Alpha-variant fills the base rules missed — these stayed at full light
+/* Alpha-variant fills the base rules missed â€” these stayed at full light
    color (e.g. bg-navy-100/60 cream at 0.6 alpha bleeding through the About
    live-count tiles, bg-slate-50/70 in the contact email box). */
 .site-ink .bg-navy-100\/60,
@@ -1053,8 +1053,8 @@ p {
   color: #6ee7b7;
 }
 
-/* Dashboard first-run onboarding panel — light mode paints a pale
-   teal→white gradient (bg-gradient-to-br from-electric-50/60 to-white/70).
+/* Dashboard first-run onboarding panel â€” light mode paints a pale
+   tealâ†’white gradient (bg-gradient-to-br from-electric-50/60 to-white/70).
    Gradient utilities are never matched by the bg-* overrides, so under the
    ink theme it stayed a bright slab. Repaint via this hook class. */
 .site-ink .onboarding-panel {
@@ -1069,7 +1069,7 @@ p {
 /* Search input chips (home hero, /search form, listing search) use plain
    bg-slate-50 plus hover:/focus:/focus-within: variants of slate-50/100 and
    white. Those variant class names are distinct from the base utilities, so
-   the generic bg-white / slate rules above never match them — leaving a light
+   the generic bg-white / slate rules above never match them â€” leaving a light
    chip under now-light remapped text (invisible typing in dark mode). */
 .site-ink .bg-slate-50,
 .site-ink .bg-slate-100,
@@ -1090,7 +1090,7 @@ p {
   background-color: rgba(22, 60, 57, 0.98);
 }
 
-/* Item listing cards — the generic ink rules left these half-light (white
+/* Item listing cards â€” the generic ink rules left these half-light (white
    surface + cream text), making the body copy invisible. Give the whole card
    an explicit dark glass treatment so every line is readable on the ink
    theme. Scoped to the `item-card` hook class so nothing else shifts. */
@@ -1120,25 +1120,25 @@ p {
 .site-ink .item-card:hover .group-hover\:text-electric-700 {
   color: #7dd3cc;
 }
-/* Empty-photo placeholder gradient → subtle dark tint. */
+/* Empty-photo placeholder gradient â†’ subtle dark tint. */
 .site-ink .item-card .bg-gradient-to-br {
   background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
 }
-/* Category chip on the photo → dark pill with light text. */
+/* Category chip on the photo â†’ dark pill with light text. */
 .site-ink .item-card .bg-white\/90 {
   background-color: rgba(12, 43, 41, 0.78);
   color: rgba(238, 246, 244, 0.85);
 }
 
-/* Footer divider above "View details" → hairline light stroke on ink. */
+/* Footer divider above "View details" â†’ hairline light stroke on ink. */
 .site-ink .item-card .card-footer {
   border-color: rgba(255, 255, 255, 0.12);
 }
-/* Lost / Found status badges → firm dark pills so the tinted text stays
+/* Lost / Found status badges â†’ firm dark pills so the tinted text stays
    readable even over bright photos (a 20% translucent red wash turns pale
    pink on white images, making the light letters invisible). */
-/* Same treatment as the home overlay badges below — solid dark pill, bright
-   tinted text, rose border — so every LOST/FOUND badge is identical. */
+/* Same treatment as the home overlay badges below â€” solid dark pill, bright
+   tinted text, rose border â€” so every LOST/FOUND badge is identical. */
 .site-ink .item-card .bg-red-100\/90,
 .site-ink .bg-red-100\/90 {
   background-color: #571515 !important;
@@ -1161,7 +1161,7 @@ p {
   color: #a5f5d3 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
-/* Home "Latest reports" overlay badges (bg-white/90 + status text) → firm
+/* Home "Latest reports" overlay badges (bg-white/90 + status text) â†’ firm
    dark pills with bright tinted text, readable over any photo. */
 .site-ink span.bg-white\/90.text-sunrise-700 {
   background-color: #571515 !important;
@@ -1184,18 +1184,18 @@ p {
 .site-ink .navbar-pill.bg-white\/95 {
   /* Translucent dark glass: low alpha + heavy blur so the pill tints with the
      page gradient instead of reading as a flat slab. Keep the alpha LOW and
-     the shadow soft — any hard edge renders as a visible border line on the
+     the shadow soft â€” any hard edge renders as a visible border line on the
      ink canvas. */
   background-color: rgba(12, 43, 41, 0.38);
   -webkit-backdrop-filter: blur(28px) saturate(1.25);
   backdrop-filter: blur(28px) saturate(1.25);
-  /* Whisper hairline instead of a hard cut — makes the pill edge read as a
+  /* Whisper hairline instead of a hard cut â€” makes the pill edge read as a
      deliberate glass rim, not a stray line. */
   border-color: rgba(255, 255, 255, 0.07);
   box-shadow: 0 10px 34px -26px rgba(0, 0, 0, 0.45);
 }
 
-/* Active-link underline → brighter mint gradient with a soft glow so it stays
+/* Active-link underline â†’ brighter mint gradient with a soft glow so it stays
    visible against the dark pill (the light-mode teal gradient reads too dim). */
 .site-ink .navbar-pill nav a > span {
   background: linear-gradient(90deg, #2dd4bf, #7ff5e3);
@@ -1203,14 +1203,14 @@ p {
   height: 2px;
 }
 
-/* Soft neutral fills → translucent ink tints. */
+/* Soft neutral fills â†’ translucent ink tints. */
 .site-ink .bg-slate-50,
 .site-ink .bg-slate-100,
 .site-ink .bg-navy-50 {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Borders → hairline light strokes. */
+/* Borders â†’ hairline light strokes. */
 .site-ink .border-slate-100,
 .site-ink .border-slate-200,
 .site-ink .border-slate-200\/60,
@@ -1224,7 +1224,7 @@ p {
   background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Navbar glass → dark glass so it melts into the ink canvas. */
+/* Navbar glass â†’ dark glass so it melts into the ink canvas. */
 .site-ink .navbar-glass {
   background: rgba(12, 43, 41, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1234,7 +1234,7 @@ p {
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-/* Shared glass utility → dark variant. */
+/* Shared glass utility â†’ dark variant. */
 .site-ink .glass {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -1243,7 +1243,7 @@ p {
     inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Hairline divider → light strokes. */
+/* Hairline divider â†’ light strokes. */
 .site-ink .hairline-x {
   background: linear-gradient(
     90deg,
@@ -1284,10 +1284,10 @@ p {
 }
 
 /* ===========================================================================
-   INK THEME REFINEMENTS — contrast fixes found by auditing every component.
+   INK THEME REFINEMENTS â€” contrast fixes found by auditing every component.
    =========================================================================== */
 
-/* Pale highlight backgrounds → translucent light, so both dark and light
+/* Pale highlight backgrounds â†’ translucent light, so both dark and light
    text on them stays readable on the ink canvas. */
 .site-ink .bg-electric-50,
 .site-ink .bg-electric-50\/50,
@@ -1325,13 +1325,13 @@ p {
 .site-ink .text-emerald-800 {
   color: #a7f3d0;
 }
-/* Opacity-suffixed emerald-800 (safety bullets) → readable mint on dark. */
+/* Opacity-suffixed emerald-800 (safety bullets) â†’ readable mint on dark. */
 .site-ink .text-emerald-800\/80,
 .site-ink .text-emerald-900\/80 {
   color: rgba(167, 243, 208, 0.85);
 }
 
-/* Logo mark on dark — the brand PNG carries a solid black canvas that
+/* Logo mark on dark â€” the brand PNG carries a solid black canvas that
    turns into a visible black box / chopped emblem on the ink background.
    Screen-blending makes pure black transparent while leaving the emblem
    colors untouched (a no-op if the PNG ever becomes transparent). */
@@ -1360,7 +1360,7 @@ p {
   color: rgba(238, 246, 244, 0.84);
 }
 
-/* Cream borders → light hairlines. */
+/* Cream borders â†’ light hairlines. */
 .site-ink .border-cream-200,
 .site-ink .border-cream-300 {
   border-color: rgba(255, 255, 255, 0.16);
@@ -1384,7 +1384,7 @@ p {
   color: #0b4f4a;
 }
 
-/* Contact page "Send us an email" — a deliberate white button (matches the
+/* Contact page "Send us an email" â€” a deliberate white button (matches the
    white Copy chip beside it); the generic bg-white retint must not repaint it
    dark teal. */
 .site-ink .bg-white.text-slate-800 {
@@ -1392,7 +1392,7 @@ p {
   border-color: rgba(11, 79, 74, 0.25);
   color: #0b4f4a;
 }
-/* Keep the label dark on hover too — the generic .site-ink hover:text-navy-900
+/* Keep the label dark on hover too â€” the generic .site-ink hover:text-navy-900
    retint would otherwise flip it near-white on the white face. */
 .site-ink a.bg-white.text-slate-800:hover {
   color: #063f3b;
@@ -1421,16 +1421,16 @@ p {
 }
 
 /* ===========================================================================
-   DARK MODE — BackgroundEffects (site-wide fixed backdrop)
+   DARK MODE â€” BackgroundEffects (site-wide fixed backdrop)
    It paints an OPAQUE cream base + 98%-white radial wash + white haze in a
-   `fixed inset-0 z-0` layer that covers the whole page — this was the light
+   `fixed inset-0 z-0` layer that covers the whole page â€” this was the light
    "fade" over the ink theme. Neutralize the light layers in dark mode; the
    teal particle/radar art stays visible on top of the ink canvas.
    =========================================================================== */
 .site-ink .site-bg-base {
   background-color: transparent;
 }
-/* Kill the white washes entirely — opacity alone still lets the huge
+/* Kill the white washes entirely â€” opacity alone still lets the huge
    0.98-alpha white radial bleed through and wash out the hero. */
 .site-ink .site-bg-glow,
 .site-ink .site-bg-haze {
@@ -1439,7 +1439,7 @@ p {
   opacity: 0;
 }
 
-/* AmbientGlow pastel blobs (background-system GLOW_BG) → faint teal tints. */
+/* AmbientGlow pastel blobs (background-system GLOW_BG) â†’ faint teal tints. */
 .site-ink .bg-electric-400\/25 {
   background-color: rgba(32, 148, 143, 0.12);
 }
@@ -1457,7 +1457,7 @@ p {
 }
 
 /* Gradient stops that pass through solid white (CTA cards, banners, sheens)
-   → near-opaque ink tints so text on them stays crisp and readable on dark. */
+   â†’ near-opaque ink tints so text on them stays crisp and readable on dark. */
 .site-ink .from-white {
   --tw-gradient-from: rgba(17, 51, 49, 0.92) var(--tw-gradient-from-position);
 }
@@ -1500,7 +1500,7 @@ p {
   --tw-gradient-to: rgba(17, 51, 49, 0.92) var(--tw-gradient-to-position);
 }
 
-/* Pastel solid fills → near-opaque dark panels (translucent washes made the
+/* Pastel solid fills â†’ near-opaque dark panels (translucent washes made the
    copy sitting on them look blurry as background art bled through). */
 .site-ink .bg-emerald-50,
 .site-ink .bg-leaf-50,
@@ -1514,7 +1514,7 @@ p {
 .site-ink .bg-amber-50 {
   background-color: rgba(17, 51, 49, 0.9);
 }
-/* Sunrise ("lost") surfaces → red tints on dark instead of orange. */
+/* Sunrise ("lost") surfaces â†’ red tints on dark instead of orange. */
 .site-ink .bg-sunrise-50 {
   background-color: rgba(239, 68, 68, 0.14);
 }
@@ -1534,7 +1534,7 @@ p {
   background-color: rgba(32, 148, 143, 0.18);
 }
 
-/* Pastel borders → light tinted hairlines. */
+/* Pastel borders â†’ light tinted hairlines. */
 .site-ink .border-emerald-200,
 .site-ink .border-leaf-200,
 .site-ink .border-teal-200 {
@@ -1553,7 +1553,7 @@ p {
   border-color: rgba(124, 201, 198, 0.3);
 }
 
-/* Bright accent text → readable light tints on ink. */
+/* Bright accent text â†’ readable light tints on ink. */
 .site-ink .text-emerald-600,
 .site-ink .text-emerald-700 {
   color: #6ee7b7;
@@ -1575,7 +1575,7 @@ p {
 }
 
 /* ===========================================================================
-   DARK MODE — FULL-SITE READABILITY SWEEP
+   DARK MODE â€” FULL-SITE READABILITY SWEEP
    Every remaining light-theme utility used across pages/components, remapped
    to readable ink values. Declared last so it wins the cascade.
    =========================================================================== */
@@ -1616,7 +1616,7 @@ p {
 }
 /* Opacity-suffixed reds (e.g. the count inside the home "Lost" pill uses
    text-rose-600/80). Without an explicit override the dark-mode sweep misses
-   them, leaving dark red text on the dark teal canvas — unreadable. */
+   them, leaving dark red text on the dark teal canvas â€” unreadable. */
 .site-ink .text-rose-600\/80,
 .site-ink .text-red-600\/80 {
   color: #ff8a8a;
@@ -1683,7 +1683,7 @@ p {
 
 
 /* ===========================================================================
-   DARK-MODE DECOR WASHES — the light pastel "background glow" decorations
+   DARK-MODE DECOR WASHES â€” the light pastel "background glow" decorations
    (fixed blobs, aurora blooms, hero gradient + SVG waves) read as a blinding
    white haze over the ink canvas. Retint them to faint teal/ink glows.
    =========================================================================== */
@@ -1699,9 +1699,9 @@ p {
 .site-ink .bg-ice-200\/\[0\.5\] {
   background-color: rgba(45, 212, 191, 0.07);
 }
-/* Homepage's own FIXED blob backdrop (page.tsx) — pastel circles with
+/* Homepage's own FIXED blob backdrop (page.tsx) â€” pastel circles with
    arbitrary opacities that stay glued to the viewport while scrolling and
-   wash out the hero text. → faint teal tints on the ink canvas. */
+   wash out the hero text. â†’ faint teal tints on the ink canvas. */
 .site-ink .bg-electric-100\/\[0\.55\] {
   background-color: rgba(32, 148, 143, 0.10);
 }
@@ -1712,7 +1712,7 @@ p {
   background-color: rgba(124, 201, 198, 0.07);
 }
 /* The fixed SVG backdrop's white CENTER LIGHT ellipses (98%-white radial
-   core) and cream vignette — CSS opacity overrides their SVG attributes. */
+   core) and cream vignette â€” CSS opacity overrides their SVG attributes. */
 .site-ink .fb-center-light-shape {
   opacity: 0.05;
 }
@@ -1720,13 +1720,13 @@ p {
   opacity: 0.04;
 }
 
-/* Hero bottom gradient (from-emerald-50/80 via transparent) → ink fade. */
+/* Hero bottom gradient (from-emerald-50/80 via transparent) â†’ ink fade. */
 .site-ink .from-emerald-50\/80 {
   --tw-gradient-from: rgba(12, 43, 41, 0.85) var(--tw-gradient-from-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
 }
 
-/* Hero decorative SVG waves (inline light fills) → faint teal ink strokes. */
+/* Hero decorative SVG waves (inline light fills) â†’ faint teal ink strokes. */
 .site-ink path[fill="#cde8d4"] {
   fill: rgba(45, 212, 191, 0.10);
 }
@@ -1734,7 +1734,7 @@ p {
   fill: rgba(45, 212, 191, 0.05);
 }
 
-/* Aurora blooms use inline background colors — dim the whole field, and fade
+/* Aurora blooms use inline background colors â€” dim the whole field, and fade
    it out at the hero's top edge: the section's overflow-hidden hard-clips the
    blurred blooms at the section top, which renders as a stray full-width
    horizontal line just below the navbar on the ink canvas. */
@@ -1765,7 +1765,7 @@ p {
 }
 
 /* Hero corner CommunityMotif illustrations: their hill fills close with a flat
-   bottom edge (V48 H0 Z) and stay light on the ink canvas — a hard horizontal
+   bottom edge (V48 H0 Z) and stay light on the ink canvas â€” a hard horizontal
    cut at the hero's bottom. Fade the bottom out and dim slightly in dark. */
 .site-ink .hero-motif {
   -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 90%);
@@ -1799,7 +1799,7 @@ p {
 
 
   /* ==========================================================================
-     INK SECTION — light tonal band that breaks an all-light page rhythm
+     INK SECTION â€” light tonal band that breaks an all-light page rhythm
      ========================================================================== */
   .section-ink {
     position: relative;
@@ -1865,7 +1865,7 @@ p {
   background-color: rgba(248, 113, 113, 0.14);
 }
 /* Danger zone (account settings "Delete account"): opacity-suffixed reds the
-   sweep above misses — the pale panel turned to mud on the ink canvas. */
+   sweep above misses â€” the pale panel turned to mud on the ink canvas. */
 .site-ink .bg-red-100 {
   background-color: rgba(248, 113, 113, 0.18);
 }
@@ -2011,9 +2011,9 @@ p {
   background-color: rgba(255, 255, 255, 0.06);
 }
 
-/* --- Buttons — keep labels full-brightness on the ink canvas ---------------- */
+/* --- Buttons â€” keep labels full-brightness on the ink canvas ---------------- */
 .site-ink .btn-primary {
-  /* Deep teal gradient in dark mode — vivid, and white label ≥4.5:1. */
+  /* Deep teal gradient in dark mode â€” vivid, and white label â‰¥4.5:1. */
   --tw-gradient-from: #0d7a72 var(--tw-gradient-from-position);
   --tw-gradient-to: #0b6b64 var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
@@ -2062,8 +2062,8 @@ p {
   background-color: #15803d;
 }
 
-/* Mid-teal solid fills (search button, filter chips) — darkened so their white
-   labels reach ≥4.5:1 on the ink canvas. */
+/* Mid-teal solid fills (search button, filter chips) â€” darkened so their white
+   labels reach â‰¥4.5:1 on the ink canvas. */
 .site-ink .bg-electric-500,
 .site-ink .bg-electric-500\/90 {
   background-color: #0d7a72;
@@ -2117,7 +2117,7 @@ p {
   color: rgba(110, 231, 183, 0.92);
 }
 
-/* Bright white frames (border-white/80 etc.) → hairline light strokes so
+/* Bright white frames (border-white/80 etc.) â†’ hairline light strokes so
    cards don't get a glowing white outline on the ink canvas. */
 .site-ink .border-white\/60,
 .site-ink .border-white\/70,
@@ -2127,7 +2127,7 @@ p {
 }
 
 /* --- Item-detail image panel + status chip ---------------------------------- */
-/* Panel fill gradient (from-slate-100 → to-blue-50/70) stayed light and made
+/* Panel fill gradient (from-slate-100 â†’ to-blue-50/70) stayed light and made
    the whole left panel glow white behind the photo. */
 .site-ink .from-slate-100 {
   --tw-gradient-from: rgba(17, 51, 49, 0.9) var(--tw-gradient-from-position);
@@ -2136,7 +2136,7 @@ p {
 .site-ink .to-blue-50\/70 {
   --tw-gradient-to: rgba(45, 212, 191, 0.08) var(--tw-gradient-to-position);
 }
-/* Status chip ("Still missing") — white glass over a bright photo read as a
+/* Status chip ("Still missing") â€” white glass over a bright photo read as a
    blank white pill with washed-out text. Dark chip + bright label instead. */
 .site-ink .status-chip {
   background-color: rgba(12, 43, 41, 0.78);
@@ -2152,31 +2152,31 @@ p {
   color: rgba(238, 246, 244, 0.75);
 }
 /* ===========================================================================
-   DARK-MODE READABILITY PASS — crisp, high-contrast letterforms.
+   DARK-MODE READABILITY PASS â€” crisp, high-contrast letterforms.
    Activated by the `site-ink` class on <html>. Declared LAST so these win the
    cascade over the earlier ink-theme rules and every Tailwind utility.
    
    These target the actual root causes of "eyes hurt / text blurry / letters
    hard to read" in dark mode, rather than papering over symptoms:
      (1)  Glass blur (backdrop-filter) keeps re-sampling the animated particle
-            / radar art BEHIND the translucent panels — every frame the glyphs sit on
+            / radar art BEHIND the translucent panels â€” every frame the glyphs sit on
             a moving, re-blurred backdrop, which makes them shimmer and look soft/fuzzy.
             In a dark theme every text-bearing surface is already near-opaque, so there's
             nothing useful left to blur. We turn the blur OFF site-wide, which crisps the
             letters instantly and also reduces motion/eye strain.
 
             (2)  Several muted/faint ink tones were still drawn at very low opacity
-            (alpha 0.5x-0.8x) — washed-out light-gray mush that strains the eyes
+            (alpha 0.5x-0.8x) â€” washed-out light-gray mush that strains the eyes
 
             (3)  Some text-bearing panels were still semi-transparent, so the moving
             background art bled through just behind the letters, smearing them.
    
-   Light mode is untouched — everything here is scoped to .site-ink.
+   Light mode is untouched â€” everything here is scoped to .site-ink.
 
    =========================================================================== */
 
 /* 1) Kill glass blur site-wide on the ink theme. No re-filtering of moving art
-      behind letters → instantly sharper, calmer text. */
+      behind letters â†’ instantly sharper, calmer text. */
 .site-ink *,
 .site-ink *::before,
 .site-ink *::after {
@@ -2184,7 +2184,7 @@ p {
   -webkit-backdrop-filter: none !important;
 }
 
-/* 2) Text-bearing surfaces → (near opaque so the animated art can't bleed
+/* 2) Text-bearing surfaces â†’ (near opaque so the animated art can't bleed
       through behind the glyphs. If a panel holds text it now has a firm, solid
       dark bed for the letters to sit on. */
 .site-ink .bg-white,
@@ -2210,7 +2210,7 @@ p {
 .site-ink .bg-white\/75 {
   background-color: rgba(14, 49, 47,  0.95);
 }
-/* Item-content readers sat in the nav late — navbar pill deliberately EXCLUDED:
+/* Item-content readers sat in the nav late â€” navbar pill deliberately EXCLUDED:
    it must keep the translucent glass from the earlier rule (rgba(12,43,41,0.38)
    + heavy blur) so the page background tints through it. An opaque slab here
    severed the pill from the ink canvas behind it. */
@@ -2242,7 +2242,7 @@ p {
   --auth-glass: rgba(13, 28, 26,  0.96);
 }
 
-/* 3) Brighter, firmer ink — lift the washed-out low-opacity grays to clearly
+/* 3) Brighter, firmer ink â€” lift the washed-out low-opacity grays to clearly
       readable light tones. (High-opacity light text on a dark bed is what makes
       dark-mode copy crisp instead of fuzzy and eye-straining.) */
 .site-ink {
@@ -2267,7 +2267,7 @@ p {
 .site-ink .text-navy-700 {
   color: rgba(238,  246,  244,  0.85);
 }
-/* Item-card secondary copy — the most-read list text on the site. */
+/* Item-card secondary copy â€” the most-read list text on the site. */
 .site-ink .item-card .text-slate-500,
 .site-ink .item-card .text-slate-600 {
   color: rgba(242,  250,  248,  0.97);
@@ -2279,7 +2279,7 @@ p {
 .site-ink .status-chip .text-slate-500 {
   color: rgba(238,  246,  244,  0.88);
 }
-/* Placeholders + map attribution → readable, not invisible. */
+/* Placeholders + map attribution â†’ readable, not invisible. */
 .site-ink .placeholder\:text-slate-400::placeholder,
 .site-ink .placeholder\:text-slate-500::placeholder {
   color: rgba(238,  246,  244,  0.8);
@@ -2290,7 +2290,7 @@ p {
 .site-ink .text-\[\#3d2f22\]\/75 {
   color: rgba(238,  246,  244,  0.9);
 }
-/* Auth copy — faint/muted/placeholder lifted to clearly legible. */
+/* Auth copy â€” faint/muted/placeholder lifted to clearly legible. */
 .site-ink .auth-root {
   --auth-muted: rgba(238,  246,  244,  0.96);
   --auth-faint: rgba(238,  246,   244,  0.86);
@@ -2317,7 +2317,7 @@ p {
   text-rendering: optimizeLegibility;
 }
 /* ===========================================================================
-   GUARANTEED INK TEXT — force the washed-out muted/faint grays to crisp,
+   GUARANTEED INK TEXT â€” force the washed-out muted/faint grays to crisp,
    clearly readable light tones everywhere on the ink theme, no matter what
    higher-specificity (component-level, light-theme) rule may have set them.
 
@@ -2363,7 +2363,7 @@ p {
 .site-ink .text-\[\#3d2f22\]\/75 {
   color: rgba(238,  246,  244,   0.9) !important;
 }
-/* --- Report detail page — premium panels dark-mode retint ------------------- */
+/* --- Report detail page â€” premium panels dark-mode retint ------------------- */
 /* The facts strip / reporter panel use Tailwind gradient utilities
    (from-white, to-slate-50/70, etc.) which the generic bg-white retints above
    can't touch (gradients paint as background-image). These hooks repaint them
@@ -2406,7 +2406,7 @@ p {
   color: #a7f3d0;
 }
 
-/* "LOST ITEM" status label — reads as urgent red on the dark ink canvas
+/* "LOST ITEM" status label â€” reads as urgent red on the dark ink canvas
    (the generic amber retint makes it orange, which doesn't signal urgency).
    Light mode keeps the warm amber. The pulsing dot follows. */
 .site-ink .status-label-lost,
@@ -2443,7 +2443,7 @@ p {
 
 
 /* ===========================================================================
-   MESSAGING — dark-mode re-tints for the chat surfaces
+   MESSAGING â€” dark-mode re-tints for the chat surfaces
    (inbox list, chats rail, thread bubbles, safety-reminder banner).
    The amber banner trio (bg-amber-50 / text-amber-800 / hover:bg-amber-100)
    kept their light-theme values in dark mode: amber-800 text landed on the
@@ -2452,7 +2452,7 @@ p {
    =========================================================================== */
 .site-ink .text-amber-800,
 .site-ink .text-amber-700 {
-  color: #fcd34d; /* amber-300 — warm but readable on the ink bed */
+  color: #fcd34d; /* amber-300 â€” warm but readable on the ink bed */
 }
 .site-ink .hover\:text-amber-800:hover {
   color: #fde68a; /* amber-200 on hover */
@@ -2466,7 +2466,7 @@ p {
   border-color: rgba(251, 191, 36, 0.28);
 }
 /* Alpha variants of the amber tints (bg-amber-50/70 on the chat safety
-   reminder, border-amber-200/60) — the plain-class rules above don't match
+   reminder, border-amber-200/60) â€” the plain-class rules above don't match
    them, so they stayed full light-theme values in dark mode. */
 .site-ink .bg-amber-50\/60,
 .site-ink .bg-amber-50\/70,
@@ -2503,7 +2503,7 @@ p {
   color: #6ee7b7;
 }
 
-/* bullet list uses the /80 alpha variant — a distinct class name */
+/* bullet list uses the /80 alpha variant â€” a distinct class name */
 .site-ink .safety-panel .text-emerald-800\/80 {
   color: rgba(167, 243, 208, 0.85);
 }
@@ -2518,7 +2518,7 @@ p {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Reward cell legibility in dark mode — bright mint label + near-white
+/* Reward cell legibility in dark mode â€” bright mint label + near-white
    value so it pops on the dark facts strip. !important beats the generic
    .site-ink emerald/slate retints elsewhere in this file. */
 
@@ -2535,7 +2535,7 @@ p {
 }
 
 /* ===========================================================================
-   LIGHT MODE — soften the report page glare
+   LIGHT MODE â€” soften the report page glare
    The pure-white report surface (bg-white/90) is too bright against the warm
    sand page. Tint it a calm mint-grey instead. Scoped to .report-surface;
    the dark theme's .site-ink .bg-white\/90 rule (higher specificity) still
@@ -2571,7 +2571,7 @@ p {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Facts cells lift on hover — a quiet "these are live data" cue.
+/* Facts cells lift on hover â€” a quiet "these are live data" cue.
    Declared for both themes because .site-ink retints backgrounds. */
 .report-surface .facts-strip-inner > div,
 .report-surface .journey-ribbon {
@@ -2592,7 +2592,7 @@ p {
 }
 
 /* --------------------------------------------------------------------------
-   ROUTE HOME band — dark-mode retints. The band is rendered with light-mode
+   ROUTE HOME band â€” dark-mode retints. The band is rendered with light-mode
    Tailwind palette classes; on the deep ink-teal panel they are retinted so
    the milestones, dashed route, and caption read as light-on-dark.
    -------------------------------------------------------------------------- */
@@ -2633,7 +2633,7 @@ p {
 
 
 /* ===========================================================================
-   DARK MODE — active nav pill & hover washes
+   DARK MODE â€” active nav pill & hover washes
    bg-electric-50 (#EAF7F5) is a near-white tint: active nav items (e.g. the
    "Discover" pill in the More menu) glowed bright white on the dark navbar.
    Repaint these soft light washes as translucent teal glass instead, and
@@ -2656,7 +2656,7 @@ p {
   background-color: rgba(255, 255, 255, 0.07);
 }
 
-/* The "More" nav trigger uses hover:bg-white/70 — the generic repaints above
+/* The "More" nav trigger uses hover:bg-white/70 â€” the generic repaints above
    only cover /80 and /90, so it stayed bright gray on hover in dark mode. */
 
 .site-ink .hover\:bg-white\/70:hover {
@@ -2664,7 +2664,7 @@ p {
 }
 
 /* ===========================================================================
-   DARK MODE — search hero shell
+   DARK MODE â€” search hero shell
    The search form on the home / search heroes shows a double bright outline
    in dark mode: border-white/80 repaints to 0.16 white AND ring-slate-200/50
    had no dark override at all (it kept its light gray ring). Melt both into
@@ -2737,7 +2737,7 @@ p {
 }
 
 /* ===========================================================================
-   REPORT DETAIL PAGE � dark-ink gaps the generic rules missed.
+   REPORT DETAIL PAGE ï¿½ dark-ink gaps the generic rules missed.
    border-slate-200/80 (gallery card, action card) and divide-slate-200/70
    (facts spec rail) weren't covered by the slate border groups above, so they
    stayed bright white hairlines against the ink surfaces.
@@ -2753,14 +2753,14 @@ p {
 }
 
 /* ===========================================================================
-   MESSENGER — chat surface & scrollbar polish
+   MESSENGER â€” chat surface & scrollbar polish
    Clean near-white wall (Messenger-style) so gradient own-bubbles pop.
    =========================================================================== */
 .chat-wall-light {
   background: linear-gradient(180deg, #fbfcfe 0%, #f2f5f9 100%);
 }
 
-/* The signature Messenger gradient — blue → purple, used for own bubbles,
+/* The signature Messenger gradient â€” blue â†’ purple, used for own bubbles,
    the send button and brand accents. */
 .msg-gradient {
   background-image: linear-gradient(135deg, #0695FF 0%, #4F46FF 55%, #A334FA 100%);
@@ -2784,7 +2784,7 @@ p {
   background: transparent;
 }
 
-/* Dark (ink) chat wall — declared after .site-ink defaults already exist, so
+/* Dark (ink) chat wall â€” declared after .site-ink defaults already exist, so
    the selector specificity is enough to swap the surface when in dark mode. */
 .site-ink .chat-wall-light {
   background: linear-gradient(180deg, #10151d 0%, #0b0f16 100%);
@@ -2796,7 +2796,7 @@ p {
   background: rgba(96, 165, 250, 0.38);
 }
 /* ===========================================================================
-   LOST-REPORT WIZARD (steps 1–2) — theme-adaptive panel.
+   LOST-REPORT WIZARD (steps 1â€“2) â€” theme-adaptive panel.
    Light mode: the standard white `.card`. Dark ("site-ink") mode: the deep
    teal gradient panel. The JSX is light-first; this block restores the
    original ink look when the panel carries the `.report-panel-dark` class.
@@ -2854,7 +2854,7 @@ p {
   color: rgba(204, 251, 241, 0.5);
 }
 
-/* CategoryDropdown inside the ink panel → dark glass styling. */
+/* CategoryDropdown inside the ink panel â†’ dark glass styling. */
 .site-ink .report-panel-dark .category-dropdown-trigger {
   background-color: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.15);
@@ -2888,7 +2888,7 @@ p {
   color: #5eead4;
 }
 
-/* City / Province native selects inside the ink panel → dark glass styling.
+/* City / Province native selects inside the ink panel â†’ dark glass styling.
    The option popups stay light (color-scheme: light) so they remain readable
    on every OS, matching the site-ink .input convention. */
 .site-ink .report-panel-dark select {
@@ -2902,14 +2902,14 @@ p {
 }
 
 /* ===========================================================================
-   REPORT-STEPS INDICATOR — keep step labels readable in both themes.
+   REPORT-STEPS INDICATOR â€” keep step labels readable in both themes.
    In light mode they inherit text-slate-400/600; in dark mode (site-ink) the
-   generic remap turns them light enough — but the accent-colored active label
+   generic remap turns them light enough â€” but the accent-colored active label
    + the empty connector render as faint dark text on the deep teal canvas
    and disappear. Force explicit values here so both themes look correct.
    =========================================================================== */
 .report-step-label {
-  color: #334155; /* slate-700, default done — strong enough on white */
+  color: #334155; /* slate-700, default done â€” strong enough on white */
 }
 .report-step-label-done {
   color: #334155; /* slate-700, done */
@@ -2930,7 +2930,7 @@ p {
   color: rgba(204, 251, 241, 0.5);
 }
 
-/* Active step accent colors look washed-out on dark teal — bump them to
+/* Active step accent colors look washed-out on dark teal â€” bump them to
    the brighter teal-300/emerald-300 equivalents so the ring + text pop. */
 .site-ink .text-teal-700 {
   color: #5eead4 !important;
@@ -2939,14 +2939,14 @@ p {
   color: #6ee7b7 !important;
 }
 
-/* Empty (inactive) connector segment in dark mode — slate-200 disappears on
+/* Empty (inactive) connector segment in dark mode â€” slate-200 disappears on
    the teal canvas. Re-theme to a faint ink tone. */
 .site-ink .report-steps-connector {
   background-color: rgba(204, 251, 241, 0.15) !important;
 }
 
 /* ===========================================================================
-   REPORT WIZARD — nested subsection cards.
+   REPORT WIZARD â€” nested subsection cards.
    The active step uses `.report-panel-dark` (teal gradient). Inside it, our
    FieldGroup/WhereSection/WhenSection cards use `bg-white/70` + slate borders.
    In site-ink mode the white surface already remaps to dark glass, but the
@@ -2962,7 +2962,7 @@ p {
 }
 
 /* ===========================================================================
-   WIZARD HEADER — eyebrow + trust strip.
+   WIZARD HEADER â€” eyebrow + trust strip.
    Light: white pill with slate-500 text. Dark: keep the pill but make the
    surface + border + text theme-appropriate.
    =========================================================================== */
@@ -2974,7 +2974,7 @@ p {
 }
 
 /* ===========================================================================
-   WIZARD NAV — sticky bottom bar.
+   WIZARD NAV â€” sticky bottom bar.
    =========================================================================== */
 .site-ink .report-wizard-nav {
   background-color: rgba(17, 51, 49, 0.92);
@@ -2982,7 +2982,7 @@ p {
 }
 
 /* ===========================================================================
-   REVIEW list — Public card + Privacy check + final confirmation card.
+   REVIEW list â€” Public card + Privacy check + final confirmation card.
    Same nested-card treatment as the subcards above.
    =========================================================================== */
 .site-ink .report-panel-dark .report-review-card,
@@ -3001,7 +3001,7 @@ p {
   color: rgba(153, 246, 228, 0.85);
 }
 
-/* The Photo tip card (amber) — re-theme as a teal-tinted tip in dark mode. */
+/* The Photo tip card (amber) â€” re-theme as a teal-tinted tip in dark mode. */
 .site-ink .report-panel-dark .report-photo-tip {
   background-color: rgba(45, 212, 191, 0.12);
   border-color: rgba(45, 212, 191, 0.32);
@@ -3011,7 +3011,7 @@ p {
   color: #5eead4;
 }
 
-/* Reward chip "active" state — light uses teal-50, dark needs a stronger fill. */
+/* Reward chip "active" state â€” light uses teal-50, dark needs a stronger fill. */
 .site-ink .report-reward-chip-active {
   border-color: rgba(45, 212, 191, 0.55) !important;
   background-color: rgba(45, 212, 191, 0.18) !important;
@@ -3129,17 +3129,17 @@ p {
 
 
 /* ===========================================================================
-   REPORT WIZARD — dark-mode re-tints (report lost / report found).
+   REPORT WIZARD â€” dark-mode re-tints (report lost / report found).
    The wizard's note cards use light pastel gradients (from-blue-50,
    from-emerald-50, ...) and deep accent text (text-teal-900, text-teal-800,
-   text-blue-700, ...) that the generic retints above miss — gradients paint
+   text-blue-700, ...) that the generic retints above miss â€” gradients paint
    as background-image, and the deep accent shades were never remapped. That
    produced light-on-light cards ("Report quality", "Private verification
    detail") and dark-on-dark chips (the active "When & where" step).
-   Light mode is untouched — everything here is scoped to .site-ink.
+   Light mode is untouched â€” everything here is scoped to .site-ink.
    =========================================================================== */
 
-/* 1) Pastel gradient note cards → solid dark ink beds. The gradient stops
+/* 1) Pastel gradient note cards â†’ solid dark ink beds. The gradient stops
       only appear on the big note/notice cards, never on small accents. */
 .site-ink .from-blue-50,
 .site-ink .from-emerald-50,
@@ -3165,7 +3165,7 @@ p {
   background-color: rgba(14, 49, 47, 0.95);
 }
 
-/* 3) Tinted icon chips / step circles (bg-blue-100, bg-slate-100, ...) →
+/* 3) Tinted icon chips / step circles (bg-blue-100, bg-slate-100, ...) â†’
       translucent white over the ink bed so the numerals & glyphs read. */
 .site-ink .bg-blue-100,
 .site-ink .bg-emerald-100,
@@ -3175,7 +3175,7 @@ p {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-/* 4) Pastel borders → faint white hairlines. */
+/* 4) Pastel borders â†’ faint white hairlines. */
 .site-ink .border-blue-200,
 .site-ink .border-emerald-200,
 .site-ink .border-teal-200,
@@ -3183,7 +3183,7 @@ p {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-/* 5) Deep accent text → light tints (the dark-on-dark / light-on-light fixes). */
+/* 5) Deep accent text â†’ light tints (the dark-on-dark / light-on-light fixes). */
 .site-ink .text-teal-900,
 .site-ink .text-teal-800 {
   color: #99f6e4;
@@ -3241,3 +3241,64 @@ p {
 .site-ink .report-wizard .border-slate-300 {
   border-color: rgba(255, 255, 255, 0.22);
 }
+
+/* ===========================================================================
+   DISCOVER PAGE â€” site-ink (dark mode) gaps
+   The Explore page (src/app/(main)/discover/page.tsx) uses opacity-suffixed
+   cream/red/emerald utilities that the sweeps above don't match â€” they fell
+   through as bright light-mode surfaces on the ink canvas. Same palette
+   values as the parent rules: white 5-6% faint fills, red 248,113,113,
+   emerald 52,211,153, cream hairline 16%.
+   =========================================================================== */
+
+/* Segmented toolbar track, tab count chips, city input fill, category hover. */
+.site-ink .bg-cream-50\/80,
+.site-ink .bg-cream-50\/50,
+.site-ink .bg-cream-200\/80,
+.site-ink .hover\:bg-cream-100:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Toolbar's soft top/bottom hairlines. */
+.site-ink .border-cream-200\/80 {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Hero "X lost" stat pill â€” dark red tint instead of pale pink. */
+.site-ink .bg-red-50\/80,
+.site-ink .hover\:bg-red-100\/80:hover {
+  background-color: rgba(248, 113, 113, 0.16);
+}
+.site-ink .border-red-100 {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+/* Hero "Y found" stat pill â€” dark emerald tint instead of pale mint. */
+.site-ink .bg-emerald-50\/80,
+.site-ink .hover\:bg-emerald-100\/80:hover {
+  background-color: rgba(52, 211, 153, 0.16);
+}
+
+/* Category explorer tiles - pastel tints become 12-14% accent tints on ink. */
+.site-ink .bg-violet-50 {
+  background-color: rgba(167, 139, 250, 0.12);
+}
+.site-ink .bg-leaf-50 {
+  background-color: rgba(53, 165, 107, 0.14);
+}
+.site-ink .bg-cyan-50 {
+  background-color: rgba(43, 163, 171, 0.14);
+}
+.site-ink .bg-indigo-50 {
+  background-color: rgba(129, 140, 248, 0.12);
+}
+.site-ink .bg-lavender-100 {
+  background-color: rgba(199, 168, 186, 0.12);
+}
+
+/* ==========================================================================
+   Discover page canvas — the page intentionally uses the site-wide luminous background
+   (body gradient + BackgroundEffects), same as Home / About / the other (main) pages.
+   No opaque canvas override here so the real background shows through consistently.
+
+   ========================================================================== */

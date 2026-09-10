@@ -6,7 +6,13 @@ import { MapPin, Navigation } from "lucide-react";
  * cluster, a dashed travel route between two pins, and a soft radar pulse.
  * Render at low opacity behind content; never interactive.
  */
-export function MapMotif({ className }: { className?: string }) {
+export function MapMotif({
+  className,
+  tone = "text-electric-600",
+}: {
+  className?: string;
+  tone?: string;
+}) {
   return (
     <div
       aria-hidden="true"
@@ -15,7 +21,7 @@ export function MapMotif({ className }: { className?: string }) {
       <svg
         viewBox="0 0 420 300"
         fill="none"
-        className="h-full w-full text-electric-600"
+        className={`h-full w-full ${tone}`}
       >
         {/* Dotted island clusters */}
         {Array.from({ length: 7 }).map((_, row) =>
