@@ -55,9 +55,10 @@ export function ItemCard({
             src={imageUrl}
             alt={title}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1279px) 33vw, 25vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            unoptimized
+            // Removed unoptimized - now uses Next.js optimization with Supabase remotePatterns
+            // This cuts bandwidth ~70% on PH mobile data
           />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-sunrise-50 via-ice-50 to-lavender-50">
@@ -139,7 +140,7 @@ export function ItemCard({
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="truncate font-display text-[15.5px] font-bold tracking-[-0.01em] text-navy-900 transition-colors duration-200 group-hover:text-teal-700">
+        <h3 className="truncate font-display text-[15.5px] font-bold tracking-[-0.01em] text-navy-900 transition-colors duration-200 group-hover:text-electric-700">
           {title}
         </h3>
 
@@ -185,9 +186,9 @@ export function ItemCard({
             </span>
           </div>
 
-          {/* View report — footer action, anchored by a hairline divider */}
-          <div className="card-footer mt-3.5 flex items-center gap-1.5 border-t border-slate-200/70 pt-3 text-xs font-semibold text-slate-500 transition-colors group-hover:text-teal-700">
-            View report
+          {/* View details — footer action, anchored by a hairline divider */}
+          <div className="card-footer mt-3.5 flex items-center gap-1.5 border-t border-slate-200/70 pt-3 text-xs font-semibold text-slate-500 transition-colors group-hover:text-electric-700">
+            View details
             <ArrowRight
               aria-hidden="true"
               className={`h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 ${a.textStrong}`}

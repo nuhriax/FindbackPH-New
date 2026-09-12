@@ -1,3 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1304 1206" role="img" aria-label="FindBack PH logo">
-  <image href="findback-logo.png" width="1304" height="1206" preserveAspectRatio="xMidYMid meet"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-label="FindBack PH logo">
+  <defs>
+    <linearGradient id="fb-logo-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F7B72"/>
+      <stop offset="100%" stop-color="#20948F"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="40" height="40" rx="12" fill="url(#fb-logo-grad)"/>
+  <!-- Location pin -->
+  <path d="M20 8.5C15.3 8.5 11.5 12.1 11.5 16.6C11.5 22.5 20 31.5 20 31.5C20 31.5 28.5 22.5 28.5 16.6C28.5 12.1 24.7 8.5 20 8.5Z" fill="white" fill-opacity="0.95"/>
+  <!-- Inner circle with check/search -->
+  <circle cx="20" cy="16.8" r="5.2" fill="#0F7B72"/>
+  <path d="M17.5 16.8L19.2 18.5L22.5 15.1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

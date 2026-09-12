@@ -1,11 +1,13 @@
-﻿import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss";
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
-            colors: {
+      colors: {
+        // Legacy names - kept for backward compat, but confusing
+        // electric = teal #0F7B72, navy = sand #FBF6EE, sunrise = red #DC2626
         electric: {
-          50:  "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
+          50: "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
           500: "#0F7B72", 600: "#0C6262", 700: "#0A4E55", 800: "#083B46", 900: "#052A33", 950: "#031B22",
         },
         navy: {
@@ -48,9 +50,6 @@ const config: Config = {
           50: "#EDF9F0", 100: "#D5F1DF", 200: "#A9E3C2", 300: "#7BD1A4", 400: "#46B687",
           500: "#1B8956", 600: "#11683F", 700: "#0E5734", 800: "#0A4026", 900: "#072B1B",
         },
-        /* Leaf — nature accents used for organic highlights, badges and the
-           "coming home" moments. Teal stays the primary action color; leaf
-           greens appear only as supporting nature motifs. */
         leaf: {
           50: "#F1FAF3", 100: "#DFF3E5", 200: "#BFE7CC", 300: "#92D5AB", 400: "#5CBF87",
           500: "#35A56B", 600: "#268A56", 700: "#1D6E45", 800: "#175736", 900: "#114229", 950: "#0A2B1B",
@@ -60,17 +59,27 @@ const config: Config = {
           500: "#F27418", 600: "#DE3810", 700: "#B5490C", 800: "#8F3900", 900: "#6E2D06",
         },
         ink: { DEFAULT: "#332312", secondary: "#4C351C", muted: "#6B5636" },
+        // Semantic aliases - use these going forward
+        brand: {
+          50: "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
+          500: "#0F7B72", 600: "#0C6262", 700: "#0A4E55", 800: "#083B46", 900: "#052A33", 950: "#031B22",
+        },
+        sand: {
+          50: "#FBF6EE", 100: "#F6EDE0", 200: "#EFE0CF", 300: "#E0CFAC", 400: "#CDB081",
+          500: "#B58A56", 600: "#96683A", 700: "#6F4E28", 800: "#4C351C", 900: "#332312", 950: "#1F150B",
+        },
+        danger: {
+          50: "#FEF2F2", 100: "#FEE2E2", 200: "#FECACA", 300: "#FCA5A5", 400: "#F87171",
+          500: "#DC2626", 600: "#B91C1C", 700: "#991B1B", 800: "#7F1D1D", 900: "#5C1515",
+        },
+        success: {
+          50: "#EDF9F0", 100: "#D5F1DF", 200: "#A9E3C2", 300: "#7BD1A4", 400: "#46B687",
+          500: "#1B8956", 600: "#11683F", 700: "#0E5734", 800: "#0A4026", 900: "#072B1B",
+        },
       },
       fontFamily: {
         sans: ["var(--font-pjs)", "system-ui", "sans-serif"],
-        // Display/brand typography: Sora (loaded in layout.tsx as --font-sora).
-        // Applied to all headings via globals.css (`@apply font-display`) and
-        // any explicit `font-display` usage — Sora gives the brand voice while
-        // Plus Jakarta Sans keeps the UI/body clear and readable.
         display: ["var(--font-sora)", "var(--font-pjs)", "system-ui", "sans-serif"],
-        // Keep every `font-mono` element on the same Plus Jakarta Sans family so
-        // counters/labels don't fall back to a browser monospace font and look
-        // out of place on the About / Safety pages.
         mono: ["var(--font-pjs)", "system-ui", "sans-serif"],
       },
       borderRadius: { xl: "1rem", "2xl": "1.25rem", "3xl": "1.5rem", card: "1.25rem", button: "0.75rem" },

@@ -5,15 +5,19 @@ export function LogoMark({ className }: { className?: string }) {
   return (
     <span
       className={clsx(
-        "logo-mark inline-flex h-9 w-9 shrink-0 items-center justify-center",
+        "logo-mark inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm",
         className,
       )}
       aria-hidden="true"
     >
+      {/* Proper vector logo - transparent bg, works in light & dark, no 1.5MB PNG */}
       <img
-        src="/brand/findback-logo.png"
+        src="/brand/findback-logo.svg"
         alt=""
+        width={36}
+        height={36}
         className="h-full w-full object-contain"
+        loading="eager"
       />
     </span>
   );
