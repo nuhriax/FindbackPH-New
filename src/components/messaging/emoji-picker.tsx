@@ -12,8 +12,8 @@ import { SearchX } from "lucide-react";
 const RECENTS_KEY = "findback:emoji-recents";
 
 /**
- * Keyword index so typing a word ("heart", "fire", "laugh"�) finds matching
- * emojis � searching by exact character alone is useless to most people.
+ * Keyword index so typing a word ("heart", "fire", "laugh"—) finds matching
+ * emojis — searching by exact character alone is useless to most people.
  */
 const KEYWORDS: Record<string, string[]> = {
   "😀": ["grin", "smile", "happy"],

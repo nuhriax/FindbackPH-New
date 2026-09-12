@@ -77,7 +77,7 @@ export function OwnershipChallengeForm({
             value={a1}
             onChange={(e) => setA1(e.target.value)}
             autoComplete="off"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-electric-500"
           />
         </label>
 
@@ -88,7 +88,7 @@ export function OwnershipChallengeForm({
               value={a2}
               onChange={(e) => setA2(e.target.value)}
               autoComplete="off"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-electric-500"
             />
           </label>
         )}

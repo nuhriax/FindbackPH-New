@@ -375,23 +375,23 @@ export function ReportDetail({
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 <span
                   className={`inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] ${
-                    isLost ? "status-label-lost text-amber-600" : "text-emerald-600"
+                    isLost ? "status-label-lost text-sunrise-600" : "text-emerald-600"
                   }`}
                 >
                   <span
                     className={`relative flex h-1.5 w-1.5 rounded-full ${
-                      isLost ? "text-amber-500" : "text-emerald-500"
+                      isLost ? "text-sunrise-500" : "text-emerald-500"
                     }`}
                   >
                     <span
                       className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${
-                        isLost ? "bg-amber-500" : "bg-emerald-500"
+                        isLost ? "bg-sunrise-500" : "bg-emerald-500"
                       }`}
                     />
 
                     <span
                       className={`relative inline-flex h-1.5 w-1.5 rounded-full ${
-                        isLost ? "bg-amber-500" : "bg-emerald-500"
+                        isLost ? "bg-sunrise-500" : "bg-emerald-500"
                       }`}
                     />
                   </span>

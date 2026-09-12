@@ -172,10 +172,10 @@ export function WizardReviewList({
       {/* Private verification detail */}
       <section
         aria-labelledby="review-private"
-        className="flex items-start gap-4 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50/50 p-5 transition-all duration-300 hover:shadow-md"
+        className="flex items-start gap-4 report-soft-surface flex items-start gap-4 rounded-2xl border border-electric-200 bg-gradient-to-br from-electric-50 to-electric-50/50 p-5 transition-all duration-300 hover:shadow-md"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 border border-blue-200">
-          <Lock size={18} className="text-blue-700" aria-hidden="true" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-electric-100 border border-electric-200">
+          <Lock size={18} className="text-electric-700" aria-hidden="true" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -185,7 +185,7 @@ export function WizardReviewList({
             >
               Private verification detail
             </h3>
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 border border-blue-200">
+            <span className="rounded-full bg-electric-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-electric-700 border border-electric-200">
               Private
             </span>
           </div>
@@ -211,11 +211,11 @@ export function WizardReviewList({
       {/* Privacy check */}
       <div
         role="note"
-        className="report-privacy-check rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-50/50 p-5 transition-all duration-300 hover:shadow-md"
+        className="report-soft-surface report-privacy-check rounded-2xl border border-sunrise-200 bg-gradient-to-br from-sunrise-50 to-sunrise-50/50 p-5 transition-all duration-300 hover:shadow-md"
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 border border-amber-200">
-            <Lock size={16} className="text-amber-700" aria-hidden="true" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sunrise-100 border border-sunrise-200">
+            <Lock size={16} className="text-sunrise-700" aria-hidden="true" />
           </div>
           <div>
             <p className="text-sm font-semibold text-navy-900 mb-1">
@@ -234,7 +234,7 @@ export function WizardReviewList({
       {cfg.extraField === "holding" && (
         <div
           role="note"
-          className="flex items-start gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-5 text-left transition-all duration-300 hover:shadow-md"
+          className="flex items-start gap-4 report-soft-surface rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-5 text-left transition-all duration-300 hover:shadow-md"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 border border-emerald-200">
             <ShieldCheck size={18} className="text-emerald-700" />

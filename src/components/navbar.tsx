@@ -325,7 +325,7 @@ export function Navbar({
                 </Link>
                 <Link
                   href="/register"
-                  className="ml-1 inline-flex items-center rounded-full bg-gradient-to-b from-electric-500 to-electric-600 px-4 py-2 text-sm font-medium text-white shadow-[0_8px_24px_-10px_rgba(15,123,122,0.65)] transition-all duration-200 hover:-translate-y-px hover:from-electric-400 hover:to-electric-500"
+                  className="ml-1 inline-flex items-center rounded-full bg-gradient-to-b from-sun-400 to-sun-500 px-4 py-2 text-sm font-medium text-ink shadow-[0_8px_24px_-10px_rgba(201,127,30,0.65)] transition-all duration-200 hover:-translate-y-px hover:from-sun-300 hover:to-sun-400"
                 >
                   Create account
                 </Link>

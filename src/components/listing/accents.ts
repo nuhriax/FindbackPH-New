@@ -1,4 +1,4 @@
-export type Accent = "lost" | "found" | "discover";
+export type Accent = "lost" | "found" | "discover" | "reunited";
 
 export type AccentClasses = {
   text: string;
@@ -13,43 +13,56 @@ export type AccentClasses = {
 };
 
 /**
- * Accent color class maps shared by every listing surface so the Lost Items
- * (blue/indigo) and Found Items (emerald/teal) pages stay two variations of
- * the same product.
+ * Accent color class maps shared by every listing surface. Lost wears coral
+ * (the "missing" signal), Found wears ocean blue, and Reunited celebrates
+ * in sun gold. Deprecated aliases (sunrise/sulo/teal) resolve to these same
+ * brand values — new call sites should use the semantic tokens directly.
  */
 export const ACCENT: Record<Accent, AccentClasses> = {
   lost: {
-    text: "text-sunrise-700",
-    textStrong: "text-sunrise-600",
-    border: "border-sunrise-200/80",
-    bgSoft: "bg-sunrise-50/80",
-    button: "bg-sunrise-500",
-    buttonHover: "hover:bg-sunrise-400",
-    focus: "focus:border-sunrise-400 focus:ring-sunrise-500/20",
-    hoverText: "group-hover:text-sunrise-700",
-    glow: "bg-sunrise-500/10",
+    text: "text-coral-700",
+    textStrong: "text-coral-600",
+    border: "border-coral-200/80",
+    bgSoft: "bg-coral-50/80",
+    button: "bg-coral-500",
+    buttonHover: "hover:bg-coral-400",
+    focus: "focus:border-coral-400 focus:ring-coral-500/20",
+    hoverText: "group-hover:text-coral-700",
+    glow: "bg-coral-500/10",
   },
   found: {
-    text: "text-emerald-700",
-    textStrong: "text-emerald-600",
-    border: "border-emerald-200/80",
-    bgSoft: "bg-emerald-50/80",
-    button: "bg-emerald-500",
-    buttonHover: "hover:bg-emerald-400",
-    focus: "focus:border-emerald-400 focus:ring-emerald-500/20",
-    hoverText: "group-hover:text-emerald-700",
-    glow: "bg-emerald-500/10",
+    text: "text-ocean-700",
+    textStrong: "text-ocean-600",
+    border: "border-ocean-200/80",
+    bgSoft: "bg-ocean-50/80",
+    button: "bg-ocean-600",
+    buttonHover: "hover:bg-ocean-500",
+    focus: "focus:border-ocean-400 focus:ring-ocean-500/20",
+    hoverText: "group-hover:text-ocean-700",
+    glow: "bg-ocean-500/10",
   },
-  /** Discover — the mixed lost+found feed wears the brand teal. */
+  /** Discover — the mixed lost+found feed wears the brand ocean. */
   discover: {
-    text: "text-teal-700",
-    textStrong: "text-teal-600",
-    border: "border-teal-200/80",
-    bgSoft: "bg-teal-50/80",
-    button: "bg-teal-700",
-    buttonHover: "hover:bg-teal-600",
-    focus: "focus:border-teal-400 focus:ring-teal-500/20",
-    hoverText: "group-hover:text-teal-700",
-    glow: "bg-teal-500/10",
+    text: "text-ocean-700",
+    textStrong: "text-ocean-600",
+    border: "border-ocean-200/80",
+    bgSoft: "bg-ocean-50/80",
+    button: "bg-ocean-700",
+    buttonHover: "hover:bg-ocean-600",
+    focus: "focus:border-ocean-400 focus:ring-ocean-500/20",
+    hoverText: "group-hover:text-ocean-700",
+    glow: "bg-ocean-500/10",
+  },
+  /** Reunited — the celebratory moment wears sun gold. */
+  reunited: {
+    text: "text-sun-700",
+    textStrong: "text-sun-600",
+    border: "border-sun-200/80",
+    bgSoft: "bg-sun-50/80",
+    button: "bg-sun-500",
+    buttonHover: "hover:bg-sun-400",
+    focus: "focus:border-sun-400 focus:ring-sun-500/20",
+    hoverText: "group-hover:text-sun-700",
+    glow: "bg-sun-500/10",
   },
 };

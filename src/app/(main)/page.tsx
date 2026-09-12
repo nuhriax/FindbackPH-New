@@ -434,11 +434,11 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/report/lost" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-sunrise-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sunrise-600 sm:w-auto">
+            <Link href="/report/lost" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-b from-sun-400 to-sun-500 px-6 py-3 text-sm font-semibold text-ink shadow-[0_10px_30px_-10px_rgba(201,127,30,0.55)] transition hover:-translate-y-px hover:from-sun-300 hover:to-sun-400 sm:w-auto">
               <PackageSearch size={16} />
               I lost something
             </Link>
-            <Link href="/report/found" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 sm:w-auto">
+            <Link href="/report/found" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-ocean-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(11,38,71,0.55)] transition hover:-translate-y-px hover:bg-ocean-400 sm:w-auto">
               <HeartHandshake size={16} />
               I found something
             </Link>

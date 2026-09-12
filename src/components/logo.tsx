@@ -1,23 +1,31 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { clsx } from "clsx";
 
 export function LogoMark({ className }: { className?: string }) {
+  // Original crest (sun + magnifier + palms + stars). Rendered raw — no
+  // tile, ring, or background — so the artwork's own shape shows.
+  // Slightly larger than the old 36px tile so detail stays legible.
+  const [missing, setMissing] = useState(false);
+  const src = missing ? "/brand/findback-logo.svg" : "/brand/original-logo.png";
   return (
     <span
       className={clsx(
-        "logo-mark inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm",
+        "logo-mark inline-flex h-11 w-11 shrink-0 items-center justify-center",
         className,
       )}
       aria-hidden="true"
     >
-      {/* Proper vector logo - transparent bg, works in light & dark, no 1.5MB PNG */}
       <img
-        src="/brand/findback-logo.svg"
+        src={src}
         alt=""
-        width={36}
-        height={36}
-        className="h-full w-full object-contain"
+        width={44}
+        height={44}
+        className="h-full w-full object-contain drop-shadow-[0_2px_6px_rgba(5,42,51,0.25)]"
         loading="eager"
+        onError={() => setMissing(true)}
       />
     </span>
   );

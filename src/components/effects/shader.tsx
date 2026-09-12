@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 type ShaderTone = "deep" | "aurora" | "ember";
 
 const TONES: Record<ShaderTone, { base: string; blooms: string[] }> = {
-  // Deep Philippine-sea teal → the site's signature dark CTA surface.
+  // Deep Philippine-sea ocean → the site's signature dark CTA surface.
   deep: {
-    base: "linear-gradient(130deg, #052A33 0%, #083B46 34%, #0C6262 68%, #0F7B72 100%)",
-    blooms: ["#46ABAA", "#2BA3AB", "#7CC9C6", "#20948F"],
+    base: "linear-gradient(130deg, #081D36 0%, #0B2647 34%, #123A63 68%, #3E6E9E 100%)",
+    blooms: ["#7E9FC6", "#5195BC", "#B0D2E4", "#EFA430"],
   },
   // Cool auroral gradient that nods at the global BackgroundEffects.
   aurora: {

@@ -245,15 +245,15 @@ function PrivateVerificationField({
   required: boolean;
 }) {
   return (
-    <div className="rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50/50 p-5 transition-all duration-300 hover:shadow-md">
+    <div className="report-soft-surface rounded-2xl border-2 border-electric-200 bg-gradient-to-br from-electric-50 to-electric-50/50 p-5 transition-all duration-300 hover:shadow-md">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 border border-blue-200">
-          <Lock size={20} className="text-blue-700" aria-hidden={true} />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-electric-100 border border-electric-200">
+          <Lock size={20} className="text-electric-700" aria-hidden={true} />
         </div>
         <div className="flex-1 min-w-0">
           <p className="flex items-center gap-2 text-sm font-bold text-navy-900">
             Private verification detail {required && <span className="text-red-600">*</span>}
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 border border-blue-200">
+            <span className="rounded-full bg-electric-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-electric-700 border border-electric-200">
               Private
             </span>
           </p>
@@ -270,10 +270,10 @@ function PrivateVerificationField({
             rows={3}
             maxLength={1000}
             required={required}
-            className="input mt-3 border-blue-200 bg-white transition-all duration-200 focus:ring-4 focus:ring-blue-500/10"
+            className="input mt-3 border-electric-200 bg-white transition-all duration-200 focus:ring-4 focus:ring-electric-500/10"
             placeholder={distPlaceholder}
           />
-          <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-blue-700">
+          <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-electric-700">
             <Lock size={12} className="shrink-0" aria-hidden={true} />
             Hidden from the public listing
           </div>

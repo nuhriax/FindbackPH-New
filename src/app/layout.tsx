@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Sora } from "next/font/google";
+import { Plus_Jakarta_Sans, Sora, Caveat } from "next/font/google";
 import "./globals.css";
 import "./auth.css";
 import { MarketingBackground } from "@/components/ui/marketing-background";
@@ -22,6 +22,15 @@ const sora = Sora({
   display: "swap",
 });
 
+// Caveat — handwritten annotation, used in exactly ONE place: the notice-card
+// annotation (e.g. "reward, tawag lang po"). Never navigation/headings/buttons.
+const caveat = Caveat({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-caveat",
+  display: "swap",
+});
+
 /**
  * Viewport metadata. `viewportFit: "cover"` is REQUIRED for the existing
  * `env(safe-area-inset-*)` padding used across the app (camera overlay,
@@ -33,7 +42,7 @@ const sora = Sora({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#2563eb",
+  themeColor: "#123A63",
   viewportFit: "cover",
 };
 
@@ -86,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
    // suppressHydrationWarning: the inline theme script below mutates
    // <html> (data-auth-theme) before React hydrates, by design — without
    // this, React logs a hydration attribute-mismatch warning on every load.
-   (<html lang="en" className={`${plusJakarta.variable} ${sora.variable}`} suppressHydrationWarning>
+   (<html lang="en" className={`${plusJakarta.variable} ${sora.variable} ${caveat.variable}`} suppressHydrationWarning>
     <body className="flex min-h-dvh flex-col font-sans text-navy-900 antialiased">
       {/* Skip link for keyboard / screen-reader users */}
       <a

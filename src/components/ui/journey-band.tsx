@@ -55,7 +55,7 @@ export function JourneyBand({
             <defs>
               <linearGradient id="fb-route" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0" stopColor="#f59341" />
-                <stop offset="0.45" stopColor="#20948f" />
+                <stop offset="0.45" stopColor="#3E6E9E" />
                 <stop offset="1" stopColor="#209b68" />
               </linearGradient>
             </defs>
@@ -116,7 +116,7 @@ export function RouteRule({ className = "" }: { className?: string }) {
         className="h-px flex-1"
         style={{
           backgroundImage:
-            "linear-gradient(90deg, #f59341, #20948f 45%, #209b68)",
+            "linear-gradient(90deg, #f59341, #3E6E9E 45%, #209b68)",
           opacity: 0.35,
         }}
       />

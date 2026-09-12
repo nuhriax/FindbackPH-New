@@ -39,23 +39,27 @@ export type AccentPalette = {
   edit: string;
 };
 
-export const ACCENT: Record<"teal" | "emerald", AccentPalette> = {
-  teal: {
-    text: "text-teal-600",
-    ring: "ring-teal-400/20",
-    iconBg: "from-teal-500 to-teal-600 shadow-teal-500/25",
-    chipActive: "bg-teal-50 border-teal-200",
-    chipActiveTitle: "text-teal-900",
-    chipActiveIcon: "bg-teal-600",
-    chipDone: "bg-teal-100 text-teal-700",
-    pulse: "bg-teal-500",
-    stepCircle: "from-teal-400 to-teal-600",
-    hoverBorder: "hover:border-teal-200",
-    tip: "border-teal-200/70 bg-teal-50/70",
-    tipIcon: "text-teal-600",
-    edit: "text-teal-600 hover:bg-teal-50 hover:text-teal-700",
+export const ACCENT: Record<"lost" | "found", AccentPalette> = {
+  // Lost flow — Coral (#E1573C ramp, aliased as "sunrise"). Coral is reserved
+  // for lost-item states, warnings, and alerts; it signals "missing".
+  lost: {
+    text: "text-sunrise-600",
+    ring: "ring-sunrise-400/20",
+    iconBg: "from-sunrise-500 to-sunrise-600 shadow-sunrise-500/25",
+    chipActive: "bg-sunrise-50 border-sunrise-200",
+    chipActiveTitle: "text-sunrise-900",
+    chipActiveIcon: "bg-sunrise-600",
+    chipDone: "bg-sunrise-100 text-sunrise-700",
+    pulse: "bg-sunrise-500",
+    stepCircle: "from-sunrise-400 to-sunrise-600",
+    hoverBorder: "hover:border-sunrise-200",
+    tip: "border-sunrise-200/70 bg-sunrise-50/70",
+    tipIcon: "text-sunrise-600",
+    edit: "text-sunrise-600 hover:bg-sunrise-50 hover:text-sunrise-700",
   },
-  emerald: {
+  // Found flow — leaf green (#1B8956 ramp, aliased as "emerald"). Signals
+  // "safe / good news" and stays visually distinct from the lost coral.
+  found: {
     text: "text-emerald-600",
     ring: "ring-emerald-400/20",
     iconBg: "from-emerald-500 to-emerald-600 shadow-emerald-500/25",
@@ -128,13 +132,13 @@ export const CONFIG: Record<WizardKind, WizardConfig> = {
     itemType: "lost_item",
     formId: "lost-report-form",
     storageKey: "fb-draft-lost",
-    accent: ACCENT.teal,
+    accent: ACCENT.lost,
     eyebrowIcon: PackageSearch,
     eyebrowLabel: "Lost something?",
     heroTitle: (
       <>
         Report a{" "}
-        <span className="bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-sunrise-600 to-sunrise-500 bg-clip-text text-transparent">
           lost item
         </span>
       </>
@@ -196,7 +200,7 @@ export const CONFIG: Record<WizardKind, WizardConfig> = {
     itemType: "found_item",
     formId: "found-report-form",
     storageKey: "fb-draft-found",
-    accent: ACCENT.emerald,
+    accent: ACCENT.found,
     eyebrowIcon: PackageCheck,
     eyebrowLabel: "Found something?",
     heroTitle: (

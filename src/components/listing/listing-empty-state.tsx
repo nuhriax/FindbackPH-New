@@ -33,7 +33,32 @@ export function ListingEmptyState({
   const a = ACCENT[accent];
 
   return (
-    <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-slate-300/80 bg-white/60 px-6 py-12 text-center">
+    <div className="relative mt-8 flex flex-col items-center overflow-hidden rounded-2xl border border-dashed border-slate-300/80 bg-white/60 px-6 py-12 text-center">
+      {/* Uwi thread — dashed teal→sulo route arcing over the empty state,
+          ending in a lamp dot. The "journey home" motif, whisper-quiet. */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 320 44"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-x-8 top-3 h-9 opacity-60"
+      >
+        <defs>
+          <linearGradient id="fb-uwi-thread" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#123A63" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#F27418" stopOpacity="0.85" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M4 38 C 80 6, 240 6, 300 30"
+          fill="none"
+          stroke="url(#fb-uwi-thread)"
+          strokeWidth="1.5"
+          strokeDasharray="1 6"
+          strokeLinecap="round"
+        />
+        <circle cx="303" cy="31" r="3" fill="#F27418" opacity="0.9" />
+        <circle cx="303" cy="31" r="6.5" fill="#F27418" opacity="0.18" />
+      </svg>
       <div
         className={`relative flex h-12 w-12 items-center justify-center rounded-xl border ${a.border} ${a.bgSoft} ${a.text}`}
       >

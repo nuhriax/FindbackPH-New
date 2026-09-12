@@ -1,4 +1,4 @@
-﻿/* ===========================================================================
+/* ===========================================================================
    FindBack PH — Authentication experience (light, luminous)
    Themed to match the site-wide design system: the global luminous `body`
    gradient + BackgroundEffects atmosphere, glassy white surfaces, blue/indigo
@@ -30,14 +30,14 @@
   /* Inputs — matches `.input` / search-box fields */
   --auth-input-bg: #ffffff;
   --auth-input-border: #cbd5e1;  /* slate-300 */
-  --auth-input-focus: #20948f;   /* electric-500 — matches site focus */
-  --auth-focus-ring: rgba(15, 123, 122, 0.12); /* electric-600/12 */
+  --auth-input-focus: #EFA430;   /* sun-400 — matches site focus */
+  --auth-focus-ring: rgba(239, 164, 48, 0.14); /* sun/14 */
 
-  /* Accents — teal, like the site primary action buttons */
-  --auth-accent: #20948f;        /* electric-500 */
-  --auth-accent-hover: #0f7b72;  /* electric-600 */
-  --auth-accent-soft: rgba(15, 123, 122, 0.08);
-  --auth-accent-ink: #0f7b72;
+  /* Accents — sun-gold, like the site primary action buttons */
+  --auth-accent: #EFA430;        /* sun-400 */
+  --auth-accent-hover: #C97F1E;  /* sun-600 */
+  --auth-accent-soft: rgba(239, 164, 48, 0.10);
+  --auth-accent-ink: #9C6117;
 
   --auth-danger: #ef4444;       /* red-500 */
   --auth-danger-soft: rgba(239, 68, 68, 0.10);
@@ -52,7 +52,7 @@
   --auth-warn-ink: #92400e;    /* amber-800 */
 
   /* Subtle luminous accents used by the brand mark */
-  --auth-glow1: rgba(124, 201, 198, 0.4);  /* electric-200 */
+  --auth-glow1: rgba(126, 159, 198, 0.4);  /* electric-200 */
   --auth-glow2: rgba(181, 138, 86, 0.3);   /* warm sand-500 */
   --auth-glow3: rgba(70, 171, 170, 0.3);   /* blue-400 */
   --auth-shadow: 0 18px 50px -24px rgba(51, 46, 38, 0.22); /* shadow-soft */
@@ -450,17 +450,17 @@
 .site-ink .auth-root {
   --auth-panel: rgba(13, 28, 26, 0.86);
   --auth-panel-solid: #0d1c1a;
-  --auth-panel-border: rgba(124, 201, 198, 0.22);
-  --auth-glass: rgba(9, 32, 30, 0.55);
+  --auth-panel-border: rgba(126, 159, 198, 0.22);
+  --auth-glass: rgba(8, 29, 54, 0.55);
 
-  --auth-fg: #eef6f4;              /* secondary text */
+  --auth-fg: #EAF1F9;              /* secondary text */
   --auth-heading: #ffffff;         /* headings + brand */
-  --auth-muted: rgba(238, 246, 244, 0.92);
-  --auth-faint: rgba(238, 246, 244, 0.72);
-  --auth-placeholder: rgba(238, 246, 244, 0.55);
+  --auth-muted: rgba(234, 241, 249, 0.92);
+  --auth-faint: rgba(234, 241, 249, 0.72);
+  --auth-placeholder: rgba(234, 241, 249, 0.55);
 
-  --auth-input-bg: rgba(9, 32, 30, 0.92);
-  --auth-input-border: rgba(124, 201, 198, 0.30);
+  --auth-input-bg: rgba(8, 29, 54, 0.92);
+  --auth-input-border: rgba(126, 159, 198, 0.30);
   --auth-input-focus: #8fe0da;     /* light electric — readable on dark */
   --auth-focus-ring: rgba(143, 224, 218, 0.16);
 
@@ -494,7 +494,7 @@
 /* The submit button inherits --auth-accent which is now a light teal; re-paint
    its face a darker teal so the white button label stays high-contrast. */
 .site-ink .auth-submit {
-  background: linear-gradient(135deg, #147d78, #0f6b66);
+  background: linear-gradient(135deg, #123A63, #0F3155);
   box-shadow: 0 12px 30px -12px rgba(15, 123, 122, 0.55);
 }
 .site-ink .auth-submit-success {

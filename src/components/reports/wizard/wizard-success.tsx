@@ -89,7 +89,7 @@ export function WizardSuccess({
         <MotionReveal delay={100}>
           <h1 className="mt-6 font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
             {cfg.success.title}{" "}
-            <span className="bg-gradient-to-r from-blue-600 via-electric-500 to-violet-500 bg-clip-text text-transparent animate-gradient">
+            <span className="bg-gradient-to-r from-electric-600 via-electric-400 to-sun-400 bg-clip-text text-transparent animate-gradient">
               live!
             </span>
           </h1>

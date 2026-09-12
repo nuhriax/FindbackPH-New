@@ -46,10 +46,10 @@ export function ItemCard({
     <>
     <Link
       href={href}
-      className="item-card group relative flex h-full flex-col overflow-hidden rounded-card border border-white/60 bg-white/80 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-white hover:bg-white hover:shadow-card-hover"
+      className="item-card notice-card group relative flex h-full flex-col overflow-hidden rounded-card transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 ring-1 ring-inset ring-slate-900/5">
+      <div className="relative aspect-[4/3] overflow-hidden bg-navy-100 ring-1 ring-inset ring-ink/10">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -62,10 +62,10 @@ export function ItemCard({
           />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-sunrise-50 via-ice-50 to-lavender-50">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 text-slate-400 shadow-sm ring-1 ring-inset ring-slate-900/5 [&_svg]:h-5 [&_svg]:w-5">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 text-ink-faint shadow-sm ring-1 ring-inset ring-ink/10 [&_svg]:h-5 [&_svg]:w-5">
               {CATEGORY_ICONS[category]}
             </span>
-            <span className="text-[11px] font-medium text-slate-400">
+            <span className="text-[11px] font-medium text-ink-faint">
               No photo yet
             </span>
           </div>
@@ -86,13 +86,13 @@ export function ItemCard({
         <span
           className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider shadow-sm ring-1 ring-inset backdrop-blur-sm ${
             kind === "lost"
-              ? "bg-red-100/90 text-red-700 ring-red-300/60"
-              : "bg-emerald-100/90 text-emerald-700 ring-emerald-300/60"
+              ? "bg-coral-100/90 text-coral-700 ring-coral-200/70"
+              : "bg-ocean-100/90 text-ocean-800 ring-ocean-200/70"
           }`}
         >
           <span
             className={`h-1.5 w-1.5 rounded-full ${
-              kind === "lost" ? "bg-red-500" : "bg-emerald-500"
+              kind === "lost" ? "bg-coral-500" : "bg-ocean-500"
             }`}
           />
           {kind === "lost" ? "Lost" : "Found"}
@@ -121,7 +121,7 @@ export function ItemCard({
         )}
 
         {/* Category chip */}
-        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-900/5 backdrop-blur-sm [&_svg]:h-3 [&_svg]:w-3 [&_svg]:text-slate-400">
+        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-semibold text-ink-soft shadow-sm ring-1 ring-inset ring-ink/10 backdrop-blur-sm [&_svg]:h-3 [&_svg]:w-3 [&_svg]:text-ink-faint">
           {CATEGORY_ICONS[category]}
           {CATEGORY_LABELS[category]}
         </span>
@@ -140,21 +140,29 @@ export function ItemCard({
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="truncate font-display text-[15.5px] font-bold tracking-[-0.01em] text-navy-900 transition-colors duration-200 group-hover:text-electric-700">
+        <h3 className="truncate font-display text-[15.5px] font-bold tracking-[-0.01em] text-navy-900 transition-colors duration-200 group-hover:text-ocean-700">
           {title}
         </h3>
 
-        <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-500">
+        <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-ink-soft">
           {description ?? ""}
         </p>
 
+        {/* Handwritten annotation — the single Caveat moment on a notice:
+            shown only on lost notices offering a reward. */}
+        {kind === "lost" && typeof reward === "number" && reward > 0 && (
+          <span className="notice-annotation mt-1.5 self-end pr-1" aria-hidden="true">
+            reward, tawag lang po
+          </span>
+        )}
+
         <div className="mt-auto pt-4">
           {/* Meta row — location · views, with the date anchored right */}
-          <div className="flex items-center justify-between gap-3 text-[11px] font-medium text-slate-500">
+          <div className="flex items-center justify-between gap-3 text-[11px] font-medium text-ink-soft">
             <span className="flex min-w-0 items-center gap-1.5">
               <MapPin
                 aria-hidden="true"
-                className="h-3.5 w-3.5 shrink-0 text-slate-400"
+                className="h-3.5 w-3.5 shrink-0 text-ink-faint"
               />
               <span className="truncate">
                 {cityLabel || provinceLabel
@@ -166,10 +174,10 @@ export function ItemCard({
                 <>
                   <span
                     aria-hidden
-                    className="h-0.5 w-0.5 shrink-0 rounded-full bg-slate-300"
+                    className="h-0.5 w-0.5 shrink-0 rounded-full bg-kraft-dark"
                   />
 
-                  <span className="flex shrink-0 items-center gap-1 text-slate-400">
+                  <span className="flex shrink-0 items-center gap-1 text-ink-faint">
                     <Eye aria-hidden="true" className="h-3.5 w-3.5" />
                     {views}
                   </span>
@@ -180,14 +188,14 @@ export function ItemCard({
             <span className="flex shrink-0 items-center gap-1.5">
               <Calendar
                 aria-hidden="true"
-                className="h-3.5 w-3.5 text-slate-400"
+                className="h-3.5 w-3.5 text-ink-faint"
               />
               {reported}
             </span>
           </div>
 
           {/* View details — footer action, anchored by a hairline divider */}
-          <div className="card-footer mt-3.5 flex items-center gap-1.5 border-t border-slate-200/70 pt-3 text-xs font-semibold text-slate-500 transition-colors group-hover:text-electric-700">
+          <div className="card-footer mt-3.5 flex items-center gap-1.5 border-t border-navy-200/70 pt-3 text-xs font-semibold text-ink-soft transition-colors group-hover:text-ocean-700">
             View details
             <ArrowRight
               aria-hidden="true"

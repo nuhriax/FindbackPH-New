@@ -78,7 +78,7 @@ export function OwnershipChallengeManager({
       <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
         <button
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-blue-700"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-electric-700"
         >
           <Lock size={13} />
           Ownership verification
@@ -118,7 +118,7 @@ export function OwnershipChallengeManager({
               else if (!q2.trim()) setQ2(suggestedQuestion);
               else setQ1(suggestedQuestion);
             }}
-            className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+            className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600 transition-colors hover:border-electric-300 hover:bg-electric-50 hover:text-electric-700"
           >
             {suggestedQuestion}
           </button>
@@ -130,14 +130,14 @@ export function OwnershipChallengeManager({
           value={q1}
           onChange={(e) => setQ1(e.target.value)}
           placeholder={`Question 1 (e.g. ${suggestedQuestion})`}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-electric-500 focus:ring-2 focus:ring-electric-500/20"
         />
         <input
           value={a1}
           onChange={(e) => setA1(e.target.value)}
           placeholder="Answer 1 (kept private)"
           autoComplete="off"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-electric-500 focus:ring-2 focus:ring-electric-500/20"
         />
 
         <details className="text-xs text-slate-500">
@@ -147,14 +147,14 @@ export function OwnershipChallengeManager({
               value={q2}
               onChange={(e) => setQ2(e.target.value)}
               placeholder="Question 2 (optional)"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-electric-500 focus:ring-2 focus:ring-electric-500/20"
             />
             <input
               value={a2}
               onChange={(e) => setA2(e.target.value)}
               placeholder="Answer 2 (kept private)"
               autoComplete="off"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-electric-500 focus:ring-2 focus:ring-electric-500/20"
             />
           </div>
         </details>
@@ -171,7 +171,7 @@ export function OwnershipChallengeManager({
         <button
           onClick={save}
           disabled={pending || a1.trim().length === 0 || q1.trim().length === 0}
-          className="rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-lg bg-sun-400 px-3.5 py-2 text-xs font-semibold text-ink transition-colors hover:bg-sun-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sun-500/35 disabled:opacity-50"
         >
           {pending ? "Saving…" : "Save questions"}
         </button>

@@ -78,8 +78,8 @@ function MatchCard({
         px-3.5
         py-3
         transition-all
-        hover:border-blue-200
-        hover:bg-blue-50/40
+        hover:border-electric-200
+        hover:bg-electric-50/40
         hover:shadow-sm
       "
     >
@@ -126,7 +126,7 @@ function MatchCard({
               text-xs
               font-bold
               text-slate-900
-              group-hover:text-blue-700
+              group-hover:text-electric-700
             "
           >
             {match.title}
@@ -153,7 +153,7 @@ function MatchCard({
             text-slate-300
             transition-all
             group-hover:translate-x-0.5
-            group-hover:text-blue-600
+            group-hover:text-electric-600
           "
         />
       </TrackLink>
@@ -166,7 +166,7 @@ function MatchCard({
               match.score >= 0.75
                 ? "bg-emerald-500"
                 : match.score >= 0.5
-                  ? "bg-blue-500"
+                  ? "bg-electric-500"
                   : "bg-slate-300"
             }`}
             style={{ width: `${Math.round(match.score * 100)}%` }}
@@ -192,7 +192,7 @@ function MatchCard({
           eventName="match_clicked"
           area="matching"
           props={{ score: match.score ?? null, target_kind: match.kind, cta: "might-be-mine" }}
-          className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition-colors hover:bg-blue-700"
+          className="inline-flex items-center gap-1 rounded-lg bg-electric-600 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition-colors hover:bg-electric-700"
         >
           This might be mine
           <ArrowRight size={11} />

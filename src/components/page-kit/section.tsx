@@ -50,7 +50,7 @@ export function PageHero({
       {/* Soft brand wash behind the hero type — breaks the flat-white feel */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(720px_320px_at_50%_-20%,rgba(15,123,122,0.10),transparent_70%),radial-gradient(560px_260px_at_85%_10%,rgba(245,147,65,0.07),transparent_65%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(720px_320px_at_50%_-20%,rgba(18,58,99,0.10),transparent_70%),radial-gradient(560px_260px_at_85%_10%,rgba(239,164,48,0.08),transparent_65%)]"
       />
       <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
         <span className="inline-flex items-center gap-2 rounded-full border border-electric-200 bg-white/85 px-3.5 py-1.5 text-xs font-semibold text-electric-700 shadow-sm backdrop-blur">
@@ -280,13 +280,13 @@ export function CTABand({
         <path
           d="M-40 150 C 240 90, 380 170, 640 120 C 900 70, 1080 150, 1480 60"
           fill="none"
-          stroke="#0e3330"
+          stroke="#123A63"
           strokeWidth="1.5"
           strokeDasharray="2 10"
           strokeLinecap="round"
         />
-        <circle cx="640" cy="120" r="4" fill="#0f7b7a" />
-        <circle cx="1080" cy="118" r="4" fill="#f59341" />
+        <circle cx="640" cy="120" r="4" fill="#123A63" />
+        <circle cx="1080" cy="118" r="4" fill="#EFA430" />
       </svg>
 
       <div className="relative mx-auto max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20">
@@ -295,10 +295,10 @@ export function CTABand({
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-electric-700">
               FindBack PH
             </p>
-            <h2 className="mt-2 font-display text-2xl font-bold leading-[1.12] tracking-tight text-[#17322f] sm:text-3xl">
+            <h2 className="mt-2 font-display text-2xl font-bold leading-[1.12] tracking-tight text-navy-900 sm:text-3xl">
               {title}
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-[#3d2f22]/75 sm:text-base">
+            <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
               {description}
             </p>
           </div>
@@ -309,7 +309,7 @@ export function CTABand({
                 <Link
                   key={action.href}
                   href={action.href}
-                  className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-button bg-electric-800 px-7 text-sm font-semibold text-white shadow-lg shadow-electric-900/15 transition hover:-translate-y-px hover:bg-electric-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-800/25 active:translate-y-0"
+                  className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-button bg-sun-400 px-7 text-sm font-semibold text-ink shadow-lg shadow-sun-700/25 transition hover:-translate-y-px hover:bg-sun-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sun-500/35 active:translate-y-0"
                 >
                   {action.label}
                   <ArrowRight aria-hidden="true" size={15} />
@@ -318,7 +318,7 @@ export function CTABand({
                 <Link
                   key={action.href}
                   href={action.href}
-                  className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-button border border-electric-800/25 bg-white/60 px-7 text-sm font-semibold text-[#17322f] transition hover:-translate-y-px hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-800/15 active:translate-y-0"
+                  className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-button border border-navy-900/25 bg-white/60 px-7 text-sm font-semibold text-navy-900 transition hover:-translate-y-px hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/20 active:translate-y-0"
                 >
                   {action.label}
                 </Link>

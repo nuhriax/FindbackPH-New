@@ -84,7 +84,7 @@ export function ReporterCard({
                   items-center
                   justify-center
                   rounded-full
-                  bg-blue-500
+                  bg-electric-500
                   text-white
                   ring-2
                   ring-white

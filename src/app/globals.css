@@ -29,10 +29,10 @@
     --radius-button: 0.75rem;
 
     /* --- Enhanced: luminous glow accents -------------------------------- */
-    --glow-soft: 234 247 245; /* teal-50 */
-    --glow-medium: 124 201 198; /* teal-300 */
-    --glow-bright: 15 123 122; /* brand teal */
-    --glow-warm: 255 116 24; /* sunset coral */
+    --glow-soft: 238 243 249; /* ocean-50 */
+    --glow-medium: 126 159 198; /* ocean-300 */
+    --glow-bright: 18 58 99; /* brand ocean */
+    --glow-warm: 225 87 60; /* sunset coral */
     --glow-leaf: 38 138 86; /* leaf-600 — nature accent, used for organic highlights */
 
     /* --- Typography ------------------------------------------------ */
@@ -216,21 +216,26 @@
   /* Full-page wrapper: gives every route a restrained, consistent entrance. */
   /* --- Button system ---------------------------------------------------- */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-button bg-gradient-to-b from-electric-500 to-electric-600 px-5 py-2.5
-      font-semibold text-white shadow-[0_10px_30px_-10px_rgba(15,123,122,0.5)] transition-all duration-200
-      hover:-translate-y-px hover:from-electric-400 hover:to-electric-500 hover:shadow-[0_14px_36px_-10px_rgba(15,123,122,0.6)]
+    @apply inline-flex items-center justify-center gap-2 rounded-button bg-gradient-to-b from-sun-400 to-sun-500 px-5 py-2.5
+      font-semibold text-ink shadow-[0_10px_30px_-10px_rgba(201,127,30,0.55)] transition-all duration-200
+      hover:-translate-y-px hover:from-sun-300 hover:to-sun-400
       active:translate-y-0 disabled:pointer-events-none disabled:opacity-50;
+  }
+  /* SULO: warm sun-gold glow on primary hover (plain CSS — @apply can't
+     parse arbitrary shadow values reliably). */
+  .btn-primary:hover {
+    box-shadow: 0 12px 44px -12px rgba(239, 164, 48, 0.5);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-button border border-slate-200 bg-white/75
-      px-5 py-2.5 font-semibold text-navy-900 shadow-sm backdrop-blur transition-all duration-200
-      hover:-translate-y-px hover:border-slate-300 hover:bg-white hover:shadow-soft active:translate-y-0;
+    @apply inline-flex items-center justify-center gap-2 rounded-button border border-ocean-200 bg-white/75
+      px-5 py-2.5 font-semibold text-ocean-500 shadow-sm backdrop-blur transition-all duration-200
+      hover:-translate-y-px hover:border-sun-300 hover:bg-white hover:shadow-soft active:translate-y-0;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-button px-4 py-2 text-sm font-medium text-slate-600
-      transition-colors hover:bg-navy-50 hover:text-navy-800;
+    @apply inline-flex items-center justify-center gap-2 rounded-button px-4 py-2 text-sm font-medium text-ink-soft
+      transition-colors hover:bg-ocean-50 hover:text-ocean-600;
   }
 
   .btn-destructive {
@@ -832,7 +837,7 @@ p {
 
   /* Brand gradient for a highlighted word inside a headline. */
   .text-gradient-brand {
-    background: linear-gradient(100deg, #0f7b72 0%, #20948f 45%, #f59341 110%);
+    background: linear-gradient(100deg, #123A63 0%, #3E6E9E 45%, #EFA430 110%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -912,9 +917,9 @@ p {
     background-color: #0e3330;
     background-image:
       radial-gradient(900px 420px at 50% -8%, rgba(245, 214, 175, 0.10), transparent 62%),
-      radial-gradient(900px 500px at 12% -10%, rgba(45, 212, 191, 0.12), transparent 60%),
+      radial-gradient(900px 500px at 12% -10%, rgba(126, 159, 198, 0.12), transparent 60%),
       radial-gradient(800px 480px at 92% 8%, rgba(255, 138, 76, 0.09), transparent 55%),
-      radial-gradient(700px 420px at 50% 115%, rgba(45, 212, 191, 0.08), transparent 60%);
+      radial-gradient(700px 420px at 50% 115%, rgba(126, 159, 198, 0.08), transparent 60%);
     color: #f4f7f6;
   }
 
@@ -940,29 +945,29 @@ p {
    =========================================================================== */
 
 .site-ink {
-  --text-heading: #f4fbf9;
-  --text-body: #f0f8f6;
-  --text-muted: #eaf5f2;
-  --text-faint: #d8ece6;
-  --background: 12 43 41;
-  --foreground: 238 246 244;
-  --card: 22 58 55;
-  --border: 255 255 255;
-  --ink-surface: 14 49 47;
-  --ink-surface-strong: 17 51 49;
-  --ink-surface-raised: 22 60 57;
+  --text-heading: #F2F7FC;
+  --text-body: #EAF1F9;
+  --text-muted: #DCE7F3;
+  --text-faint: #C7D6E8;
+  --background: 11 38 71;   /* ocean deep #0B2647 */
+  --foreground: 234 241 249;
+  --card: 18 58 99;         /* ocean blue surface */
+  --border: 126 159 198;
+  --ink-surface: 13 43 74;  /* #0D2B4A */
+  --ink-surface-strong: 16 49 85;
+  --ink-surface-raised: 18 58 99;
   color-scheme: dark;
 }
 
 /* Page canvas */
 .site-ink body {
-  background-color: #0c2b29;
+  background-color: #0B2647;
   background-image:
-    radial-gradient(1100px 700px at 50% -6%, rgba(245, 214, 175, 0.10), transparent 62%),
-    radial-gradient(950px 640px at 4% 4%, rgba(45, 212, 191, 0.10), transparent 58%),
-    radial-gradient(900px 620px at 96% 8%, rgba(255, 138, 76, 0.07), transparent 55%),
-    radial-gradient(1000px 760px at 50% 112%, rgba(45, 212, 191, 0.08), transparent 60%);
-  color: #eef6f4;
+    radial-gradient(1100px 700px at 50% -6%, rgba(239, 164, 48, 0.10), transparent 62%),
+    radial-gradient(950px 640px at 4% 4%, rgba(62, 110, 158, 0.22), transparent 58%),
+    radial-gradient(900px 620px at 96% 8%, rgba(239, 164, 48, 0.07), transparent 55%),
+    radial-gradient(1000px 760px at 50% 112%, rgba(126, 159, 198, 0.10), transparent 60%);
+  color: #EAF1F9;
 }
 
 .site-ink h1,
@@ -988,10 +993,11 @@ p {
 }
 
 /* --- Accent text brightened for dark --- */
-.site-ink :is(.text-electric-600, .text-electric-700, .text-electric-500) { color: #6fe3da; }
-.site-ink :is(.text-electric-800, .text-electric-900) { color: #a5efe9; }
+.site-ink :is(.text-electric-600, .text-electric-700, .text-electric-500) { color: #9FC4EA; }
+.site-ink :is(.text-electric-800, .text-electric-900) { color: #C3D9F0; }
 .site-ink :is(.text-emerald-600, .text-emerald-700) { color: #6ee7b7; }
 .site-ink :is(.text-emerald-800, .text-emerald-900, .text-emerald-800\/80, .text-emerald-700\/80, .text-emerald-700\/90) { color: #a7f3d0; }
+.site-ink :is(.text-sunrise-800, .text-sunrise-900) { color: #ffc9c2; }
 .site-ink :is(.text-sunrise-600, .text-sunrise-700, .text-red-600, .text-red-700, .text-rose-600, .text-rose-700) { color: #ff8a8a; }
 .site-ink :is(.text-amber-600, .text-amber-700, .text-orange-600, .text-orange-700) { color: #fdba74; }
 .site-ink :is(.text-blue-600, .text-blue-700, .text-blue-500) { color: #93c5fd; }
@@ -1002,7 +1008,7 @@ p {
 .site-ink :is(.bg-white, .bg-white\/80, .bg-white\/85, .bg-white\/90, .bg-white\/95,
   .bg-white\/40, .bg-white\/45, .bg-white\/50, .bg-white\/60, .bg-white\/70,
   .bg-white\/10, .bg-white\/15, .bg-white\/20, .bg-white\/25, .bg-white\/30, .bg-white\/35, .bg-white\/75) {
-  background-color: rgba(14, 49, 47, 0.985);
+  background-color: rgba(11, 38, 71, 0.985);
 }
 
 .site-ink :is(.bg-slate-50, .bg-slate-100, .bg-navy-50,
@@ -1010,18 +1016,18 @@ p {
   .bg-slate-50\/60, .bg-slate-50\/70, .bg-slate-50\/80, .bg-slate-50\/50,
   .bg-slate-100\/45, .bg-slate-100\/50, .bg-slate-100\/60, .bg-slate-100\/70,
   .bg-cream-50, .bg-cream-100, .bg-ice-50, .bg-slate-200\/50) {
-  background-color: rgba(14, 49, 47, 0.92);
+  background-color: rgba(11, 38, 71, 0.92);
 }
 
 /* Pastel fills → translucent tints */
 .site-ink :is(.bg-emerald-50, .bg-leaf-50, .bg-electric-50, .bg-teal-50,
   .bg-sky-50, .bg-blue-50, .bg-violet-50, .bg-amber-50, .bg-orange-50,
   .bg-emerald-50\/60, .bg-emerald-50\/70, .bg-blue-50\/70, .bg-electric-50\/50) {
-  background-color: rgba(45, 212, 191, 0.10);
+  background-color: rgba(126, 159, 198, 0.10);
 }
 .site-ink :is(.bg-emerald-100, .bg-leaf-100, .bg-electric-100, .bg-teal-100,
   .bg-sky-100, .bg-blue-100, .bg-blue-50\/40) {
-  background-color: rgba(45, 212, 191, 0.16);
+  background-color: rgba(126, 159, 198, 0.16);
 }
 .site-ink :is(.bg-sunrise-50, .bg-orange-50\/60, .bg-amber-50\/60) {
   background-color: rgba(239, 68, 68, 0.14);
@@ -1047,14 +1053,14 @@ p {
 
 /* --- Item cards --- */
 .site-ink .item-card {
-  background-color: rgba(14, 49, 47, 0.985);
+  background-color: rgba(11, 38, 71, 0.985);
   border-color: rgba(255, 255, 255, 0.14);
 }
 .site-ink .item-card:hover {
   background-color: rgba(22, 60, 57, 0.98);
   border-color: rgba(255, 255, 255, 0.24);
 }
-.site-ink .item-card :is(.text-navy-900) { color: #eef6f4; }
+.site-ink .item-card :is(.text-navy-900) { color: #EAF1F9; }
 .site-ink .item-card :is(.text-slate-500, .text-slate-600) { color: rgba(242, 250, 248, 0.97); }
 .site-ink .item-card .bg-white\/90 {
   background-color: rgba(12, 43, 41, 0.78);
@@ -1116,19 +1122,22 @@ p {
 
 /* Buttons */
 .site-ink .btn-primary {
-  --tw-gradient-from: #0d7a72 var(--tw-gradient-from-position);
-  --tw-gradient-to: #0b6b64 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-  color: #ffffff;
+  --tw-gradient-from: #EFA430 var(--tw-gradient-from-position);
+  --tw-gradient-to: #E19122 var(--tw-gradient-to-position);
+  color: #241E17;
+}
+.site-ink .btn-primary:hover {
+  box-shadow: 0 12px 44px -12px rgba(239, 164, 48, 0.4);
+  color: #241E17;
 }
 .site-ink .btn-secondary {
-  border-color: rgba(124, 201, 198, 0.25);
-  background-color: rgba(255, 255, 255, 0.06);
-  color: #eef6f4;
+  border-color: rgba(239, 164, 48, 0.3);
+  background-color: rgba(18, 58, 99, 0.5);
+  color: #EAF1F9;
 }
 .site-ink .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.10);
-  border-color: rgba(124, 201, 198, 0.45);
+  background-color: rgba(18, 58, 99, 0.75);
+  border-color: rgba(239, 164, 48, 0.5);
 }
 
 /* BackgroundEffects - neutralize light washes */
@@ -1141,7 +1150,7 @@ p {
 }
 .site-ink :is(.bg-electric-400\/25, .bg-lavender-200\/50, .bg-sky-200\/45, .bg-blue-200\/50, .bg-ice-100\/55,
   .bg-electric-100\/\[0\.55\], .bg-sky-200\/\[0\.35\], .bg-lavender-200\/\[0\.45\], .bg-ice-200\/\[0\.5\]) {
-  background-color: rgba(45, 212, 191, 0.08);
+  background-color: rgba(126, 159, 198, 0.08);
 }
 .site-ink .fb-center-light-shape { opacity: 0.05; }
 .site-ink .fb-vignette-shape { opacity: 0.04; }
@@ -1150,19 +1159,19 @@ p {
 .site-ink .hero-aurora { opacity: 0.3; }
 .site-ink .hero-waves { mask-image: linear-gradient(to bottom, #000 0, transparent 88%); }
 .site-ink .hero-motif { mask-image: linear-gradient(to bottom, #000 0, transparent 90%); opacity: 0.45; }
-.site-ink path[fill="#cde8d4"] { fill: rgba(45, 212, 191, 0.10); }
-.site-ink path[fill="#e5f0e7"] { fill: rgba(45, 212, 191, 0.05); }
+.site-ink path[fill="#cde8d4"] { fill: rgba(126, 159, 198, 0.10); }
+.site-ink path[fill="#e5f0e7"] { fill: rgba(126, 159, 198, 0.05); }
 
 /* Logo fix - screen blend for old PNG with black bg */
 .site-ink .logo-mark img { mix-blend-mode: screen; }
 
 /* Inputs */
-.site-ink input, .site-ink textarea, .site-ink select { color: #eef6f4; }
+.site-ink input, .site-ink textarea, .site-ink select { color: #EAF1F9; }
 .site-ink .placeholder\:text-slate-400::placeholder,
 .site-ink .placeholder\:text-slate-500::placeholder { color: rgba(238, 246, 244, 0.65); }
 
 /* Selection + scrollbar */
-.site-ink ::selection { background: rgba(45, 212, 191, 0.32); color: #f4fbf9; }
+.site-ink ::selection { background: rgba(126, 159, 198, 0.32); color: #F2F7FC; }
 .site-ink * { scrollbar-color: rgba(238, 246, 244, 0.28) transparent; }
 .site-ink *::-webkit-scrollbar-thumb { background: rgba(238, 246, 244, 0.22); }
 .site-ink *::-webkit-scrollbar-thumb:hover { background: rgba(238, 246, 244, 0.38); }
@@ -1176,7 +1185,7 @@ p {
 
 /* --- Report wizard dark --- */
 .site-ink .report-panel-dark {
-  background-image: linear-gradient(to bottom, #0d423c, #062622);
+  background-image: linear-gradient(to bottom, #0D2B4A, #081D36);
   border-color: rgba(255, 255, 255, 0.1);
 }
 .site-ink .report-panel-dark label { color: #ffffff; }
@@ -1191,32 +1200,32 @@ p {
 
 /* --- MapLibre --- */
 .site-ink .maplibregl-ctrl-group {
-  background-color: rgba(9, 32, 30, 0.82);
-  border: 1px solid rgba(124, 201, 198, 0.25);
+  background-color: rgba(8, 29, 54, 0.82);
+  border: 1px solid rgba(126, 159, 198, 0.25);
 }
 .site-ink .maplibregl-ctrl button .maplibregl-ctrl-icon { filter: invert(1) brightness(1.4); }
 .site-ink .maplibregl-ctrl-attrib {
-  background-color: rgba(9, 32, 30, 0.6);
+  background-color: rgba(8, 29, 54, 0.6);
   color: rgba(238, 246, 244, 0.75);
 }
-.site-ink .maplibregl-ctrl-attrib a { color: #8fe0da; }
+.site-ink .maplibregl-ctrl-attrib a { color: #9FC4EA; }
 
 /* --- Chat --- */
 .site-ink .chat-wall-light { background: linear-gradient(180deg, #10151d 0%, #0b0f16 100%); }
 
 /* --- Gradient stops → dark --- */
 .site-ink :is(.from-white, .from-slate-50, .from-emerald-50, .from-blue-50, .from-amber-50, .from-sunrise-50) {
-  --tw-gradient-from: rgba(14, 49, 47, 0.92) var(--tw-gradient-from-position);
+  --tw-gradient-from: rgba(11, 38, 71, 0.92) var(--tw-gradient-from-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
 }
 .site-ink :is(.to-white, .to-slate-100, .to-emerald-50, .to-blue-50) {
-  --tw-gradient-to: rgba(14, 49, 47, 0.92) var(--tw-gradient-to-position);
+  --tw-gradient-to: rgba(11, 38, 71, 0.92) var(--tw-gradient-to-position);
 }
 
 /* --- Special cases that must stay white (intentional) --- */
 .site-ink :is(.bg-white.text-electric-800, .bg-white.text-slate-800) {
   background-color: #f6fbfa !important;
-  color: #0b4f4a !important;
+  color: #173F58 !important;
 }
 
 /* ===========================================================================
@@ -1282,10 +1291,141 @@ p {
   position: relative;
   background-color: #f6efe1;
   background-image:
-    radial-gradient(900px 500px at 12% -10%, rgba(191, 231, 204, 0.45), transparent 60%),
-    radial-gradient(800px 480px at 92% 8%, rgba(255, 214, 175, 0.35), transparent 55%),
-    radial-gradient(700px 420px at 50% 115%, rgba(191, 231, 204, 0.30), transparent 60%);
-  color: #3d2f22;
+    radial-gradient(900px 500px at 12% -10%, rgba(18, 58, 99, 0.10), transparent 60%),
+    radial-gradient(800px 480px at 92% 8%, rgba(239, 164, 48, 0.12), transparent 55%),
+    radial-gradient(700px 420px at 50% 115%, rgba(11, 38, 71, 0.08), transparent 60%);
+  color: #241e17;
 }
-.section-ink h2, .section-ink h3 { color: #17322f; }
-.section-ink p { color: rgba(61, 47, 34, 0.75); }
+.section-ink h2, .section-ink h3 { color: #0B2647; }
+.section-ink p { color: rgba(36, 30, 23, 0.75); }
+
+/* ===========================================================================
+   NOTICE-BOARD DESIGN SYSTEM — shared surfaces, pins, stamps, annotations
+   Palette vars mirror the tailwind tokens (ocean/sun/coral/cork/kraft/sand/
+   ink/stamp) so non-Tailwind CSS can use them too. Cork/kraft are reserved
+   for the physical notice-board metaphor only.
+   =========================================================================== */
+:root {
+  --fb-ocean: #123A63;
+  --fb-deep: #0B2647;
+  --fb-sun: #EFA430;
+  --fb-sun-soft: #F8E3BC;
+  --fb-coral: #E1573C;
+  --fb-coral-soft: #FADFD7;
+  --fb-cork: #A9723F;
+  --fb-cork-dark: #5E3C22;
+  --fb-kraft: #E4D2A7;
+  --fb-kraft-light: #F0E4C6;
+  --fb-sand: #FBF6EC;
+  --fb-ink: #241E17;
+  --fb-ink-soft: #6B5F4E;
+  --fb-stamp: #B23A2E;
+  --fb-focus: 0 0 0 3px rgba(239, 164, 48, 0.45);
+}
+
+/* Sun-gold focus outline everywhere — readable on sand and on ocean deep. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--fb-sun);
+  outline-offset: 2px;
+  box-shadow: var(--fb-focus);
+}
+
+/* Kraft paper notice card — the one true card of the notice-board metaphor.
+   Used on report cards and selected highlight surfaces ONLY. */
+.notice-card {
+  position: relative;
+  background-color: var(--fb-kraft-light);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(140% 60% at 50% 0%, rgba(255, 255, 255, 0.25), transparent 70%);
+  border: 1px solid rgba(94, 60, 34, 0.28);
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgba(36, 30, 23, 0.08),
+    0 14px 30px -18px rgba(36, 30, 23, 0.28);
+}
+.notice-card::before {
+  /* Sun-gold pin head — the notice "pinned to the board". */
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, #FFD9A0, var(--fb-sun) 55%, #C97F1E);
+  box-shadow: 0 2px 4px rgba(36, 30, 23, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+.notice-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 4px rgba(36, 30, 23, 0.10),
+    0 22px 44px -20px rgba(36, 30, 23, 0.34);
+}
+
+/* Handwritten annotation — the single Caveat moment. */
+.notice-annotation {
+  font-family: var(--font-caveat), cursive;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  color: var(--fb-cork-dark);
+  transform: rotate(-2deg);
+}
+
+/* Rubber-stamp badge — restrained, for verified/recovered states. */
+.stamp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border: 2px solid currentColor;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+  opacity: 0.92;
+}
+
+/* Cork board band — homepage hero / discover backdrop strips only. */
+.cork-board {
+  position: relative;
+  background-color: var(--fb-cork);
+  background-image:
+    radial-gradient(3px 3px at 20% 30%, rgba(94, 60, 34, 0.5) 40%, transparent 41%),
+    radial-gradient(3px 3px at 70% 60%, rgba(94, 60, 34, 0.4) 40%, transparent 41%),
+    radial-gradient(2px 2px at 45% 80%, rgba(94, 60, 34, 0.45) 40%, transparent 41%),
+    radial-gradient(2px 2px at 85% 15%, rgba(94, 60, 34, 0.4) 40%, transparent 41%);
+  background-size: 46px 46px;
+  border: 6px solid var(--fb-cork-dark);
+  border-radius: 1.25rem;
+  box-shadow: inset 0 2px 12px rgba(36, 30, 23, 0.35), 0 20px 50px -24px rgba(36, 30, 23, 0.4);
+}
+
+/* Dark-mode adaptation of the notice surfaces (site-ink mechanism). */
+.site-ink .notice-card {
+  background-color: rgba(18, 58, 99, 0.55);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 40%);
+  border-color: rgba(239, 164, 48, 0.28);
+}
+
+/* Pastel gradient washes (private-detail notices, privacy check, photo
+   placeholder) — the gradient IMAGE would still paint the light wash over
+   the darkened background-color, so drop it and fall back to a flat tint. */
+.site-ink .report-soft-surface {
+  background-image: none;
+  background-color: rgba(126, 159, 198, 0.1);
+}
+.site-ink .notice-annotation { color: var(--fb-sun-soft); }
+.site-ink .stamp-badge { opacity: 1; }
+.site-ink .cork-board {
+  background-color: #6E4A28;
+  border-color: #3E2814;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notice-card, .notice-card:hover { transition: none; transform: none; }
+}

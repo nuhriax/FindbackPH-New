@@ -241,6 +241,22 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
       return;
     }
 
+    // Earlier steps unmount as the user advances (WizardStepShell returns
+    // null), so FormData only holds the fields still mounted on the Review
+    // step. DraftAutoSave mirrors every named field into localStorage — merge
+    // any missing values back in so client validation and the server action
+    // see the whole report.
+    let draft: Record<string, string> = {};
+    try {
+      const raw = window.localStorage.getItem(cfg.storageKey);
+      if (raw) draft = JSON.parse(raw) as Record<string, string>;
+    } catch {
+      /* corrupted draft — fall back to FormData only */
+    }
+    for (const [name, value] of Object.entries(draft)) {
+      if (value && !formData.get(name)) formData.append(name, value);
+    }
+
     // Server-side schema also trims; these give instant, friendly feedback.
     const title = formData.get("title")?.toString() ?? "";
     const description = formData.get("description")?.toString() ?? "";

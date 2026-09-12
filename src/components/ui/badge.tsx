@@ -2,21 +2,25 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * FindBack PH — Badge primitive.
+ * FindBack PH — Badge primitive (Notice-Board design system).
  *
  * Semantic tones follow the brand hierarchy:
- *   electric → neutral/brand info   · sunrise → "lost" status
- *   emerald  → "found"/returned     · navy → quiet meta labels
+ *   ocean  → neutral/brand info        · coral → "lost" status & alerts
+ *   emerald→ "found"/returned          · sun   → found/celebratory labels
+ *   navy   → quiet meta labels
  */
 
-export type BadgeTone = "electric" | "sunrise" | "emerald" | "navy" | "neutral";
+export type BadgeTone = "electric" | "sunrise" | "emerald" | "navy" | "neutral" | "coral" | "ocean" | "sun";
 
 const TONES: Record<BadgeTone, string> = {
-  electric: "border-electric-200 bg-electric-50 text-electric-700",
-  sunrise: "border-sunrise-200 bg-sunrise-50 text-sunrise-700",
+  electric: "border-ocean-200 bg-ocean-50 text-ocean-600",
+  sunrise: "border-coral-200 bg-coral-50 text-coral-700",
   emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  navy: "border-slate-300/70 bg-cream-100 text-navy-800",
-  neutral: "border-slate-200 bg-white/80 text-slate-600",
+  navy: "border-slate-300/70 bg-cream-100 text-ocean-500",
+  neutral: "border-slate-200 bg-white/80 text-ink-soft",
+  coral: "border-coral-200 bg-coral-50 text-coral-700",
+  ocean: "border-ocean-200 bg-ocean-50 text-ocean-600",
+  sun: "border-sun-300/80 bg-sun-50 text-sun-700",
 };
 
 export function Badge({

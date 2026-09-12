@@ -1,8 +1,8 @@
-﻿import { ImageResponse } from "next/og";
+import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "FindBack PH — Reunite lost & found items across the Philippines";
+export const alt = "FindBack PH · Reunite lost & found items across the Philippines";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -29,7 +29,7 @@ export default function OpengraphImage() {
               width: 84,
               height: 84,
               borderRadius: 20,
-              background: "linear-gradient(180deg, #20948f, #0f7b72)",
+              background: "linear-gradient(180deg, #3E6E9E, #123A63)",
               color: "#ffffff",
               alignItems: "center",
               justifyContent: "center",

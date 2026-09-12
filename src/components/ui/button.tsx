@@ -3,49 +3,49 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "reac
 import { cn } from "@/lib/utils";
 
 /**
- * FindBack PH — Premium Button primitives.
+ * FindBack PH — Button primitives (Notice-Board design system).
  *
  * One source of truth for every clickable action on the site. Use these instead
- * of hand-rolled `rounded-xl bg-electric-600 ...` class strings so hover, focus,
- * disabled and size behaviour stay identical everywhere.
+ * of hand-rolled class strings so hover, focus, disabled and size behaviour
+ * stay identical everywhere.
  *
  * Variants:
- *   primary   — brand teal, subtle top sheen, lift on hover (main CTAs)
- *   dark      — deep espresso/navy solid (premium contrast moments)
- *   outline   — white surface, warm border (secondary actions)
+ *   primary   — sun gold with ink text (main CTAs; the brand "pin")
+ *   dark      — ocean blue solid (premium contrast moments)
+ *   outline   — sand surface, ocean border (secondary actions)
  *   ghost     — no border/surface (tertiary, toolbars)
- *   danger    — destructive (delete / report actions)
+ *   danger    — coral (destructive / lost-alert actions)
  */
 
 export type ButtonVariant = "primary" | "dark" | "outline" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const BASE =
-  "group/btn relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-button font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-electric-500/25 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50";
+  "group/btn relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-button font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sun-300/50 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: cn(
-    "bg-gradient-to-b from-electric-500 to-electric-600 text-white",
-    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_10px_24px_-10px_rgba(15,123,114,0.55)]",
-    "hover:-translate-y-px hover:from-electric-400 hover:to-electric-500",
-    "hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3),0_16px_32px_-12px_rgba(15,123,114,0.65)]"
+    "bg-gradient-to-b from-sun-400 to-sun-500 text-ink",
+    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35),0_10px_24px_-10px_rgba(201,127,30,0.55)]",
+    "hover:-translate-y-px hover:from-sun-300 hover:to-sun-400",
+    "hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_16px_32px_-12px_rgba(201,127,30,0.65)]"
   ),
   dark: cn(
-    "bg-navy-900 text-cream-50",
-    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_10px_24px_-10px_rgba(31,21,11,0.6)]",
-    "hover:-translate-y-px hover:bg-navy-800",
-    "hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16),0_16px_32px_-12px_rgba(31,21,11,0.7)]"
+    "bg-ocean-500 text-white",
+    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_10px_24px_-10px_rgba(11,38,71,0.6)]",
+    "hover:-translate-y-px hover:bg-ocean-400",
+    "hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16),0_16px_32px_-12px_rgba(11,38,71,0.7)]"
   ),
   outline: cn(
-    "border border-slate-200 bg-white/90 text-navy-900 shadow-soft backdrop-blur",
-    "hover:-translate-y-px hover:border-electric-200 hover:bg-white hover:text-electric-700",
+    "border border-ocean-200 bg-white/90 text-ocean-500 shadow-soft backdrop-blur",
+    "hover:-translate-y-px hover:border-sun-300 hover:bg-white hover:text-ocean-600",
     "hover:shadow-card"
   ),
-  ghost: "text-navy-800 hover:bg-electric-50 hover:text-electric-700",
+  ghost: "text-ocean-500 hover:bg-ocean-50 hover:text-ocean-600",
   danger: cn(
-    "bg-gradient-to-b from-sunrise-500 to-sunrise-600 text-white",
-    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_10px_24px_-10px_rgba(222,56,16,0.55)]",
-    "hover:-translate-y-px hover:from-sunrise-400 hover:to-sunrise-500"
+    "bg-gradient-to-b from-coral-500 to-coral-600 text-white",
+    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_10px_24px_-10px_rgba(184,64,42,0.55)]",
+    "hover:-translate-y-px hover:from-coral-500 hover:to-coral-500"
   ),
 };
 

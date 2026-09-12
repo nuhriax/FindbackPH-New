@@ -1064,16 +1064,17 @@ function pickPinElement(): HTMLElement {
   const el = document.createElement("div");
   el.style.cssText =
     "display:flex;width:38px;height:38px;align-items:center;justify-content:center;" +
-    "border-radius:9999px;background:#2563eb;border:3px solid #fff;" +
-    "box-shadow:0 6px 18px rgba(37,99,235,.45);cursor:grab;" +
+    "border-radius:9999px;background:#123A63;border:3px solid #fff;" +
+    "box-shadow:0 6px 18px rgba(18,58,99,.45);cursor:grab;" +
     "transition:transform .15s ease";
   el.innerHTML = PIN_SVG;
   return el;
 }
 
-/** Teardrop pin SVG (LOST rose / FOUND emerald) with a white ring. */
+/** Teardrop pin SVG — SULO: LOST stays signal-red for instant recognition,
+    FOUND glows lamp-amber (the guiding light). White ring for basemap contrast. */
 function teardropPinSvg(kind: "lost" | "found"): string {
-  const color = kind === "lost" ? "#e11d48" : "#059669";
+  const color = kind === "lost" ? "#e11d48" : "#F27418";
   return (
     `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">` +
     `<path d="M15 37C15 37 27.5 21.8 27.5 13.5a12.5 12.5 0 1 0-25 0C2.5 21.8 15 37 15 37Z" fill="${color}" stroke="#fff" stroke-width="2.5"/>` +
@@ -1082,7 +1083,7 @@ function teardropPinSvg(kind: "lost" | "found"): string {
   );
 }
 
-/** DOM element for a LOST (red) / FOUND (green) teardrop pin marker. */
+/** DOM element for a LOST (red) / FOUND (sulo amber) teardrop pin marker. */
 function dotPinElement(kind: "lost" | "found"): HTMLElement {
   const el = document.createElement("div");
   el.className = "fbx-pin";
@@ -1111,20 +1112,20 @@ function pointPopupHtml(point: MapPoint): string {
   const isLost = point.kind === "lost";
   const badge = isLost
     ? "background:#ffe4e6;color:#be123c"
-    : "background:#d1fae5;color:#047857";
-  const accent = isLost ? "#e11d48" : "#059669";
+    : "background:#fff3e5;color:#B5490C";
+  const accent = isLost ? "#e11d48" : "#F27418";
   const label = isLost ? "LOST" : "FOUND";
 
   return (
     `<div style="width:244px;font-family:inherit;border-top:4px solid ${accent}">` +
-    `<div style="padding:13px 16px 15px;background:linear-gradient(180deg,${isLost ? "#fff5f6" : "#f2fbf7"},#ffffff)">` +
+    `<div style="padding:13px 16px 15px;background:linear-gradient(180deg,${isLost ? "#fff5f6" : "#fff7ed"},#ffffff)">` +
     `<span style="display:inline-flex;align-items:center;border-radius:9999px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.08em;box-shadow:inset 0 0 0 1px ${accent}22;${badge}">${label}</span>` +
     `<p style="margin:11px 0 0;font-size:15px;line-height:1.4;font-weight:700;color:#0f172a">${escapeHtml(point.title)}</p>` +
     `<p style="margin:6px 0 0;font-size:12px;color:#475569">📍 ${escapeHtml(place)}</p>` +
     (when
       ? `<p style="margin:4px 0 0;font-size:11.5px;color:#94a3b8">🕐 ${isLost ? "Lost" : "Found"} ${escapeHtml(when)}</p>`
       : "") +
-    `<a href="${escapeHtml(point.href)}" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:13px;padding:10px 12px;border-radius:9999px;background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.02em;text-decoration:none;box-shadow:0 4px 12px rgba(37,99,235,.35);transition:filter .15s ease" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">View Report &rarr;</a>` +
+    `<a href="${escapeHtml(point.href)}" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:13px;padding:10px 12px;border-radius:9999px;background:linear-gradient(180deg,#3E6E9E,#123A63);color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.02em;text-decoration:none;box-shadow:0 4px 12px rgba(18,58,99,.35);transition:filter .15s ease" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">View Report &rarr;</a>` +
     `</div></div>`
   );
 }

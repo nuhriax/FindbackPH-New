@@ -78,6 +78,7 @@ export function Footer() {
               {[
                 { icon: HeartHandshake, label: "Community Reports" },
                 { icon: Sparkles, label: "Privacy Protected" },
+                { icon: MapPin, label: "Guiding light home" },
               ].map((b) => (
                 <span
                   key={b.label}

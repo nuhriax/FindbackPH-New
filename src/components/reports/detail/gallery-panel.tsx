@@ -81,7 +81,7 @@ export function GalleryCard({
           />
         </div>
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-blue-50">
+        <div className="absolute inset-0 flex items-center justify-center report-soft-surface bg-gradient-to-br from-slate-200 via-slate-100 to-electric-50">
           <div className="text-center">
             <div
               className="

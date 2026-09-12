@@ -109,7 +109,7 @@ export default function DiscoverLoading() {
           <div className="relative hidden h-[560px] w-[360px] shrink-0 flex-col overflow-hidden rounded-3xl border border-white/70 bg-white shadow-card ring-1 ring-inset ring-slate-900/[0.03] 2xl:w-[400px] xl:flex">
             <div
               aria-hidden="true"
-              className="absolute inset-x-0 top-0 z-10 h-1 bg-gradient-to-r from-teal-600 via-teal-400 to-emerald-400"
+              className="absolute inset-x-0 top-0 z-10 h-1 bg-gradient-to-r from-teal-600 via-sulo-400 to-sulo-500"
             />
             <div className="flex items-center justify-between border-b border-slate-100 bg-white/80 px-4 py-3">
               <div className="h-4 w-28 rounded skeleton" />

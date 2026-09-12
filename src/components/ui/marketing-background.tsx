@@ -2,13 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-
-// Heavy SVG background - dynamic import so it's not bundled for dashboard pages
-const BackgroundEffects = dynamic(
-  () => import("./background-effects").then((m) => m.BackgroundEffects),
-  { ssr: false, loading: () => null }
-);
+import { SuloBackground } from "./sulo-background";
 
 // Only show the fancy background on marketing / public pages where it adds value.
 // On dashboard, messages, report, search etc it hurts performance on low-end PH devices.
@@ -50,5 +44,5 @@ export function MarketingBackground() {
   if (reduced) return null; // Respect accessibility - no heavy animation
   if (!isMarketingRoute(pathname)) return null; // Don't render on app pages
 
-  return <BackgroundEffects />;
+  return <SuloBackground />;
 }

@@ -68,19 +68,19 @@ export function WizardNav({
           type="submit"
           disabled={isPending}
           className={[
-            "btn-primary flex items-center gap-2 transition-all duration-200",
+            "btn-primary flex min-w-0 items-center gap-2 transition-all duration-200",
             isPending ? "opacity-75 cursor-wait" : "hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]",
           ].join(" ")}
         >
           {isPending ? (
             <>
-              <Loader2 size={16} className="animate-spin" aria-hidden={true} />
+              <Loader2 size={16} className="animate-spin shrink-0" aria-hidden={true} />
               <span>Publishing…</span>
             </>
           ) : (
             <>
-              <span>{publishLabel}</span>
-              <ArrowRight size={16} aria-hidden={true} />
+              <span className="truncate">{publishLabel}</span>
+              <ArrowRight size={16} className="shrink-0" aria-hidden={true} />
             </>
           )}
         </button>
@@ -88,13 +88,13 @@ export function WizardNav({
         <button
           type="button"
           onClick={onNext}
-          className="btn-primary group flex items-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+          className="btn-primary group flex min-w-0 items-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
           aria-label={`Continue — ${continueLabels[step - 1] ?? "Next"}`}
         >
-          <span>{continueLabels[step - 1] ?? "Continue"}</span>
+          <span className="truncate">{continueLabels[step - 1] ?? "Continue"}</span>
           <ArrowRight
             size={16}
-            className="transition-transform duration-200 group-hover:translate-x-0.5"
+            className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
             aria-hidden={true}
           />
         </button>

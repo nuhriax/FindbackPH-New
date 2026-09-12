@@ -141,7 +141,7 @@ export default async function handler(req: Request) {
                 (i: { title: string; id: string }) =>
                   `<li><strong>${i.title}</strong> — <a href="${itemHref(
                     i
-                  )}" style="color:#2563eb">view on FindBack PH</a></li>`
+                  )}" style="color:#123A63">view on FindBack PH</a></li>`
               )
               .join("")}
 </ul>

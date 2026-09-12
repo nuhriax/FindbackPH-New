@@ -18,7 +18,7 @@ export function DiscoverMapCard({ points }: { points: MapPoint[] }) {
       {/* Brand accent hairline across the top of the card */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 z-10 h-1 bg-gradient-to-r from-teal-600 via-teal-400 to-emerald-400"
+        className="absolute inset-x-0 top-0 z-10 h-1 bg-gradient-to-r from-teal-600 via-sulo-400 to-sulo-500"
       />
 
       <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-white/80 px-4 py-3 backdrop-blur-sm">

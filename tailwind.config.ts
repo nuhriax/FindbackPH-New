@@ -4,19 +4,61 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Legacy names - kept for backward compat, but confusing
-        // electric = teal #0F7B72, navy = sand #FBF6EE, sunrise = red #DC2626
+        // ── Notice-Board brand palette (FindBackPH design system) ──────────
+        // Ocean blue + sun gold carry the brand; coral is reserved for lost
+        // labels/alerts; cork/kraft only for physical notice-board surfaces.
+        ocean: {
+          light: "#3E6E9E", DEFAULT: "#123A63", dark: "#0D2B4A",
+          50: "#EEF3F9", 100: "#D8E4F1", 200: "#B3C9E0", 300: "#7E9FC6",
+          400: "#3E6E9E", 500: "#123A63", 600: "#0F3155", 700: "#0D2B4A",
+          800: "#0A2138", 900: "#071826", 950: "#0B2647",
+        },
+        deep: {
+          DEFAULT: "#0B2647", 50: "#0B2647", 900: "#081D36", 950: "#050F1F",
+        },
+        sun: {
+          soft: "#F8E3BC", DEFAULT: "#EFA430", dark: "#C97F1E",
+          50: "#FDF3E0", 100: "#F8E3BC", 200: "#F2CE8B", 300: "#EFB45E",
+          400: "#EFA430", 500: "#E19122", 600: "#C97F1E", 700: "#9C6117",
+        },
+        coral: {
+          soft: "#FADFD7", DEFAULT: "#E1573C", dark: "#B8402A",
+          50: "#FDF0EC", 100: "#FADFD7", 200: "#F4BBA9", 500: "#E1573C",
+          600: "#C9492F", 700: "#B8402A",
+        },
+        cork: {
+          light: "#A9723F", DEFAULT: "#8A5A31", dark: "#5E3C22",
+          100: "#D9BC97", 200: "#C29E6E", 500: "#A9723F", 700: "#8A5A31",
+          900: "#5E3C22",
+        },
+        kraft: {
+          DEFAULT: "#E4D2A7", light: "#F0E4C6", dark: "#CDB584",
+          50: "#F7EFDA", 100: "#F0E4C6", 200: "#E4D2A7", 400: "#D6BE8C",
+          700: "#A98F5E",
+        },
+        // (Sand lives in its merged token below — legacy numeric scale kept.)
+        ink: {
+          DEFAULT: "#241E17", soft: "#6B5F4E", faint: "#8B7D68",
+        },
+        stamp: {
+          DEFAULT: "#B23A2E", soft: "#F3DEDB", dark: "#8F2C22",
+        },
+        // ── LEGACY ALIASES — retinted to the Notice-Board palette ──────────
+        // Old class names resolve to brand values; migrate call sites to the
+        // semantic names above. electric (was teal) → ocean.
         electric: {
-          50: "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
-          500: "#0F7B72", 600: "#0C6262", 700: "#0A4E55", 800: "#083B46", 900: "#052A33", 950: "#031B22",
+          50: "#EEF3F9", 100: "#D8E4F1", 200: "#B3C9E0", 300: "#7E9FC6", 400: "#3E6E9E",
+          500: "#123A63", 600: "#0F3155", 700: "#0D2B4A", 800: "#0A2138", 900: "#071826", 950: "#050F1F",
         },
+        // navy (was warm sand browns) → ink-tinted neutrals
         navy: {
-          50: "#FBF6EE", 100: "#F6EDE0", 200: "#EFE0CF", 300: "#E0CFAC", 400: "#CDB081",
-          500: "#B58A56", 600: "#96683A", 700: "#6F4E28", 800: "#4C351C", 900: "#332312", 950: "#1F150B",
+          50: "#F7F4EE", 100: "#EFEAE1", 200: "#E0D9CC", 300: "#C4BAA9", 400: "#A99C88",
+          500: "#8B7D68", 600: "#6B5F4E", 700: "#55493C", 800: "#3A322A", 900: "#241E17", 950: "#171310",
         },
+        // sunrise (was red #DC2626) → coral
         sunrise: {
-          50: "#FEF2F2", 100: "#FEE2E2", 200: "#FECACA", 300: "#FCA5A5", 400: "#F87171",
-          500: "#DC2626", 600: "#B91C1C", 700: "#991B1B", 800: "#7F1D1D", 900: "#5C1515",
+          50: "#FDF0EC", 100: "#FADFD7", 200: "#F4BBA9", 300: "#F4BBA9", 400: "#E1573C",
+          500: "#E1573C", 600: "#C9492F", 700: "#B8402A", 800: "#8F2C22", 900: "#6B2118",
         },
         ice: {
           50: "#FDF6EE", 100: "#F7EFE3", 200: "#F0E3D0", 300: "#E6CEB7", 400: "#D7BF97", 500: "#C4A878",
@@ -27,20 +69,20 @@ const config: Config = {
           soft: "#FBF6EF", warm: "#FBF6EF",
         },
         blue: {
-          50: "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
-          500: "#20948F", 600: "#0F7B72", 700: "#0C6262", 800: "#0A4E55", 900: "#083B46", 950: "#052A33",
+          50: "#EEF3F9", 100: "#D8E4F1", 200: "#B3C9E0", 300: "#7E9FC6", 400: "#3E6E9E",
+          500: "#123A63", 600: "#0F3155", 700: "#0D2B4A", 800: "#0A2138", 900: "#071826", 950: "#050F1F",
         },
         indigo: {
           50: "#F7F1F4", 100: "#EFE1E9", 200: "#E0C9DB", 300: "#CBA4C3", 400: "#B578A5",
           500: "#9C5483", 600: "#833D6B", 700: "#6B2F56", 800: "#4F2040", 900: "#3A192F", 950: "#28101E",
         },
         cyan: {
-          50: "#ECFBF9", 100: "#D0F3F1", 200: "#A5E7E5", 300: "#6DD4D3", 400: "#47B9BA",
-          500: "#2BA3AB", 600: "#1D8C96", 700: "#17727C", 800: "#115B66", 900: "#0D4751",
+          50: "#EEF6F9", 100: "#D4EAF3", 200: "#A8D3E6", 300: "#7EB8D6", 400: "#4E93B8",
+          500: "#2E7194", 600: "#1D5471", 700: "#173F58", 800: "#123044", 900: "#0D2233",
         },
         sky: {
-          50: "#EAF9F9", 100: "#D6F1F1", 200: "#B0E3E7", 300: "#82CED6", 400: "#51B2BC",
-          500: "#259CA7", 600: "#17908A", 700: "#11707A", 800: "#0E555E", 900: "#0B3E46",
+          50: "#EEF6F9", 100: "#D8E9F1", 200: "#B0D2E4", 300: "#82B6D4", 400: "#5195BC",
+          500: "#2E7194", 600: "#1D5471", 700: "#173F58", 800: "#123044", 900: "#0D2233",
         },
         violet: {
           50: "#F5F3FF", 100: "#EDE9FE", 200: "#DDD6FE", 300: "#C4B5FD", 400: "#A78BFA",
@@ -54,23 +96,42 @@ const config: Config = {
           50: "#F1FAF3", 100: "#DFF3E5", 200: "#BFE7CC", 300: "#92D5AB", 400: "#5CBF87",
           500: "#35A56B", 600: "#268A56", 700: "#1D6E45", 800: "#175736", 900: "#114229", 950: "#0A2B1B",
         },
-        amber: {
-          50: "#FFF3E5", 100: "#FFE6CC", 200: "#FBD0A5", 300: "#F8B574", 400: "#F5913D",
-          500: "#F27418", 600: "#DE3810", 700: "#B5490C", 800: "#8F3900", 900: "#6E2D06",
+        // teal (Tailwind default; found-accents + discover controls) → ocean family
+        teal: {
+          50: "#EEF3F9", 100: "#D8E4F1", 200: "#B3C9E0", 300: "#7E9FC6", 400: "#3E6E9E",
+          500: "#123A63", 600: "#0F3155", 700: "#0D2B4A", 800: "#0A2138", 900: "#071826", 950: "#050F1F",
         },
-        ink: { DEFAULT: "#332312", secondary: "#4C351C", muted: "#6B5636" },
+        // amber (was orange #F27418) → sun gold family
+        amber: {
+          50: "#FDF3E0", 100: "#F8E3BC", 200: "#F2CE8B", 300: "#EFB45E", 400: "#EFA430",
+          500: "#E19122", 600: "#C97F1E", 700: "#9C6117", 800: "#8A5312", 900: "#6E410E",
+        },
         // Semantic aliases - use these going forward
         brand: {
-          50: "#EAF7F5", 100: "#D6EFEB", 200: "#B3E4DD", 300: "#7CC9C6", 400: "#46ABAA",
-          500: "#0F7B72", 600: "#0C6262", 700: "#0A4E55", 800: "#083B46", 900: "#052A33", 950: "#031B22",
+          50: "#EEF3F9", 100: "#D8E4F1", 200: "#B3C9E0", 300: "#7E9FC6", 400: "#3E6E9E",
+          500: "#123A63", 600: "#0F3155", 700: "#0D2B4A", 800: "#0A2138", 900: "#071826", 950: "#050F1F",
         },
+        // Sand — the light-mode page background. Numeric legacy scale kept for
+        // existing utilities; DEFAULT/muted/deep carry the brand hex values.
         sand: {
+          DEFAULT: "#FBF6EC", muted: "#F3EBD9", deep: "#EFE3C9",
           50: "#FBF6EE", 100: "#F6EDE0", 200: "#EFE0CF", 300: "#E0CFAC", 400: "#CDB081",
           500: "#B58A56", 600: "#96683A", 700: "#6F4E28", 800: "#4C351C", 900: "#332312", 950: "#1F150B",
         },
         danger: {
           50: "#FEF2F2", 100: "#FEE2E2", 200: "#FECACA", 300: "#FCA5A5", 400: "#F87171",
           500: "#DC2626", 600: "#B91C1C", 700: "#991B1B", 800: "#7F1D1D", 900: "#5C1515",
+        },
+        // SULO (guiding-light) — legacy lamp-amber, now resolves to the
+        // Notice-Board sun-gold. Kept as an alias; migrate call sites to `sun`.
+        sulo: {
+          50: "#FDF3E0", 100: "#F8E3BC", 200: "#F2CE8B", 300: "#EFB45E", 400: "#EFA430",
+          500: "#E19122", 600: "#C97F1E", 700: "#9C6117", 800: "#8A5312", 900: "#6E410E",
+        },
+        // Harbor — deep ocean ink for headings-on-dark, footer + map rail frames.
+        harbor: {
+          50: "#EEF3F9", 100: "#D8E4F1", 200: "#B3C9E0", 300: "#7E9FC6", 400: "#3E6E9E",
+          500: "#123A63", 600: "#0F3155", 700: "#0D2B4A", 800: "#0A2138", 900: "#071826", 950: "#050F1F",
         },
         success: {
           50: "#EDF9F0", 100: "#D5F1DF", 200: "#A9E3C2", 300: "#7BD1A4", 400: "#46B687",
@@ -81,12 +142,17 @@ const config: Config = {
         sans: ["var(--font-pjs)", "system-ui", "sans-serif"],
         display: ["var(--font-sora)", "var(--font-pjs)", "system-ui", "sans-serif"],
         mono: ["var(--font-pjs)", "system-ui", "sans-serif"],
+        // Handwritten annotation — reserved for the single Caveat moment on
+        // notice cards (e.g. "reward, tawag lang po"). Never for UI text.
+        hand: ["var(--font-caveat)", "cursive"],
       },
       borderRadius: { xl: "1rem", "2xl": "1.25rem", "3xl": "1.5rem", card: "1.25rem", button: "0.75rem" },
       boxShadow: {
-        glow: "0 0 40px rgba(15, 123, 122, 0.14)",
+        glow: "0 0 40px rgba(18, 58, 99, 0.14)",
         "glow-leaf": "0 0 40px rgba(38, 138, 86, 0.16)",
-        "glow-lg": "0 0 70px rgba(15, 123, 122, 0.24)",
+        "glow-lg": "0 0 70px rgba(18, 58, 99, 0.24)",
+        "glow-sulo": "0 0 44px rgba(239, 164, 48, 0.20)",
+        "glow-sulo-lg": "0 12px 44px -12px rgba(239, 164, 48, 0.45)",
         card: "0 24px 60px -26px rgba(51, 46, 38, 0.22)",
         "card-hover": "0 34px 80px -30px rgba(51, 46, 38, 0.30)",
         soft: "0 18px 50px -24px rgba(51, 46, 38, 0.18)",

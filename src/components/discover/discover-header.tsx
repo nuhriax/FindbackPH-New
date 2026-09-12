@@ -47,8 +47,8 @@ export function DiscoverHeader({
             <Reveal>
               <p className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-teal-700 ring-1 ring-inset ring-teal-200/70">
                 <span className="relative flex size-1.5">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-teal-500 opacity-60" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-teal-600" />
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-sulo-500 opacity-60" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-sulo-600" />
                 </span>
                 FindBackPH · Philippines
               </p>
@@ -58,7 +58,7 @@ export function DiscoverHeader({
               <h1 className="mt-4 font-display text-4xl font-bold leading-[1.08] tracking-tight text-navy-900 sm:text-5xl lg:text-[3.4rem]">
                 Find what you lost,{" "}
 
-                <span className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-teal-600 via-sulo-500 to-sulo-600 bg-clip-text text-transparent">
               Return what you found.
                 </span>
               </h1>
@@ -105,8 +105,8 @@ export function DiscoverHeader({
             "just launched" zero case. */}
         <Reveal delay={0.2}>
           <div className="mt-10 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-            <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-teal-200/50 bg-white/60 px-4 py-3 shadow-soft backdrop-blur-md">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-200/70">
+            <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-sulo-200/60 bg-white/60 px-4 py-3 shadow-soft backdrop-blur-md">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sulo-50 text-sulo-700 ring-1 ring-inset ring-sulo-200/70">
                 <PackageSearch className="size-4" aria-hidden="true" />
               </span>
               <div className="min-w-0">

@@ -75,7 +75,7 @@ export function ReportEditToggle({
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={open}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-900 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-900 shadow-sm transition-all hover:border-electric-300 hover:bg-electric-50"
         >
           <Edit3 size={16} />
           Edit Report

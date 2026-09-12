@@ -36,7 +36,7 @@ export function FactsRow({
 
         {item.timeWindow && (
           <MetricTile
-            icon={<Clock3 size={13} className="shrink-0 text-violet-600" />}
+            icon={<Clock3 size={13} className="shrink-0 text-electric-600" />}
             label="Approx. time"
             value={item.timeWindow}
             title={item.timeWindow}

@@ -35,7 +35,7 @@ export function JeepneyMotif({ className }: { className?: string }) {
         <rect x="92" y="22" width="8" height="7" rx="1" fill="#b8ddf0" />
         {/* colorful side stripe — classic jeepney decor */}
         <path d="M52 31 h52" stroke="#f27418" strokeWidth="1.6" opacity="0.8" />
-        <path d="M56 33.5 h4 M64 33.5 h4 M72 33.5 h4 M80 33.5 h4 M88 33.5 h4 M96 33.5 h4" stroke="#20948f" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+        <path d="M56 33.5 h4 M64 33.5 h4 M72 33.5 h4 M80 33.5 h4 M88 33.5 h4 M96 33.5 h4" stroke="#3E6E9E" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
         {/* wheels */}
         <circle cx="64" cy="38" r="4.5" fill="#4c351c" />
         <circle cx="64" cy="38" r="1.8" fill="#f7efdf" />

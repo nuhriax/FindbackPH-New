@@ -115,7 +115,7 @@ export default async function AboutPage() {
       <section className="relative overflow-hidden bg-ink-900 py-16 text-white sm:py-20">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_260px_at_50%_120%,rgba(15,123,122,0.35),transparent_70%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_260px_at_50%_120%,rgba(18,58,99,0.35),transparent_70%)]"
         />
         <MotionReveal direction="blur" className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
           <p className="font-display text-2xl font-bold leading-snug tracking-tight sm:text-3xl">
