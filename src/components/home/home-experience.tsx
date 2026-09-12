@@ -188,7 +188,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
               <Reveal delay={130}>
                 <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
                   FindBack PH connects people who lost something with people
-                  who found it — safely, quickly, and locally.
+                  who found it ï¿½ safely, quickly, and locally.
                 </p>
               </Reveal>
 
@@ -232,7 +232,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                   </div>
 
                   <form
-                    action="/search"
+                    action="/discover"
                     method="GET"
                     className="group rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_15px_45px_rgba(15,23,42,.08)] transition duration-300 focus-within:border-blue-300 focus-within:shadow-[0_20px_55px_rgba(15,123,122,.12)]"
                   >
@@ -478,7 +478,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
       </section>
 
       {/* =========================================================
-          HOW IT WORKS — 3 STEPS
+          HOW IT WORKS ï¿½ 3 STEPS
       ========================================================= */}
 
       <section className="relative py-14 sm:py-16" aria-labelledby="how-heading">
@@ -508,7 +508,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                 step: "1",
                 icon: FileText,
                 title: "Post a report",
-                text: "Describe your item, add a photo, and drop a pin. Takes under two minutes — and your contact details stay hidden.",
+                text: "Describe your item, add a photo, and drop a pin. Takes under two minutes ï¿½ and your contact details stay hidden.",
                 href: "/report/lost",
                 cta: "Report an item",
               },
@@ -517,7 +517,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                 icon: Radar,
                 title: "Get matched",
                 text: "We surface reports near where your item went missing, and notify you when a matching found item appears.",
-                href: "/search",
+                href: "/discover",
                 cta: "Browse reports",
               },
               {
@@ -923,7 +923,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
             <Reveal delay={100}>
               <Link
-                href="/search"
+                href="/discover"
                 className="group inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-600 hover:shadow-lg"
               >
                 Browse everything
@@ -952,7 +952,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
                   delay={index * 45}
                 >
                   <Link
-                    href={`/search?category=${category}`}
+                    href={`/discover?category=${category}`}
                     className="group relative block h-full min-h-[190px] overflow-hidden rounded-[26px] border border-slate-200/80 bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,.035)] transition-all duration-500 hover:-translate-y-1.5 hover:border-transparent hover:shadow-[0_25px_60px_rgba(15,23,42,.1)]"
                   >
                     {/* Glow */}
@@ -1038,7 +1038,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
               </div>
 
               <Link
-                href="/search"
+                href="/discover"
                 className="group inline-flex items-center gap-2 text-xs font-bold text-slate-700 transition hover:text-blue-600"
               >
                 Start a smarter search
@@ -1246,7 +1246,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
-                href="/search"
+                href="/discover"
                 className="group inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
               >
                 Search Reports
@@ -1317,7 +1317,7 @@ export default function HomeExperience({ stats }: HomeExperienceProps) {
 
             <div className="mt-9 flex flex-wrap justify-center gap-3">
               <Link
-                href="/search"
+                href="/discover"
                 className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-slate-950 shadow-[0_15px_40px_rgba(255,255,255,.08)] transition hover:-translate-y-0.5 hover:bg-blue-50"
               >
                 <Search size={17} />

@@ -28,9 +28,19 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // A stale/expired session or a flaky Supabase round-trip must never 500 the
+  // whole site — degrade to "treated as signed out" instead of throwing.
+  let user: Awaited<
+    ReturnType<typeof supabase.auth.getUser>
+  >["data"]["user"] = null;
+  try {
+    const {
+      data: { user: sessionUser },
+    } = await supabase.auth.getUser();
+    user = sessionUser;
+  } catch (error) {
+    console.error("[middleware] getUser failed — continuing signed-out:", error);
+  }
 
   const path = request.nextUrl.pathname;
   const isProtected = PROTECTED_PREFIXES.some((p) => path.startsWith(p));
@@ -56,11 +66,19 @@ export async function middleware(request: NextRequest) {
     request.method === "GET" &&
     !AUTH_PAGES.some((p) => path.startsWith(p))
   ) {
-    const { data: onboardingProfile } = await supabase
-      .from("profiles")
-      .select("first_name, last_name")
-      .eq("id", user.id)
-      .maybeSingle();
+    let onboardingProfile: { first_name: string | null; last_name: string | null } | null =
+      null;
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      onboardingProfile = data;
+    } catch (error) {
+      // A failed lookup must never trap a signed-in user — let them through.
+      console.error("[middleware] onboarding profile lookup failed:", error);
+    }
 
     if (
       onboardingProfile &&

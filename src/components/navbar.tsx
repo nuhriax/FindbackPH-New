@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { Search, Menu, X, LogOut, LayoutDashboard, User as UserIcon, Settings, Bookmark, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, User as UserIcon, Settings, Bookmark, ChevronDown } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { logoutAction } from "@/lib/actions/auth";
@@ -218,14 +218,6 @@ export function Navbar({
           </nav>
 
           <div className="hidden items-center justify-end gap-1 justify-self-end lg:flex">
-            <Link
-              href="/search"
-              aria-label="Search"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-navy-50 hover:text-navy-800"
-            >
-              <Search size={20} />
-            </Link>
-
             {user ? (
               <>
                 <NotificationDropdown initialCount={notificationCount} />
@@ -341,15 +333,8 @@ export function Navbar({
             )}
           </div>
 
-          {/* Mobile actions — search stays one tap away */}
+          {/* Mobile actions */}
           <div className="flex items-center justify-self-end gap-0.5 lg:hidden">
-            <Link
-              href="/search"
-              aria-label="Search"
-              className="rounded-full p-2.5 text-slate-600 transition-colors hover:bg-white/80 hover:text-navy-800"
-            >
-              <Search size={20} />
-            </Link>
             {user ? (
               <Link
                 href="/dashboard"

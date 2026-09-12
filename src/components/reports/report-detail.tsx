@@ -82,8 +82,8 @@ export function ReportDetail({
   similarItems = [],
   viewers,
   returnConfirm,
-  backHref = "/search",
-  backLabel = "Back to search",
+  backHref = "/discover",
+  backLabel = "Back to reports",
   matchHref,
 }: {
   kind: "lost" | "found";

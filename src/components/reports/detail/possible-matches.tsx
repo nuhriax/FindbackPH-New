@@ -58,7 +58,7 @@ function MatchCard({
   position: number;
 }) {
   const matchInfo = getMatchInfo(match.score);
-  const href = matchHref ? matchHref(match.id) : `/search/${match.id}`;
+  const href = matchHref ? matchHref(match.id) : match.kind === "lost" ? `/lost/${match.id}` : `/found/${match.id}`;
   const matchLocation =
     [match.city, match.province].filter(Boolean).join(", ") ||
     "Location not set";

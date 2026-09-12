@@ -36,7 +36,7 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/search"
+            href="/discover"
             className="btn-secondary inline-flex items-center justify-center gap-2"
           >
             <Search size={15} />

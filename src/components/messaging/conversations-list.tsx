@@ -86,7 +86,7 @@ export async function ConversationsList() {
           <Link href="/found" className="btn-secondary">
             <PackageCheck size={16} /> Browse found items
           </Link>
-          <Link href="/search" className="btn-primary">
+          <Link href="/discover" className="btn-primary">
             Search reports
           </Link>
         </div>

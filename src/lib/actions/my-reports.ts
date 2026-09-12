@@ -102,8 +102,7 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
     return { error: "Couldn't update this report. Please try again." };
   }
 
-  revalidatePath("/search");
-  revalidatePath(`/search/${id}`);
+  revalidatePath("/discover");
   revalidatePath(`/dashboard/reports`);
   return {};
 }
@@ -141,7 +140,7 @@ async function notifyReturnedParticipants(itemType: "lost_item" | "found_item", 
       title: "A report you contacted was marked as returned",
       message:
         "The person you reached out to has marked this report as returned. You can review the report for reference.",
-      link: `/search/${itemId}`,
+      link: itemType === "lost_item" ? `/lost/${itemId}` : `/found/${itemId}`,
     });
   }
 }
@@ -182,8 +181,7 @@ export async function setMyReportStatusAction(
 
   revalidatePath("/dashboard/reports");
   revalidatePath("/dashboard");
-  revalidatePath(`/search/${itemId}`);
-  revalidatePath(`/search`);
+  revalidatePath("/discover");
   revalidatePath(`/lost/${itemId}`);
   revalidatePath(`/found/${itemId}`);
   return {};

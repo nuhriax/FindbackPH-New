@@ -1,7 +1,7 @@
 "use client";
 
 import { LayoutGrid, MapPin } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * Owns Discover's results workspace: the feed on the left and — on xl screens
@@ -23,10 +23,20 @@ export function DiscoverResultsView({
   headerLeft?: ReactNode;
 }) {
   const [view, setView] = useState<"grid" | "map">("grid");
+  const mapRailRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const syncMapLink = () => {
-      if (window.location.hash === "#discover-map" && map) setView("map");
+      if (window.location.hash === "#discover-map" && map) {
+        setView("map");
+        // The rail mounts hidden on <xl, so the browser can't anchor to it on
+        // its own — bring it into view once the map view is rendered.
+        if (window.innerWidth < 1280) {
+          requestAnimationFrame(() =>
+            mapRailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          );
+        }
+      }
     };
     syncMapLink();
     window.addEventListener("hashchange", syncMapLink);
@@ -91,8 +101,10 @@ export function DiscoverResultsView({
         </div>
         {map && (
           <aside
+            ref={mapRailRef}
+            id="discover-map"
             aria-label="Report locations map"
-            className={`shrink-0 xl:sticky xl:top-[148px] xl:block xl:w-[360px] 2xl:w-[400px] ${
+            className={`shrink-0 scroll-mt-24 xl:sticky xl:block xl:top-[206px] xl:w-[360px] 2xl:w-[400px] ${
               view === "map" ? "w-full" : "hidden"
             }`}
           >

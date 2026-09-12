@@ -96,7 +96,7 @@ export function CategoryScroller({
           type="button"
           onClick={() => scrollBy(-1)}
           aria-label="Scroll categories left"
-          className="absolute left-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-electric-300 hover:text-electric-700"
+          className="absolute left-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-teal-300 hover:text-teal-700"
         >
           <ChevronLeft size={14} aria-hidden="true" />
         </button>
@@ -106,7 +106,7 @@ export function CategoryScroller({
           type="button"
           onClick={() => scrollBy(1)}
           aria-label="Scroll categories right"
-          className="absolute right-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-electric-300 hover:text-electric-700"
+          className="absolute right-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-teal-300 hover:text-teal-700"
         >
           <ChevronRight size={14} aria-hidden="true" />
         </button>

@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
  * Discovers and validates internal links from rendered pages.
  */
 test.describe("Link Audit", () => {
-  const pagesToCheck = ["/", "/search", "/about", "/contact", "/login"];
+  const pagesToCheck = ["/", "/discover", "/about", "/contact", "/login"];
 
   for (const pagePath of pagesToCheck) {
     test(`${pagePath} internal links return valid status`, async ({ page, request }) => {
@@ -51,7 +51,6 @@ test.describe("Important Navigation Links", () => {
     await page.goto("/");
 
     // Check for key navigation elements
-    await expect(page.getByRole("link", { name: /search/i }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: /report/i }).first()).toBeVisible();
   });
 

@@ -1,6 +1,5 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 /**
@@ -20,10 +19,6 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("[global] fatal layout error:", error.message, error.digest ?? "", "\n", error.stack);
-    // Last-resort boundary — report fatals to Sentry too (no-op without a DSN).
-    Sentry.captureException(error, {
-      extra: { digest: error.digest ?? null },
-    });
   }, [error]);
 
   return (

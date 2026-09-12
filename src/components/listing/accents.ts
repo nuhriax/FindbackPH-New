@@ -1,4 +1,4 @@
-export type Accent = "lost" | "found";
+export type Accent = "lost" | "found" | "discover";
 
 export type AccentClasses = {
   text: string;
@@ -39,5 +39,17 @@ export const ACCENT: Record<Accent, AccentClasses> = {
     focus: "focus:border-emerald-400 focus:ring-emerald-500/20",
     hoverText: "group-hover:text-emerald-700",
     glow: "bg-emerald-500/10",
+  },
+  /** Discover — the mixed lost+found feed wears the brand teal. */
+  discover: {
+    text: "text-teal-700",
+    textStrong: "text-teal-600",
+    border: "border-teal-200/80",
+    bgSoft: "bg-teal-50/80",
+    button: "bg-teal-700",
+    buttonHover: "hover:bg-teal-600",
+    focus: "focus:border-teal-400 focus:ring-teal-500/20",
+    hoverText: "group-hover:text-teal-700",
+    glow: "bg-teal-500/10",
   },
 };

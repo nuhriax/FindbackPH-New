@@ -100,7 +100,6 @@ export async function saveOwnershipChallengeAction(
 
   revalidatePath(`/lost/${itemId}`);
   revalidatePath(`/found/${itemId}`);
-  revalidatePath(`/search/${itemId}`);
   return {};
 }
 
@@ -129,7 +128,6 @@ export async function deleteOwnershipChallengeAction(
 
   revalidatePath(`/lost/${itemId}`);
   revalidatePath(`/found/${itemId}`);
-  revalidatePath(`/search/${itemId}`);
   return {};
 }
 
@@ -182,7 +180,6 @@ export async function submitOwnershipAnswersAction(
   if (result?.passed) {
     revalidatePath(`/lost/${itemId}`);
     revalidatePath(`/found/${itemId}`);
-    revalidatePath(`/search/${itemId}`);
     return { passed: true };
   }
   return { passed: false, error: result?.error ?? "mismatch" };

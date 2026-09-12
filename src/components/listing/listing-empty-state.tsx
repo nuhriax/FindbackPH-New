@@ -24,8 +24,8 @@ export function ListingEmptyState({
   description: string;
   hasFilters: boolean;
   clearHref: string;
-  reportHref: string;
-  reportLabel: string;
+  reportHref?: string;
+  reportLabel?: string;
   secondaryHref?: string;
   secondaryLabel?: string;
   secondaryNote?: string;
@@ -76,13 +76,15 @@ export function ListingEmptyState({
           </Link>
         )}
 
-        <Link
-          href={reportHref}
-          className={`inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-4 text-xs font-semibold text-white transition-colors ${a.button} ${a.buttonHover}`}
-        >
-          <Plus aria-hidden="true" className="h-3.5 w-3.5" />
-          {reportLabel}
-        </Link>
+        {reportHref && reportLabel && (
+          <Link
+            href={reportHref}
+            className={`inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-4 text-xs font-semibold text-white transition-colors ${a.button} ${a.buttonHover}`}
+          >
+            <Plus aria-hidden="true" className="h-3.5 w-3.5" />
+            {reportLabel}
+          </Link>
+        )}
 
         {secondaryHref && secondaryLabel && (
           <Link

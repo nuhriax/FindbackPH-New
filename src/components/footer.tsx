@@ -3,7 +3,6 @@ import { HeartHandshake, Mail, MapPin, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const EXPLORE = [
-  { label: "Search", href: "/search" },
   { label: "Discover", href: "/discover" },
   { label: "Report Lost", href: "/report/lost" },
   { label: "Report Found", href: "/report/found" },
@@ -45,9 +44,8 @@ export function Footer() {
           <div>
             <Logo variant="light" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
-              Every lost thing has a way home. The Philippines&apos; free
-              community lost-and-found platform — private by default, safe by
-              design, built for every island and barangay.
+              Find lost belongings reported by people across the Philippines. Search by item, location, or category, and connect with the person who may help bring them home.
+
             </p>
             <RouteRule className="mt-6 max-w-[220px]" />
           </div>

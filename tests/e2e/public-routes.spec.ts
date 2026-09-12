@@ -12,9 +12,9 @@ test.describe("Public Routes", () => {
     await expect(page.locator("#main-content")).toBeVisible();
   });
 
-  test("search page loads", async ({ page }) => {
-    await page.goto("/search");
-    await expect(page).toHaveTitle(/Search/);
+  test("discover page loads", async ({ page }) => {
+    await page.goto("/discover");
+    await expect(page).toHaveTitle(/Discover/);
   });
 
   test("lost items page loads", async ({ page }) => {

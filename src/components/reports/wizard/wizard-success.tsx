@@ -173,7 +173,7 @@ export function WizardSuccess({
               <span>Report another item</span>
             </button>
             <Link
-              href={`/search?q=${encodeURIComponent(itemTitle)}&type=${cfg.itemType === "lost_item" ? "found" : "lost"}`}
+              href={`/discover?q=${encodeURIComponent(itemTitle)}&type=${cfg.itemType === "lost_item" ? "found" : "lost"}`}
               className="btn-secondary flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
             >
               <span>Browse potential matches</span>

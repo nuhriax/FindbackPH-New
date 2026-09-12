@@ -21,7 +21,7 @@ const viewports = [
 
 const pages = [
   { path: "/", name: "homepage" },
-  { path: "/search", name: "search" },
+  { path: "/discover", name: "discover" },
   { path: "/login", name: "login" },
   { path: "/register", name: "register" },
   { path: "/lost", name: "lost" },

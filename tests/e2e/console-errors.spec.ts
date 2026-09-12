@@ -6,7 +6,6 @@ import { test, expect } from "@playwright/test";
  */
 const publicPages = [
   "/",
-  "/search",
   "/lost",
   "/found",
   "/discover",

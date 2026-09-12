@@ -420,7 +420,7 @@ export default async function HomePage() {
           </div>
 
           <div className="mx-auto mt-8 max-w-2xl">
-            <form action="/search" method="GET" role="search" className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center">
+            <form action="/discover" method="GET" role="search" className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center">
               <div className="flex min-h-[48px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3">
                 <Search size={18} className="shrink-0 text-slate-400" />
                 <input name="q" type="search" maxLength={120} placeholder="e.g. iPhone, wallet, keys, school ID" aria-label="Search reports" className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-500" />
@@ -458,7 +458,7 @@ export default async function HomePage() {
               return (
                 <Link
                   key={category.value}
-                  href={`/search?category=${encodeURIComponent(category.value)}`}
+                  href={`/discover?category=${encodeURIComponent(category.value)}`}
                   className="group flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-electric-300 hover:shadow-md"
                 >
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500 transition group-hover:border-electric-200 group-hover:bg-electric-50 group-hover:text-electric-600">
@@ -517,7 +517,7 @@ export default async function HomePage() {
             </div>
 
             <Link
-              href="/search"
+              href="/discover"
               className="inline-flex items-center gap-2 text-sm font-semibold text-electric-700 transition hover:text-electric-600"
             >
               View all reports
@@ -546,7 +546,7 @@ export default async function HomePage() {
             </Link>
 
             <Link
-              href="/search"
+              href="/discover"
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
             >
               <Search size={13} />

@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Public Routes - Core", () => {
   const publicRoutes = [
     { path: "/", title: /FindBack PH/ },
-    { path: "/search", title: /Search/ },
+    { path: "/discover", title: /Discover/ },
     { path: "/lost", title: /Lost/ },
     { path: "/found", title: /Found/ },
     { path: "/discover", title: /Discover/ },

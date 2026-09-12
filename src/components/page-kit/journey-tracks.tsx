@@ -145,26 +145,6 @@ export function JourneyTracks() {
 
       {/* The morphing timeline */}
       <MotionReveal key={`${track}-list`} direction="up" className="relative mt-10">
-        {/* the dotted "return path" — the motif that runs through all three pages */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 4 100"
-          preserveAspectRatio="none"
-          className="absolute left-[50px] top-4 hidden h-[calc(100%-3rem)] w-1 sm:block"
-        >
-          <line
-            x1="2"
-            y1="0"
-            x2="2"
-            y2="100"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeDasharray="1 7"
-            strokeLinecap="round"
-            className={track === "lost" ? "text-sunrise-300" : "text-leaf-300"}
-          />
-        </svg>
-
         <ol className="space-y-5">
           {steps.map((step, i) => (
             <li key={step.title}>

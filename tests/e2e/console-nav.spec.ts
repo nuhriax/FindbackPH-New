@@ -30,7 +30,7 @@ test.describe("Console Errors", () => {
     page.on("pageerror", (err) => {
       errors.push(err.message);
     });
-    await page.goto("/search");
+    await page.goto("/discover");
     await page.waitForLoadState("networkidle");
     expect(errors).toEqual([]);
   });
