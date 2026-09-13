@@ -125,7 +125,7 @@ export default async function DashboardPage() {
       {/* ── Page header — lean app bar: identity + context left, actions right ── */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3.5">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-electric-50 text-lg font-bold text-electric-700">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-electric-50 to-electric-50 text-lg font-bold text-electric-700">
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img loading="lazy" src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
@@ -166,7 +166,7 @@ export default async function DashboardPage() {
             key={s.label}
             href={s.href}
             aria-label={`${s.label}: ${s.value}`}
-            className="card group relative block overflow-hidden p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
+            className="card group relative block overflow-hidden p-4 transition hover:-translate-y-0.5 hover:border-electric-200 hover:shadow-lg"
           >
             <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${STAT_ACCENT[s.tone]}`} />
             <div className="relative flex items-center justify-between gap-2">
@@ -218,12 +218,12 @@ export default async function DashboardPage() {
               <Link
                 key={s.step}
                 href={s.href}
-                className="group rounded-xl border border-slate-200/70 bg-white/80 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                className="group rounded-xl border border-slate-200/70 bg-white/80 p-4 transition hover:-translate-y-0.5 hover:border-electric-200 hover:shadow-md"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-electric-600 text-xs font-bold text-white">
                   {s.step}
                 </span>
-                <p className="mt-2.5 text-sm font-semibold text-navy-900 group-hover:text-blue-700">{s.title}</p>
+                <p className="mt-2.5 text-sm font-semibold text-navy-900 group-hover:text-electric-700">{s.title}</p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">{s.text}</p>
               </Link>
             ))}
@@ -257,18 +257,18 @@ export default async function DashboardPage() {
 
                 <Link
                   href="/dashboard/saved"
-                  className="card group flex items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
+                  className="card group flex items-center justify-between gap-3 p-4 transition hover:-translate-y-0.5 hover:border-electric-200 hover:shadow-lg"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-electric-200 bg-electric-50 text-electric-600">
                       <Bookmark size={16} />
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-navy-900 group-hover:text-blue-700">Saved reports</p>
+                      <p className="text-sm font-semibold text-navy-900 group-hover:text-electric-700">Saved reports</p>
                       <p className="text-xs text-slate-500">{savedItems?.length ?? 0} bookmarked</p>
                     </div>
                   </div>
-                  <ChevronRight size={16} className="text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-500" />
+                  <ChevronRight size={16} className="text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-electric-500" />
                 </Link>
         </aside>
       </div>
@@ -279,13 +279,13 @@ export default async function DashboardPage() {
 const STAT_TONES: Record<string, string> = {
   sunrise: "border-sunrise-200 bg-sunrise-50 text-sunrise-600",
   emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
-  blue: "border-blue-200 bg-blue-50 text-blue-600",
+  blue: "border-electric-200 bg-electric-50 text-electric-600",
   leaf: "border-leaf-200 bg-leaf-50 text-leaf-600",
 };
 
 const STAT_ACCENT: Record<string, string> = {
   sunrise: "bg-sunrise-200",
   emerald: "bg-emerald-200",
-  blue: "bg-blue-200",
+  blue: "bg-electric-200",
   leaf: "bg-leaf-200",
 };

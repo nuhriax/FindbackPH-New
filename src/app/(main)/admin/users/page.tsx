@@ -40,8 +40,10 @@ export default async function AdminUsersPage() {
         </div>
       ) : (
           <div className="mt-8 card overflow-hidden">
-            <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            {/* Scrollable on narrow screens; min-width keeps columns readable
+                while the page itself never overflows at 320px. */}
+            <div className="admin-table-scroll overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-ice-50 text-slate-600">
                 <tr>
                   <th className="px-4 py-3 font-semibold">User</th>
@@ -53,7 +55,7 @@ export default async function AdminUsersPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {users.map((user: any) => (
-                  <tr key={user.id} className="text-slate-600 hover:bg-blue-50/40">
+                  <tr key={user.id} className="text-slate-600 hover:bg-electric-50/40">
                     <td className="px-4 py-3">
                       <span className="font-medium text-navy-900">
                         {user.first_name} {user.last_name}

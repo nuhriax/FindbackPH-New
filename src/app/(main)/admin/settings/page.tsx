@@ -19,7 +19,7 @@ export default async function AdminSettingsPage() {
 
       <div className="rounded-2xl border border-slate-200/70 bg-white/70 p-6 shadow-soft backdrop-blur-md">
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-600">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-electric-200 bg-electric-50 text-electric-600">
             <SettingsIcon size={18} />
           </span>
           <div>

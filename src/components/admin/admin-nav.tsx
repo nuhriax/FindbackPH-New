@@ -37,8 +37,8 @@ export function AdminNav() {
             className={clsx(
               "inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors",
               active
-                ? "border-indigo-200 bg-indigo-50 text-indigo-700"
-                : "border-transparent text-slate-600 hover:bg-white/70 hover:text-indigo-700"
+                ? "border-electric-200 bg-electric-50 text-electric-700"
+                : "border-transparent text-slate-600 hover:bg-white/70 hover:text-electric-700"
             )}
           >
             <Icon size={15} aria-hidden="true" />

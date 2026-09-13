@@ -53,7 +53,7 @@ function ChangePasswordCard() {
   return (
     <section className="card p-6 sm:p-7">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-electric-200 bg-electric-50 text-electric-600">
           <KeyRound size={18} />
         </span>
         <div>
@@ -108,7 +108,7 @@ function AccountDetailsCard() {
   return (
     <section className="card p-6 sm:p-7">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-electric-200 bg-electric-50 text-electric-600">
           <Mail size={18} />
         </span>
         <div>
@@ -159,7 +159,7 @@ function NotificationsPrefsCard() {
   return (
     <section className="card p-6 sm:p-7">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-electric-200 bg-electric-50 text-electric-600">
           <Bell size={18} />
         </span>
         <div>

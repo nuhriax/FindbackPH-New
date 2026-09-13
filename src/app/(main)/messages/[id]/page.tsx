@@ -824,7 +824,7 @@ const startRecording = async () => {
             <span className="block truncate text-[15px] font-semibold leading-tight text-navy-900">{displayName}</span>
             <span className="mt-0.5 block truncate text-xs text-slate-500">
               about{" "}
-              <span className="font-medium text-blue-600 hover:underline">{itemTitle}</span>
+              <span className="font-medium text-electric-600 hover:underline">{itemTitle}</span>
             </span>
           </span>
         </Link>
@@ -836,7 +836,7 @@ const startRecording = async () => {
                 onClick={() => setCallMode("audio")}
                 aria-label={`Voice call ${displayName}`}
                 title="Voice call"
-                className="rounded-full p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                className="rounded-full p-2 text-slate-500 transition-colors hover:bg-electric-50 hover:text-electric-600"
               >
                 <Phone size={18} />
               </button>
@@ -845,7 +845,7 @@ const startRecording = async () => {
                 onClick={() => setCallMode("video")}
                 aria-label={`Video call ${displayName}`}
                 title="Video call"
-                className="rounded-full p-2 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                className="rounded-full p-2 text-slate-500 transition-colors hover:bg-electric-50 hover:text-electric-600"
               >
                 <Video size={18} />
               </button>
@@ -891,7 +891,7 @@ const startRecording = async () => {
             )}
             {messages.length === 0 ? (
               <div className="mx-auto flex h-full max-w-3xl flex-col items-center justify-center px-6 text-center">
-                <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full msg-gradient text-xl font-semibold text-white shadow-lg shadow-blue-500/20">
+                <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full msg-gradient text-xl font-semibold text-white shadow-lg shadow-electric-500/20">
                   {otherUser?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img loading="lazy" src={otherUser.avatar_url} alt="" className="h-full w-full object-cover" />
@@ -902,7 +902,7 @@ const startRecording = async () => {
                 <p className="mt-4 font-display text-lg font-semibold text-navy-900">{displayName}</p>
                 <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-slate-500">
                   You and {displayName.split(" ")[0]} are talking about{" "}
-                  <Link href={itemHref} className="font-medium text-blue-600 hover:underline">
+                  <Link href={itemHref} className="font-medium text-electric-600 hover:underline">
                     {itemTitle}
                   </Link>
                   . Say hello 👋
@@ -1185,7 +1185,7 @@ const startRecording = async () => {
                   }}
                   placeholder="Aa"
                   aria-label={`Message ${displayName}`}
-                  className="max-h-[120px] min-w-0 flex-1 resize-none rounded-full border border-slate-200 bg-white px-4 py-2.5 text-[15px] leading-snug text-navy-900 shadow-sm placeholder:text-slate-400 transition focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="max-h-[120px] min-w-0 flex-1 resize-none rounded-full border border-slate-200 bg-white px-4 py-2.5 text-[15px] leading-snug text-navy-900 shadow-sm placeholder:text-slate-400 transition focus:border-electric-300 focus:outline-none focus:ring-2 focus:ring-electric-200"
                   maxLength={2000}
                   required
                 />

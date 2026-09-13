@@ -183,8 +183,8 @@ function FilterChip({ label, active, href }: { label: string; active: boolean; h
         aria-current={active ? "page" : undefined}
         className={
           active
-            ? "rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-sm font-medium text-blue-700"
-            : "rounded-full border border-transparent px-3.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-white/70 hover:text-blue-700"
+            ? "rounded-full border border-electric-200 bg-electric-50 px-3.5 py-1.5 text-sm font-medium text-electric-700"
+            : "rounded-full border border-transparent px-3.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-white/70 hover:text-electric-700"
         }
       >
         {label}
@@ -236,7 +236,7 @@ function FilterChip({ label, active, href }: { label: string; active: boolean; h
           </span>
         </td>
         <td className="px-4 py-3">
-          <Link href={href} className="font-medium text-navy-900 hover:text-blue-700">
+          <Link href={href} className="font-medium text-navy-900 hover:text-electric-700">
             {report.title}
           </Link>
           <span className="mt-0.5 hidden text-xs text-slate-500 sm:block">
@@ -284,7 +284,7 @@ function formatDate(value: string): string {
 }
 
 const STATUS_TONES: Record<string, string> = {
-  active: "border-blue-200 bg-blue-50 text-blue-700",
+  active: "border-electric-200 bg-electric-50 text-electric-700",
   matched: "border-amber-200 bg-amber-50 text-amber-700",
   recovered: "border-emerald-200 bg-emerald-50 text-emerald-700",
   archived: "border-slate-200 bg-slate-100 text-slate-600",
@@ -298,7 +298,7 @@ function StatusPill({ status }: { status: ItemStatus }) {
 }
 
 const SUMMARY_TONES: Record<string, string> = {
-  blue: "border-blue-200 bg-blue-50 text-blue-600",
+  blue: "border-electric-200 bg-electric-50 text-electric-600",
   sunrise: "border-sunrise-200 bg-sunrise-50 text-sunrise-600",
   emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
   slate: "border-slate-200 bg-slate-100 text-slate-600",

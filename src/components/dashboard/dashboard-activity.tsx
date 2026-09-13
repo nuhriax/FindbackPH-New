@@ -4,9 +4,9 @@ import { Bell, HeartHandshake, MessageCircle, PackageCheck } from "lucide-react"
 
 function activityIcon(type: string) {
   if (type === "possible_match") return { Icon: PackageCheck, cls: "border-emerald-200 bg-emerald-50 text-emerald-600" };
-  if (type === "item_returned") return { Icon: HeartHandshake, cls: "border-blue-200 bg-blue-50 text-blue-600" };
-  if (type === "new_message") return { Icon: MessageCircle, cls: "border-violet-200 bg-violet-50 text-violet-600" };
-  return { Icon: Bell, cls: "border-blue-200 bg-blue-50 text-blue-600" };
+  if (type === "item_returned") return { Icon: HeartHandshake, cls: "border-electric-200 bg-electric-50 text-electric-600" };
+  if (type === "new_message") return { Icon: MessageCircle, cls: "border-electric-200 bg-electric-50 text-electric-600" };
+  return { Icon: Bell, cls: "border-electric-200 bg-electric-50 text-electric-600" };
 }
 
 export function DashboardActivity({ notifications }: { notifications: any[] }) {
@@ -38,7 +38,7 @@ export function DashboardActivity({ notifications }: { notifications: any[] }) {
                 )}
               </div>
               {!n.read && (
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-electric-500" />
               )}
             </div>
           );
@@ -47,7 +47,7 @@ export function DashboardActivity({ notifications }: { notifications: any[] }) {
       {notifications.length > 5 && (
         <Link
           href="/notifications"
-          className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+          className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-electric-600 hover:text-electric-700"
         >
           View all notifications
         </Link>

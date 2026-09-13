@@ -53,7 +53,7 @@ export function OverviewTabs({
               aria-current={isActive ? "page" : undefined}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-t-lg border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? "border-blue-600 bg-white text-blue-700"
+                  ? "border-electric-600 bg-white text-electric-700"
                   : "border-transparent text-slate-600 hover:text-navy-900"
               }`}
             >
@@ -61,7 +61,7 @@ export function OverviewTabs({
               <span className="hidden sm:inline">{t.label}</span>
               <span
                 className={`rounded-full px-1.5 text-xs tabular-nums ${
-                  isActive ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-600"
+                  isActive ? "bg-electric-100 text-electric-700" : "bg-slate-100 text-slate-600"
                 }`}
               >
                 {counts[t.key]}
@@ -110,7 +110,7 @@ function EmptyRow({ text }: { text: string }) {
 }
 
 const STATUS_TONES: Record<string, string> = {
-  active: "border-blue-200 bg-blue-50 text-blue-700",
+  active: "border-electric-200 bg-electric-50 text-electric-700",
   recovered: "border-emerald-200 bg-emerald-50 text-emerald-700",
   matched: "border-amber-200 bg-amber-50 text-amber-700",
   archived: "border-slate-200 bg-slate-100 text-slate-600",

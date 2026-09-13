@@ -143,7 +143,7 @@ export function VoicePlayer({ src, duration, dark }: { src: string; duration?: n
             <span
               key={i}
               className={`w-[3px] shrink-0 rounded-full transition-colors ${playing && filled ? "animate-pulse" : ""} ${
-                dark ? (filled ? "bg-white" : "bg-white/35") : filled ? "bg-blue-600" : "bg-slate-300"
+                dark ? (filled ? "bg-white" : "bg-white/35") : filled ? "bg-electric-600" : "bg-slate-300"
               }`}
               style={{ height: `${Math.round(h * 100)}%` }}
             />

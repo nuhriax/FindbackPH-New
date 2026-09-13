@@ -209,7 +209,7 @@ export function ProfileForm({
           {/* Avatar + camera badge overlay */}
           <div className="flex flex-col items-center gap-1.5 sm:items-start">
             <div className="relative">
-              <span className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-50 to-electric-50 text-3xl font-semibold text-blue-700 ring-4 ring-white">
+              <span className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-electric-50 to-electric-50 text-3xl font-semibold text-electric-700 ring-4 ring-white">
                 {avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img loading="lazy" src={avatarUrl} alt="Profile preview" className="h-full w-full object-cover" />
@@ -224,7 +224,7 @@ export function ProfileForm({
                 aria-label="Change profile photo"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="absolute -bottom-0.5 -right-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow-md ring-2 ring-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="absolute -bottom-0.5 -right-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-electric-600 text-white shadow-md ring-2 ring-white transition-colors hover:bg-electric-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {uploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
               </button>
@@ -287,7 +287,7 @@ export function ProfileForm({
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <a
                 href={memberHref}
-                className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50/70 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                className="inline-flex items-center gap-1.5 rounded-full border border-electric-200 bg-electric-50/70 px-3 py-1 text-xs font-medium text-electric-700 transition-colors hover:bg-electric-100"
               >
                 <ExternalLink size={12} />
                 View public profile
@@ -296,7 +296,7 @@ export function ProfileForm({
                 type="button"
                 onClick={copyProfileLink}
                 aria-label="Copy public profile link"
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:border-electric-200 hover:text-electric-700"
               >
                 {copied ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Copy size={12} />}
                 {copied ? "Link copied" : "Copy link"}
@@ -312,7 +312,7 @@ export function ProfileForm({
             </div>
             <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300"
+                className="h-full rounded-full bg-gradient-to-r from-electric-500 to-emerald-500 transition-all duration-300"
                 style={{ width: `${completion}%` }}
               />
             </div>

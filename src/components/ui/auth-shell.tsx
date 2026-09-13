@@ -1,4 +1,4 @@
-﻿import { LogoMark } from "@/components/logo";
+import { LogoMark } from "@/components/logo";
 import { cn } from "@/lib/utils";
 
 interface AuthShellProps {
@@ -15,7 +15,7 @@ export function AuthShell({
   className,
 }: AuthShellProps) {
   return (
-    <div className="relative flex min-h-[82vh] items-center justify-center px-4 py-14 sm:px-6">
+    <div className="relative flex min-h-[82vh] items-center justify-center overflow-x-clip px-4 py-14 sm:px-6">
       <div className="relative w-full max-w-[430px]">
 
         {/* ================================================================
@@ -33,7 +33,7 @@ export function AuthShell({
             w-48
             -translate-x-1/2
             rounded-full
-            bg-blue-400/10
+            bg-electric-400/10
             blur-[80px]
           "
         />
@@ -69,7 +69,7 @@ export function AuthShell({
                   absolute
                   inset-[-18px]
                   rounded-[28px]
-                  bg-blue-400/10
+                  bg-electric-400/10
                   blur-2xl
                 "
               />
@@ -91,12 +91,12 @@ export function AuthShell({
                   bg-gradient-to-br
                   from-white
                   via-white/95
-                  to-blue-50/90
+                  to-electric-50/90
 
-                  shadow-[0_18px_50px_rgba(15,123,122,0.14)]
+                  shadow-[0_18px_50px_rgba(18,58,99,0.16)]
 
                   ring-1
-                  ring-blue-100/60
+                  ring-electric-100/60
 
                   backdrop-blur-xl
                 "
@@ -114,8 +114,8 @@ export function AuthShell({
                   h-2.5
                   w-2.5
                   rounded-full
-                  bg-blue-400
-                  shadow-[0_0_12px_rgba(15,123,122,0.55)]
+                  bg-sun-400
+                  shadow-[0_0_12px_rgba(239,164,48,0.55)]
                 "
               />
             </div>
@@ -148,7 +148,7 @@ export function AuthShell({
               sm:p-8
 
               shadow-[0_24px_80px_rgba(15,23,42,0.08)]
-              shadow-blue-100/20
+              shadow-electric-100/20
 
               backdrop-blur-2xl
 
@@ -175,7 +175,7 @@ export function AuthShell({
               h-px
               bg-gradient-to-r
               from-transparent
-              via-blue-300/70
+              via-electric-300/70
               to-transparent
             "
           />
@@ -194,7 +194,7 @@ export function AuthShell({
               h-56
               w-56
               rounded-full
-              bg-blue-300/[0.07]
+              bg-electric-300/[0.07]
               blur-3xl
             "
           />

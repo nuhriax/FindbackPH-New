@@ -146,7 +146,7 @@ export default async function AdminDashboardPage() {
                 </div>
                 <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs capitalize ${
                   report.status === "active"
-                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    ? "border-electric-200 bg-electric-50 text-electric-700"
                     : report.status === "recovered"
                     ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                     : "border-slate-200 bg-slate-100 text-slate-600"
@@ -167,7 +167,7 @@ export default async function AdminDashboardPage() {
 }
 
 const ADMIN_TONES: Record<string, string> = {
-  blue: "border-blue-200 bg-blue-50 text-blue-600",
+  blue: "border-electric-200 bg-electric-50 text-electric-600",
   sunrise: "border-sunrise-200 bg-sunrise-50 text-sunrise-600",
   emerald: "border-emerald-200 bg-emerald-50 text-emerald-600",
   leaf: "border-leaf-200 bg-leaf-50 text-leaf-600",
@@ -176,7 +176,7 @@ const ADMIN_TONES: Record<string, string> = {
 };
 
 const ADMIN_ACCENT: Record<string, string> = {
-  blue: "bg-blue-200",
+  blue: "bg-electric-200",
   sunrise: "bg-sunrise-200",
   emerald: "bg-emerald-200",
   leaf: "bg-leaf-200",

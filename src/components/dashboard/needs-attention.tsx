@@ -67,7 +67,7 @@ export function NeedsAttention({
       <div className="flex items-center gap-2">
         <Bell size={16} className="text-electric-600" />
         <h2 className="font-display text-sm font-semibold text-navy-900">Needs your attention</h2>
-        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+        <span className="rounded-full bg-electric-100 px-2 py-0.5 text-xs font-semibold text-electric-700">
           {items.length}
         </span>
       </div>
@@ -76,12 +76,12 @@ export function NeedsAttention({
           <Link
             key={item.id}
             href={item.link}
-            className="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/80 p-3 transition-colors hover:border-blue-200 hover:bg-blue-50/30"
+            className="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/80 p-3 transition-colors hover:border-electric-200 hover:bg-electric-50/30"
           >
             <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
               item.type === "match"
                 ? "border border-emerald-200 bg-emerald-50 text-emerald-600"
-                : "border border-blue-200 bg-blue-50 text-blue-600"
+                : "border border-electric-200 bg-electric-50 text-electric-600"
             }`}>
               {item.type === "match" ? <Sparkles size={14} /> : <MessageCircle size={14} />}
             </span>

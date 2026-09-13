@@ -1,8 +1,8 @@
 /* ===========================================================================
-   FindBack PH — Authentication experience (light, luminous)
+   FindBack PH â€” Authentication experience (light, luminous)
    Themed to match the site-wide design system: the global luminous `body`
    gradient + BackgroundEffects atmosphere, glassy white surfaces, blue/indigo
-   accents, navy typography and electric focus rings — the same identity used by
+   accents, navy typography and electric focus rings â€” the same identity used by
    the rest of the site and by the shared AuthShell used on /forgot-password
    and /reset-password. Tokens are scoped under `.auth-root` so they never
    leak into the rest of the site.
@@ -10,30 +10,30 @@
 
 /* ----------------------------- Design tokens --------------------------- */
 .auth-root {
-  /* Inherit the global luminous body background + BackgroundEffects — no
+  /* Inherit the global luminous body background + BackgroundEffects â€” no
      separate dark paint so auth shares the same atmosphere as every page. */
   --auth-bg-0: transparent;
 
-  /* Glassy card surface — matches `.surface` / AuthShell card */
+  /* Glassy card surface â€” matches `.surface` / AuthShell card */
   --auth-panel: rgba(255, 255, 255, 0.84);
   --auth-panel-solid: #ffffff;
   --auth-panel-border: rgba(226, 232, 240, 0.60);  /* slate-200/60 */
   --auth-glass: rgba(255, 255, 255, 0.45);
 
-  /* Text — mirrors the site: one Deep Navy for all auth text */
+  /* Text â€” mirrors the site: one Deep Navy for all auth text */
   --auth-fg: #2e2417;          /* secondary text */
-  --auth-heading: #2e2417;     /* deep navy — same as site text */
+  --auth-heading: #2e2417;     /* deep navy â€” same as site text */
   --auth-muted: #2e2417;
   --auth-faint: #2e2417;
   --auth-placeholder: #2e2417;
 
-  /* Inputs — matches `.input` / search-box fields */
+  /* Inputs â€” matches `.input` / search-box fields */
   --auth-input-bg: #ffffff;
   --auth-input-border: #cbd5e1;  /* slate-300 */
-  --auth-input-focus: #EFA430;   /* sun-400 — matches site focus */
+  --auth-input-focus: #EFA430;   /* sun-400 â€” matches site focus */
   --auth-focus-ring: rgba(239, 164, 48, 0.14); /* sun/14 */
 
-  /* Accents — sun-gold, like the site primary action buttons */
+  /* Accents â€” sun-gold, like the site primary action buttons */
   --auth-accent: #EFA430;        /* sun-400 */
   --auth-accent-hover: #C97F1E;  /* sun-600 */
   --auth-accent-soft: rgba(239, 164, 48, 0.10);
@@ -76,18 +76,18 @@
   font-family: var(--font-pjs), system-ui, sans-serif;
 }
 
-/* Centered shell (brand + card) — mirrors AuthShell layout */
+/* Centered shell (brand + card) â€” mirrors AuthShell layout */
 .auth-shell {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
   width: 100%;
-  max-width: 28rem;            /* max-w-md — matches AuthShell */
+  max-width: 28rem;            /* max-w-md â€” matches AuthShell */
   margin-inline: auto;
 }
 
-/* Brand above the card — uses the shared FindBack PH logo */
+/* Brand above the card â€” uses the shared FindBack PH logo */
 .auth-brand {
   display: inline-flex;
   justify-content: center;
@@ -324,7 +324,7 @@
   text-underline-offset: 2px;
 }
 
-/* submit button — blue/indigo gradient, matches site primary action */
+/* submit button â€” blue/indigo gradient, matches site primary action */
 .auth-submit {
   position: relative;
   display: inline-flex;
@@ -338,7 +338,7 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--fb-ink, #221a10);
   background: linear-gradient(135deg, var(--auth-accent), var(--auth-accent-hover));
   box-shadow: 0 12px 30px -12px var(--auth-accent);
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
@@ -441,7 +441,7 @@
 }
 
 /* ===========================================================================
-   DARK MODE — FindBack PH auth pages (`.site-ink` on <html>)
+   DARK MODE â€” FindBack PH auth pages (`.site-ink` on <html>)
    Every auth surface flows from the `.auth-root` custom properties below, so
    the whole login / register / signup / report / verify experience re-tints to
    frosted ink glass by remapping only these tokens. Declared last to win the
@@ -461,7 +461,7 @@
 
   --auth-input-bg: rgba(8, 29, 54, 0.92);
   --auth-input-border: rgba(126, 159, 198, 0.30);
-  --auth-input-focus: #8fe0da;     /* light electric — readable on dark */
+  --auth-input-focus: #8fe0da;     /* light electric â€” readable on dark */
   --auth-focus-ring: rgba(143, 224, 218, 0.16);
 
   --auth-accent: #8fe0da;          /* links + focus + icons */
@@ -491,11 +491,12 @@
   color-scheme: dark;
 }
 
-/* The submit button inherits --auth-accent which is now a light teal; re-paint
-   its face a darker teal so the white button label stays high-contrast. */
+/* Primary CTA stays Sun Gold in dark mode too â€” switch the label to ink so
+   contrast holds on the gold face (approved phase-2 CTA decision). */
 .site-ink .auth-submit {
-  background: linear-gradient(135deg, #123A63, #0F3155);
-  box-shadow: 0 12px 30px -12px rgba(15, 123, 122, 0.55);
+  color: var(--fb-ink, #221a10);
+  background: linear-gradient(135deg, var(--auth-accent), var(--auth-accent-hover));
+  box-shadow: 0 12px 30px -12px rgba(239, 164, 48, 0.45);
 }
 .site-ink .auth-submit-success {
   background: linear-gradient(135deg, var(--auth-success-btn-a), var(--auth-success-btn-b));

@@ -10,7 +10,7 @@ import { getSignedImageUrls } from "@/lib/storage";
 export const dynamic = "force-dynamic";
 
 const STATUS_TONES: Record<string, string> = {
-  active: "border-blue-200 bg-blue-50 text-blue-700",
+  active: "border-electric-200 bg-electric-50 text-electric-700",
   matched: "border-amber-200 bg-amber-50 text-amber-700",
   recovered: "border-emerald-200 bg-emerald-50 text-emerald-700",
   archived: "border-slate-200 bg-slate-100 text-slate-600",
@@ -103,7 +103,7 @@ export default async function DashboardSavedPage() {
           </p>
           <Link
             href="/discover"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-electric-50 px-4 py-2 text-sm font-medium text-electric-700 transition hover:bg-electric-100"
           >
             Browse reports
           </Link>
@@ -150,7 +150,7 @@ export default async function DashboardSavedPage() {
 
                 {/* Details */}
                 <div className="min-w-0 flex-1">
-                  <Link href={href} className="truncate text-sm font-medium text-navy-900 hover:text-blue-700">
+                  <Link href={href} className="truncate text-sm font-medium text-navy-900 hover:text-electric-700">
                     {title}
                   </Link>
                   <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">

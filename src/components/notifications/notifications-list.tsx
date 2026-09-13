@@ -12,8 +12,8 @@ import type { Notification } from "@/types/database";
 function notificationIcon(type: string) {
   if (type === "possible_match") return { Icon: PackageCheck, cls: "border-emerald-200 bg-emerald-50 text-emerald-600" };
   if (type === "moderation_action") return { Icon: ShieldAlert, cls: "border-amber-200 bg-amber-50 text-amber-600" };
-  if (type === "item_returned") return { Icon: HeartHandshake, cls: "border-blue-200 bg-blue-50 text-blue-600" };
-  return { Icon: Bell, cls: "border-blue-200 bg-blue-50 text-blue-600" };
+  if (type === "item_returned") return { Icon: HeartHandshake, cls: "border-electric-200 bg-electric-50 text-electric-600" };
+  return { Icon: Bell, cls: "border-electric-200 bg-electric-50 text-electric-600" };
 }
 
 const FILTERS = [
@@ -123,7 +123,7 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
   if (items.length === 0) {
     return (
       <div className="rounded-card border border-slate-200/70 bg-white/70 p-12 text-center shadow-soft backdrop-blur-md">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50 text-blue-600">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-electric-200 bg-electric-50 text-electric-600">
           <Bell size={24} />
         </div>
         <h2 className="mt-5 font-display text-lg font-semibold text-navy-900">You&apos;re all caught up</h2>
@@ -145,8 +145,8 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
             onClick={() => setFilter(f.key)}
             className={
               filter === f.key
-                ? "rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-sm font-medium text-blue-700"
-                : "rounded-full border border-transparent px-3.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-white/70 hover:text-blue-700"
+                ? "rounded-full border border-electric-200 bg-electric-50 px-3.5 py-1.5 text-sm font-medium text-electric-700"
+                : "rounded-full border border-transparent px-3.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-white/70 hover:text-electric-700"
             }
           >
             {f.label}
@@ -162,7 +162,7 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
           type="button"
           onClick={markAll}
           disabled={unreadCount === 0 || isPending}
-          className="text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="text-sm font-medium text-electric-600 transition-colors hover:text-electric-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? "Updating…" : "Mark all as read"}
         </button>
@@ -188,7 +188,7 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
                   if (!isRead) markRead(n.id);
                 }}
                 className={`card flex items-start gap-4 p-4 transition-all duration-200 hover:-translate-y-px hover:shadow-card-hover ${
-                  isRead ? "opacity-70" : "border-blue-200/80"
+                  isRead ? "opacity-70" : "border-electric-200/80"
                 }`}
               >
                 <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${cls}`}>
@@ -197,7 +197,7 @@ export function NotificationsList({ initial }: { initial: Notification[] }) {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-medium text-navy-900">{n.title}</h3>
-                    {!isRead && <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />}
+                    {!isRead && <span className="h-2 w-2 shrink-0 rounded-full bg-electric-500" />}
                   </div>
                   <p className="mt-1 text-sm text-slate-600">{n.message}</p>
                   <span className="mt-1.5 inline-block text-xs text-slate-500">

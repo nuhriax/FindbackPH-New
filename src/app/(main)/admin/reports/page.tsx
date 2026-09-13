@@ -72,7 +72,7 @@ export default async function AdminReportsPage({
             {items.map((item: any) => (
               <div key={item.id} className="card card-hover flex flex-wrap items-center justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
-                  <Link href={`/${type === "lost_item" ? "lost" : "found"}/${item.id}`} className="font-medium text-navy-900 transition-colors hover:text-blue-700">
+                  <Link href={`/${type === "lost_item" ? "lost" : "found"}/${item.id}`} className="font-medium text-navy-900 transition-colors hover:text-electric-700">
                     {item.title}
                   </Link>
                   <p className="mt-0.5 text-sm text-slate-600">
@@ -180,7 +180,7 @@ function PotentialDuplicates({
                 <Link
                   key={it.id}
                   href={`/${basePath}/${it.id}`}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-electric-300 hover:text-electric-700"
                 >
                   {it.status} · {format(new Date(it.created_at), "MMM d")}
                 </Link>

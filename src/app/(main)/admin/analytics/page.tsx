@@ -136,7 +136,7 @@ export default async function AdminAnalyticsPage() {
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2">
-            <TrendingUp size={16} className="text-blue-600" />
+            <TrendingUp size={16} className="text-electric-600" />
             <p className="text-sm text-slate-600">Recovery Rate</p>
           </div>
           <p className="mt-2 font-display text-2xl font-semibold text-navy-900">{recoveryRate}%</p>

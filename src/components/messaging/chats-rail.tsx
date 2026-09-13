@@ -85,7 +85,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search chats"
           aria-label="Search conversations"
-          className="w-full rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-3 text-sm text-navy-900 placeholder:text-slate-400 transition focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-3 text-sm text-navy-900 placeholder:text-slate-400 transition focus:border-electric-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-electric-200"
         />
       </div>
 
@@ -102,7 +102,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
             className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
               showUnreadOnly
                 ? "msg-gradient text-white"
-                : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                : "bg-electric-50 text-electric-600 hover:bg-electric-100"
             }`}
           >
             Unread {unreadTotal}
@@ -124,7 +124,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
                 aria-current={c.isActive ? "true" : undefined}
                 className={`flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors ${
                   c.isActive
-                    ? "bg-blue-50 ring-1 ring-blue-200"
+                    ? "bg-electric-50 ring-1 ring-electric-200"
                     : "hover:bg-slate-100/80"
                 }`}
               >
@@ -145,7 +145,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
                       {c.displayName}
                     </span>
                     {c.timeLabel && (
-                      <span className={`ml-auto shrink-0 text-[11px] ${c.isUnread ? "font-semibold text-blue-600" : "text-slate-400"}`}>
+                      <span className={`ml-auto shrink-0 text-[11px] ${c.isUnread ? "font-semibold text-electric-600" : "text-slate-400"}`}>
                         {formatTimeLabel(c.timeLabel)}
                       </span>
                     )}
@@ -154,7 +154,7 @@ export function ChatsRail({ activeId }: { activeId: string }) {
                     <span className={`min-w-0 flex-1 truncate text-[13px] ${c.isUnread ? "font-semibold text-navy-900" : "text-slate-500"}`}>
                       {c.preview}
                     </span>
-                    {c.isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500" aria-label="Unread" />}
+                    {c.isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-electric-500" aria-label="Unread" />}
                   </span>
                 </span>
               </Link>

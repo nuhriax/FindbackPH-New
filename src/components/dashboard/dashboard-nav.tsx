@@ -89,7 +89,7 @@ export function DashboardNav({ isAdmin, profile }: { isAdmin: boolean; profile: 
           <span
             className={clsx(
               "mt-0.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
-              isAdmin ? "bg-indigo-50 text-indigo-600" : "bg-emerald-50 text-emerald-600"
+              isAdmin ? "bg-electric-50 text-electric-600" : "bg-emerald-50 text-emerald-600"
             )}
           >
             {isMember ? <HeartHandshake size={10} aria-hidden="true" /> : <ShieldCheck size={10} aria-hidden="true" />}

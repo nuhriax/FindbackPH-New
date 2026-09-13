@@ -9,7 +9,7 @@ export function DashboardMatches({ matches }: { matches: any[] }) {
           <Sparkles size={16} className="text-electric-600" />
           <h2 className="font-display text-sm font-semibold text-navy-900">Possible Matches</h2>
         </div>
-        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+        <span className="rounded-full bg-electric-100 px-2 py-0.5 text-xs font-semibold text-electric-700">
           {matches.length}
         </span>
       </div>

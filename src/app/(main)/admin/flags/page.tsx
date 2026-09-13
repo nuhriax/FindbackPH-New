@@ -19,7 +19,7 @@ const REASON_LABELS: Record<string, string> = {
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
-  under_review: "bg-blue-100 text-blue-800 ring-1 ring-blue-200",
+  under_review: "bg-electric-100 text-electric-800 ring-1 ring-electric-200",
   reviewed: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
   resolved: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
   dismissed: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
@@ -79,7 +79,7 @@ export default async function AdminFlagsPage() {
         <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-medium text-red-700 ring-1 ring-red-200">
           {pendingCount} pending
         </span>
-          <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-200">
+          <span className="rounded-full bg-electric-500/10 px-3 py-1 text-xs font-medium text-electric-700 ring-1 ring-electric-200">
             {flags?.filter((f) => f.status === "under_review").length ?? 0} listings under review
           </span>
         </div>
@@ -128,7 +128,7 @@ export default async function AdminFlagsPage() {
                       {flag.details && (
                         <p className="mt-2 text-sm text-slate-700">{flag.details}</p>
                       )}
-                      <Link href={href} className="mt-2 inline-block text-xs text-blue-600 hover:underline">
+                      <Link href={href} className="mt-2 inline-block text-xs text-electric-600 hover:underline">
                         View {flag.item_type === "lost_item" ? "lost" : "found"} report →
                       </Link>
                     </div>

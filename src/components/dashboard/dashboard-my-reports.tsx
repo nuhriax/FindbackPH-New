@@ -15,7 +15,7 @@ type ReportItem = {
 };
 
 const STATUS_TONES: Record<string, string> = {
-  active: "border-blue-200 bg-blue-50 text-blue-700",
+  active: "border-electric-200 bg-electric-50 text-electric-700",
   matched: "border-amber-200 bg-amber-50 text-amber-700",
   recovered: "border-emerald-200 bg-emerald-50 text-emerald-700",
   archived: "border-slate-200 bg-slate-100 text-slate-600",
@@ -66,7 +66,7 @@ export function DashboardMyReports({
         <h2 className="font-display text-sm font-semibold text-navy-900">My Reports</h2>
         <Link
           href="/dashboard/reports"
-          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+          className="inline-flex items-center gap-1 text-xs font-medium text-electric-600 hover:text-electric-700"
         >
           View all reports
           <ChevronRight size={14} />
@@ -76,7 +76,7 @@ export function DashboardMyReports({
       {recentReports.length === 0 ? (
         <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-white/50 p-5 text-center">
           <p className="text-sm text-slate-500">You haven&apos;t created any reports yet.</p>
-          <Link href="/report/lost" className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue-600">
+          <Link href="/report/lost" className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-electric-600">
             Report your first item
           </Link>
         </div>
@@ -96,7 +96,7 @@ export function DashboardMyReports({
                   {report.kind === "lost" ? <PackageX size={14} /> : <PackageCheck size={14} />}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <Link href={href} className="truncate text-sm font-medium text-navy-900 hover:text-blue-700">
+                  <Link href={href} className="truncate text-sm font-medium text-navy-900 hover:text-electric-700">
                     {report.title}
                   </Link>
                   <p className="flex items-center gap-1 truncate text-xs text-slate-500">

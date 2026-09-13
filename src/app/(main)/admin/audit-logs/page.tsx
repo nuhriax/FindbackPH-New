@@ -41,8 +41,9 @@ export default async function AdminAuditLogsPage() {
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200/70 bg-white/70 shadow-soft backdrop-blur-md">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          {/* Scrollable on narrow screens; page itself never overflows at 320px. */}
+            <div className="admin-table-scroll overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-slate-50/80 text-slate-600">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Admin</th>
@@ -58,7 +59,7 @@ export default async function AdminAuditLogsPage() {
                     ? `${admin.first_name ?? ""} ${admin.last_name ?? ""}`.trim() || admin.username
                     : log.admin_id?.slice(0, 8) ?? "Unknown";
                   return (
-                    <tr key={log.id} className="text-slate-600 hover:bg-blue-50/30">
+                    <tr key={log.id} className="text-slate-600 hover:bg-electric-50/30">
                       <td className="px-4 py-3">
                         <span className="font-medium text-navy-900">{adminName}</span>
                       </td>

@@ -71,7 +71,7 @@ export async function ConversationsList() {
   if (conversations.length === 0) {
     return (
       <div className="rounded-card border border-slate-200/70 bg-white/70 p-12 text-center shadow-soft backdrop-blur-md">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50 text-blue-600">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-electric-200 bg-electric-50 text-electric-600">
           <MessageCircle size={24} />
         </div>
         <h2 className="mt-5 font-display text-lg font-semibold text-navy-900">No conversations yet</h2>
