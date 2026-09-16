@@ -68,14 +68,20 @@ export function HeroBoard({
 
       <NoticeSlip card={newest} tilt="-rotate-1" featured />
 
+      {/* Reply — docks directly beneath the primary with a short dashed
+          thread between them. The status badge rides ON the reply card's
+          top edge (proximity = relationship; no caption row needed). */}
       {replyCard && (
-        <div className="flex items-center gap-2.5 px-6 py-2.5" aria-hidden="true">
-          <span className="h-px flex-1 border-t-2 border-dashed border-ocean-300/70" />
+        <div className="relative mt-3 pl-6">
           <span
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.1em] shadow-sm ${
+            aria-hidden="true"
+            className="absolute -top-3 left-8 h-6 w-0 border-l-2 border-dashed border-ocean-300/80"
+          />
+          <span
+            className={`absolute -top-3 left-12 z-10 inline-flex -rotate-1 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.1em] shadow-sm ring-1 ${
               hasMatch
-                ? "bg-emerald-600 text-white"
-                : "border border-ink/10 bg-white/90 text-ink-soft"
+                ? "bg-emerald-600 text-white ring-emerald-700/30"
+                : "bg-white/95 text-ink-soft ring-ink/10"
             }`}
           >
             {hasMatch ? (
@@ -90,12 +96,6 @@ export function HeroBoard({
               </>
             )}
           </span>
-          <span className="h-px flex-1 border-t-2 border-dashed border-ocean-300/70" />
-        </div>
-      )}
-
-      {replyCard && (
-        <div className="pl-8">
           <NoticeSlip card={replyCard} tilt="rotate-1" />
         </div>
       )}
@@ -125,7 +125,9 @@ function NoticeSlip({
   return (
     <article className={`notice-card relative ${tilt} p-4 ${featured ? "pt-5 shadow-card" : "pt-4 shadow-sm"}`}>
       <span
-        className={`washi-tape -top-2 ${featured ? "left-10 -rotate-6" : "left-8 rotate-3"}`}
+        className={`washi-tape -top-2 ${
+          featured ? "left-10 -rotate-6" : "right-8 rotate-3"
+        }`}
         aria-hidden="true"
       />
       <span
