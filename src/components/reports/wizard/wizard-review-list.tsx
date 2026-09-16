@@ -78,6 +78,7 @@ export function WizardReviewList({
       label: "Approximate time",
       value: review.timeWindow || <span className="text-slate-400">—</span>,
       editStep: 2,
+      icon: <span className="text-lg">🕒</span>,
     },
     {
       label: "Location",
@@ -135,22 +136,28 @@ export function WizardReviewList({
           {rows.map(({ label, value, editStep, icon }) => (
             <div
               key={label}
-              className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0"
+              className="grid grid-cols-[20px_minmax(0,9.5rem)_minmax(0,1fr)_auto] items-start gap-x-2.5 gap-y-1 py-2.5 first:pt-0 last:pb-0"
             >
-              <span aria-hidden="true" className="w-5 shrink-0 text-center text-sm">
+              <span
+                aria-hidden="true"
+                className="flex h-6 w-5 items-start justify-center pt-0.5 text-[15px] leading-5"
+              >
                 {icon}
               </span>
-              <dt className="w-32 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-slate-400 sm:w-40">
+              <dt className="pt-[3px] text-[11px] font-semibold uppercase leading-4 tracking-[0.08em] text-slate-500">
                 {label}
               </dt>
-              <dd className="min-w-0 flex-1 truncate text-sm text-navy-900" title={typeof value === "string" ? value : undefined}>
+              <dd
+                className="min-w-0 whitespace-pre-wrap break-words text-sm font-normal leading-6 text-slate-800 antialiased"
+                title={typeof value === "string" ? value : undefined}
+              >
                 {value}
               </dd>
               <button
                 type="button"
                 onClick={() => onEdit(editStep)}
                 className={[
-                  "shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium transition-all duration-200",
+                  "mt-0.5 shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium transition-all duration-200",
                   "hover:scale-105 active:scale-95",
                   accent.edit,
                 ].join(" ")}
@@ -248,17 +255,17 @@ export function WizardReviewList({
         )}
 
         {/* Final confirmation */}
-        <div className="report-confirm-card flex items-start gap-3 rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all duration-300 hover:border-slate-300 hover:shadow-md">
-          <div className="relative mt-0.5">
+        <div className="report-confirm-card flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 transition-all duration-200 has-[:checked]:border-navy-900 has-[:checked]:bg-navy-50 has-[:checked]:shadow-sm hover:border-slate-300">
+          <div className="relative mt-0.5 shrink-0">
             <input
               id="confirmAccurate"
               name="confirmAccurate"
               type="checkbox"
               required
-              className="peer h-5 w-5 shrink-0 cursor-pointer rounded border-2 border-slate-300 text-teal-600 transition-all duration-200 focus:ring-4 focus:ring-teal-500/20 checked:border-teal-600"
+              className="peer h-5 w-5 shrink-0 cursor-pointer appearance-none rounded-md border-[1.5px] border-slate-400 bg-white transition-colors duration-150 hover:border-navy-700 checked:border-navy-900 checked:bg-navy-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-900/25 focus-visible:ring-offset-2"
             />
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity duration-200">
-              <Check size={14} className="text-white" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-white opacity-0 transition-opacity duration-150 peer-checked:opacity-100">
+              <Check size={13} strokeWidth={3.5} className="text-white" aria-hidden="true" />
             </div>
           </div>
           <label

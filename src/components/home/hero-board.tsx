@@ -100,16 +100,16 @@ export function HeroBoard({
       )}
 
       {third ? (
-        <div className="notice-card absolute bottom-2 left-6 w-52 -rotate-1 p-4 pt-5">
+        <div className="notice-card absolute bottom-0 left-0 z-10 w-52 -rotate-1 p-4 pt-5">
           <span className="washi-tape -top-2 left-3 -rotate-6" aria-hidden="true" />
           <p
-            className={`text-[10px] font-bold uppercase tracking-[0.14em] ${
+            className={`truncate text-[10px] font-bold uppercase tracking-[0.14em] ${
               third.kind === "lost" ? "text-coral-600" : "text-ocean-600"
             }`}
           >
             {third.kind === "lost" ? "Lost" : "Found"} · {third.city || "PH"}
           </p>
-          <p className="mt-1 truncate text-sm font-bold text-navy-900">
+          <p className="mt-1 truncate text-sm font-bold text-navy-900" title={third.title}>
             {third.title}
           </p>
           <p className="mt-0.5 text-[11px] text-ink-soft">{third.dateLabel}</p>
@@ -118,15 +118,16 @@ export function HeroBoard({
 
 
       {newest.imageUrl ? (
-        <div className="absolute -left-4 bottom-20 w-32 rotate-3 rounded-sm bg-white p-1.5 pb-6 shadow-[0_12px_30px_-12px_rgba(51,46,38,0.4)]">
+        <div className="absolute bottom-6 left-[13.75rem] z-20 w-[7.5rem] rotate-2 rounded-sm bg-white p-1.5 pb-6 shadow-[0_12px_30px_-12px_rgba(51,46,38,0.4)]">
           <span className="washi-tape -top-2 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
           {/* eslint-disable-next-line @next/next/no-img-element -- static small polaroid, next/image adds no value here */}
           <img
             src={newest.imageUrl}
             alt=""
-            className="aspect-square w-full rounded-[2px] object-cover"
+            loading="lazy"
+            className="aspect-square w-full rounded-[2px] bg-slate-100 object-cover"
           />
-          <p className="absolute inset-x-0 bottom-1.5 text-center font-hand text-[11px] leading-none text-cork-700">
+          <p className="absolute inset-x-1 bottom-1.5 truncate text-center font-hand text-[11px] leading-none text-cork-700">
             spotted in {newest.city || "PH"}
           </p>
         </div>

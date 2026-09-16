@@ -1441,11 +1441,46 @@ p {
   --fb-focus: 0 0 0 3px rgba(239, 164, 48, 0.45);
 }
 
-/* Sun-gold focus outline everywhere — readable on sand and on ocean deep. */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+/* Sun-gold focus outline for buttons/links — readable on sand and on ocean
+   deep. */
+:where(a, button, [tabindex]):focus-visible {
   outline: 2px solid var(--fb-sun);
   outline-offset: 2px;
   box-shadow: var(--fb-focus);
+}
+
+/* Hero slip fields: the input itself never paints — the .hero-search-field
+   well paints the focus instead. This plain (unlayered) rule beats Tailwind's
+   preflight `input:focus` background + the layered form-system resets, so no
+   inner orange box can appear while typing. */
+input.hero-search-input,
+input.hero-search-input:focus,
+input.hero-search-input:focus-visible,
+input.hero-search-input:active {
+  outline: none;
+  outline-offset: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+input.hero-search-input::-moz-focus-inner {
+  border: 0;
+}
+
+/* Hero slip well: soft gold wash + single darker edge on focus — never a
+   double box. Unlayered so it wins over the form-system defaults. */
+.hero-search-field:focus-within {
+  border-color: #c97f1e;
+  box-shadow: 0 0 0 3px rgba(239, 164, 48, 0.28);
+  outline: none;
+}
+
+/* Every other text field: kill UA/Tailwind outlines, keep their own focus
+   ring. :where() keeps specificity at zero so component focus:ring still
+   wins. */
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  outline-offset: 0;
 }
 
 /* Kraft paper notice card — the one true card of the notice-board metaphor.

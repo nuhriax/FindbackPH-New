@@ -95,10 +95,10 @@ export function HeroSearch({ className }: { className?: string }) {
         action="/discover"
         method="GET"
         role="search"
-        className="rounded-xl border border-cork-700/30 bg-kraft-100 p-2 pt-2.5 shadow-[3px_3px_0_0_rgba(36,30,23,0.15)] transition focus-within:border-sun-300 focus-within:ring-4 focus-within:ring-sun-100"
+        className="rounded-xl border border-cork-700/30 bg-kraft-100 p-2 pt-2.5 shadow-[3px_3px_0_0_rgba(36,30,23,0.15)]"
       >
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="flex min-h-[48px] flex-1 items-center gap-3 rounded-lg border border-cork-700/25 bg-white/80 px-3">
+          <div className="hero-search-field flex min-h-[48px] flex-1 items-center gap-3 rounded-lg border border-cork-700/25 bg-white/80 px-3">
             <Search size={18} className="shrink-0 text-ink-faint" />
             <input
               name="q"
@@ -106,14 +106,14 @@ export function HeroSearch({ className }: { className?: string }) {
               maxLength={100}
               placeholder="What are you looking for? e.g. iPhone, wallet, school ID"
               aria-label="Search reports"
-              className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-faint"
+              className="hero-search-input w-full border-0 bg-transparent p-0 text-sm text-ink shadow-none outline-none placeholder:text-ink-faint focus:outline-none focus:ring-0 focus:ring-offset-0"
             />
           </div>
 
           {/* City — custom suggestion dropdown (native <datalist> renders as
               the OS-default dark list and can't be themed) */}
           <div ref={boxRef} className="relative sm:w-44">
-            <div className="flex min-h-[48px] items-center gap-2 rounded-lg border border-cork-700/25 bg-white/80 px-3 focus-within:border-sun-400">
+            <div className="hero-search-field flex min-h-[48px] items-center gap-2 rounded-lg border border-cork-700/25 bg-white/80 px-3">
               <MapPin size={16} className="shrink-0 text-ink-faint" />
               <input
                 ref={inputRef}
@@ -165,7 +165,7 @@ export function HeroSearch({ className }: { className?: string }) {
                     setActiveIndex(-1);
                   }
                 }}
-                className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-faint"
+                className="hero-search-input w-full border-0 bg-transparent p-0 text-sm text-ink shadow-none outline-none placeholder:text-ink-faint focus:outline-none focus:ring-0 focus:ring-offset-0"
               />
               {city ? (
                 <button

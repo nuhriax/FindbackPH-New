@@ -64,7 +64,7 @@ export function ListingSearch({
               placeholder="Search item, brand, color, model..."
               autoComplete="off"
               spellCheck={false}
-              className={`h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-3.5 text-sm text-navy-900 outline-none transition-colors placeholder:text-slate-400 hover:bg-slate-100 focus:border-transparent focus:bg-white focus:ring-4 ${a.focus}`}
+              className={`h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-3.5 text-sm text-navy-900 outline-none transition-colors placeholder:text-slate-400 hover:bg-slate-100 focus:bg-white focus:ring-4 ${a.focus}`}
             />
           </div>
 
@@ -113,7 +113,7 @@ export function ListingSearch({
               maxLength={maxLength}
               placeholder="City or location"
               autoComplete="address-level2"
-              className={`h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-3.5 text-sm text-navy-900 outline-none transition-colors placeholder:text-slate-400 hover:bg-slate-100 focus:border-transparent focus:bg-white focus:ring-4 ${a.focus}`}
+              className={`h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-3.5 text-sm text-navy-900 outline-none transition-colors placeholder:text-slate-400 hover:bg-slate-100 focus:bg-white focus:ring-4 ${a.focus}`}
             />
           </div>
 

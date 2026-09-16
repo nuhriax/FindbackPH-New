@@ -90,7 +90,7 @@ export function DiscoverFilters({
               maxLength={80}
               placeholder="Search by city or municipality..."
               autoComplete="address-level2"
-              className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3.5 text-sm text-navy-900 outline-none transition placeholder:text-slate-400 hover:bg-slate-100 focus:border-transparent focus:bg-white focus:ring-4 focus:ring-teal-500/20"
+              className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3.5 text-sm text-navy-900 outline-none transition placeholder:text-slate-400 hover:bg-slate-100 focus:bg-white focus:ring-4 focus:ring-teal-500/20"
             />
 
             <input type="hidden" name="category" value={query.category} />
