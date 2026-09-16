@@ -109,7 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         Sets an attribute on <html>; CSS + useTheme read it (no hydration clash). */}
         <script
         dangerouslySetInnerHTML={{
-        __html: `(function(){try{var t=localStorage.getItem('fb-auth-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}t=t||'light';var r=document.documentElement;r.setAttribute('data-auth-theme',t);r.classList.toggle('site-ink',t==='dark');}catch(e){document.documentElement.setAttribute('data-auth-theme','light');}})();`,
+        __html: `(function(){try{document.documentElement.setAttribute('data-auth-theme','light');localStorage.setItem('fb-auth-theme','light');}catch(e){document.documentElement.setAttribute('data-auth-theme','light');}})();`,
         }}
         />
         <MarketingBackground />
