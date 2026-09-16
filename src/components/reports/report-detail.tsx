@@ -405,7 +405,7 @@ export function ReportDetail({
                   {categoryLabel}
                 </span>
 
-                {item.viewCount != null && (
+                {item.viewCount != null && !isOwner && (
                   <>
                     <span aria-hidden className="h-1 w-1 rounded-full bg-slate-300" />
 

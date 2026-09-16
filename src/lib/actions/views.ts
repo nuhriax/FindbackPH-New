@@ -60,9 +60,28 @@ export async function incrementItemViewAction(
   const supabase = await createClient();
   const ipHash = await getClientIpHash();
 
+  // Owners never count as viewers of their own report — viewing your own
+  // listing right after publishing (or any time later) must not inflate the
+  // counter or appear in the viewers list.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: owner } = await supabase
+      .from(itemType)
+      .select("reporter_id")
+      .eq("id", itemId)
+      .maybeSingle<{ reporter_id: string | null }>();
+    if (owner?.reporter_id && owner.reporter_id === user.id) {
+      return false;
+    }
+  }
+
   // Returns true only when the DB actually counted this view (first time this
   // registered viewer, from this IP, sees this report). Falls back to the
   // legacy per-bump 104 RPC while the 105/106/108 migrations are missing.
+  // Owner guard above still applies to the fallback: the owner never counts,
+  // even on deployments where only the legacy counter exists.
   const { data, error } = await supabase.rpc("register_item_view", {
     p_item_type: itemType,
     p_item_id: itemId,
@@ -72,6 +91,8 @@ export async function incrementItemViewAction(
 
   if (error && /function public\.register_item_view/i.test(error.message)) {
     // Migrations not applied yet - degrade to the per-bump 104 RPC.
+    // Owner already returned false above, so reaching this point means the
+    // viewer is NOT the reporter.
     await supabase.rpc("increment_item_view_count", {
       p_item_type: itemType,
       p_item_id: itemId,
