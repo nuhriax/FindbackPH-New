@@ -109,7 +109,6 @@ export function Hero({
             {cards.length > 0 ? (
               <HeroBoard
                 cards={cards}
-                totalActive={totalActive}
                 recoveredCount={recoveredCount}
               />
             ) : (
@@ -129,18 +128,19 @@ export function Hero({
       </div>
 
       {/* Sampayan — the ticker hangs on the string with no band behind it,
-          so the page background flows straight through. */}
-      {cards.length > 0 && (
+          so the page background flows straight through. It shows reports
+          BEYOND the two already pinned on the board — the board is the
+          headline, the ticker is the long tail. Never the same item twice. */}
+      {recent.length > 2 && (
         <div className="relative mt-10">
           <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
             <LiveActivityTicker
-              items={cards.map((r) => ({
+              items={recent.slice(2, 6).map((r) => ({
                 title: r.title,
                 kind: r.kind,
                 city: r.city,
                 dateLabel: r.dateLabel,
               }))}
-              totalActive={totalActive}
             />
           </div>
         </div>

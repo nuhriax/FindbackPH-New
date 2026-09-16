@@ -47,11 +47,9 @@ const KIND_STYLES = {
 
 export function LiveActivityTicker({
   items,
-  totalActive,
   className,
 }: {
   items: TickerItem[];
-  totalActive: number;
   className?: string;
 }) {
   const [index, setIndex] = useState(0);
@@ -131,13 +129,9 @@ export function LiveActivityTicker({
 
         <span aria-hidden="true" className="h-5 w-px shrink-0 bg-ink/10" />
 
-        {/* Proof + action — count whispers, the CTA is the only loud element */}
-        <span className="flex shrink-0 items-center gap-2.5">
-          {totalActive > 0 && (
-            <span className="hidden text-[11px] font-semibold tabular-nums text-ink-soft md:inline">
-              {totalActive.toLocaleString()} active
-            </span>
-          )}
+        {/* Proof + action — the only loud element is the CTA; the active
+            count deliberately lives in the hero eyebrow, not here (dedup). */}
+        <span className="flex shrink-0 items-center">
           <Link
             href="/discover"
             className={cn(

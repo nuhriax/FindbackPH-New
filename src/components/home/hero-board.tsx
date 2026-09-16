@@ -14,11 +14,9 @@ import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
  */
 export function HeroBoard({
   cards,
-  totalActive,
   recoveredCount = 0,
 }: {
   cards: HeroCard[];
-  totalActive: number;
   recoveredCount?: number;
 }) {
   const newest = cards[0];
@@ -62,19 +60,10 @@ export function HeroBoard({
 
   return (
     <div className="relative mx-auto w-full max-w-[24rem]">
-      <div className="mb-3 flex items-center justify-between px-1">
+      <div className="mb-3 px-1">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-faint">
           Community board
         </p>
-        {totalActive > 0 && (
-          <p className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/90 py-1 pl-2.5 pr-3 text-[11px] font-bold text-ink shadow-sm backdrop-blur-sm">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            </span>
-            {totalActive} active
-          </p>
-        )}
       </div>
 
       <NoticeSlip card={newest} tilt="-rotate-1" featured />
