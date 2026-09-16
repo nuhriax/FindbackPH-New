@@ -23,7 +23,7 @@ export function LogoMark({ className }: { className?: string }) {
         alt=""
         width={44}
         height={44}
-        className="h-full w-full object-contain drop-shadow-[0_2px_6px_rgba(5,42,51,0.25)]"
+        className="logo-mark-img h-full w-full object-contain drop-shadow-[0_2px_6px_rgba(5,42,51,0.25)]"
         loading="eager"
         onError={() => setMissing(true)}
       />

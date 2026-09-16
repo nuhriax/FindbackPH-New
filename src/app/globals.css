@@ -1268,6 +1268,18 @@ p {
 .site-ink path[fill="#cde8d4"] { fill: rgba(126, 159, 198, 0.10); }
 .site-ink path[fill="#e5f0e7"] { fill: rgba(126, 159, 198, 0.05); }
 
+/* Logo mark: never fade it — the crest artwork carries its own full-color
+   paint. The DARK MODE SWEEP remaps ANY img with an opacity-modifier or the
+   dedicated .logo-mark rule (mix-blend screen) can wash it out on the glass
+   pill; force full opacity + no blend/filter dimming so the sun-crest logo
+   renders as bright in dark mode as in light. */
+.site-ink .logo-mark img,
+.site-ink .logo-mark-img {
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: saturate(1.15);
+}
+
 /* Logo fix - screen blend for old PNG with black bg */
 .site-ink .logo-mark img { mix-blend-mode: screen; }
 
