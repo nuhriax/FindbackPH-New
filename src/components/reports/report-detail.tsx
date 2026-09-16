@@ -84,6 +84,7 @@ export function ReportDetail({
   returnConfirm,
   backHref = "/discover",
   backLabel = "Back to reports",
+  breadcrumbTrail,
   matchHref,
 }: {
   kind: "lost" | "found";
@@ -120,6 +121,9 @@ export function ReportDetail({
 
   backHref?: string;
   backLabel?: string;
+
+  /** Pre-rendered breadcrumb trail (keeps the page's JSON-LD in the page file). */
+  breadcrumbTrail?: React.ReactNode;
 
   matchHref?: (id: string) => string;
 }) {
@@ -265,27 +269,34 @@ export function ReportDetail({
       </div>
 
       <div className="mx-auto w-full max-w-[1280px] px-4 pb-10 pt-4 sm:px-6 lg:px-8">
-        {/* COMPACT UTILITY ROW — back · share */}
-        <div className="mb-3 flex items-center justify-between gap-4">
-          <Link
-            href={backHref}
-            className="
-              group inline-flex min-h-9 items-center gap-2 rounded-full px-2
-              text-sm font-semibold text-slate-500 transition-colors
-              hover:text-slate-900 focus:outline-none focus:ring-2
-              focus:ring-electric-400/40
-            "
-          >
-            <ArrowLeft
-              size={15}
-              aria-hidden="true"
-              className="transition-transform duration-200 group-hover:-translate-x-0.5"
-            />
+        {/* COMBINED NAV ROW — breadcrumbs (left) + back + share (right).
+            One row instead of two stacked nav rows: drops the old
+            "Back to lost items" pill that duplicated the breadcrumbs. */}
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1 [&>nav]:mb-0">
+            {breadcrumbTrail}
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <Link
+              href={backHref}
+              aria-label={backLabel}
+              title={backLabel}
+              className="
+                group inline-flex h-9 w-9 items-center justify-center rounded-full
+                text-slate-400 transition-colors
+                hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2
+                focus:ring-electric-400/40
+              "
+            >
+              <ArrowLeft
+                size={16}
+                aria-hidden="true"
+                className="transition-transform duration-200 group-hover:-translate-x-0.5"
+              />
+            </Link>
 
-            <span>{backLabel}</span>
-          </Link>
-
-          <ShareButton title={item.title} />
+            <ShareButton title={item.title} />
+          </div>
         </div>
 
         {/* COMPACT STATUS INDICATOR — tiny horizontal stepper */}

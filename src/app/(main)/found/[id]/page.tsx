@@ -421,16 +421,6 @@ export default async function FoundItemDetailPage({ params }: Props) {
         }}
       />
 
-      <div className="mx-auto w-full max-w-[1380px] px-4 pt-5 sm:px-6 lg:px-8">
-        <Breadcrumbs
-          items={[
-            { label: "Discover", href: "/discover" },
-            { label: "Found items", href: "/found" },
-            { label: raw.title },
-          ]}
-        />
-      </div>
-
       <ReportDetail
         kind="found"
         item={item}
@@ -446,6 +436,15 @@ export default async function FoundItemDetailPage({ params }: Props) {
         viewers={viewers}
         backHref="/found"
         backLabel="Back to found items"
+        breadcrumbTrail={
+          <Breadcrumbs
+            items={[
+              { label: "Discover", href: "/discover" },
+              { label: "Found items", href: "/found" },
+              { label: raw.title },
+            ]}
+          />
+        }
         matchHref={(matchId) => `/lost/${matchId}`}
       />
     </>
