@@ -1,4 +1,4 @@
-import { ArrowLeftRight, Clock, MapPin } from "lucide-react";
+import { ArrowLeftRight, Clock, MapPin, Scissors } from "lucide-react";
 
 import type { HeroCard } from "@/components/home/hero";
 import { CATEGORY_LABELS } from "@/lib/validation";
@@ -6,11 +6,11 @@ import { CATEGORY_ICONS } from "@/lib/category-icons";
 import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 
 /**
- * HeroBoard — senior UI/UX restructure.
- * Old board scattered 3 equal absolute cards + floating polaroid + chip
- * with no reading order and constant overlaps. New board is ONE vertical
- * story in normal flow: header -> primary notice -> connector -> reply
- * slip -> proof line. Photos dock INSIDE cards; nothing ever overlaps text.
+ * HeroBoard — the hero visual as a VINTAGE NOTICE POSTER pinned to the
+ * community cork board. One paper artifact, top-to-bottom like a real
+ * "MISSING"-style poster: kicker → giant headline → featured report →
+ * a cut line → the reply item → small print. Everything in normal flow,
+ * truncation-guarded, nothing overlapping.
  */
 export function HeroBoard({
   cards,
@@ -57,6 +57,7 @@ export function HeroBoard({
 
   const replyCard: HeroCard | null = bestMatch ?? cards[1] ?? null;
   const hasMatch = bestMatch !== null;
+  const newestIsLost = newest.kind === "lost";
 
   return (
     <div className="relative mx-auto w-full max-w-[26rem]">
@@ -69,147 +70,163 @@ export function HeroBoard({
         </span>
       )}
 
-      {/* The physical board — cork surface, wooden frame. Kraft cards pinned
-          to it pop with real depth instead of floating on the page. */}
-      <div className="cork-board rotate-[0.4deg] p-5 pt-8 sm:p-6 sm:pt-9">
-        {/* Board sign — a small taped-on label, not a UI heading */}
-        <div className="absolute -top-3.5 left-1/2 z-20 -translate-x-1/2">
-          <span className="inline-flex -rotate-1 items-center gap-2 rounded-md border border-cork-700/40 bg-kraft-100 px-4 py-1.5 shadow-md">
-            <span
-              aria-hidden="true"
-              className="h-2 w-2 rounded-full bg-coral-500 shadow-[0_1px_2px_rgba(36,30,23,0.4)]"
-            />
-            <span className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-cork-700">
-              Community Board
-            </span>
-          </span>
-        </div>
-
-        <NoticeSlip card={newest} tilt="-rotate-1" featured />
-
-        {/* Connector — a physical thread with a medallion tying the two
-            notices together: match = emerald seal, otherwise a quiet tag. */}
-        {replyCard && (
-          <div className="relative z-10 -my-0.5 flex flex-col items-center">
-            <span
-              aria-hidden="true"
-              className="h-4 w-0 border-l-2 border-dashed border-kraft-100/70"
-            />
-            <span
-              className={`inline-flex rotate-1 items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] shadow-md ring-1 ${
-                hasMatch
-                  ? "bg-emerald-500 text-white ring-emerald-700/40"
-                  : "bg-kraft-100 text-cork-700 ring-cork-700/30"
-              }`}
-            >
-              {hasMatch ? (
-                <>
-                  <ArrowLeftRight size={11} aria-hidden="true" />
-                  Possible match
-                </>
-              ) : (
-                <>
-                  <Clock size={11} aria-hidden="true" />
-                  Latest reply
-                </>
-              )}
-            </span>
-            <span
-              aria-hidden="true"
-              className="h-4 w-0 border-l-2 border-dashed border-kraft-100/70"
-            />
-          </div>
-        )}
-
-        {replyCard && (
-          <div className="pl-5">
-            <NoticeSlip card={replyCard} tilt="rotate-1" />
-          </div>
-        )}
-
-        {/* Handwritten on the cork — the human touch, bottom of the board */}
-        <p
-          className="notice-annotation mt-5 text-center text-[1.15rem]"
-          style={{ color: "#F0E4C6" }}
+      {/* Cork board backing — the poster is pinned to it */}
+      <div className="cork-board rotate-[0.4deg] p-4 pt-7 sm:p-5 sm:pt-8">
+        {/* Pushpin holding the poster */}
+        <span
           aria-hidden="true"
-        >
-          every notice here is a neighbor helping ✎
-        </p>
-      </div>
-    </div>
-  );
-}
+          className="absolute left-1/2 top-2.5 z-20 h-3.5 w-3.5 -translate-x-1/2 rounded-full shadow-[0_2px_4px_rgba(36,30,23,0.5)]"
+          style={{
+            background:
+              "radial-gradient(circle at 35% 30%, #FFD9A0, #E19122 55%, #C97F1E)",
+          }}
+        />
 
-function NoticeSlip({
-  card,
-  tilt,
-  featured = false,
-}: {
-  card: HeroCard;
-  tilt: "-rotate-1" | "rotate-1";
-  featured?: boolean;
-}) {
-  const isLost = card.kind === "lost";
-  const categoryLabel = CATEGORY_LABELS[card.category] ?? "Other";
+        {/* THE POSTER — one sheet of aged paper with a double-rule frame */}
+        <article className="relative -rotate-[0.6deg] border-[3px] border-cork-700 bg-[#FCF5E5] px-5 pb-4 pt-5 shadow-[0_18px_40px_-18px_rgba(36,30,23,0.55)]">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-1.5 border border-cork-700/35"
+          />
 
-  return (
-    <article className={`notice-card relative ${tilt} p-4 ${featured ? "pt-5 shadow-card" : "pt-4 shadow-sm"}`}>
-      <span
-        className={`washi-tape -top-2 ${
-          featured ? "left-10 -rotate-6" : "right-8 rotate-3"
-        }`}
-        aria-hidden="true"
-      />
-      <span
-        aria-hidden="true"
-        className={`absolute inset-y-4 left-0 w-1 rounded-full ${isLost ? "bg-coral-500" : "bg-ocean-500"}`}
-      />
-      <div className="flex items-start gap-3 pl-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 items-center gap-1.5">
-            <span
-              className={`inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.1em] ${
-                isLost ? "bg-coral-600 text-white" : "bg-ocean-600 text-white"
-              }`}
-            >
-              {isLost ? "Lost" : "Found"}
-            </span>
-            <span className="inline-flex min-w-0 items-center gap-1 text-[11px] font-semibold text-ink-soft">
-              <MapPin size={11} aria-hidden="true" className="shrink-0" />
-              <span className="truncate">{card.city || "Philippines"}</span>
-            </span>
-          </div>
+          {/* Kicker */}
+          <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.3em] text-ink-soft">
+            ★ Community Notice ★
+          </p>
+
+          {/* Giant headline — the poster moment */}
           <h3
-            className={`mt-1.5 line-clamp-2 break-words font-bold leading-snug text-navy-900 ${
-              featured ? "min-h-[2.75rem] text-[15px]" : "text-[13px]"
+            className={`mt-2 text-center font-display text-[2.6rem] font-black uppercase leading-none tracking-tight ${
+              newestIsLost ? "text-coral-600" : "text-ocean-600"
             }`}
           >
-            {card.title}
+            {newestIsLost ? "Missing" : "Found!"}
           </h3>
-          <p className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] font-medium text-ink-soft">
-            <span className="inline-flex min-w-0 items-center gap-1 [&_svg]:size-3.5 [&_svg]:shrink-0">
-              {CATEGORY_ICONS[card.category]}
-              <span className="truncate">{categoryLabel}</span>
-            </span>
-            <span aria-hidden="true" className="shrink-0 text-ink-faint">·</span>
-            <span className="inline-flex shrink-0 items-center gap-1">
-              <Clock size={11} aria-hidden="true" />
-              {card.dateLabel}
-            </span>
+          <p className="notice-annotation mt-1 text-center text-[1.1rem] leading-none">
+            {newestIsLost
+              ? "have you seen me?"
+              : "someone is smiling right now"}
           </p>
-        </div>
-        {card.imageUrl ? (
-          <figure className="shrink-0 -rotate-2 overflow-hidden rounded-lg border-2 border-white bg-slate-100 shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={card.imageUrl}
-              alt=""
-              loading="lazy"
-              className={`object-cover ${featured ? "h-20 w-20" : "h-16 w-16"}`}
-            />
-          </figure>
-        ) : null}
+
+          <span
+            aria-hidden="true"
+            className="mx-auto mt-3 block h-0.5 w-24 rounded-full bg-cork-700/50"
+          />
+
+          {/* Featured report */}
+          <div className="mt-4 flex items-start gap-3.5">
+            <div className="min-w-0 flex-1">
+              <p className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">
+                <MapPin size={11} aria-hidden="true" className="shrink-0" />
+                <span className="truncate">{newest.city || "Philippines"}</span>
+                <span aria-hidden="true" className="text-ink-faint">
+                  ·
+                </span>
+                <Clock size={11} aria-hidden="true" className="shrink-0" />
+                {newest.dateLabel}
+              </p>
+              <h4 className="mt-1.5 line-clamp-3 break-words font-display text-lg font-bold leading-snug text-navy-900">
+                {newest.title}
+              </h4>
+              <p className="mt-1.5 inline-flex min-w-0 items-center gap-1.5 rounded-md bg-kraft-100/80 px-2 py-1 text-[11px] font-bold text-cork-700">
+                <span className="[&_svg]:size-3.5 [&_svg]:shrink-0">
+                  {CATEGORY_ICONS[newest.category]}
+                </span>
+                <span className="truncate">
+                  {CATEGORY_LABELS[newest.category] ?? "Other"}
+                </span>
+              </p>
+            </div>
+
+            {newest.imageUrl ? (
+              <figure
+                className="relative shrink-0 rotate-2 border-[3px] border-white bg-slate-100 p-0.5 shadow-md"
+                aria-hidden="true"
+              >
+                <span className="washi-tape -top-2.5 left-1/2 -translate-x-1/2 -rotate-3" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={newest.imageUrl}
+                  alt=""
+                  loading="lazy"
+                  className="h-24 w-24 object-cover"
+                />
+              </figure>
+            ) : null}
+          </div>
+
+          {/* Cut line — classic poster scissors rule */}
+          {replyCard && (
+            <div
+              className="relative mt-5 flex items-center gap-2"
+              aria-hidden="true"
+            >
+              <span className="h-0 flex-1 border-t-2 border-dashed border-ink/25" />
+              <Scissors
+                size={13}
+                className="shrink-0 -scale-x-100 text-ink/40"
+              />
+              <span className="h-0 flex-1 border-t-2 border-dashed border-ink/25" />
+            </div>
+          )}
+
+          {/* Reply item — below the cut */}
+          {replyCard && (
+            <div className="mt-3.5 flex items-start gap-3">
+              <span
+                aria-hidden="true"
+                className={`mt-1 h-9 w-1 shrink-0 rounded-full ${
+                  replyCard.kind === "lost" ? "bg-coral-500" : "bg-ocean-500"
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                {hasMatch ? (
+                  <p className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white shadow-sm">
+                    <ArrowLeftRight size={10} aria-hidden="true" />
+                    Possible match
+                  </p>
+                ) : (
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ink-faint">
+                    Also on the board
+                  </p>
+                )}
+                <h4 className="mt-1 line-clamp-2 break-words text-[13px] font-bold leading-snug text-navy-900">
+                  {replyCard.title}
+                </h4>
+                <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] font-medium text-ink-soft">
+                  <MapPin size={11} aria-hidden="true" className="shrink-0" />
+                  <span className="truncate">
+                    {replyCard.city || "Philippines"}
+                  </span>
+                  <span aria-hidden="true" className="text-ink-faint">
+                    ·
+                  </span>
+                  {replyCard.dateLabel}
+                </p>
+              </div>
+              {replyCard.imageUrl ? (
+                <figure
+                  className="shrink-0 -rotate-2 border-2 border-white bg-slate-100 p-0.5 shadow-sm"
+                  aria-hidden="true"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={replyCard.imageUrl}
+                    alt=""
+                    loading="lazy"
+                    className="h-12 w-12 object-cover"
+                  />
+                </figure>
+              ) : null}
+            </div>
+          )}
+
+          {/* Small print footer */}
+          <p className="mt-4 border-t border-cork-700/30 pt-2.5 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
+            Post yours free — findback.ph
+          </p>
+        </article>
       </div>
-    </article>
+    </div>
   );
 }
