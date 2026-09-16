@@ -205,11 +205,7 @@ export function Hero({
       {/* Sampayan — the ticker hangs on the string with no band behind it,
           so the page background flows straight through. */}
       {cards.length > 0 && (
-        <div className="relative mt-8">
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 top-1/2 h-px bg-ink/15"
-          />
+        <div className="relative mt-10">
           <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
             <LiveActivityTicker
               items={cards.map((r) => ({
