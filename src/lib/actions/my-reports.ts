@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { lostItemSchema, foundItemSchema, type LostItemInput, type FoundItemInput } from "@/lib/validation";
 import { notifyUserOnce } from "@/lib/notify";
+import { mutateWithColumnRetry } from "@/lib/supabase/column-retry";
 
 
 export type ActionResult = { error: string } | { error?: undefined };
@@ -77,7 +78,17 @@ export async function updateReportAction(formData: FormData): Promise<ActionResu
         current_holding_info: d.currentHoldingInfo ?? null,
       };
 
-  const { error } = await supabase.from(table).update(updateData).eq("id", id).eq("reporter_id", user.id);
+  const { error } = await mutateWithColumnRetry(
+    async (row) => {
+      const res = await supabase
+        .from(table)
+        .update(row as never)
+        .eq("id", id)
+        .eq("reporter_id", user.id);
+      return { data: res.data as unknown, error: res.error as unknown };
+    },
+    updateData as Record<string, unknown>
+  );
 
   if (error) {
     console.error("Report update error:", error);

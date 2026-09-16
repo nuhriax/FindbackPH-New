@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { runMatchingForLostItem, runMatchingForFoundItem } from "@/lib/actions/matching";
 import { verifyTurnstileAction } from "@/lib/actions/turnstile";
+import { parseMissingColumn } from "@/lib/supabase/column-retry";
 
 export type ActionResult = { error?: string; itemId?: string };
 
@@ -40,32 +41,31 @@ async function insertItemRow(
   payload: Record<string, unknown>
 ): Promise<{ data: { id: string } | null; error: unknown }> {
   const insert = (row: Record<string, unknown>) =>
-    // `row` is Record<string, unknown> so the retry path can strip the
-    // coordinate keys; the payloads are assembled in this module only.
+    // `row` is Record<string, unknown> so the retry path can strip keys; the
+    // payloads are assembled in this module only.
     (supabase.from(table).insert(row as never) as any)
       .select("id")
       .single();
 
-  let result = await insert(payload);
-  if (
-    result.error &&
-    typeof result.error === "object" &&
-    "code" in result.error &&
-    (result.error as { code?: string }).code === "42703"
-  ) {
-    const { time_window: _timeWindow, ...withoutTimeWindow } = payload;
-    result = await insert(withoutTimeWindow);
-    if (
-      result.error &&
-      typeof result.error === "object" &&
-      "code" in result.error &&
-      (result.error as { code?: string }).code === "42703"
-    ) {
-      const { latitude: _lat, longitude: _lng, ...withoutCoordinates } = withoutTimeWindow;
-      result = await insert(withoutCoordinates);
+  let row = { ...payload };
+  // The live table schema may lag behind the app (migrations not yet applied).
+  // PostgREST rejects unknown payload columns with PGRST204 ("Could not find
+  // the 'x' column ...") — drop the reported column and retry, so a deployment
+  // never hard-fails on an optional column the database doesn't have yet.
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const result = await insert(row);
+    if (!result.error) return result as { data: { id: string } | null; error: null };
+
+    const err = result.error as { code?: string; message?: string };
+    const missing = parseMissingColumn(err);
+    if (!missing || !(missing in row)) {
+      console.error(`${table} insert failed:`, err.code, err.message);
+      return result as { data: { id: string } | null; error: unknown };
     }
+    const { [missing]: _dropped, ...rest } = row;
+    row = rest;
   }
-  return result as { data: { id: string } | null; error: unknown };
+  return { data: null, error: new Error("insert retries exhausted") };
 }
 
 
