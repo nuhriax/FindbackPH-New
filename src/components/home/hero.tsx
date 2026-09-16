@@ -202,17 +202,15 @@ export function Hero({
         </div>
       </div>
 
-      {/* Sampayan — the ticker IS the hero's bottom edge (chapter 01 proof).
-          Same data as the board visual above; nothing new is introduced.
-          -mx breaks out of the section's side padding so the cork band runs
-          truly edge-to-edge instead of floating with gaps at the corners. */}
+      {/* Sampayan — the ticker hangs on the string with no band behind it,
+          so the page background flows straight through. */}
       {cards.length > 0 && (
-        <div className="relative -mx-4 mt-10 border-y border-cork-900/25 bg-cork-500/95 py-3 shadow-inner sm:-mx-6">
+        <div className="relative mt-8">
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-1/2 h-px bg-cork-900/40"
+            className="absolute inset-x-0 top-1/2 h-px bg-ink/15"
           />
-          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
             <LiveActivityTicker
               items={cards.map((r) => ({
                 title: r.title,
