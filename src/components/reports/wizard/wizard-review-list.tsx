@@ -110,19 +110,15 @@ export function WizardReviewList({
   });
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-2xl border border-teal-200 bg-teal-50/70 p-4" aria-label="Report quality">
-        <p className="text-sm font-semibold text-teal-900">Report quality: {qualityGaps.length === 0 ? "Great" : qualityGaps.length === 1 ? "Good" : "Could be stronger"}</p>
-        {qualityGaps.length > 0 ? <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-5 text-teal-800">{qualityGaps.map((gap) => <li key={gap}>{gap}</li>)}</ul> : <p className="mt-1 text-xs text-teal-800">You have included the key details that help matching and safe returns.</p>}
-      </section>
-      {/* Public information card */}
+    <div className="grid gap-4 lg:grid-cols-5 lg:items-start">
+      {/* LEFT (3/5): the public report summary */}
       <section
         aria-labelledby="review-public"
-        className="report-review-card rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm transition-all duration-300 hover:shadow-md"
+        className="report-review-card rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm transition-all duration-300 hover:shadow-md lg:col-span-3"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Eye size={18} className="text-slate-600" aria-hidden="true" />
+            <Eye size={16} className="text-slate-600" aria-hidden="true" />
             <h3
               id="review-public"
               className="report-eyebrow text-sm font-semibold text-slate-700"
@@ -167,90 +163,112 @@ export function WizardReviewList({
         </dl>
       </section>
 
-      {/* Private verification detail — compact single-row note */}
-      <section
-        aria-labelledby="review-private"
-        className="flex items-center gap-3 rounded-xl border border-electric-200 bg-electric-50/60 px-4 py-2.5"
-      >
-        <Lock size={15} className="shrink-0 text-electric-700" aria-hidden="true" />
-        <h3 id="review-private" className="shrink-0 text-xs font-bold text-navy-900">
-          Private verification detail
-          <span className="ml-1.5 rounded-full bg-electric-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-electric-700">
-            Private
-          </span>
-        </h3>
-        <p className="min-w-0 flex-1 truncate text-xs text-slate-600">
-          Hidden from the public — used to verify claimants.
-        </p>
-        <button
-          type="button"
-          onClick={() => onEdit(1)}
-          className={[
-            "shrink-0 rounded-lg px-2 py-1 text-[11px] font-semibold transition-all duration-200",
-            "hover:scale-105 active:scale-95",
-            accent.edit,
-          ].join(" ")}
-          aria-label="Edit private verification detail"
+      {/* RIGHT (2/5): quality, privacy notes, and confirmation */}
+      <div className="space-y-3 lg:col-span-2">
+        <section
+          className="rounded-xl border border-teal-200 bg-teal-50/70 px-4 py-3"
+          aria-label="Report quality"
         >
-          Edit
-        </button>
-      </section>
+          <p className="text-xs font-semibold text-teal-900">
+            Report quality:{" "}
+            {qualityGaps.length === 0
+              ? "Great"
+              : qualityGaps.length === 1
+                ? "Good"
+                : "Could be stronger"}
+          </p>
+          {qualityGaps.length > 0 ? (
+            <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[11px] leading-4 text-teal-800">
+              {qualityGaps.map((gap) => (
+                <li key={gap}>{gap}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-0.5 text-[11px] text-teal-800">
+              All key details are included for matching and safe returns.
+            </p>
+          )}
+        </section>
 
-      {/* Privacy check — compact single-row note */}
-      <p
-        role="note"
-        className="report-privacy-check flex items-center gap-2 rounded-xl border border-sunrise-200 bg-sunrise-50/60 px-4 py-2.5 text-xs leading-5 text-sunrise-800"
-      >
-        <ShieldCheck size={15} className="shrink-0" aria-hidden="true" />
-        <span>
-          Before publishing, double-check that no phone numbers, home addresses,
-          or other sensitive info are in the description or photos.
-        </span>
-      </p>
+        {/* Private verification detail — compact single-row note */}
+        <section
+          aria-labelledby="review-private"
+          className="flex items-center gap-3 rounded-xl border border-electric-200 bg-electric-50/60 px-4 py-2.5"
+        >
+          <Lock size={15} className="shrink-0 text-electric-700" aria-hidden="true" />
+          <div className="min-w-0 flex-1">
+            <h3 id="review-private" className="text-xs font-bold text-navy-900">
+              Private verification detail
+              <span className="ml-1.5 rounded-full bg-electric-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-electric-700">
+                Private
+              </span>
+            </h3>
+            <p className="truncate text-xs text-slate-600">
+              Hidden from the public — used to verify claimants.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onEdit(1)}
+            className={[
+              "shrink-0 rounded-lg px-2 py-1 text-[11px] font-semibold transition-all duration-200",
+              "hover:scale-105 active:scale-95",
+              accent.edit,
+            ].join(" ")}
+            aria-label="Edit private verification detail"
+          >
+            Edit
+          </button>
+        </section>
 
-      {/* Found-specific: ownership verification tip */}
-      {cfg.extraField === "holding" && (
-        <div
+        {/* Privacy check — compact note */}
+        <p
           role="note"
-          className="flex items-start gap-4 report-soft-surface rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-5 text-left transition-all duration-300 hover:shadow-md"
+          className="report-privacy-check flex items-start gap-2 rounded-xl border border-sunrise-200 bg-sunrise-50/60 px-4 py-2.5 text-xs leading-5 text-sunrise-800"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 border border-emerald-200">
-            <ShieldCheck size={18} className="text-emerald-700" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-navy-900 mb-1">
-              Prepare to verify ownership
-            </p>
-            <p className="text-xs leading-relaxed text-slate-600">
-              When someone claims it, ask them to describe a detail you kept
-              private through FindBack messages before arranging a safe, public
-              handover.
-            </p>
-          </div>
-        </div>
-      )}
+          <ShieldCheck size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
+          <span>
+            Before publishing, double-check that no phone numbers, home
+            addresses, or other sensitive info are in the description or photos.
+          </span>
+        </p>
 
-      {/* Final confirmation */}
-      <div className="report-confirm-card flex items-start gap-4 rounded-2xl border-2 border-slate-200 bg-white p-5 transition-all duration-300 hover:border-slate-300 hover:shadow-md">
-        <div className="relative mt-0.5">
-          <input
-            id="confirmAccurate"
-            name="confirmAccurate"
-            type="checkbox"
-            required
-            className="peer h-5 w-5 shrink-0 cursor-pointer rounded border-2 border-slate-300 text-teal-600 transition-all duration-200 focus:ring-4 focus:ring-teal-500/20 checked:border-teal-600"
-          />
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity duration-200">
-            <Check size={14} className="text-white" aria-hidden="true" />
+        {/* Found-specific: ownership verification tip */}
+        {cfg.extraField === "holding" && (
+          <p
+            role="note"
+            className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-2.5 text-xs leading-5 text-emerald-800"
+          >
+            <ShieldCheck size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <span>
+              When someone claims it, ask them to describe the private detail via
+              FindBack messages before arranging a safe, public handover.
+            </span>
+          </p>
+        )}
+
+        {/* Final confirmation */}
+        <div className="report-confirm-card flex items-start gap-3 rounded-2xl border-2 border-slate-200 bg-white p-4 transition-all duration-300 hover:border-slate-300 hover:shadow-md">
+          <div className="relative mt-0.5">
+            <input
+              id="confirmAccurate"
+              name="confirmAccurate"
+              type="checkbox"
+              required
+              className="peer h-5 w-5 shrink-0 cursor-pointer rounded border-2 border-slate-300 text-teal-600 transition-all duration-200 focus:ring-4 focus:ring-teal-500/20 checked:border-teal-600"
+            />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity duration-200">
+              <Check size={14} className="text-white" aria-hidden="true" />
+            </div>
           </div>
+          <label
+            htmlFor="confirmAccurate"
+            className="cursor-pointer text-sm leading-relaxed text-slate-700"
+          >
+            <span className="font-semibold text-navy-900">I confirm</span> that
+            the information in this report is accurate and safe to share.
+          </label>
         </div>
-        <label
-          htmlFor="confirmAccurate"
-          className="cursor-pointer text-sm leading-relaxed text-slate-700"
-        >
-          <span className="font-semibold text-navy-900">I confirm</span> that the
-          information in this report is accurate and safe to share.
-        </label>
       </div>
     </div>
   );

@@ -29,7 +29,6 @@ import Link from "next/link";
 import { DraftAutoSave } from "./draft-autosave";
 import { track, flushSync } from "@/lib/analytics-client";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
-import { TurnstileWidget, TURNSTILE_ENABLED } from "@/components/auth/turnstile-widget";
 import type { ColorValue } from "@/lib/validation";
 
 import {
@@ -490,41 +489,10 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
               onEditStep={handleEditStep}
             />
 
-            {/* Human verification — only mounted on the Review step so the
-                challenge loads when it's actually needed, never earlier.
-                Renders nothing when Turnstile isn't configured. */}
-            {step === TOTAL_STEPS && TURNSTILE_ENABLED && (
-              <section
-                aria-labelledby="wizard-verify-heading"
-                className="rounded-2xl border border-slate-200/80 bg-white/70 p-5"
-              >
-                <h2
-                  id="wizard-verify-heading"
-                  className="font-display text-sm font-semibold text-navy-900"
-                >
-                  Are you human?
-                </h2>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  Complete this quick verification to continue.
-                </p>
-                <div className="mt-3">
-                  <TurnstileWidget
-                    onVerify={(token) => {
-                      turnstileTokenRef.current = token;
-                    }}
-                    onError={() => {
-                      turnstileTokenRef.current = null;
-                    }}
-                    onExpire={() => {
-                      turnstileTokenRef.current = null;
-                    }}
-                    resetRef={(reset) => {
-                      turnstileResetRef.current = reset;
-                    }}
-                  />
-                </div>
-              </section>
-            )}
+            {/* Human verification: intentionally removed from the report flow.
+                Spam is handled by the fleet-wide Postgres rate limiter on the
+                create actions. Turnstile can be re-added later once properly
+                configured in Cloudflare (valid key + domain allowlist). */}
 
             {error && (
               <WizardError
