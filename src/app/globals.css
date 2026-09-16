@@ -1661,6 +1661,7 @@ p {
 }
 @media (prefers-reduced-motion: reduce) {
   .notice-card, .notice-card:hover { transition: none; transform: none; }
+}
 
 /* 4c) hover states on light backgrounds — hover:bg-* with light fills must not
    stay light, otherwise remapped light text becomes invisible on hover */
@@ -1690,6 +1691,19 @@ p {
   background-color: rgba(242, 206, 139, 0.12) !important;
 }
 .site-ink [class*="hover:bg-sun-"], .site-ink [class*="hover:bg-coral-50"] {
+  background-color: rgba(242, 206, 139, 0.12) !important;
+}
+/* Native search input: with color-scheme:dark Chrome paints the inner search
+   field dark even inside a light well — force light scheme + explicit paper
+   background inside the slip. */
+.site-ink form[class*="bg-kraft-100"] input[type="search"],
+.site-ink [class*="bg-kraft-100"] input[type="search"] {
+  color-scheme: light;
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-radius: 0.5rem;
+  appearance: none;
+  -webkit-appearance: none;
+}
 
 .site-ink :is(.bg-electric-100, .bg-navy-100, .bg-slate-200, .bg-ocean-100) { background-color: rgba(126, 159, 198, 0.20); }
 
@@ -1746,9 +1760,4 @@ p {
 }
 .site-ink [class*="to-rose-50"], .site-ink [class*="to-red-50"] {
   --tw-gradient-to: rgba(255, 138, 138, 0.05) var(--tw-gradient-to-position);
-}
-
-  background-color: rgba(242, 206, 139, 0.12) !important;
-}
-
 }
