@@ -136,7 +136,7 @@ export function Navbar({
         {/* Floating pill shell */}
         <div
           className={clsx(
-            "navbar-pill mx-auto flex h-14 items-center justify-between gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
+            "navbar-pill mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[20px] border px-3 transition-all duration-300 sm:px-4",
             scrolled
               ? "border-ice-200/80 bg-white/95 shadow-[0_16px_46px_-22px_rgba(15,123,122,0.35)] backdrop-blur-2xl"
               : "border-ice-200/60 bg-white/95 shadow-[0_10px_36px_-24px_rgba(15,123,122,0.28)] backdrop-blur-2xl"
@@ -144,7 +144,7 @@ export function Navbar({
         >
           <Logo className="justify-self-start" />
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-1 justify-self-center lg:flex">
             {PRIMARY_LINKS.map((link) => {
               const active = isActive(link.href);
 
@@ -334,7 +334,7 @@ export function Navbar({
           </div>
 
           {/* Mobile actions */}
-          <div className="flex items-center justify-self-end gap-0.5 lg:hidden">
+          <div className="flex items-center justify-end gap-0.5 lg:hidden">
             {user ? (
               <Link
                 href="/dashboard"
