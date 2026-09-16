@@ -144,7 +144,7 @@ export function ItemCard({
           {title}
         </h3>
 
-        <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-ink-soft">
+        <p className="mt-1.5 line-clamp-2 min-h-[2.5em] text-xs leading-5 text-ink-soft">
           {description ?? ""}
         </p>
 
@@ -157,8 +157,10 @@ export function ItemCard({
         )}
 
         <div className="mt-auto pt-4">
-          {/* Meta row — location · views, with the date anchored right */}
-          <div className="flex items-center justify-between gap-3 text-[11px] font-medium text-ink-soft">
+          {/* Meta row — location · views on top, date below. Two stacked
+              rows instead of one squeezed line so long "City · 5m ago"
+              strings wrap instead of cropping. */}
+          <div className="flex flex-col gap-1.5 text-[11px] font-medium text-ink-soft">
             <span className="flex min-w-0 items-center gap-1.5">
               <MapPin
                 aria-hidden="true"
