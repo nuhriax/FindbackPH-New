@@ -135,28 +135,26 @@ export function WizardReviewList({
           </span>
         </div>
 
-        <div className="space-y-3">
+        <dl className="divide-y divide-slate-100">
           {rows.map(({ label, value, editStep, icon }) => (
             <div
               key={label}
-              className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-3 transition-all duration-200 hover:bg-slate-50 hover:border-slate-200"
+              className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-sm">
+              <span aria-hidden="true" className="w-5 shrink-0 text-center text-sm">
                 {icon}
               </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  {label}
-                </p>
-                <p className="mt-0.5 text-sm text-navy-900 break-words">
-                  {typeof value === 'string' ? value : value}
-                </p>
-              </div>
+              <dt className="w-32 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-slate-400 sm:w-40">
+                {label}
+              </dt>
+              <dd className="min-w-0 flex-1 truncate text-sm text-navy-900" title={typeof value === "string" ? value : undefined}>
+                {value}
+              </dd>
               <button
                 type="button"
                 onClick={() => onEdit(editStep)}
                 className={[
-                  "shrink-0 rounded-lg px-2.5 py-1 text-xs font-medium transition-all duration-200",
+                  "shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium transition-all duration-200",
                   "hover:scale-105 active:scale-95",
                   accent.edit,
                 ].join(" ")}
@@ -166,39 +164,29 @@ export function WizardReviewList({
               </button>
             </div>
           ))}
-        </div>
+        </dl>
       </section>
 
-      {/* Private verification detail */}
+      {/* Private verification detail — compact single-row note */}
       <section
         aria-labelledby="review-private"
-        className="flex items-start gap-4 report-soft-surface flex items-start gap-4 rounded-2xl border border-electric-200 bg-gradient-to-br from-electric-50 to-electric-50/50 p-5 transition-all duration-300 hover:shadow-md"
+        className="flex items-center gap-3 rounded-xl border border-electric-200 bg-electric-50/60 px-4 py-2.5"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-electric-100 border border-electric-200">
-          <Lock size={18} className="text-electric-700" aria-hidden="true" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3
-              id="review-private"
-              className="text-sm font-bold text-navy-900"
-            >
-              Private verification detail
-            </h3>
-            <span className="rounded-full bg-electric-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-electric-700 border border-electric-200">
-              Private
-            </span>
-          </div>
-          <p className="text-xs leading-relaxed text-slate-600">
-            Hidden from the public listing — only you see it. Use it to confirm
-            a claimant really knows the item.
-          </p>
-        </div>
+        <Lock size={15} className="shrink-0 text-electric-700" aria-hidden="true" />
+        <h3 id="review-private" className="shrink-0 text-xs font-bold text-navy-900">
+          Private verification detail
+          <span className="ml-1.5 rounded-full bg-electric-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-electric-700">
+            Private
+          </span>
+        </h3>
+        <p className="min-w-0 flex-1 truncate text-xs text-slate-600">
+          Hidden from the public — used to verify claimants.
+        </p>
         <button
           type="button"
           onClick={() => onEdit(1)}
           className={[
-            "shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200",
+            "shrink-0 rounded-lg px-2 py-1 text-[11px] font-semibold transition-all duration-200",
             "hover:scale-105 active:scale-95",
             accent.edit,
           ].join(" ")}
@@ -208,27 +196,17 @@ export function WizardReviewList({
         </button>
       </section>
 
-      {/* Privacy check */}
-      <div
+      {/* Privacy check — compact single-row note */}
+      <p
         role="note"
-        className="report-soft-surface report-privacy-check rounded-2xl border border-sunrise-200 bg-gradient-to-br from-sunrise-50 to-sunrise-50/50 p-5 transition-all duration-300 hover:shadow-md"
+        className="report-privacy-check flex items-center gap-2 rounded-xl border border-sunrise-200 bg-sunrise-50/60 px-4 py-2.5 text-xs leading-5 text-sunrise-800"
       >
-        <div className="flex items-start gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sunrise-100 border border-sunrise-200">
-            <Lock size={16} className="text-sunrise-700" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-navy-900 mb-1">
-              Privacy check
-            </p>
-            <p className="text-xs leading-relaxed text-slate-600">
-              Before publishing, make sure you haven&apos;t included phone numbers,
-              home addresses, IDs, passwords, or other sensitive information in the
-              public description or photos.
-            </p>
-          </div>
-        </div>
-      </div>
+        <ShieldCheck size={15} className="shrink-0" aria-hidden="true" />
+        <span>
+          Before publishing, double-check that no phone numbers, home addresses,
+          or other sensitive info are in the description or photos.
+        </span>
+      </p>
 
       {/* Found-specific: ownership verification tip */}
       {cfg.extraField === "holding" && (

@@ -13,7 +13,7 @@ import {
 
 import { submitContactAction } from "@/lib/actions/contact";
 import { MotionReveal } from "@/components/effects/motion-reveal";
-import { TurnstileWidget } from "@/components/auth/turnstile-widget";
+import { TurnstileWidget, TURNSTILE_ENABLED } from "@/components/auth/turnstile-widget";
 import Link from "next/link";
 
 const quickLinks = [
@@ -285,8 +285,9 @@ export default function ContactPage() {
                         </div>
                       )}
 
-                      {/* Human verification — renders nothing when Turnstile
+                      {/* Human verification — hidden entirely when Turnstile
                           isn't configured (local dev / pre-launch). */}
+                      {TURNSTILE_ENABLED && (
                       <div
                         role="group"
                         aria-label="Security verification"
@@ -313,6 +314,7 @@ export default function ContactPage() {
                           }}
                         />
                       </div>
+                      )}
 
                       <div className="flex flex-col gap-4 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                         <p className="max-w-sm text-xs leading-5 text-slate-500">

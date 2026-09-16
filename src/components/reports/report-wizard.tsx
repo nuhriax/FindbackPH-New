@@ -29,7 +29,7 @@ import Link from "next/link";
 import { DraftAutoSave } from "./draft-autosave";
 import { track, flushSync } from "@/lib/analytics-client";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
-import { TurnstileWidget } from "@/components/auth/turnstile-widget";
+import { TurnstileWidget, TURNSTILE_ENABLED } from "@/components/auth/turnstile-widget";
 import type { ColorValue } from "@/lib/validation";
 
 import {
@@ -493,7 +493,7 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
             {/* Human verification — only mounted on the Review step so the
                 challenge loads when it's actually needed, never earlier.
                 Renders nothing when Turnstile isn't configured. */}
-            {step === TOTAL_STEPS && (
+            {step === TOTAL_STEPS && TURNSTILE_ENABLED && (
               <section
                 aria-labelledby="wizard-verify-heading"
                 className="rounded-2xl border border-slate-200/80 bg-white/70 p-5"

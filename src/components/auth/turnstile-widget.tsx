@@ -40,6 +40,9 @@ declare global {
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
+/** True when Turnstile is configured at build time — safe for client code. */
+export const TURNSTILE_ENABLED = Boolean(SITE_KEY);
+
 function loadTurnstileScript(): Promise<TurnstileApi> {
   return new Promise((resolve, reject) => {
     if (window.turnstile) return resolve(window.turnstile);
