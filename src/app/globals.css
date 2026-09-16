@@ -1644,6 +1644,21 @@ p {
 .site-ink [class*="bg-kraft-100"] :is(.text-ink, .text-ink-soft, .text-ink-faint) { color: #241E17; }
 .site-ink [class*="bg-kraft-100"] :is(.placeholder\:text-ink-faint)::placeholder { color: rgba(36, 30, 23, 0.55); }
 .site-ink [class*="bg-kraft-100"] :is(.border-cork-700, .border-cork-700\/25, .border-cork-700\/30) { border-color: rgba(94, 60, 34, 0.25); }
+/* Input wells inside the slip: the global sweep darkens every bg-white/80
+   panel, which turned these wells into dark boxes with dark ink text. Keep
+   them light paper like the slip, with dark typed text and legible icons. */
+.site-ink [class*="bg-kraft-100"] :is(.bg-white\/80) {
+  background-color: rgba(255, 255, 255, 0.88);
+}
+.site-ink [class*="bg-kraft-100"] input {
+  color: #241E17;
+}
+.site-ink [class*="bg-kraft-100"] input::placeholder {
+  color: rgba(36, 30, 23, 0.55);
+}
+.site-ink [class*="bg-kraft-100"] svg {
+  color: rgba(36, 30, 23, 0.55);
+}
 @media (prefers-reduced-motion: reduce) {
   .notice-card, .notice-card:hover { transition: none; transform: none; }
 
