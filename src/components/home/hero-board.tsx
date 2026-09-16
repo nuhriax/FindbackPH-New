@@ -71,7 +71,7 @@ export function HeroBoard({
       )}
 
       {/* Cork board backing — the poster is pinned to it */}
-      <div className="cork-board rotate-[0.4deg] p-4 pt-7 sm:p-5 sm:pt-8">
+      <div className="cork-board rotate-[0.4deg] p-5 pt-8 sm:p-6 sm:pt-9">
         {/* Pushpin holding the poster */}
         <span
           aria-hidden="true"
@@ -83,7 +83,7 @@ export function HeroBoard({
         />
 
         {/* THE POSTER — one sheet of aged paper with a double-rule frame */}
-        <article className="relative -rotate-[0.6deg] border-[3px] border-cork-700 bg-[#FCF5E5] px-5 pb-4 pt-5 shadow-[0_18px_40px_-18px_rgba(36,30,23,0.55)]">
+        <article className="relative -rotate-[0.6deg] border-[3px] border-cork-700 bg-[#FCF5E5] px-5 pb-5 pt-4 shadow-[0_18px_40px_-18px_rgba(36,30,23,0.55)] sm:px-6">
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-1.5 border border-cork-700/35"
@@ -164,7 +164,7 @@ export function HeroBoard({
                   loading="lazy"
                   className="h-24 w-24 object-cover"
                 />
-                <figcaption className="absolute inset-x-1 bottom-0.5 truncate text-center font-hand text-[13px] leading-[1.4] text-cork-700">
+                <figcaption className="absolute inset-x-0 bottom-0.5 truncate px-1 text-center font-hand text-[12px] leading-[1.5] text-cork-700">
                   as posted by a neighbor
                 </figcaption>
               </figure>
@@ -209,15 +209,17 @@ export function HeroBoard({
                 <h4 className="mt-1 line-clamp-2 break-words text-[13px] font-bold leading-snug text-navy-900">
                   {replyCard.title}
                 </h4>
-                <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] font-medium text-ink-soft">
-                  <MapPin size={11} aria-hidden="true" className="shrink-0" />
-                  <span className="truncate">
-                    {replyCard.city || "Philippines"}
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-medium text-ink-soft">
+                  <span className="inline-flex min-w-0 max-w-full items-center gap-1">
+                    <MapPin size={11} aria-hidden="true" className="shrink-0" />
+                    <span className="truncate">
+                      {replyCard.city || "Philippines"}
+                    </span>
                   </span>
                   <span aria-hidden="true" className="text-ink-faint">
                     ·
                   </span>
-                  <span className="inline-flex min-w-0 items-center gap-1 [&_svg]:size-3 [&_svg]:shrink-0">
+                  <span className="inline-flex min-w-0 max-w-full items-center gap-1 [&_svg]:size-3 [&_svg]:shrink-0">
                     {CATEGORY_ICONS[replyCard.category]}
                     <span className="truncate">
                       {CATEGORY_LABELS[replyCard.category] ?? "Other"}
@@ -226,7 +228,9 @@ export function HeroBoard({
                   <span aria-hidden="true" className="text-ink-faint">
                     ·
                   </span>
-                  {replyCard.dateLabel}
+                  <span className="whitespace-nowrap">
+                    {replyCard.dateLabel}
+                  </span>
                 </p>
               </div>
               {replyCard.imageUrl ? (
@@ -248,11 +252,13 @@ export function HeroBoard({
 
           {/* Small print footer — reference number + call to action, like a
               real filed notice */}
-          <div className="mt-4 flex items-center justify-between gap-2 border-t border-cork-700/30 pt-2.5 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
-            <span className="tabular-nums">
-              Report № {newest.id.replace(/-/g, "").slice(0, 6).toUpperCase()}
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-cork-700/30 pt-3 text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+            <span className="shrink-0 tabular-nums">
+              № {newest.id.replace(/-/g, "").slice(0, 6).toUpperCase()}
             </span>
-            <span className="truncate">Post yours free — findback.ph</span>
+            <span className="whitespace-nowrap">
+              Post yours free — findback.ph
+            </span>
           </div>
         </article>
       </div>
