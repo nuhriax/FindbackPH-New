@@ -103,7 +103,7 @@ export function Hero({
             other side. Newest report is always the big top card; its best
             opposite-kind match (if any) docks bottom-right as the reply. */}
         <div className="relative mx-auto hidden w-full max-w-md lg:block" aria-hidden="true">
-          <div className="relative aspect-[4/3.4]">
+          <div className="relative min-h-[24rem] py-2">
             <MapMotif className="absolute inset-0 opacity-70" tone="text-ocean-300" />
 
             {cards.length > 0 ? (
