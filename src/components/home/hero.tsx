@@ -1,12 +1,18 @@
-import { BadgeCheck, Search } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 
 import { MapMotif } from "@/components/map-motif";
 import { HeroSearch } from "@/components/home/hero-search";
 import { LiveActivityTicker } from "@/components/home/live-activity-ticker";
+import { HeroBoard } from "@/components/home/hero-board";
 import type { TickerItem } from "@/components/home/live-activity-ticker";
 
 export type HeroCard = TickerItem & {
   kind: "lost" | "found";
+  /** Full card data for real match scoring on the board. */
+  id: string;
+  category: import("@/types/database").ItemCategory;
+  province: string;
+  description: string;
   imageUrl?: string | null;
 };
 
@@ -93,99 +99,19 @@ export function Hero({
           </p>
         </div>
 
-        {/* ── RIGHT: live notice board visual ── */}
+        {/* ── RIGHT: live board — newest post pinned left, matches on the
+            other side. Newest report is always the big top card; its best
+            opposite-kind match (if any) docks bottom-right as the reply. */}
         <div className="relative mx-auto hidden w-full max-w-md lg:block" aria-hidden="true">
           <div className="relative aspect-[4/3.4]">
             <MapMotif className="absolute inset-0 opacity-70" tone="text-ocean-300" />
 
             {cards.length > 0 ? (
-              <>
-                {/* Pinned notice chips — real reports, slightly rotated like a corkboard */}
-                <div className="notice-card absolute left-0 top-4 w-60 -rotate-2 p-4 pt-5">
-                  <span className="washi-tape -top-2 left-1/2 -translate-x-1/2 -rotate-2" aria-hidden="true" />
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-coral-600">
-                    Lost · {cards[0].city || "PH"}
-                  </p>
-                  <p className="mt-1 truncate text-sm font-bold text-navy-900">
-                    {cards[0].title}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-ink-soft">
-                    {cards[0].dateLabel}
-                  </p>
-                </div>
-
-                {cards[1] && (
-                  <div className="notice-card absolute right-0 top-24 w-56 rotate-2 p-4 pt-5">
-                    <span className="washi-tape -top-2 left-1/2 -translate-x-1/2 rotate-3" aria-hidden="true" />
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ocean-600">
-                      Found · {cards[1].city || "PH"}
-                    </p>
-                    <p className="mt-1 truncate text-sm font-bold text-navy-900">
-                      {cards[1].title}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-ink-soft">
-                      {cards[1].dateLabel}
-                    </p>
-                  </div>
-                )}
-
-                {cards[2] ? (
-                  <div className="notice-card absolute bottom-2 left-6 w-52 -rotate-1 p-4 pt-5">
-                    <span className="washi-tape -top-2 left-3 -rotate-6" aria-hidden="true" />
-                    <p
-                      className={`text-[10px] font-bold uppercase tracking-[0.14em] ${
-                        cards[2].kind === "lost" ? "text-coral-600" : "text-ocean-600"
-                      }`}
-                    >
-                      {cards[2].kind === "lost" ? "Lost" : "Found"} ·{" "}
-                      {cards[2].city || "PH"}
-                    </p>
-                    <p className="mt-1 truncate text-sm font-bold text-navy-900">
-                      {cards[2].title}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-ink-soft">
-                      {cards[2].dateLabel}
-                    </p>
-                  </div>
-                ) : null}
-
-                {/* Polaroid of the newest notice — real photo when available */}
-                {cards[0].imageUrl ? (
-                  <div className="absolute -left-4 bottom-20 w-32 rotate-3 rounded-sm bg-white p-1.5 pb-6 shadow-[0_12px_30px_-12px_rgba(51,46,38,0.4)]">
-                    <span className="washi-tape -top-2 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true" />
-                    {/* eslint-disable-next-line @next/next/no-img-element -- static small polaroid, next/image adds no value here */}
-                    <img
-                      src={cards[0].imageUrl}
-                      alt=""
-                      className="aspect-square w-full rounded-[2px] object-cover"
-                    />
-                    <p className="absolute inset-x-0 bottom-1.5 text-center font-hand text-[11px] leading-none text-cork-700">
-                      spotted in {cards[0].city || "PH"}
-                    </p>
-                  </div>
-                ) : null}
-
-                {/* Match tag — kraft tag tied to the board */}
-                <div className="absolute -right-2 bottom-16 flex rotate-1 items-center gap-2 border border-ink/15 bg-kraft-200 px-3.5 py-2 text-xs font-bold text-ink shadow-sm">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100">
-                    <Search size={11} aria-hidden="true" />
-                  </span>
-                  Possible matches found
-                </div>
-
-                {/* Stamp — only when the platform genuinely has a reunion to
-                    celebrate. Before that, showing it next to an active lost
-                    report implies the wrong thing (a "returned" stamp on a
-                    still-missing item). */}
-                {recoveredCount > 0 && (
-                  <span
-                    className="stamp-badge absolute -top-3 right-6 rotate-[-8deg] bg-white/80 px-2.5 py-1 text-stamp"
-                    aria-hidden="true"
-                  >
-                    RETURNED!
-                  </span>
-                )}
-              </>
+              <HeroBoard
+                cards={cards}
+                totalActive={totalActive}
+                recoveredCount={recoveredCount}
+              />
             ) : (
               /* Day-one fallback: invite instead of empty board */
               <div className="notice-card absolute inset-x-8 top-1/2 -translate-y-1/2 p-6 text-center">
