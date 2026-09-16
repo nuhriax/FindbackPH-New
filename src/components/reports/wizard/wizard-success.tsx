@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 // ---------------------------------------------------------------------------
-// WizardSuccess — celebratory success screen shared by both report flows.
+// WizardSuccess â€” celebratory success screen shared by both report flows.
 //
 // Enhanced with confetti-like animation, better CTAs, and improved
 // visual hierarchy.
@@ -9,9 +9,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Check, CheckCircle2, Share2, Printer, ArrowRight, Home } from "lucide-react";
+import { Check, CheckCircle2, Share2, ArrowRight } from "lucide-react";
 import { MotionReveal } from "@/components/effects/motion-reveal";
-import type { AccentPalette, WizardConfig } from "../report-wizard-config";
+import type { WizardConfig } from "../report-wizard-config";
 
 export function WizardSuccess({
   cfg,
@@ -37,7 +37,7 @@ export function WizardSuccess({
         setActiveAction(null);
         return;
       } catch {
-        // user cancelled — fall through to copy
+        // user cancelled â€” fall through to copy
       }
     }
     try {
@@ -64,22 +64,15 @@ export function WizardSuccess({
         className="pointer-events-none absolute left-1/2 top-4 h-80 w-[40rem] max-w-full -translate-x-1/2 rounded-full bg-emerald-300/20 blur-3xl animate-pulse"
       />
 
-      <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
+      <div className="relative mx-auto max-w-xl px-4 text-center sm:px-6">
         {/* Success icon with animation */}
         <MotionReveal>
-          <div className="relative mx-auto flex h-24 w-24 items-center justify-center">
-            {/* Outer ring animation */}
+          <div className="relative mx-auto flex h-20 w-20 items-center justify-center">
             <span
               aria-hidden="true"
               className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-20"
             />
-            {/* Middle ring */}
-            <span
-              aria-hidden="true"
-              className="absolute inline-flex h-20 w-20 animate-pulse rounded-full bg-emerald-200/30"
-            />
-            {/* Inner icon container */}
-            <span className="relative flex h-16 w-16 items-center justify-center rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 shadow-xl shadow-emerald-200/50 transition-transform duration-500 hover:scale-110">
+            <span className="relative flex h-16 w-16 items-center justify-center rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 shadow-xl shadow-emerald-200/50">
               <CheckCircle2 size={32} className="text-emerald-600" />
             </span>
           </div>
@@ -95,24 +88,50 @@ export function WizardSuccess({
           </h1>
         </MotionReveal>
 
+        {/* The report itself â€” anchors the moment to something concrete */}
+        <MotionReveal delay={150}>
+          <Link
+            href={`${cfg.success.basePath}/${itemId}`}
+            className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:shadow"
+          >
+            <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
+            <span className="truncate">{itemTitle}</span>
+            <span className="shrink-0 text-xs font-semibold text-slate-400">view â†’</span>
+          </Link>
+        </MotionReveal>
+
         {/* Lead text */}
         <MotionReveal delay={200}>
-          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-600 sm:text-base">
             {cfg.success.lead}
           </p>
         </MotionReveal>
 
-        {/* Next steps cards */}
+        {/* Next steps â€” connected timeline */}
         <MotionReveal delay={300}>
-          <ol className="mx-auto mt-10 flex max-w-lg flex-col gap-3 text-left">
+          <ol className="relative mx-auto mt-8 max-w-sm text-left">
+            {/* vertical rail */}
+            <span
+              aria-hidden="true"
+              className="absolute bottom-3 left-[13px] top-3 w-px bg-gradient-to-b from-emerald-300 via-slate-200 to-slate-200"
+            />
             {cfg.success.steps.map(([t, d], i) => (
-              <SuccessStep
-                key={t}
-                index={i + 1}
-                title={t}
-                description={d}
-                accent={cfg.accent}
-              />
+              <li key={t} className="relative flex items-start gap-4 pb-5 last:pb-0">
+                <span
+                  className={[
+                    "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-sm ring-4 ring-white",
+                    i === 0
+                      ? "bg-emerald-500"
+                      : "bg-gradient-to-br " + cfg.accent.stepCircle,
+                  ].join(" ")}
+                >
+                  {i === 0 ? <Check size={13} strokeWidth={3} /> : i + 1}
+                </span>
+                <div className="min-w-0 pt-0.5">
+                  <p className="text-sm font-semibold text-navy-900">{t}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{d}</p>
+                </div>
+              </li>
             ))}
           </ol>
         </MotionReveal>
@@ -141,7 +160,7 @@ export function WizardSuccess({
               ) : activeAction === "share" ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-transparent" />
-                  <span>Sharing…</span>
+                  <span>Sharingâ€¦</span>
                 </>
               ) : (
                 <>
@@ -153,82 +172,47 @@ export function WizardSuccess({
           </div>
         </MotionReveal>
 
-        {/* Secondary actions */}
+        {/* Secondary actions â€” quiet text links, single row */}
         <MotionReveal delay={500}>
-          <div className="mt-3 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-sm text-slate-500">
+            <Link
+              href={`/discover?q=${encodeURIComponent(itemTitle)}&type=${cfg.itemType === "lost_item" ? "found" : "lost"}`}
+              className="rounded-lg px-2 py-1.5 font-medium transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              Browse matches
+            </Link>
+            <span aria-hidden="true" className="text-slate-300">Â·</span>
+            <button
+              type="button"
+              onClick={onReportAnother}
+              className="rounded-lg px-2 py-1.5 font-medium transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              Report another
+            </button>
+            <span aria-hidden="true" className="text-slate-300">Â·</span>
             <button
               type="button"
               onClick={printReport}
               disabled={activeAction === "print"}
-              className="btn-secondary flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98] disabled:opacity-50"
+              className="rounded-lg px-2 py-1.5 font-medium transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
             >
-              <Printer size={16} aria-hidden={true} />
-              <span>Print report</span>
+              Print
             </button>
-            <button
-              type="button"
-              onClick={onReportAnother}
-              className="btn-secondary flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
-            >
-              <span>Report another item</span>
-            </button>
-            <Link
-              href={`/discover?q=${encodeURIComponent(itemTitle)}&type=${cfg.itemType === "lost_item" ? "found" : "lost"}`}
-              className="btn-secondary flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
-            >
-              <span>Browse potential matches</span>
-            </Link>
+            <span aria-hidden="true" className="text-slate-300">Â·</span>
             <Link
               href="/"
-              className="btn-secondary flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
+              className="rounded-lg px-2 py-1.5 font-medium transition hover:bg-slate-100 hover:text-slate-700"
             >
-              <Home size={16} aria-hidden={true} />
-              <span>Return home</span>
+              Home
             </Link>
           </div>
         </MotionReveal>
 
         {/* Tip */}
         <MotionReveal delay={600}>
-          <p className="mt-8 text-xs text-slate-500">{cfg.success.tip}</p>
+          <p className="mx-auto mt-6 max-w-sm text-xs text-slate-400">{cfg.success.tip}</p>
         </MotionReveal>
       </div>
     </div>
-  );
-}
-
-function SuccessStep({
-  index,
-  title,
-  description,
-  accent,
-}: {
-  index: number;
-  title: string;
-  description: string;
-  accent: AccentPalette;
-}) {
-  return (
-    <li
-      className={[
-        "group flex items-start gap-3 rounded-2xl border p-4 backdrop-blur transition-all duration-300",
-        "hover:-translate-y-0.5 hover:shadow-md",
-        accent.hoverBorder,
-        "border-slate-200/70 bg-white/80",
-      ].join(" ")}
-    >
-      <span
-        className={[
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[11px] font-bold text-white shadow-sm transition-transform duration-300 group-hover:scale-110",
-          accent.stepCircle,
-        ].join(" ")}
-      >
-        {index}
-      </span>
-      <div>
-        <p className="text-sm font-semibold text-navy-900">{title}</p>
-        <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{description}</p>
-      </div>
-    </li>
   );
 }
