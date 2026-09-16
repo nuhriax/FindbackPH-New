@@ -22,9 +22,12 @@ export type HeroCard = TickerItem & {
 export function Hero({
   totalActive,
   recent,
+  recoveredCount = 0,
 }: {
   totalActive: number;
   recent: HeroCard[];
+  /** Real reunions platform-wide — gates the "returned" proof stamp. */
+  recoveredCount?: number;
 }) {
   const cards = recent.slice(0, 3);
 
@@ -170,13 +173,18 @@ export function Hero({
                   Possible matches found
                 </div>
 
-                {/* Stamp — recovered proof */}
-                <span
-                  className="stamp-badge absolute -top-3 right-6 rotate-[-8deg] bg-white/80 px-2.5 py-1 text-stamp"
-                  aria-hidden="true"
-                >
-                  NAIBALIK NA!
-                </span>
+                {/* Stamp — only when the platform genuinely has a reunion to
+                    celebrate. Before that, showing it next to an active lost
+                    report implies the wrong thing (a "returned" stamp on a
+                    still-missing item). */}
+                {recoveredCount > 0 && (
+                  <span
+                    className="stamp-badge absolute -top-3 right-6 rotate-[-8deg] bg-white/80 px-2.5 py-1 text-stamp"
+                    aria-hidden="true"
+                  >
+                    RETURNED!
+                  </span>
+                )}
               </>
             ) : (
               /* Day-one fallback: invite instead of empty board */

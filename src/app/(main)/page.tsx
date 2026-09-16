@@ -338,7 +338,7 @@ export default async function HomePage() {
       <LiveReportsRefresh />
 
       {/* 1 — HERO: dual-intent notice-board hero */}
-      <Hero totalActive={totalActive} recent={latestReports.slice(0, 3)} />
+      <Hero totalActive={totalActive} recent={latestReports.slice(0, 3)} recoveredCount={recoveredCount} />
 
       {/* 2 — LIVE REPORTS with filter tabs */}
       <section
