@@ -510,3 +510,24 @@
 @media (prefers-reduced-motion: reduce) {
   .auth-page, .auth-shake { animation: none !important; }
 }
+/* ===========================================================================
+   Cookie-consent banner (dark card) — exempt from the unified light-site font
+   color rule in globals.css (`p { color: #2e2417 }` wins the cascade over
+   Tailwind utilities, which is why the banner text rendered near-black on
+   near-black). Placed here so it loads after globals.css and beats that rule.
+   High-contrast pairings against #1c1e21:
+     title  #ffffff  (~16:1) / body  #d7dce2  (~11:1) / link  #ffd27a  (~12:1)
+   =========================================================================== */
+.cookie-consent-title {
+  color: #ffffff;
+}
+
+.cookie-consent-body,
+.cookie-consent-text {
+  color: #d7dce2;
+}
+
+.cookie-consent-link {
+  color: #ffd27a;
+  text-decoration-thickness: 1.5px;
+}

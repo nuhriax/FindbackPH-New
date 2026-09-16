@@ -41,19 +41,17 @@ export function CookieConsent({ visible }: { visible: boolean }) {
             className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded-full bg-gradient-to-b from-sun-300 to-sun-500 ring-1 ring-white/20"
           />
           <div
-            className="min-w-0 text-[13px] leading-relaxed"
-            style={{ color: "#d7dce2" }}
+            className="cookie-consent-body min-w-0 text-[13px] leading-relaxed"
           >
-            <p className="font-semibold" style={{ color: "#ffffff" }}>
+            <p className="cookie-consent-title font-semibold">
               We use cookies.
             </p>
-            <p className="mt-0.5">
+            <p className="mt-0.5 cookie-consent-text">
               Only the cookies needed to keep FindBackPH working, keep you
               signed in, and protect forms. No trackers, no ad networks.{" "}
               <Link
                 href="/privacy"
-                className="underline underline-offset-2"
-                style={{ color: "#f2b23e" }}
+                className="cookie-consent-link underline underline-offset-2"
               >
                 Privacy Policy
               </Link>
