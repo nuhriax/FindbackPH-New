@@ -121,9 +121,6 @@ export function HeroBoard({
           <div className="mt-4 flex items-start gap-3.5">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">
-                <span className="shrink-0 rounded-sm bg-kraft-200/70 px-1.5 py-0.5 text-[9.5px] font-extrabold text-cork-700">
-                  {newestIsLost ? "Last seen" : "Spotted at"}
-                </span>
                 <span className="inline-flex min-w-0 items-center gap-1">
                   <MapPin size={11} aria-hidden="true" className="shrink-0" />
                   <span className="truncate">{newest.city || "Philippines"}</span>
@@ -248,31 +245,6 @@ export function HeroBoard({
               ) : null}
             </div>
           )}
-
-          {/* Kind-specific call to action — a MISSING poster pleads for
-              sightings; a FOUND poster invites a safe claim. */}
-          <div
-            className={`mt-4 flex items-center gap-2 rounded-lg border-2 border-dashed px-3 py-2 ${
-              newestIsLost
-                ? "border-coral-500/50 bg-coral-50/60 text-coral-700"
-                : "border-ocean-500/50 bg-ocean-50/60 text-ocean-700"
-            }`}
-          >
-            <span className="text-sm" aria-hidden="true">
-              {newestIsLost ? "👁️" : "🤝"}
-            </span>
-            <p className="min-w-0 flex-1 text-[11px] font-bold leading-snug">
-              {newestIsLost
-                ? "Seen this item? Report a sighting — help it get home."
-                : "Think this is yours? Claim it safely — describe its details to verify."}
-            </p>
-            <span
-              aria-hidden="true"
-              className="shrink-0 font-display text-sm font-black"
-            >
-              →
-            </span>
-          </div>
 
           {/* Small print footer — reference number + call to action, like a
               real filed notice */}
