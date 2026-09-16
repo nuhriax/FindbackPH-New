@@ -59,53 +59,83 @@ export function HeroBoard({
   const hasMatch = bestMatch !== null;
 
   return (
-    <div className="relative mx-auto w-full max-w-[24rem]">
-      <div className="mb-3 px-1">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-faint">
-          Community board
+    <div className="relative mx-auto w-full max-w-[26rem]">
+      {recoveredCount > 0 && (
+        <span
+          className="stamp-badge absolute -top-3 right-1 z-30 rotate-[-8deg] bg-white/85 px-3 py-1.5 text-stamp shadow-md"
+          aria-hidden="true"
+        >
+          RETURNED!
+        </span>
+      )}
+
+      {/* The physical board — cork surface, wooden frame. Kraft cards pinned
+          to it pop with real depth instead of floating on the page. */}
+      <div className="cork-board rotate-[0.4deg] p-5 pt-8 sm:p-6 sm:pt-9">
+        {/* Board sign — a small taped-on label, not a UI heading */}
+        <div className="absolute -top-3.5 left-1/2 z-20 -translate-x-1/2">
+          <span className="inline-flex -rotate-1 items-center gap-2 rounded-md border border-cork-700/40 bg-kraft-100 px-4 py-1.5 shadow-md">
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 rounded-full bg-coral-500 shadow-[0_1px_2px_rgba(36,30,23,0.4)]"
+            />
+            <span className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-cork-700">
+              Community Board
+            </span>
+          </span>
+        </div>
+
+        <NoticeSlip card={newest} tilt="-rotate-1" featured />
+
+        {/* Connector — a physical thread with a medallion tying the two
+            notices together: match = emerald seal, otherwise a quiet tag. */}
+        {replyCard && (
+          <div className="relative z-10 -my-0.5 flex flex-col items-center">
+            <span
+              aria-hidden="true"
+              className="h-4 w-0 border-l-2 border-dashed border-kraft-100/70"
+            />
+            <span
+              className={`inline-flex rotate-1 items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] shadow-md ring-1 ${
+                hasMatch
+                  ? "bg-emerald-500 text-white ring-emerald-700/40"
+                  : "bg-kraft-100 text-cork-700 ring-cork-700/30"
+              }`}
+            >
+              {hasMatch ? (
+                <>
+                  <ArrowLeftRight size={11} aria-hidden="true" />
+                  Possible match
+                </>
+              ) : (
+                <>
+                  <Clock size={11} aria-hidden="true" />
+                  Latest reply
+                </>
+              )}
+            </span>
+            <span
+              aria-hidden="true"
+              className="h-4 w-0 border-l-2 border-dashed border-kraft-100/70"
+            />
+          </div>
+        )}
+
+        {replyCard && (
+          <div className="pl-5">
+            <NoticeSlip card={replyCard} tilt="rotate-1" />
+          </div>
+        )}
+
+        {/* Handwritten on the cork — the human touch, bottom of the board */}
+        <p
+          className="notice-annotation mt-5 text-center text-[1.15rem]"
+          style={{ color: "#F0E4C6" }}
+          aria-hidden="true"
+        >
+          every notice here is a neighbor helping ✎
         </p>
       </div>
-
-      <NoticeSlip card={newest} tilt="-rotate-1" featured />
-
-      {/* Reply — docks directly beneath the primary with a short dashed
-          thread between them. The status badge rides ON the reply card's
-          top edge (proximity = relationship; no caption row needed). */}
-      {replyCard && (
-        <div className="relative mt-3 pl-6">
-          <span
-            aria-hidden="true"
-            className="absolute -top-3 left-8 h-6 w-0 border-l-2 border-dashed border-ocean-300/80"
-          />
-          <span
-            className={`absolute -top-3 left-12 z-10 inline-flex -rotate-1 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.1em] shadow-sm ring-1 ${
-              hasMatch
-                ? "bg-emerald-600 text-white ring-emerald-700/30"
-                : "bg-white/95 text-ink-soft ring-ink/10"
-            }`}
-          >
-            {hasMatch ? (
-              <>
-                <ArrowLeftRight size={11} aria-hidden="true" />
-                Possible match
-              </>
-            ) : (
-              <>
-                <Clock size={11} aria-hidden="true" />
-                Latest reply
-              </>
-            )}
-          </span>
-          <NoticeSlip card={replyCard} tilt="rotate-1" />
-        </div>
-      )}
-
-      {recoveredCount > 0 && (
-        <p className="mt-3 inline-flex -rotate-1 items-center gap-1.5 rounded-lg border border-sun-500/30 bg-sun-100/80 px-2.5 py-1 text-[11px] font-bold text-cork-700 shadow-sm">
-          <span aria-hidden="true">✓</span>
-          {recoveredCount} {recoveredCount === 1 ? "reunion" : "reunions"} and counting
-        </p>
-      )}
     </div>
   );
 }
@@ -171,7 +201,12 @@ function NoticeSlip({
         {card.imageUrl ? (
           <figure className="shrink-0 -rotate-2 overflow-hidden rounded-lg border-2 border-white bg-slate-100 shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={card.imageUrl} alt="" loading="lazy" className="h-16 w-16 object-cover" />
+            <img
+              src={card.imageUrl}
+              alt=""
+              loading="lazy"
+              className={`object-cover ${featured ? "h-20 w-20" : "h-16 w-16"}`}
+            />
           </figure>
         ) : null}
       </div>
