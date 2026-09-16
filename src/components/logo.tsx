@@ -9,7 +9,7 @@ export function LogoMark({ className }: { className?: string }) {
   // tile, ring, or background — so the artwork's own shape shows.
   // Slightly larger than the old 36px tile so detail stays legible.
   const [missing, setMissing] = useState(false);
-  const src = missing ? "/brand/findback-logo.svg" : "/brand/original-logo.png";
+  const src = missing ? "/icons/icon-512.png" : "/brand/original-logo.png";
   return (
     <span
       className={clsx(

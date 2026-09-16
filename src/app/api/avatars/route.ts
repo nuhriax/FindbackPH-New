@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getAvatarPublicUrl } from "@/lib/storage";
+import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 
 /**
  * POST /api/avatars
@@ -28,6 +29,12 @@ export async function POST(req: NextRequest) {
       { error: "You must be signed in to upload a photo" },
       { status: 401 }
     );
+  }
+
+  // Abuse prevention: cap avatar replacement bursts per IP (10 / 10 min).
+  const rl = await consumeRateLimit("avatars", 10, 10 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 
   let formData;

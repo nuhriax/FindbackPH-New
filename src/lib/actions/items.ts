@@ -6,6 +6,7 @@ import { PH_LAT_RANGE, PH_LNG_RANGE } from "@/lib/ph-locations";
 import { revalidatePath } from "next/cache";
 import { consumeRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { runMatchingForLostItem, runMatchingForFoundItem } from "@/lib/actions/matching";
+import { verifyTurnstileAction } from "@/lib/actions/turnstile";
 
 export type ActionResult = { error?: string; itemId?: string };
 
@@ -94,6 +95,12 @@ async function reportCooldownMsRemaining(
 }
 
 export async function createLostItemAction(formData: FormData): Promise<ActionResult> {
+  // Bot protection — server-verified Turnstile token (no-op when unconfigured).
+  const turnstile = await verifyTurnstileAction(formData.get("turnstileToken"));
+  if (!turnstile.ok) {
+    return { error: "Please complete the security challenge and try again." };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -190,6 +197,12 @@ export async function createLostItemAction(formData: FormData): Promise<ActionRe
 }
 
 export async function createFoundItemAction(formData: FormData): Promise<ActionResult> {
+  // Bot protection — server-verified Turnstile token (no-op when unconfigured).
+  const turnstile = await verifyTurnstileAction(formData.get("turnstileToken"));
+  if (!turnstile.ok) {
+    return { error: "Please complete the security challenge and try again." };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

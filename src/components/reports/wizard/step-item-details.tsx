@@ -212,7 +212,7 @@ function DescriptionField({
       />
       <div className="mt-2 flex items-center justify-between gap-3">
         <p className="text-xs text-slate-500">
-          Describe the brand, color, size, model, condition, or other visible features.
+          e.g. A black leather wallet with a worn-out corner.
         </p>
         <div className="flex items-center gap-2">
           <div className="h-1.5 w-16 rounded-full bg-slate-200 overflow-hidden">

@@ -29,6 +29,7 @@ import Link from "next/link";
 import { DraftAutoSave } from "./draft-autosave";
 import { track, flushSync } from "@/lib/analytics-client";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
+import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import type { ColorValue } from "@/lib/validation";
 
 import {
@@ -65,6 +66,13 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
   // Set when the server tells us the session expired mid-flow, so we can
   // offer a sign-in link instead of a dead-end error.
   const [authRequired, setAuthRequired] = useState(false);
+  // Turnstile bot protection: the token is captured by the widget and attached
+  // to the FormData at submit time. The server re-verifies it — the client
+  // state alone is never treated as proof. Null until the challenge is solved
+  // (or forever, when Turnstile isn't configured — the widget renders nothing
+  // and the server action no-ops in that case).
+  const turnstileTokenRef = useRef<string | null>(null);
+  const turnstileResetRef = useRef<(() => void) | null>(null);
   // Optional "Pin exact location" coordinate captured on the Where & when
   // step. Kept in state (instead of relying only on the hidden inputs) so the
   // marker and the coordinate readout can render live.
@@ -273,12 +281,22 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
     // Selected photos are uploaded separately through the route handler —
     // Server Actions can't accept File objects (Next.js only serializes
     // JSON-like values), so we never put them into `formData`.
+
+    // Attach the Turnstile token (null when Turnstile isn't configured — the
+    // server side is env-gated and no-ops in that case).
+    if (turnstileTokenRef.current) {
+      formData.set("turnstileToken", turnstileTokenRef.current);
+    }
+
     setError(null);
     startTransition(async () => {
       const result = await cfg.action(formData);
       if (result?.error) {
         setError(result.error);
         if (/signed in/i.test(result.error)) setAuthRequired(true);
+        // A spent Turnstile token cannot be reused — reset for the retry.
+        turnstileTokenRef.current = null;
+        turnstileResetRef.current?.();
         track("report_submit_error", "reports", { kind, stage: "create" });
         return;
       }
@@ -332,6 +350,9 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
     setColor("");
     setRewardChip(null);
     setCoverIndex(0);
+    // Fresh verification for the next report — the old token is spent.
+    turnstileTokenRef.current = null;
+    turnstileResetRef.current?.();
   };
 
   const handleEditStep = (target: ReviewEditStep) => goToStep(target);
@@ -348,8 +369,8 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
   }
 
   return (
-    <div className="report-wizard py-8 lg:py-12">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <div className="report-wizard flex w-full flex-col items-center py-8 lg:py-12">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <WizardHeader
           eyebrowIcon={cfg.eyebrowIcon}
           eyebrowLabel={cfg.eyebrowLabel}
@@ -365,9 +386,9 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
           </Link>
         </p>
 
-        <div className="mx-auto mt-10 grid w-full max-w-6xl gap-8 lg:grid-cols-[13rem,minmax(0,50rem)] lg:items-start lg:justify-center">
-          <aside className="hidden lg:block lg:sticky lg:top-24">
-            <nav aria-label="Report steps" className="rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-sm backdrop-blur">
+        <div className="relative mx-auto mt-10 w-full max-w-6xl">
+          <aside className="hidden lg:block lg:absolute lg:inset-y-0 lg:left-0 lg:w-52 lg:pointer-events-none">
+            <nav aria-label="Report steps" className="lg:pointer-events-auto lg:sticky lg:top-24 rounded-2xl border border-slate-200/80 bg-white/80 p-3 shadow-sm backdrop-blur">
               <p className="px-2 pb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Your report</p>
               <ol className="space-y-1">
                 {cfg.captions.map((caption, index) => {
@@ -385,8 +406,8 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
               <p className="mt-3 border-t border-slate-100 px-2 pt-3 text-xs leading-5 text-slate-500">Your progress saves automatically on this device.</p>
             </nav>
           </aside>
-          {/* Main form column */}
-          <div className="min-w-0">
+          {/* Main form column — centered */}
+          <div className="mx-auto w-full min-w-0 max-w-2xl">
           {/* Mobile step indicator */}
           <div className="lg:hidden">
               <MobileStepIndicator
@@ -418,7 +439,7 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
                 e.preventDefault();
               }
             }}
-            className="space-y-6"
+            className="mx-auto w-full space-y-6"
           >
             <DraftAutoSave
               formId={cfg.formId}
@@ -468,6 +489,42 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
               imageCount={images.length}
               onEditStep={handleEditStep}
             />
+
+            {/* Human verification — only mounted on the Review step so the
+                challenge loads when it's actually needed, never earlier.
+                Renders nothing when Turnstile isn't configured. */}
+            {step === TOTAL_STEPS && (
+              <section
+                aria-labelledby="wizard-verify-heading"
+                className="rounded-2xl border border-slate-200/80 bg-white/70 p-5"
+              >
+                <h2
+                  id="wizard-verify-heading"
+                  className="font-display text-sm font-semibold text-navy-900"
+                >
+                  Are you human?
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Complete this quick verification to continue.
+                </p>
+                <div className="mt-3">
+                  <TurnstileWidget
+                    onVerify={(token) => {
+                      turnstileTokenRef.current = token;
+                    }}
+                    onError={() => {
+                      turnstileTokenRef.current = null;
+                    }}
+                    onExpire={() => {
+                      turnstileTokenRef.current = null;
+                    }}
+                    resetRef={(reset) => {
+                      turnstileResetRef.current = reset;
+                    }}
+                  />
+                </div>
+              </section>
+            )}
 
             {error && (
               <WizardError

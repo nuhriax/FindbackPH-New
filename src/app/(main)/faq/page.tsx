@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { FaqExplorer, type Faq } from "@/components/faq/faq-explorer";
+import { jsonLdStringify } from "@/lib/utils";
+
 
 export const metadata: Metadata = {
   title: "FAQ - Lost & Found Questions Answered",
@@ -68,7 +70,7 @@ export default function FAQPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdStringify(faqJsonLd) }}
       />
       <FaqExplorer faqs={faqs} />
     </>

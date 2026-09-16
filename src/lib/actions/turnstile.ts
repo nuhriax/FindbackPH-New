@@ -39,13 +39,15 @@ export async function verifyTurnstileAction(
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ secret, response: value }),
+      // 5s ceiling — never let a hung Cloudflare stall the action.
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {
       console.error("Turnstile verify HTTP error:", res.status);
-      // Network/verification failure: fail open to avoid locking out real users
-      // when Cloudflare is unreachable, but log for investigation.
-      return { ok: true };
+      // Fail CLOSED: an unverifiable token must not grant access to
+      // report/contact submission. (F-011 remediation.)
+      return { ok: false, error: "verification_unavailable" };
     }
 
     const data = (await res.json()) as { success: boolean; "error-codes"?: string[] };
@@ -56,7 +58,10 @@ export async function verifyTurnstileAction(
     return { ok: false, error: "verification_failed" };
   } catch (e) {
     console.error("Turnstile verify exception:", e);
-    return { ok: true };
+    // Fail CLOSED (F-011): network errors/timeouts must not bypass the
+    // challenge. Cloudflare outages will block submissions until restored —
+    // acceptable for a spam-control control surface.
+    return { ok: false, error: "verification_unavailable" };
   }
 }
 

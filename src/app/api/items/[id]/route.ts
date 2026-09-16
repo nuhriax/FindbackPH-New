@@ -52,7 +52,7 @@ async function loadItem(supabase: Awaited<ReturnType<typeof createClient>>, id: 
   return supabase
     .from(table)
     .select(
-      `*, profiles!${fk}(id, username, first_name, last_name, avatar_url)`
+      `id, reporter_id, title, description, category, status, city, province, approximate_location, current_holding_info, reward_amount, date_found, date_lost, created_at, profiles!${fk}(id, username, first_name, last_name, avatar_url)`
     )
     .eq("id", id)
     .maybeSingle();

@@ -1,8 +1,10 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { SiteChrome } from "@/components/site-chrome";
 import { NavbarShell } from "@/components/navbar/navbar-shell";
 import { NavbarFallback } from "@/components/navbar/navbar-fallback";
 import { IncomingCallManager } from "@/components/messaging/incoming-call-manager";
+import { CookieConsent } from "@/components/cookie-consent";
 
 /**
  * Layout for every `(main)` route (the whole public site plus dashboards).
@@ -13,7 +15,17 @@ import { IncomingCallManager } from "@/components/messaging/incoming-call-manage
  * their full-screen experience — while `/login` and `/register` live under the
  * separate `(auth)` route group below and never touch this layout at all.
  */
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default async function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Cookie consent is decided server-side so the banner never flashes or
+  // mismatches during hydration. Read-only — consent itself is a first-party
+  // cookie set by the client on Accept.
+  const consented =
+    (await cookies()).get("fb_cookie_consent")?.value === "accepted";
+
   return (
     <SiteChrome
       navbar={
@@ -32,6 +44,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </main>
       {/* Global incoming voice/video call listener — rings anywhere in the app */}
       <IncomingCallManager />
+      {!consented && <CookieConsent visible />}
       </SiteChrome>
   );
 }

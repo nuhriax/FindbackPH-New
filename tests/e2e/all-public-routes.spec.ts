@@ -10,7 +10,6 @@ test.describe("Public Routes - Core", () => {
     { path: "/discover", title: /Discover/ },
     { path: "/lost", title: /Lost/ },
     { path: "/found", title: /Found/ },
-    { path: "/discover", title: /Discover/ },
     { path: "/about", title: /About/ },
     { path: "/safety", title: /Safety/ },
     { path: "/how-it-works", title: /How/ },

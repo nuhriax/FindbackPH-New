@@ -5,6 +5,7 @@ import "./auth.css";
 import { MarketingBackground } from "@/components/ui/marketing-background";
 import { ToastProvider } from "@/components/ui/toast";
 import { PwaRegister } from "@/components/pwa/pwa-register";
+import { jsonLdStringify } from "@/lib/utils";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -115,7 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
+        __html: jsonLdStringify({
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "FindBack PH",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -13,6 +13,7 @@ import {
 
 import { submitContactAction } from "@/lib/actions/contact";
 import { MotionReveal } from "@/components/effects/motion-reveal";
+import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import Link from "next/link";
 
 const quickLinks = [
@@ -27,6 +28,11 @@ export default function ContactPage() {
   const [isPending, startTransition] = useTransition();
   const [msgLen, setMsgLen] = useState(0);
   const [copied, setCopied] = useState(false);
+  // Turnstile bot protection: token captured by the widget, attached to the
+  // FormData at submit time, and re-verified server-side in submitContactAction
+  // (which no-ops when Turnstile isn't configured). Never trusted client-side.
+  const turnstileTokenRef = useRef<string | null>(null);
+  const turnstileResetRef = useRef<(() => void) | null>(null);
 
   const supportEmail = "Findbackph.support@gmail.com";
   const composeHref = `mailto:${supportEmail}?subject=${encodeURIComponent(
@@ -46,12 +52,19 @@ export default function ContactPage() {
   function handleSubmit(formData: FormData) {
     setError(null);
 
+    if (turnstileTokenRef.current) {
+      formData.set("turnstileToken", turnstileTokenRef.current);
+    }
+
     startTransition(async () => {
       try {
         const result = await submitContactAction(formData);
 
         if (result?.error) {
           setError(result.error);
+          // A spent Turnstile token cannot be reused — reset for the retry.
+          turnstileTokenRef.current = null;
+          turnstileResetRef.current?.();
           return;
         }
 
@@ -271,6 +284,35 @@ export default function ContactPage() {
                           {error}
                         </div>
                       )}
+
+                      {/* Human verification — renders nothing when Turnstile
+                          isn't configured (local dev / pre-launch). */}
+                      <div
+                        role="group"
+                        aria-label="Security verification"
+                        className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4"
+                      >
+                        <p className="mb-2 text-sm font-semibold text-navy-900">
+                          Are you human?
+                        </p>
+                        <p className="mb-3 text-xs text-slate-500">
+                          Complete this quick verification to continue.
+                        </p>
+                        <TurnstileWidget
+                          onVerify={(token) => {
+                            turnstileTokenRef.current = token;
+                          }}
+                          onError={() => {
+                            turnstileTokenRef.current = null;
+                          }}
+                          onExpire={() => {
+                            turnstileTokenRef.current = null;
+                          }}
+                          resetRef={(reset) => {
+                            turnstileResetRef.current = reset;
+                          }}
+                        />
+                      </div>
 
                       <div className="flex flex-col gap-4 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                         <p className="max-w-sm text-xs leading-5 text-slate-500">

@@ -91,7 +91,7 @@ export function ShareButton({ title }: { title: string }) {
         onClick={handleNativeShare}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white/75 px-4 text-sm font-medium text-navy-900 shadow-sm transition-colors hover:border-blue-300 hover:bg-blue-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-400 focus-visible:ring-offset-2 active:translate-y-px"
+        className="button button-primary"
       >
         <Share2 size={16} aria-hidden="true" />
         Share

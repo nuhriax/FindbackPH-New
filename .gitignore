@@ -120,3 +120,5 @@ shot-nav-responsive.js
 # Keep shots/ folder but ignore any new root pngs
 /*.png
 
+
+supabase/.temp/

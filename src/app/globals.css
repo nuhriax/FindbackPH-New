@@ -910,17 +910,27 @@ p {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Footer ink — warmed toward the sand page color, with a soft "dawn" fade
-     at the top so the dark band emerges from the page instead of cutting off. */
+  /* Footer — theme-adaptive. Light mode: soft ice/sand gradient with dark
+     text (matches the page above). Dark mode (site-ink): the SAME ocean-deep
+     canvas + ambient washes as the dark body, so the band blends seamlessly.
+     All footer text/chips use the variables below so both themes just work. */
   .footer-ink {
     position: relative;
-    background-color: #0e3330;
+    --footer-heading: #241E17;
+    --footer-body: #5d5344;
+    --footer-faint: #8B7D68;
+    --footer-line: rgba(36, 30, 23, 0.12);
+    --footer-chip-border: rgba(18, 58, 99, 0.22);
+    --footer-chip-bg: rgba(238, 243, 249, 0.75);
+    --footer-chip-text: #0F3155;
+    --footer-accent: #0F3155;
+    background-color: #FBF6EF;
     background-image:
-      radial-gradient(900px 420px at 50% -8%, rgba(245, 214, 175, 0.10), transparent 62%),
-      radial-gradient(900px 500px at 12% -10%, rgba(126, 159, 198, 0.12), transparent 60%),
-      radial-gradient(800px 480px at 92% 8%, rgba(255, 138, 76, 0.09), transparent 55%),
-      radial-gradient(700px 420px at 50% 115%, rgba(126, 159, 198, 0.08), transparent 60%);
-    color: #f4f7f6;
+      radial-gradient(900px 420px at 50% -8%, rgba(255, 255, 255, 0.9), transparent 62%),
+      radial-gradient(900px 500px at 12% -10%, rgba(216, 228, 241, 0.5), transparent 60%),
+      radial-gradient(800px 480px at 92% 8%, rgba(248, 227, 188, 0.4), transparent 55%),
+      linear-gradient(180deg, #FDFBF7 0%, #F4EFE4 100%);
+    color: var(--footer-body);
   }
 
   .footer-ink::before {
@@ -928,8 +938,55 @@ p {
     position: absolute;
     inset: 0 0 auto 0;
     height: 140px;
-    background: linear-gradient(180deg, rgba(247, 240, 227, 0.16), transparent);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), transparent);
     pointer-events: none;
+  }
+
+  .site-ink .footer-ink {
+    --footer-heading: #F2F7FC;
+    --footer-body: rgba(234, 241, 249, 0.88);
+    --footer-faint: rgba(203, 218, 236, 0.68);
+    --footer-line: rgba(255, 255, 255, 0.12);
+    --footer-chip-border: rgba(255, 255, 255, 0.15);
+    --footer-chip-bg: rgba(255, 255, 255, 0.05);
+    --footer-chip-text: rgba(234, 241, 249, 0.75);
+    --footer-accent: #7fd7c9;
+    background-color: #0B2647;
+    background-image:
+      radial-gradient(1100px 700px at 50% -6%, rgba(239, 164, 48, 0.10), transparent 62%),
+      radial-gradient(950px 640px at 4% 4%, rgba(62, 110, 158, 0.22), transparent 58%),
+      radial-gradient(900px 620px at 96% 8%, rgba(239, 164, 48, 0.07), transparent 55%),
+      radial-gradient(1000px 760px at 50% 112%, rgba(126, 159, 198, 0.10), transparent 60%);
+    color: var(--footer-body);
+  }
+
+  .site-ink .footer-ink::before {
+    background: linear-gradient(180deg, rgba(126, 159, 198, 0.14), transparent);
+  }
+
+  /* Footer component pieces — driven by the variables above. */
+  .footer-title {
+    color: var(--footer-faint);
+  }
+  .footer-link {
+    color: var(--footer-body);
+    transition: color 0.2s ease;
+  }
+  .footer-link:hover {
+    color: var(--footer-heading);
+  }
+  .footer-dot {
+    background: var(--footer-accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .footer-link-group:hover .footer-dot {
+    opacity: 1;
+  }
+  .footer-chip {
+    border: 1px solid var(--footer-chip-border);
+    background: var(--footer-chip-bg);
+    color: var(--footer-chip-text);
   }
 
 /* ===========================================================================
@@ -1003,6 +1060,55 @@ p {
 .site-ink :is(.text-blue-600, .text-blue-700, .text-blue-500) { color: #93c5fd; }
 .site-ink :is(.text-violet-600, .text-violet-700, .text-purple-600, .text-purple-700) { color: #c4b5fd; }
 .site-ink :is(.text-leaf-600, .text-leaf-700) { color: #7fdcae; }
+/* ocean/teal resolve to dark navy (#123A63 family) — unreadable as text on dark */
+.site-ink :is(.text-ocean-500, .text-teal-500, .text-ocean-600, .text-teal-600,
+  .text-ocean-700, .text-teal-700, .text-teal-800, .text-harbor-500, .text-harbor-600) { color: #9FC4EA; }
+/* warm accents: cork annotation text, stamp red */
+.site-ink :is(.text-cork-700, .text-cork-900) { color: #D9BC97; }
+.site-ink :is(.text-sulo-600, .text-sulo-700, .text-sulo-800, .text-sulo-900) { color: #F2CE8B; }
+.site-ink .text-stamp { color: #F3A099; }
+
+/* --- Gradient display text (bg-clip-text): dark gradient stops → light ones --- */
+/* discover hero: keep the mint→gold intent of the original stops */
+.site-ink .from-teal-600.via-sulo-500.bg-clip-text {
+  background-image: linear-gradient(90deg, #7FD7C9 0%, #EFB45E 55%, #F2CE8B 100%) !important;
+}
+/* cool/dark starting stops → light sky gradient */
+.site-ink :is(.from-teal-600, .from-leaf-600, .from-ocean-600, .from-ocean-500,
+  .from-electric-500, .from-electric-600, .from-blue-600, .from-blue-500,
+  .from-indigo-500, .from-harbor-600).bg-clip-text {
+  background-image: linear-gradient(90deg, #9FC4EA 0%, #C3D9F0 100%) !important;
+}
+/* warm starting stops → light coral gradient */
+.site-ink :is(.from-sunrise-600, .from-sunrise-500, .from-coral-500, .from-coral-600).bg-clip-text {
+  background-image: linear-gradient(90deg, #FFB3A7 0%, #FFD1C2 100%) !important;
+}
+/* green starting stops → light mint gradient */
+.site-ink :is(.from-emerald-500, .from-emerald-600, .from-leaf-500).bg-clip-text {
+  background-image: linear-gradient(90deg, #7FDCAE 0%, #A7F3D0 100%) !important;
+}
+
+/* --- Gradient pastel stops: light gradient backgrounds → dark ink panels --- */
+/* faq CTA band + pastel gradient surfaces: replace light gradient entirely */
+.site-ink [class*="bg-gradient-to-"]:is(.from-electric-50, .from-emerald-50, .from-sunrise-50,
+  .from-blue-50, .from-blue-100, .from-blue-200, .from-lavender-50, .from-slate-200):not(.bg-clip-text) {
+  background-image: linear-gradient(135deg, rgba(126, 159, 198, 0.16), rgba(126, 159, 198, 0.06)) !important;
+}
+.site-ink :is(.from-slate-50, .from-slate-100, .from-white, .from-cream-50, .from-cream-100, .from-ice-50,
+  .from-electric-50, .from-electric-50\/60, .from-emerald-50, .from-sunrise-50):not(.bg-clip-text) {
+  --tw-gradient-from: rgba(11, 38, 71, 0.92) var(--tw-gradient-from-pos);
+}
+.site-ink :is(.to-slate-50, .to-slate-100, .to-white, .to-white\/70, .to-cream-50, .to-cream-100, .to-ice-50,
+  .to-electric-50, .to-electric-50\/50, .to-emerald-50, .to-emerald-100, .to-sunrise-50):not(.bg-clip-text) {
+  --tw-gradient-to: rgba(11, 38, 71, 0.92) var(--tw-gradient-to-pos);
+}
+.site-ink :is(.via-white, .via-ice-50, .via-slate-100, .via-indigo-200):not(.bg-clip-text) {
+  --tw-gradient-via: rgba(11, 38, 71, 0.92) var(--tw-gradient-via-pos);
+  --tw-gradient-to: rgba(11, 38, 71, 0.92) var(--tw-gradient-to-pos);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via) var(--tw-gradient-via-pos), var(--tw-gradient-to);
+}
+.site-ink .bg-electric-100 { background-color: rgba(126, 159, 198, 0.18); }
+
 
 /* --- Surfaces: white + slate + cream → dark ink panels (opaque for crisp text) --- */
 .site-ink :is(.bg-white, .bg-white\/80, .bg-white\/85, .bg-white\/90, .bg-white\/95,
@@ -1421,6 +1527,65 @@ p {
   background-color: rgba(126, 159, 198, 0.1);
 }
 
+/* ====================================================================== */
+/* DARK MODE SWEEP — variant-proof overrides                              */
+/* Tailwind prefixes (lg:, md:, sm:, hover:, group-hover:) and arbitrary  */
+/* fractions (/60, /[0.04]) escape single-class selectors, so match them  */
+/* with attribute selectors. Order: after all other site-ink rules.       */
+/* ====================================================================== */
+
+/* 1) Any white surface, any prefix/variant (lg:bg-white/60, hover:bg-white/[0.08], bg-white/50 …) */
+.site-ink [class*="bg-white/"]:not([class*="hover:"]):not([class*="group-hover:"]):not([class*="focus"]):not([class*="disabled"]):not(.bg-clip-text) {
+  background-color: rgba(11, 38, 71, 0.985);
+}
+
+/* 2) Navy-50/100 surfaces with any prefix — but never on hover-only classes */
+.site-ink [class*="bg-navy-50"]:not([class*="hover:"]):not([class*="group-hover:"]):not([class*="focus"]) {
+  background-color: rgba(11, 38, 71, 0.92);
+}
+
+/* 3) Blue-50 unread tints (bg-blue-50/60 etc.) */
+.site-ink [class*="bg-blue-50/"]:not([class*="hover:"]):not([class*="focus"]) {
+  background-color: rgba(126, 159, 198, 0.12);
+}
+
+/* 4) Light pastel hover fills → translucent ink tints (keeps affordance, no light flash) */
+.site-ink [class*="hover:bg-navy-50"]:hover,
+.site-ink [class*="hover:bg-navy-100"]:hover,
+.site-ink [class*="hover:bg-slate-50"]:hover,
+.site-ink [class*="hover:bg-slate-100"]:hover,
+.site-ink [class*="hover:bg-slate-200"]:hover,
+.site-ink [class*="hover:bg-electric-50"]:hover,
+.site-ink [class*="hover:bg-electric-100"]:hover,
+.site-ink [class*="hover:bg-cream"]:hover,
+.site-ink [class*="hover:bg-ice"]:hover,
+.site-ink [class*="hover:bg-blue-50"]:hover,
+.site-ink [class*="hover:bg-white/"]:hover,
+.site-ink [class*="group-hover:bg-navy"]:hover,
+.site-ink [class*="group-hover:bg-white/"] {
+  background-color: rgba(126, 159, 198, 0.14);
+}
+
+/* 5) Hover accent fills that assume a light page (hover:bg-electric-600 etc. keep hue — skip) */
+
+/* 6) focus-visible rings on light: keep — rings are accents, no change needed */
+
+/* 4b) group-hover accent fills — trigger is parent hover, so restyle unconditionally */
+.site-ink [class*="group-hover:bg-electric-50"],
+.site-ink [class*="group-hover:bg-electric-100"] {
+  background-color: rgba(126, 159, 198, 0.22);
+}
+.site-ink [class*="group-hover:bg-slate-50"],
+.site-ink [class*="group-hover:bg-slate-100"],
+.site-ink [class*="group-hover:bg-navy-50"],
+.site-ink [class*="group-hover:bg-navy-100"] {
+  background-color: rgba(126, 159, 198, 0.14);
+}
+
+/* ====================================================================== */
+/* end DARK MODE SWEEP                                                    */
+/* ====================================================================== */
+
 /* Admin tables stay scrollable inside their card at narrow widths — the
    edge fade hints at more columns without a page-level overflow. */
 .admin-table-scroll {
@@ -1445,4 +1610,94 @@ p {
 }
 @media (prefers-reduced-motion: reduce) {
   .notice-card, .notice-card:hover { transition: none; transform: none; }
+
+/* 4c) hover states on light backgrounds — hover:bg-* with light fills must not
+   stay light, otherwise remapped light text becomes invisible on hover */
+.site-ink .btn-ghost:hover {
+  background-color: rgba(126, 159, 198, 0.14);
+  color: #C3D9F0;
+}
+.site-ink [class*="hover:bg-ocean-50"], .site-ink [class*="hover:bg-ocean-100"],
+.site-ink [class*="hover:bg-electric-50"], .site-ink [class*="hover:bg-electric-100"],
+.site-ink [class*="hover:bg-slate-50"], .site-ink [class*="hover:bg-slate-100"],
+.site-ink [class*="hover:bg-navy-50"], .site-ink [class*="hover:bg-navy-100"],
+.site-ink [class*="hover:bg-cream-50"], .site-ink [class*="hover:bg-cream-100"],
+.site-ink [class*="hover:bg-ice-50"], .site-ink [class*="hover:bg-ice-100"],
+.site-ink [class*="hover:bg-white"] {
+  background-color: rgba(126, 159, 198, 0.14) !important;
+}
+/* colored hover washes: keep the hue, drop the lightness */
+.site-ink [class*="hover:bg-red-50"], .site-ink [class*="hover:bg-rose-50"] {
+  background-color: rgba(255, 138, 138, 0.12) !important;
+}
+.site-ink [class*="hover:bg-emerald-50"], .site-ink [class*="hover:bg-leaf-50"],
+.site-ink [class*="hover:bg-green-50"] {
+  background-color: rgba(126, 220, 174, 0.12) !important;
+}
+.site-ink [class*="hover:bg-amber-50"], .site-ink [class*="hover:bg-yellow-50"],
+.site-ink [class*="hover:bg-orange-50"] {
+  background-color: rgba(242, 206, 139, 0.12) !important;
+}
+.site-ink [class*="hover:bg-sun-"], .site-ink [class*="hover:bg-coral-50"] {
+
+.site-ink :is(.bg-electric-100, .bg-navy-100, .bg-slate-200, .bg-ocean-100) { background-color: rgba(126, 159, 198, 0.20); }
+
+/* 4d) light gradient stops — from/via/to with pastel 50/100 stops stay light
+   while text on top is remapped white; darken the gradient itself */
+.site-ink [class*="from-electric-50"], .site-ink [class*="from-electric-100"],
+.site-ink [class*="from-ocean-50"], .site-ink [class*="from-ocean-100"],
+.site-ink [class*="from-slate-50"], .site-ink [class*="from-slate-100"],
+.site-ink [class*="from-navy-50"], .site-ink [class*="from-navy-100"],
+.site-ink [class*="from-cream-50"], .site-ink [class*="from-cream-100"],
+.site-ink [class*="from-ice-50"], .site-ink [class*="from-ice-100"],
+.site-ink [class*="from-white"] {
+  --tw-gradient-from: rgba(126, 159, 198, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.site-ink [class*="via-electric-50"], .site-ink [class*="via-slate-50"],
+.site-ink [class*="via-navy-50"], .site-ink [class*="via-white"] {
+  --tw-gradient-via: rgba(126, 159, 198, 0.10) var(--tw-gradient-via-position);
+}
+.site-ink [class*="to-electric-50"], .site-ink [class*="to-electric-100"],
+.site-ink [class*="to-ocean-50"], .site-ink [class*="to-slate-50"],
+.site-ink [class*="to-slate-100"], .site-ink [class*="to-navy-50"],
+.site-ink [class*="to-navy-100"], .site-ink [class*="to-cream-50"],
+.site-ink [class*="to-cream-100"], .site-ink [class*="to-ice-50"],
+.site-ink [class*="to-white"] {
+  --tw-gradient-to: rgba(126, 159, 198, 0.05) var(--tw-gradient-to-position);
+}
+/* warm pastel gradient stops */
+.site-ink [class*="from-amber-50"], .site-ink [class*="from-orange-50"],
+.site-ink [class*="from-sun-50"], .site-ink [class*="from-coral-50"],
+.site-ink [class*="from-sunrise-50"] {
+  --tw-gradient-from: rgba(242, 206, 139, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.site-ink [class*="to-amber-50"], .site-ink [class*="to-orange-50"],
+.site-ink [class*="to-sun-50"], .site-ink [class*="to-coral-50"],
+.site-ink [class*="to-sunrise-50"] {
+  --tw-gradient-to: rgba(242, 206, 139, 0.05) var(--tw-gradient-to-position);
+}
+/* green pastel gradient stops */
+.site-ink [class*="from-emerald-50"], .site-ink [class*="from-leaf-50"],
+.site-ink [class*="from-green-50"] {
+  --tw-gradient-from: rgba(126, 220, 174, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.site-ink [class*="to-emerald-50"], .site-ink [class*="to-leaf-50"],
+.site-ink [class*="to-green-50"] {
+  --tw-gradient-to: rgba(126, 220, 174, 0.05) var(--tw-gradient-to-position);
+}
+/* rose pastel gradient stops */
+.site-ink [class*="from-rose-50"], .site-ink [class*="from-red-50"] {
+  --tw-gradient-from: rgba(255, 138, 138, 0.12) var(--tw-gradient-from-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.site-ink [class*="to-rose-50"], .site-ink [class*="to-red-50"] {
+  --tw-gradient-to: rgba(255, 138, 138, 0.05) var(--tw-gradient-to-position);
+}
+
+  background-color: rgba(242, 206, 139, 0.12) !important;
+}
+
 }

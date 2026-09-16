@@ -9,7 +9,7 @@
  * Bump CACHE_VERSION whenever the offline shell or fallback changes.
  */
 
-const CACHE_VERSION = "findback-ph-v1";
+const CACHE_VERSION = "findback-ph-v2";
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {

@@ -2,38 +2,20 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowRight,
-  BadgeCheck,
-  Briefcase,
-  FileText,
-  GraduationCap,
-  HeartHandshake,
-  type LucideIcon,
-  KeyRound,
-  Laptop,
-  Lock,
   MapPin,
-  Package,
   PackageSearch,
-  PawPrint,
-  Search,
-  Shirt,
+  HeartHandshake,
   ShieldCheck,
-  Smartphone,
-  WalletCards,
-  Watch,
+  UsersRound,
+  type LucideIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 
-import { Reveal } from "@/components/reveal";
-import { SplitText } from "@/components/effects/split-text";
-import { MotionReveal } from "@/components/effects/motion-reveal";
-import { Aurora } from "@/components/effects/aurora";
-import { CommunityMotif } from "@/components/ui/community-motif";
 import { LiveReportsRefresh } from "@/components/home/live-reports-refresh";
-import { PaperNotes } from "@/components/ui/paper-notes";
-import { ItemCard } from "@/components/item-card";
+import { Hero, type HeroCard } from "@/components/home/hero";
+import { FeedTabs, type FeedCard } from "@/components/home/feed-tabs";
+import { StickyActionBar } from "@/components/home/sticky-action-bar";
 import { ButtonLink } from "@/components/ui/button";
-import { AnimatedNumber } from "@/components/home/animated-number";
 import { createClient } from "@/lib/supabase/server";
 import { getImagePublicUrl, getSignedImageUrls } from "@/lib/storage";
 import type {
@@ -64,22 +46,8 @@ export const metadata: Metadata = {
    TYPES
    ============================================================================ */
 
-type RecentCard = {
-  id: string;
-  href: string;
-  title: string;
-  category: ItemCategory;
-  city: string;
-  province: string;
-  description: string;
-  dateLabel: string;
-  createdAt: string | null;
-  kind: "lost" | "found";
-  imageUrl?: string | null;
-  views?: number | null;
-  /** Lost items only — offered reward, shown as a chip on the card. */
-  reward?: number | null;
-};
+type RecentCard = FeedCard &
+  HeroCard & { createdAt: string | null };
 
 type LostRow = Pick<
   LostItem,
@@ -191,44 +159,6 @@ function buildRecentCards(
     })
     .slice(0, 6);
 }
-
-/* ============================================================================
-   CATEGORIES
-   ============================================================================ */
-
-/**
- * Full browse grid — ALL categories the platform supports, using the exact
- * values `searchParamsSchema` validates against (`src/lib/validation.ts`).
- * The old "popular" chip list linked to invalid singular values
- * (`phone`, `wallet`, `jewelry`) that the search schema rejected, so those
- * filters silently did nothing. Every tile here filters correctly.
- */
-const categories: { label: string; value: string; icon: LucideIcon }[] = [
-  { label: "Phones & Tablets", value: "phones", icon: Smartphone },
-  { label: "Wallets", value: "wallets", icon: WalletCards },
-  { label: "IDs", value: "ids", icon: BadgeCheck },
-  { label: "Bags", value: "bags", icon: Briefcase },
-  { label: "Keys", value: "keys", icon: KeyRound },
-  { label: "Jewelry & Watches", value: "jewelry", icon: Watch },
-  { label: "Electronics", value: "electronics", icon: Laptop },
-  { label: "Documents", value: "documents", icon: FileText },
-  { label: "Clothing", value: "clothing", icon: Shirt },
-  { label: "Pets", value: "pets", icon: PawPrint },
-  { label: "School Items", value: "school_items", icon: GraduationCap },
-  { label: "Other", value: "other", icon: Package },
-];
-
-/** Popular Philippine search destinations, linked to the search page. */
-const POPULAR_CITIES = [
-  "Quezon City",
-  "Manila",
-  "Cebu City",
-  "Makati",
-  "Davao City",
-  "Taguig",
-  "Pasig",
-  "Mandaluyong",
-];
 
 /* ============================================================================
    HOMEPAGE
@@ -401,319 +331,157 @@ export default async function HomePage() {
     foundImageMap
   );
 
+  const totalActive = lostCount + foundCount;
+
   return (
-    <main className="relative min-h-screen">
+    <main className="relative min-h-screen overflow-hidden">
       <LiveReportsRefresh />
 
-      {/* HERO */}
-      <section className="relative px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-12">
-        <div className="mx-auto max-w-4xl">
-          <div className="text-center">
-            <h1 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl lg:text-5xl">
-              Lost something? Found something?
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-base text-slate-600 sm:text-lg">
-              From phones and wallets to IDs, bags, pets, and documents — search
-              community reports or post your own. Free, private, and built for
-              the Philippines.
-            </p>
-          </div>
+      {/* 1 — HERO: dual-intent notice-board hero */}
+      <Hero totalActive={totalActive} recent={latestReports.slice(0, 3)} />
 
-          <div className="mx-auto mt-8 max-w-2xl">
-            <form action="/discover" method="GET" role="search" className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center">
-              <div className="flex min-h-[48px] flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3">
-                <Search size={18} className="shrink-0 text-slate-400" />
-                <input name="q" type="search" maxLength={120} placeholder="e.g. iPhone, wallet, keys, school ID" aria-label="Search reports" className="w-full bg-transparent text-sm text-navy-900 outline-none placeholder:text-slate-500" />
-              </div>
-              <button type="submit" className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-lg bg-electric-500 px-6 text-sm font-semibold text-white transition hover:bg-electric-600">
-                <Search size={16} />
-                Search
-              </button>
-            </form>
-            <p className="mt-3 text-center text-xs text-slate-500">Search by item name, category, or location</p>
-          </div>
-
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/report/lost" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-b from-sun-400 to-sun-500 px-6 py-3 text-sm font-semibold text-ink shadow-[0_10px_30px_-10px_rgba(201,127,30,0.55)] transition hover:-translate-y-px hover:from-sun-300 hover:to-sun-400 sm:w-auto">
-              <PackageSearch size={16} />
-              I lost something
-            </Link>
-            <Link href="/report/found" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-ocean-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(11,38,71,0.55)] transition hover:-translate-y-px hover:bg-ocean-400 sm:w-auto">
-              <HeartHandshake size={16} />
-              I found something
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* TRUST STRIP — privacy + free + safe, critical for lost & found conversion */}
-      <section className="mx-auto max-w-5xl px-4 pb-10 sm:px-6">
-        <div className="grid gap-3 rounded-2xl border border-slate-200/70 bg-white/70 p-3 shadow-sm backdrop-blur-sm sm:grid-cols-3 sm:p-4">
-          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-4 py-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-electric-50 text-electric-600 ring-1 ring-inset ring-electric-200/60">
-              <Lock size={14} />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-navy-900">Private by default</p>
-              <p className="text-[11px] leading-tight text-slate-500">Contact hidden until you choose to share</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-4 py-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-200/60">
-              <BadgeCheck size={14} />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-navy-900">Free forever</p>
-              <p className="text-[11px] leading-tight text-slate-500">No fees, community-powered for PH</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-4 py-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200/60">
-              <ShieldCheck size={14} />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-navy-900">Safe handover</p>
-              <p className="text-[11px] leading-tight text-slate-500">Meet at mall, barangay hall, café</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BROWSE BY CATEGORY — full 12-category grid, all filters valid */}
-      <section aria-labelledby="browse-categories" className="px-4 pb-12 sm:px-6">
-        <div className="mx-auto max-w-5xl">
-          <p id="browse-categories" className="mb-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500">
-            Browse by category
-          </p>
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Link
-                  key={category.value}
-                  href={`/discover?category=${encodeURIComponent(category.value)}`}
-                  className="group flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-electric-300 hover:shadow-md"
-                >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500 transition group-hover:border-electric-200 group-hover:bg-electric-50 group-hover:text-electric-600">
-                    <Icon size={18} aria-hidden="true" />
-                  </span>
-                  <span className="text-xs font-semibold leading-tight text-navy-900">
-                    {category.label}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="border-y border-slate-200/70 bg-slate-50/50 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid gap-px overflow-hidden rounded-xl border border-slate-200/70 bg-slate-200/50 sm:grid-cols-3">
-                <Stat
-                  value={lostCount}
-                  label="Active lost reports"
-                  caption="still being looked for"
-                  icon={PackageSearch}
-                />
-
-                <Stat
-                  value={foundCount}
-                  label="Active found reports"
-                  caption="waiting to go home"
-                  icon={HeartHandshake}
-                />
-
-                <Stat
-                  value={recoveredCount}
-                  label="Items recovered"
-                  caption="and counting"
-                  icon={ShieldCheck}
-                  featured
-                />
-          </div>
-        </div>
-      </section>
-
-      {/* RECENT REPORTS */}
-      <section className="px-4 pb-12 pt-10 sm:px-6 sm:pb-16">
+      {/* 2 — LIVE REPORTS with filter tabs */}
+      <section
+        id="latest-reports"
+        aria-labelledby="latest-reports-heading"
+        className="scroll-mt-24 px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10"
+      >
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="font-display text-xl font-bold tracking-tight text-navy-900 sm:text-2xl">
-                Latest reports
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-electric-600">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                </span>
+                Live from the community
+              </p>
+              <h2
+                id="latest-reports-heading"
+                className="mt-2 font-display text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl"
+              >
+                See what needs a way home
               </h2>
               <p className="mt-1 text-sm text-slate-600">
-                Recently reported by the community.
+                Recent lost and found reports from people across the
+                Philippines — updating in real time.
               </p>
             </div>
-
             <Link
               href="/discover"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-electric-700 transition hover:text-electric-600"
+              className="group inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-soft transition hover:-translate-y-px hover:border-electric-200 hover:text-electric-700"
             >
               View all reports
-              <ArrowRight size={15} />
+              <ArrowRight
+                size={15}
+                className="transition-transform group-hover:translate-x-0.5"
+              />
             </Link>
           </div>
 
-          {/* QUICK FILTERS */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link
-              href="/lost"
-              className="inline-flex items-center gap-2 rounded-full border border-sunrise-200 bg-sunrise-50 px-4 py-2 text-xs font-semibold text-sunrise-700 transition hover:bg-sunrise-100"
-            >
-              <PackageSearch size={13} />
-              Lost
-              <span className="text-sunrise-500/70">{lostCount}</span>
-            </Link>
-
-            <Link
-              href="/found"
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-            >
-              <HeartHandshake size={13} />
-              Found
-              <span className="text-emerald-500/70">{foundCount}</span>
-            </Link>
-
-            <Link
-              href="/discover"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-            >
-              <Search size={13} />
-              Search all
-            </Link>
+          <div className="mt-7">
+            {latestReports.length > 0 ? (
+              <FeedTabs cards={latestReports} />
+            ) : (
+              <EmptyReports />
+            )}
           </div>
-
-          {/* REPORT GRID */}
-          {latestReports.length > 0 ? (
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {latestReports.map((item) => (
-                <MotionReveal
-                  key={`${item.kind}-${item.id}`}
-                  className="h-full"
-                >
-                  <ItemCard
-                    href={item.href}
-                    title={item.title}
-                    category={item.category}
-                    city={item.city}
-                    province={item.province}
-                    reported={item.dateLabel}
-                    description={item.description}
-                    kind={item.kind}
-                    imageUrl={item.imageUrl}
-                    views={item.views}
-                    reward={item.reward}
-                  />
-                </MotionReveal>
-              ))}
-            </div>
-          ) : (
-            <EmptyReports />
-          )}
         </div>
       </section>
 
-      {/* SAFETY */}
-      <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
-        <div className="rounded-2xl border border-emerald-200/60 bg-emerald-50/50 p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-emerald-200 bg-white text-emerald-600">
-              <ShieldCheck size={20} />
-            </div>
+      {/* 3 — TRUST + SAFETY (links onward to /safety, /faq, /how-it-works) */}
+      <section
+        aria-labelledby="trust-heading"
+        className="relative z-10 px-4 pb-16 sm:px-6 sm:pb-20"
+      >
+        <div className="mx-auto max-w-7xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-electric-600">
+            Why you can trust FindBack
+          </p>
+          <h2
+            id="trust-heading"
+            className="mb-6 mt-2 font-display text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl"
+          >
+            Safe for both sides of every handover
+          </h2>
 
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold text-navy-900">
-                Meet in a safe, public place
-              </h3>
-              <p className="mt-0.5 text-sm text-slate-600">
-                Keep personal info private until you&apos;re ready to share. Choose a busy mall, barangay hall, or café for handovers.
-              </p>
-            </div>
-
-            <Link
+          <div className="grid overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-card sm:grid-cols-3">
+            <TrustLink
               href="/safety"
-              className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800"
-            >
-              Safety guide
-              <ArrowRight size={13} />
-            </Link>
+              icon={ShieldCheck}
+              title="Private by default"
+              detail="Contact details stay hidden until you choose to share them."
+              cta="Read our safety guide"
+            />
+            <TrustLink
+              href="/faq"
+              icon={UsersRound}
+              title="Powered by people"
+              detail="Real, live reports from your local community — no middlemen."
+              cta="See how matching works"
+            />
+            <TrustLink
+              href="/how-it-works"
+              icon={MapPin}
+              title="Return with care"
+              detail="Verify ownership privately, then meet in a safe, public place."
+              cta="See the full process"
+            />
           </div>
         </div>
       </section>
+
+      {/* Mobile thumb-reach actions (spacer keeps the footer reachable) */}
+      <div aria-hidden="true" className="h-16 md:hidden" />
+      <StickyActionBar />
     </main>
   );
 }
 
 /* ============================================================================
-   STAT
+   TRUST LINK — one trust claim + a concrete onward path. Replaces the old
+   dead-end trust cards so every trust claim leads somewhere useful.
    ============================================================================ */
 
-function Stat({
-  value,
-  label,
-  caption,
+import type { ElementType } from "react";
+
+function TrustLink({
+  href,
   icon: Icon,
-  featured = false,
+  title,
+  detail,
+  cta,
 }: {
-  value: number;
-  label: string;
-  caption?: string;
-  icon?: LucideIcon;
-  featured?: boolean;
+  href: string;
+  icon: ElementType;
+  title: string;
+  detail: string;
+  cta: string;
 }) {
   return (
-    <div
-      className={`relative px-6 py-7 sm:px-8 sm:py-8 ${
-        featured ? "bg-emerald-50/60" : "bg-white/80"
-      }`}
+    <Link
+      href={href}
+      className="group flex flex-col items-start gap-3 border-b border-slate-200/70 px-5 py-5 transition hover:bg-electric-50/40 sm:border-b-0 sm:border-r sm:px-6 sm:py-6 sm:last:border-r-0"
     >
-      {featured && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent"
-        />
-      )}
-
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          {label}
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-electric-50 text-electric-700 transition group-hover:bg-electric-100">
+        <Icon size={16} aria-hidden="true" />
+      </span>
+      <div>
+        <p className="flex items-center gap-1.5 text-sm font-bold text-navy-900 transition group-hover:text-electric-700">
+          {title}
+          <ArrowRight
+            size={13}
+            className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
+          />
         </p>
-
-        {Icon && (
-          <span
-            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border shadow-sm ${
-              featured
-                ? "border-emerald-200 bg-emerald-100 text-emerald-700"
-                : "border-slate-200 bg-white text-slate-500"
-            }`}
-          >
-            <Icon size={16} aria-hidden="true" />
-          </span>
-        )}
-      </div>
-
-      <div
-        className={`mt-3 display-giant text-4xl sm:text-5xl lg:text-[3.2rem] ${
-          featured ? "text-emerald-600" : "text-navy-900"
-        }`}
-      >
-        <AnimatedNumber value={Math.max(0, Math.round(value))} />
-      </div>
-
-      {caption && (
-        <p
-          className={`mt-1.5 text-xs ${
-            featured ? "font-medium text-emerald-700/80" : "text-slate-400"
-          }`}
-        >
-          {caption}
+        <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
+          {detail}
         </p>
-      )}
-    </div>
+        <p className="mt-1.5 text-[11px] font-semibold text-electric-600">
+          {cta}
+        </p>
+      </div>
+    </Link>
   );
 }
 
@@ -725,7 +493,7 @@ function EmptyReports() {
   return (
     <div className="mt-7 rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm">
-        <Search size={21} />
+        <PackageSearch size={21} />
       </div>
 
       <h3 className="mt-5 font-display text-xl font-semibold text-navy-900">

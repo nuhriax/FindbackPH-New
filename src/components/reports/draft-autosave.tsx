@@ -43,7 +43,7 @@ export function DraftAutoSave({
     } catch {
       /* corrupted draft - ignore */
     }
-  }, [active, storageKey]);
+  }, [active, storageKey, formId]);
 
   // Save on input (debounced write of a synchronous snapshot).
   useEffect(() => {

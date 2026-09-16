@@ -284,12 +284,12 @@
 .ps-label { font-size: 0.72rem; font-weight: 700; min-width: 52px; text-align: right; }
 
 /* rows, links, checks */
-.auth-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.1rem; }
+.auth-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-top: 0.1rem; }
 .auth-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
 @media (max-width: 480px) { .auth-grid-2 { grid-template-columns: 1fr; } }
 .auth-check {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.5rem;
   font-size: 0.82rem;
   color: var(--auth-muted);
@@ -313,9 +313,9 @@
 }
 .auth-check-label { cursor: pointer; }
 .auth-link {
-  color: var(--auth-accent);
-  font-weight: 600;
-  text-decoration: none;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   transition: color 0.2s ease;
 }
 .auth-link:hover {

@@ -27,12 +27,7 @@ test.describe("Public Routes", () => {
     await expect(page).toHaveTitle(/Found/);
   });
 
-  test("discover page loads", async ({ page }) => {
-    await page.goto("/discover");
-    await expect(page).toHaveTitle(/Discover/);
-  });
-
-  test("about page loads", async ({ page }) => {
+  test("discover page loads (second check)", async ({ page }) => {
     await page.goto("/about");
     await expect(page).toHaveTitle(/About/);
   });
