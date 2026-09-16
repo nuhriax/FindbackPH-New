@@ -110,25 +110,38 @@ export function HeroBoard({
 
           <span
             aria-hidden="true"
-            className="mx-auto mt-3 block h-0.5 w-24 rounded-full bg-cork-700/50"
-          />
+            className="mx-auto mt-3 flex items-center justify-center gap-2 text-cork-700/60"
+          >
+            <span className="h-px w-10 bg-cork-700/40" />
+            <span className="text-[10px]">✦</span>
+            <span className="h-px w-10 bg-cork-700/40" />
+          </span>
 
           {/* Featured report */}
           <div className="mt-4 flex items-start gap-3.5">
             <div className="min-w-0 flex-1">
-              <p className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">
-                <MapPin size={11} aria-hidden="true" className="shrink-0" />
-                <span className="truncate">{newest.city || "Philippines"}</span>
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">
+                <span className="inline-flex min-w-0 items-center gap-1">
+                  <MapPin size={11} aria-hidden="true" className="shrink-0" />
+                  <span className="truncate">{newest.city || "Philippines"}</span>
+                </span>
                 <span aria-hidden="true" className="text-ink-faint">
                   ·
                 </span>
-                <Clock size={11} aria-hidden="true" className="shrink-0" />
-                {newest.dateLabel}
-              </p>
+                <span className="inline-flex shrink-0 items-center gap-1">
+                  <Clock size={11} aria-hidden="true" className="shrink-0" />
+                  {newest.dateLabel}
+                </span>
+              </div>
               <h4 className="mt-1.5 line-clamp-3 break-words font-display text-lg font-bold leading-snug text-navy-900">
                 {newest.title}
               </h4>
-              <p className="mt-1.5 inline-flex min-w-0 items-center gap-1.5 rounded-md bg-kraft-100/80 px-2 py-1 text-[11px] font-bold text-cork-700">
+              {newest.description ? (
+                <p className="mt-1.5 line-clamp-2 text-[11.5px] italic leading-relaxed text-ink-soft">
+                  “{newest.description.trim()}”
+                </p>
+              ) : null}
+              <p className="mt-2 inline-flex min-w-0 items-center gap-1.5 rounded-md bg-kraft-100/80 px-2 py-1 text-[11px] font-bold text-cork-700">
                 <span className="[&_svg]:size-3.5 [&_svg]:shrink-0">
                   {CATEGORY_ICONS[newest.category]}
                 </span>
@@ -140,7 +153,7 @@ export function HeroBoard({
 
             {newest.imageUrl ? (
               <figure
-                className="relative shrink-0 rotate-2 border-[3px] border-white bg-slate-100 p-0.5 shadow-md"
+                className="relative shrink-0 rotate-2 border-[3px] border-white bg-white pb-5 shadow-md"
                 aria-hidden="true"
               >
                 <span className="washi-tape -top-2.5 left-1/2 -translate-x-1/2 -rotate-3" />
@@ -151,6 +164,9 @@ export function HeroBoard({
                   loading="lazy"
                   className="h-24 w-24 object-cover"
                 />
+                <figcaption className="absolute inset-x-1 bottom-0.5 truncate text-center font-hand text-[13px] leading-[1.4] text-cork-700">
+                  as posted by a neighbor
+                </figcaption>
               </figure>
             ) : null}
           </div>
@@ -201,6 +217,15 @@ export function HeroBoard({
                   <span aria-hidden="true" className="text-ink-faint">
                     ·
                   </span>
+                  <span className="inline-flex min-w-0 items-center gap-1 [&_svg]:size-3 [&_svg]:shrink-0">
+                    {CATEGORY_ICONS[replyCard.category]}
+                    <span className="truncate">
+                      {CATEGORY_LABELS[replyCard.category] ?? "Other"}
+                    </span>
+                  </span>
+                  <span aria-hidden="true" className="text-ink-faint">
+                    ·
+                  </span>
                   {replyCard.dateLabel}
                 </p>
               </div>
@@ -221,10 +246,14 @@ export function HeroBoard({
             </div>
           )}
 
-          {/* Small print footer */}
-          <p className="mt-4 border-t border-cork-700/30 pt-2.5 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
-            Post yours free — findback.ph
-          </p>
+          {/* Small print footer — reference number + call to action, like a
+              real filed notice */}
+          <div className="mt-4 flex items-center justify-between gap-2 border-t border-cork-700/30 pt-2.5 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+            <span className="tabular-nums">
+              Report № {newest.id.replace(/-/g, "").slice(0, 6).toUpperCase()}
+            </span>
+            <span className="truncate">Post yours free — findback.ph</span>
+          </div>
         </article>
       </div>
     </div>
