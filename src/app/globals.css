@@ -1608,6 +1608,30 @@ p {
   background-color: #6E4A28;
   border-color: #3E2814;
 }
+/* 4e) notice-board text + surfaces: kraft/cork/input ink tokens → light tones.
+   Without these, hero eyebrow strip, search-bar glyphs, kraft taps, and
+   hero headline/hand-underline text render dark-on-dark. */
+/* 4e-continued) trust cards + hero eyebrow strip: those panels already map to
+   dark surfaces via the sweep, but their inner titles/descriptions use
+   light-fill utilities that sweep rules don't cover — lock light text here. */
+.site-ink :is(.text-ink, .text-ink-soft, .text-ink-faint) { color: #EAF1F9; }
+.site-ink :is(.bg-kraft-100, .bg-kraft-200) { background-color: rgba(216, 188, 151, 0.14); }
+.site-ink :is(.bg-kraft-200\/70) { background-color: rgba(216, 188, 151, 0.22); }
+.site-ink :is(.border-cork-700, .border-cork-700\/25, .border-cork-700\/30, .border-cork-900) { border-color: rgba(216, 188, 151, 0.30); }
+.site-ink :is(.border-ink, .border-ink\/10, .border-ink\/15, .border-ink\/20, .ring-ink, .ring-ink\/10, .ring-ink\/20) { border-color: rgba(216, 188, 151, 0.30); }
+.site-ink :is(.text-cork-700) { color: #F2CE8B; }
+.site-ink :is(.text-sun-700) { color: #F2CE8B; }
+.site-ink :is(.bg-sun-400, .bg-sun-500) { color: #241E17; }
+/* HeroSearch paper-slip shell: keep it light paper even in dark mode. A dark
+   search slip on the dark page reads as a hole; light paper + dark ink text
+   preserves the notice-board metaphor and interior contrast. */
+.site-ink [class*="bg-kraft-100"]:not([class*="hover:"]) {
+  background-color: #F0E4C6;
+  border-color: rgba(94, 60, 34, 0.28);
+}
+.site-ink [class*="bg-kraft-100"] :is(.text-ink, .text-ink-soft, .text-ink-faint) { color: #241E17; }
+.site-ink [class*="bg-kraft-100"] :is(.placeholder\:text-ink-faint)::placeholder { color: rgba(36, 30, 23, 0.55); }
+.site-ink [class*="bg-kraft-100"] :is(.border-cork-700, .border-cork-700\/25, .border-cork-700\/30) { border-color: rgba(94, 60, 34, 0.25); }
 @media (prefers-reduced-motion: reduce) {
   .notice-card, .notice-card:hover { transition: none; transform: none; }
 
