@@ -26,13 +26,21 @@ export const SORT_LABELS: Record<SortOption, string> = {
 /** "Reported 3 days ago" — or a neutral fallback for missing/invalid dates. */
 export function reportedLabel(value: string): string {
   if (!value) {
-    return "Reported recently";
+    return "Reported just now";
   }
 
   const date = new Date(value);
 
   if (!isValid(date)) {
-    return "Reported recently";
+    return "Reported just now";
+  }
+
+  // Clock-skew / edge guards: a report timestamped a few seconds (or even a
+  // few seconds in the future) must never render as "0 minutes ago" or
+  // "in 5 minutes" — the feed's freshest possible label is "just now".
+  const diffSeconds = (Date.now() - date.getTime()) / 1000;
+  if (diffSeconds < 60) {
+    return "Reported just now";
   }
 
   return `Reported ${formatDistanceToNow(date, {

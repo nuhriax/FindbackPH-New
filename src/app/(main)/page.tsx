@@ -91,8 +91,10 @@ function formatReportDate(
 
   const difference = Date.now() - date.getTime();
 
-  if (difference < 0) {
-    return format(date, "MMM d");
+  // Freshest possible label — covers sub-minute ages AND slight clock skew
+  // (a timestamp a few seconds in the future must not render as a date).
+  if (difference < 60_000) {
+    return "Just now";
   }
 
   const minutes = Math.floor(difference / 60000);
