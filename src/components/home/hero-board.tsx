@@ -1,16 +1,16 @@
-import { ArrowLeftRight, Clock, MapPin, Scissors } from "lucide-react";
+
+import { Clock, MapPin } from "lucide-react";
 
 import type { HeroCard } from "@/components/home/hero";
 import { CATEGORY_LABELS } from "@/lib/validation";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
-import { computeMatchScore, MATCH_THRESHOLD } from "@/lib/matching-score";
 
 /**
  * HeroBoard — the hero visual as a VINTAGE NOTICE POSTER pinned to the
  * community cork board. One paper artifact, top-to-bottom like a real
  * "MISSING"-style poster: kicker → giant headline → featured report →
- * a cut line → the reply item → small print. Everything in normal flow,
- * truncation-guarded, nothing overlapping.
+ * small print. Shows only the single latest post. Everything in normal
+ * flow, truncation-guarded, nothing overlapping.
  */
 export function HeroBoard({
   cards,
@@ -20,43 +20,6 @@ export function HeroBoard({
   recoveredCount?: number;
 }) {
   const newest = cards[0];
-  const opposites = cards.slice(1).filter((c) => c.kind !== newest.kind);
-
-  let bestMatch: HeroCard | null = null;
-  let bestScore = 0;
-  for (const c of opposites) {
-    const score = computeMatchScore(
-      {
-        category: newest.category,
-        id: newest.id,
-        city: newest.city ?? null,
-        province: newest.province ?? null,
-        approximate_location: null,
-        date_lost: null,
-        title: newest.title,
-        description: newest.description ?? "",
-        distinguishing_features: null,
-      },
-      {
-        category: c.category,
-        id: c.id,
-        city: c.city ?? null,
-        province: c.province ?? null,
-        approximate_location: null,
-        date_found: null,
-        title: c.title,
-        description: c.description ?? "",
-        distinguishing_features: null,
-      }
-    );
-    if (score > MATCH_THRESHOLD && score > bestScore) {
-      bestScore = score;
-      bestMatch = c;
-    }
-  }
-
-  const replyCard: HeroCard | null = bestMatch ?? cards[1] ?? null;
-  const hasMatch = bestMatch !== null;
   const newestIsLost = newest.kind === "lost";
 
   return (
@@ -117,138 +80,89 @@ export function HeroBoard({
             <span className="h-px w-10 bg-cork-700/40" />
           </span>
 
-          {/* Featured report */}
-          <div className="mt-4 flex items-start gap-3.5">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">
-                <span className="inline-flex min-w-0 items-center gap-1">
+          {/* Featured report — full-width meta line, then text + polaroid */}
+          <div className="mt-4">
+            {/* Ledger — classic poster WHERE / WHEN rows. Label + value on
+                one line each, so a long city or province can never drag the
+                time onto a ragged second line. */}
+            <div className="space-y-1.5 text-[11px] font-bold uppercase tracking-[0.1em]">
+              <p className="flex min-w-0 items-baseline gap-2.5">
+                <span className="w-14 shrink-0 text-[9px] tracking-[0.22em] text-ink-faint">
+                  Where
+                </span>
+                <span className="inline-flex min-w-0 items-center gap-1 text-ink-soft">
                   <MapPin size={11} aria-hidden="true" className="shrink-0" />
-                  <span className="truncate">{newest.city || "Philippines"}</span>
+                  <span className="truncate">
+                    {[newest.city, newest.province]
+                      .filter(Boolean)
+                      .join(", ") || "Philippines"}
+                  </span>
                 </span>
-                <span aria-hidden="true" className="text-ink-faint">
-                  ·
+              </p>
+              <p className="flex min-w-0 items-baseline gap-2.5">
+                <span className="w-14 shrink-0 text-[9px] tracking-[0.22em] text-ink-faint">
+                  When
                 </span>
-                <span className="inline-flex shrink-0 items-center gap-1">
+                <span className="inline-flex min-w-0 items-center gap-1 text-ink-soft">
                   <Clock size={11} aria-hidden="true" className="shrink-0" />
-                  {newest.dateLabel}
-                </span>
-              </div>
-              <h4 className="mt-1.5 line-clamp-3 break-words font-display text-lg font-bold leading-snug text-navy-900">
-                {newest.title}
-              </h4>
-              {newest.description ? (
-                <p className="mt-1.5 line-clamp-2 text-[11.5px] italic leading-relaxed text-ink-soft">
-                  “{newest.description.trim()}”
-                </p>
-              ) : null}
-              <p className="mt-2 inline-flex min-w-0 items-center gap-1.5 rounded-md bg-kraft-100/80 px-2 py-1 text-[11px] font-bold text-cork-700">
-                <span className="[&_svg]:size-3.5 [&_svg]:shrink-0">
-                  {CATEGORY_ICONS[newest.category]}
-                </span>
-                <span className="truncate">
-                  {CATEGORY_LABELS[newest.category] ?? "Other"}
+                  <span className="normal-case">{newest.dateLabel}</span>
                 </span>
               </p>
             </div>
 
-            {newest.imageUrl ? (
-              <figure
-                className="relative shrink-0 rotate-2 border-[3px] border-white bg-white pb-5 shadow-md"
-                aria-hidden="true"
-              >
-                <span className="washi-tape -top-2.5 left-1/2 -translate-x-1/2 -rotate-3" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={newest.imageUrl}
-                  alt=""
-                  loading="lazy"
-                  className="h-24 w-24 object-cover"
-                />
-                <figcaption className="absolute inset-x-0 bottom-0.5 truncate px-1 text-center font-hand text-[12px] leading-[1.5] text-cork-700">
-                  as posted by a neighbor
-                </figcaption>
-              </figure>
-            ) : null}
-          </div>
-
-          {/* Cut line — classic poster scissors rule */}
-          {replyCard && (
-            <div
-              className="relative mt-5 flex items-center gap-2"
-              aria-hidden="true"
-            >
-              <span className="h-0 flex-1 border-t-2 border-dashed border-ink/25" />
-              <Scissors
-                size={13}
-                className="shrink-0 -scale-x-100 text-ink/40"
-              />
-              <span className="h-0 flex-1 border-t-2 border-dashed border-ink/25" />
-            </div>
-          )}
-
-          {/* Reply item — below the cut */}
-          {replyCard && (
-            <div className="mt-3.5 flex items-start gap-3">
-              <span
-                aria-hidden="true"
-                className={`mt-1 h-9 w-1 shrink-0 rounded-full ${
-                  replyCard.kind === "lost" ? "bg-coral-500" : "bg-ocean-500"
-                }`}
-              />
+            {/* Body — title/quote/chip left, polaroid centered right */}
+            <div className="mt-3 flex items-center gap-4">
               <div className="min-w-0 flex-1">
-                {hasMatch ? (
-                  <p className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white shadow-sm">
-                    <ArrowLeftRight size={10} aria-hidden="true" />
-                    Possible match
-                  </p>
-                ) : (
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ink-faint">
-                    Also on the board
-                  </p>
-                )}
-                <h4 className="mt-1 line-clamp-2 break-words text-[13px] font-bold leading-snug text-navy-900">
-                  {replyCard.title}
+                <h4 className="break-words font-display text-xl font-bold leading-snug text-navy-900">
+                  {newest.title}
                 </h4>
-                <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-medium text-ink-soft">
-                  <span className="inline-flex min-w-0 max-w-full items-center gap-1">
-                    <MapPin size={11} aria-hidden="true" className="shrink-0" />
-                    <span className="truncate">
-                      {replyCard.city || "Philippines"}
-                    </span>
+                {newest.description ? (
+                  <p className="mt-1.5 line-clamp-3 text-[12px] italic leading-relaxed text-ink-soft">
+                    “{newest.description.trim()}”
+                  </p>
+                ) : null}
+                <p className="mt-2.5 inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md bg-kraft-100/80 px-2 py-1 text-[11px] font-bold text-cork-700">
+                  <span className="[&_svg]:size-3.5 [&_svg]:shrink-0">
+                    {CATEGORY_ICONS[newest.category]}
                   </span>
-                  <span aria-hidden="true" className="text-ink-faint">
-                    ·
-                  </span>
-                  <span className="inline-flex min-w-0 max-w-full items-center gap-1 [&_svg]:size-3 [&_svg]:shrink-0">
-                    {CATEGORY_ICONS[replyCard.category]}
-                    <span className="truncate">
-                      {CATEGORY_LABELS[replyCard.category] ?? "Other"}
-                    </span>
-                  </span>
-                  <span aria-hidden="true" className="text-ink-faint">
-                    ·
-                  </span>
-                  <span className="whitespace-nowrap">
-                    {replyCard.dateLabel}
+                  <span className="truncate">
+                    {CATEGORY_LABELS[newest.category] ?? "Other"}
                   </span>
                 </p>
               </div>
-              {replyCard.imageUrl ? (
+
+              {newest.imageUrl ? (
                 <figure
-                  className="shrink-0 -rotate-2 border-2 border-white bg-slate-100 p-0.5 shadow-sm"
+                  className="relative w-28 shrink-0 rotate-2 border-[3px] border-white bg-white p-1 pb-7 shadow-md"
                   aria-hidden="true"
                 >
+                  <span className="washi-tape -top-2.5 left-1/2 -translate-x-1/2 -rotate-3" />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={replyCard.imageUrl}
+                    src={newest.imageUrl}
                     alt=""
                     loading="lazy"
-                    className="h-12 w-12 object-cover"
+                    className="h-24 w-full object-cover"
                   />
+                  <figcaption className="absolute inset-x-0 bottom-0.5 px-1 text-center font-hand text-[11px] leading-tight text-cork-700">
+                    as posted by
+                    <br />a neighbor
+                  </figcaption>
                 </figure>
               ) : null}
             </div>
-          )}
+          </div>
+
+          {/* Invitation slip — the poster's own call to action, filling the
+              lower sheet like a reply stub on a real notice */}
+          <div className="mt-5 flex items-center gap-2.5 rounded-lg border-2 border-dashed border-ink/25 bg-white/40 px-3.5 py-2.5">
+            <span aria-hidden="true" className="text-sm">
+              ✎
+            </span>
+            <p className="min-w-0 flex-1 text-[11px] font-bold leading-snug text-ink-soft">
+              Lost or found something too? Post your notice — it&apos;s free.
+            </p>
+          </div>
 
           {/* Small print footer — reference number + call to action, like a
               real filed notice */}
