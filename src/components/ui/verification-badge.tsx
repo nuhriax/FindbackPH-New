@@ -1,4 +1,4 @@
-import { BadgeCheck, FileCheck2, HeartHandshake } from "lucide-react";
+import { BadgeCheck, FileCheck2, HeartHandshake, Smartphone } from "lucide-react";
 
 /**
  * Phase 7 trust badges — deliberately SUBTLE. Small inline pills meant to sit
@@ -85,6 +85,66 @@ export function OwnershipVerifiedBadge() {
     >
       <BadgeCheck size={11} aria-hidden />
       Ownership verified
+    </span>
+  );
+}
+
+/**
+ * Phase 8 — phone-verified pill. True SMS-OTP confirmation only
+ * (auth.users.phone_confirmed_at); hidden entirely when absent.
+ */
+export function PhoneVerifiedBadge() {
+  return (
+    <span
+      title="Confirmed their mobile number by SMS one-time code"
+      className={`${base} border-teal-200 bg-teal-50 text-teal-700`}
+    >
+      <Smartphone size={11} aria-hidden />
+      Phone verified
+    </span>
+  );
+}
+
+/**
+ * Phase 8 — the strongest trust tier. Rendered ONLY when an admin approved
+ * the member's government-ID review. Gold because it is earned, not claimed.
+ */
+export function IdVerifiedBadge({ seal = false }: { seal?: boolean }) {
+  if (seal) {
+    return (
+      <span
+        title="Government ID verified by the FindBack PH team"
+        aria-label="ID verified"
+        className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-sun-400 to-sun-600 text-white shadow-md ring-2 ring-white"
+      >
+        <BadgeCheck size={16} strokeWidth={2.4} aria-hidden />
+      </span>
+    );
+  }
+  return (
+    <span
+      title="Government ID verified by the FindBack PH team"
+      className={`${base} border-sun-300 bg-sun-50 text-sun-700`}
+    >
+      <BadgeCheck size={11} aria-hidden />
+      ID verified
+    </span>
+  );
+}
+
+/** Provider chip — shows HOW an account is backed (linked identity tier). */
+export function ProviderBadge({ provider }: { provider: "google" | "facebook" }) {
+  const meta =
+    provider === "google"
+      ? { label: "Google-linked", className: "border-slate-200 bg-white text-slate-600" }
+      : { label: "Facebook-linked", className: "border-blue-200 bg-blue-50 text-blue-700" };
+  return (
+    <span
+      title={`Signed up through ${provider === "google" ? "Google" : "Facebook"} — the account is backed by that provider identity`}
+      className={`${base} ${meta.className}`}
+    >
+      {provider === "google" ? "G" : "f"}
+      {meta.label}
     </span>
   );
 }

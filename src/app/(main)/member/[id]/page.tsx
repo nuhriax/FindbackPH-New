@@ -13,6 +13,9 @@ import {
   VerifiedAccountBadge,
   TrustedMemberBadge,
   VerifiedSeal,
+  PhoneVerifiedBadge,
+  IdVerifiedBadge,
+  ProviderBadge,
 } from "@/components/ui/verification-badge";
 import {
   ArrowLeft,
@@ -103,10 +106,24 @@ export default async function MemberProfilePage({ params }: Props) {
   });
   const emailVerified = Boolean(emailVerifiedRow);
 
+  // Phase 8 — phone (SMS-OTP) and government-ID verification lookups.
+  const [{ data: phoneVerifiedRow }, { data: idVerifiedRow }] = await Promise.all([
+    supabase.rpc("is_phone_verified", { p_uid: profile.id }),
+    supabase.rpc("is_identity_verified", { p_uid: profile.id }),
+  ]);
+  const phoneVerified = Boolean(phoneVerifiedRow);
+  const idVerified = Boolean(idVerifiedRow);
+  // Which providers back this account — mirrored onto profiles by the
+  // sync_linked_providers trigger (migration 115), no auth access needed.
+  const providers = ((profile as { linked_providers?: string[] | null }).linked_providers ?? [])
+    .filter((p) => p === "google" || p === "facebook");
+
   const trust = computeTrustSignals({
     emailVerified,
     profileCreatedAt: profile.created_at ?? null,
     successfulReturns: profile.successful_returns,
+    phoneVerified,
+    idVerified,
   });
 
   const [lost, found] = await Promise.all([
@@ -222,10 +239,23 @@ return (
                     </h1>
                     {trust.trustedMember && <TrustedMemberBadge />}
                     {trust.emailVerified && <VerifiedAccountBadge />}
+                    {trust.phoneVerified && <PhoneVerifiedBadge />}
+                    {trust.idVerified && <IdVerifiedBadge />}
                   </div>
                   <p className="mt-1 text-sm text-slate-500">
                     {profile.username ? `@${profile.username}` : "FindBack member"}
                   </p>
+                  {/* Linked-identity tier — how this account is backed. */}
+                  {providers.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {providers.map((provider) => (
+                        <ProviderBadge
+                          key={provider}
+                          provider={provider as "google" | "facebook"}
+                        />
+                      ))}
+                    </div>
+                  )}
                   {profile.location && (
                     <p className="mt-1.5 flex items-center gap-1 text-xs text-slate-500">
                       <MapPin size={12} className="text-slate-400" />
