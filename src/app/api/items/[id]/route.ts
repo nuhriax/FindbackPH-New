@@ -11,7 +11,6 @@ type ItemRow = {
   reporter_id: string;
   title: string;
   description: string | null;
-  distinguishing_features: string | null;
   category: string | null;
   status: string | null;
   city: string | null;
@@ -139,7 +138,9 @@ export async function GET(
     dateOccurred: row.date_lost ?? row.date_found ?? row.created_at,
     brand: null,
     color: null,
-    distinguishingFeatures: row.distinguishing_features,
+    // Private ownership-verification details are NEVER exposed here — they
+    // live in item_private_details (owner-only RLS) and are checked via RPC.
+    distinguishingFeatures: null,
     reward:
       row.reward_amount && Number(row.reward_amount) > 0
         ? `₱${Number(row.reward_amount).toLocaleString()}`
