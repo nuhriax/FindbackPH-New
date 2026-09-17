@@ -52,6 +52,13 @@ export async function getSignedImageUrls(
  * The bucket must be created as public in Supabase Storage.
  */
 export function getAvatarPublicUrl(storagePath: string): string {
+  // Call sites may hand us either a bare storage path ("uid/avatar.webp")
+  // or a full public URL (the avatar API stores the complete URL in
+  // profiles.avatar_url). Detect and pass URLs through untouched —
+  // re-prefixing produced ".../avatars/https://..." and a 404.
+  if (/^https?:\/\//i.test(storagePath)) {
+    return storagePath;
+  }
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   return `${supabaseUrl}/storage/v1/object/public/avatars/${storagePath}`;
 }
