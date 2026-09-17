@@ -157,7 +157,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { error, data } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
     // Give people a direct path when the dashboard "require email confirmation"
@@ -168,6 +168,24 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
       };
     }
     return { error: "Incorrect email or password" };
+  }
+
+  // Moderation gate: a suspended or banned member must not hold a session,
+  // even with valid credentials (P1 finding from the pre-launch audit).
+  if (data?.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_suspended, is_banned")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (profile?.is_banned || profile?.is_suspended) {
+      await supabase.auth.signOut();
+      return {
+        error: profile.is_banned
+          ? "This account has been banned. Contact support@findbackph.com if you believe this is a mistake."
+          : "This account is currently suspended. Contact support@findbackph.com if you believe this is a mistake.",
+      };
+    }
   }
 
   return { ok: true };
