@@ -13,10 +13,6 @@ export type TrustSignals = {
   emailVerified: boolean;
   /** Account is at least TRUSTED_MIN_ACCOUNT_DAYS old AND has ≥1 real return. */
   trustedMember: boolean;
-  /** Supabase Auth confirmed the user's phone via SMS OTP (Phase 8). */
-  phoneVerified?: boolean;
-  /** An admin approved this member's government-ID review (Phase 8). */
-  idVerified?: boolean;
 };
 
 /** How long an account must exist before "Trusted member" may be shown. */
@@ -43,10 +39,6 @@ export function computeTrustSignals(options: {
   emailVerified: boolean;
   profileCreatedAt: string | null | undefined;
   successfulReturns: number | null | undefined;
-  /** SMS-OTP confirmed phone (auth.users.phone_confirmed_at) — Phase 8. */
-  phoneVerified?: boolean;
-  /** Admin-approved government ID — Phase 8. */
-  idVerified?: boolean;
 }): TrustSignals {
   const { emailVerified, profileCreatedAt, successfulReturns } = options;
 
@@ -57,12 +49,7 @@ export function computeTrustSignals(options: {
     trustedMember = ageDays >= TRUSTED_MIN_ACCOUNT_DAYS;
   }
 
-  return {
-    emailVerified,
-    trustedMember,
-    phoneVerified: options.phoneVerified ?? false,
-    idVerified: options.idVerified ?? false,
-  };
+  return { emailVerified, trustedMember };
 }
 
 /** Which OAuth/email providers back this account (Phase 8 "linked identity"). */

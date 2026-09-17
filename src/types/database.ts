@@ -24,31 +24,11 @@ export type Profile = {
   successful_returns: number;
   is_suspended: boolean;
   is_banned: boolean;
-  // Phase 8 identity verification (migration 115). Present once the SQL has
-  // run; optional here so reads against older projects stay type-safe.
-  id_verification_status?: "none" | "pending" | "approved" | "rejected" | string;
-  id_verified_at?: string | null;
+  // Linked-identity chips (Google/Facebook) — mirrored from auth.users by the
+  // sync_linked_providers trigger (migration 115, provider chips kept).
+  linked_providers?: string[] | null;
   created_at: string;
   updated_at: string;
-};
-
-/** One submitted government-ID review (private — owner + service role only). */
-export type IdentityVerification = {
-  id: string;
-  user_id: string;
-  doc_type:
-    | "philsys"
-    | "drivers_license"
-    | "passport"
-    | "umid"
-    | "voters_id";
-  storage_path: string;
-  status: "pending" | "approved" | "rejected";
-  consent_at: string;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-  rejection_reason: string | null;
-  created_at: string;
 };
 
 export type ContactMessage = {
@@ -530,21 +510,6 @@ export interface Database {
         Update: Partial<ClaimAttempt>;
         Relationships: [];
       };
-      identity_verifications: {
-        Row: IdentityVerification;
-        Insert: Omit<
-          IdentityVerification,
-          "id" | "created_at" | "status" | "reviewed_by" | "reviewed_at" | "rejection_reason"
-        > & {
-          created_at?: string;
-          status?: IdentityVerification["status"];
-          reviewed_by?: string | null;
-          reviewed_at?: string | null;
-          rejection_reason?: string | null;
-        };
-        Update: Partial<IdentityVerification>;
-        Relationships: [];
-      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -553,23 +518,6 @@ export interface Database {
        * id (lookup only; never returns account data). Used by /member/[id].
        */
       is_email_verified: {
-        Args: { p_uid: string };
-        Returns: boolean;
-      };
-      /**
-       * Phase 8 — real "phone confirmed" signal for an arbitrary user id
-       * (boolean only). Backed by auth.users.phone_confirmed_at; false until
-       * the Phone provider is enabled and the user completes an SMS OTP.
-       */
-      is_phone_verified: {
-        Args: { p_uid: string };
-        Returns: boolean;
-      };
-      /**
-       * Phase 8 — "ID verified" seal state for an arbitrary user id (boolean
-       * only). True only after an admin approved a government-ID review.
-       */
-      is_identity_verified: {
         Args: { p_uid: string };
         Returns: boolean;
       };

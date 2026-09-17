@@ -234,15 +234,6 @@ export default async function FoundItemDetailPage({ params }: Props) {
   // Verified Report — only when the reporter is email-confirmed AND photos exist.
   trust.verifiedReport = isVerifiedReport(emailVerified, imageUrls.length);
 
-  // Phase 8 — gold "ID verified" seal when the reporter's government ID was
-  // approved by an admin. Boolean-only RPC; safe for any viewer.
-  if (raw.reporter_id) {
-    const { data: idVerifiedRow } = await supabase.rpc("is_identity_verified", {
-      p_uid: raw.reporter_id,
-    });
-    trust.idVerified = Boolean(idVerifiedRow);
-  }
-
   const matches: DetailMatch[] = [];
 
   for (const match of matchRows ?? []) {

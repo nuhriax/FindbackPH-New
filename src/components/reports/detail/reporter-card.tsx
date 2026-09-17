@@ -4,7 +4,6 @@ import { ArrowRight, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import {
   TrustedMemberBadge,
   VerifiedReportBadge,
-  IdVerifiedBadge,
 } from "@/components/ui/verification-badge";
 import type {
   DetailItem,
@@ -120,7 +119,6 @@ export function ReporterCard({
 
               {/* Strongest earned signal sits with the name */}
               {trust?.verifiedReport && <VerifiedReportBadge />}
-              {trust?.idVerified && <IdVerifiedBadge />}
             </div>
 
             <p className="mt-0.5 truncate text-[11.5px] text-slate-500">

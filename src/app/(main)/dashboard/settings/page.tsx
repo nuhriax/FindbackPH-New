@@ -6,7 +6,6 @@ import { AlertTriangle, Bell, CheckCircle2, KeyRound, Mail, ShieldCheck, Trash2 
 import { changePasswordAction, deleteAccountAction } from "@/lib/actions/settings";
 import { MatchAlertPrefs } from "@/components/dashboard/match-alert-prefs";
 import { PasskeysCard } from "@/components/dashboard/passkeys-card";
-import { VerificationCard } from "@/components/dashboard/verification-card";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
@@ -20,7 +19,6 @@ export default function SettingsPage() {
       </p>
 
       <div className="mt-8 space-y-6">
-        <VerificationCard />
         <AccountDetailsCard />
         <ChangePasswordCard />
         <PasskeysCard />

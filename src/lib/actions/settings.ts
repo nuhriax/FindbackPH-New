@@ -60,7 +60,7 @@ export async function changePasswordAction(formData: FormData): Promise<ActionRe
  * file (an orphaned object is better than a trapped account).
  */
 async function cleanupUserStorage(service: SupabaseClient, userId: string) {
-  const buckets = ["item-images", "avatars", "chat-images", "chat-videos", "id-documents"] as const;
+  const buckets = ["item-images", "avatars", "chat-images", "chat-videos"] as const;
 
   await Promise.all(
     buckets.map(async (bucket) => {
