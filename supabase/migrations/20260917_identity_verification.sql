@@ -57,6 +57,12 @@ alter table public.identity_verifications enable row level security;
 drop policy if exists "iv owner select" on public.identity_verifications;
 create policy "iv owner select"
   on public.identity_verifications for select to authenticated
+  using (user_id = auth.uid());
+
+drop policy if exists "iv owner insert" on public.identity_verifications;
+create policy "iv owner insert"
+  on public.identity_verifications for insert to authenticated
+  with check (user_id = auth.uid());
 
 -- 3) PRIVATE STORAGE BUCKET — id-documents ------------------------------------
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -166,10 +172,3 @@ revoke select on public.profiles from anon;
 grant select (id, username, first_name, last_name, avatar_url, bio, location,
   successful_returns, created_at, id_verification_status, linked_providers)
   on public.profiles to anon;
-
-  using (user_id = auth.uid());
-
-drop policy if exists "iv owner insert" on public.identity_verifications;
-create policy "iv owner insert"
-  on public.identity_verifications for insert to authenticated
-  with check (user_id = auth.uid());
