@@ -144,8 +144,9 @@ export async function removeAvatarAction(): Promise<ActionResult> {
     return { error: "Could not remove your photo. Please try again." };
   }
 
-  revalidatePath("/dashboard/profile");
-  revalidatePath("/dashboard");
+  // Whole-layout revalidation so the removed photo disappears from the navbar
+  // and every page immediately, not just the profile screen.
+  revalidatePath("/", "layout");
   return {};
 }
 

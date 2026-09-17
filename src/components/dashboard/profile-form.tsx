@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { CalendarDays, Camera, CheckCircle2, Copy, ExternalLink, HeartHandshake, Loader2, MailCheck, Save, ShieldAlert, Trash2 } from "lucide-react";
 import { updateProfileAction, removeAvatarAction, resendVerificationAction } from "@/lib/actions/profile";
 import { uploadAvatarClient } from "@/lib/file-upload-client";
@@ -28,6 +29,7 @@ export function ProfileForm({
   /** Masked account email, e.g. "j***@gmail.com". */
   maskedEmail: string;
 }) {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -150,6 +152,10 @@ export function ProfileForm({
       setAvatarUrl(result.avatarUrl);
       setAvatarSaved(true);
       window.setTimeout(() => setAvatarSaved(false), 2500);
+      // The upload route already saved the URL to the profile and revalidated
+      // the layout — refresh so the navbar and other server-rendered avatars
+      // update on screen right away, without a manual reload.
+      router.refresh();
     }
   }
 

@@ -120,12 +120,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  revalidatePath("/dashboard/profile");
-  revalidatePath("/dashboard");
+  // Persist the new avatar URL to the profile IMMEDIATELY — the user should
+  // not have to press "Save profile" for the photo change to take effect.
+  // The URL carries a cache-buster (?v=) so every page (navbar, member pages,
+  // messages, reporter cards) fetches the fresh image, not the CDN-cached one.
+  const avatarUrl = `${getAvatarPublicUrl(fileName)}?v=${Date.now()}`;
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ avatar_url: avatarUrl })
+    .eq("id", user.id);
+  if (profileError) {
+    console.error("Avatar profile update error:", profileError);
+    return NextResponse.json(
+      { error: "Photo uploaded but could not be applied. Try saving your profile." },
+      { status: 500 }
+    );
+  }
+
+  // Revalidate the whole layout — the navbar renders the avatar on every page,
+  // so a narrow revalidation would leave stale photos across the site.
+  revalidatePath("/", "layout");
 
   // Cache-buster: the filename never changes, so browsers/CDN would otherwise
   // keep showing the previous photo for up to an hour (cacheControl: 3600).
-  return NextResponse.json({
-    avatarUrl: `${getAvatarPublicUrl(fileName)}?v=${Date.now()}`,
-  });
+  return NextResponse.json({ avatarUrl });
 }
