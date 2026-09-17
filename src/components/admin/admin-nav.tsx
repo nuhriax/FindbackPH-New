@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { FileText, Flag, LayoutDashboard, Mail, ScrollText, Settings, Users } from "lucide-react";
+import { FileText, Flag, LayoutDashboard, Mail, ScrollText, Settings, User, Users } from "lucide-react";
 
 const LINKS = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -13,6 +13,9 @@ const LINKS = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
   { label: "Settings", href: "/admin/settings", icon: Settings },
+  // Escape hatch to the member side. Points at /dashboard/profile (NOT the
+  // /dashboard root, which redirects admins back here).
+  { label: "My Account", href: "/dashboard/profile", icon: User },
 ];
 
 export function AdminNav() {

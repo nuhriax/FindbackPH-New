@@ -35,6 +35,18 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  // Admins/moderators land in the ADMIN panel, not the member dashboard.
+  // Every other /dashboard/* page (reports, messages, profile…) still works
+  // for them — only this root redirects.
+  const { data: roleRow } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (roleRow && (roleRow.role === "admin" || roleRow.role === "moderator")) {
+    redirect("/admin");
+  }
+
   const [
     { data: lostItems = [] },
     { data: foundItems = [] },

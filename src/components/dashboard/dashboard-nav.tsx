@@ -98,6 +98,18 @@ export function DashboardNav({ isAdmin, profile }: { isAdmin: boolean; profile: 
         </div>
       </Link>
 
+      {/* Admins get a one-click jump to the moderation panel. Never rendered
+          for members — isAdmin comes from the server-side role check. */}
+      {isAdmin && (
+        <Link
+          href="/admin"
+          className="mb-1 flex items-center gap-2.5 rounded-xl border border-electric-200 bg-electric-50/70 px-3 py-2.5 text-sm font-semibold text-electric-700 transition-colors hover:bg-electric-50"
+        >
+          <ShieldCheck size={16} aria-hidden="true" />
+          Admin Panel
+        </Link>
+      )}
+
       {/* Grouped links */}
       {LINK_GROUPS.map((group) => (
         <div key={group.heading} className="mt-1.5">
