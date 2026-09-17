@@ -54,6 +54,10 @@ export async function trackServerEvent(
   options: { path?: string; sessionId?: string } = {}
 ): Promise<void> {
   try {
+    // Demo mode never writes analytics — presentation sample data must not
+    // pollute real product metrics (or the admin analytics dashboards).
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === "1") return;
+
     const supabase = await createClient();
     const {
       data: { user },

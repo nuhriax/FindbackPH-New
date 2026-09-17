@@ -35,6 +35,8 @@ export type FeedItem = {
   latitude?: number | null;
   longitude?: number | null;
   reward_amount?: number | null;
+  /** Optional href override (demo feed routes sample items to /demo/*). */
+  href?: string;
 };
 
 export type DiscoverData = {

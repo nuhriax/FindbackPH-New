@@ -113,7 +113,9 @@ export function DiscoverResultsGrid({
             delay={Math.min(index * 0.04, 0.3)}
           >
             <ItemCard
-              href={`/${item.kind}/${item.id}`}
+              // Demo feed items carry their own /demo/* href; real items
+              // keep the canonical /{kind}/{id} route.
+              href={"href" in item && item.href ? item.href : `/${item.kind}/${item.id}`}
               kind={item.kind}
               title={item.title}
               category={item.category}

@@ -5,6 +5,8 @@ import { NavbarShell } from "@/components/navbar/navbar-shell";
 import { NavbarFallback } from "@/components/navbar/navbar-fallback";
 import { IncomingCallManager } from "@/components/messaging/incoming-call-manager";
 import { CookieConsent } from "@/components/cookie-consent";
+import { DemoBar } from "@/components/demo/demo-bar";
+import { DEMO_MODE } from "@/lib/demo/config";
 
 /**
  * Layout for every `(main)` route (the whole public site plus dashboards).
@@ -45,6 +47,12 @@ export default async function MainLayout({
       {/* Global incoming voice/video call listener — rings anywhere in the app */}
       <IncomingCallManager />
       {!consented && <CookieConsent visible />}
+      {/* Demo controls — inert unless NEXT_PUBLIC_DEMO_MODE=1 (local only). */}
+      {DEMO_MODE && (
+        <Suspense fallback={null}>
+          <DemoBar />
+        </Suspense>
+      )}
       </SiteChrome>
   );
 }
