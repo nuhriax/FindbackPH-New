@@ -6,7 +6,7 @@ import { computeTrustSignals } from "@/lib/trust";
 import { computeBadges, getBadgeStats } from "@/lib/badges";
 import { BadgesCard } from "@/components/dashboard/badges-card";
 import { getAvatarPublicUrl, getSignedImageUrls } from "@/lib/storage";
-import { AvatarImage } from "@/components/avatar-image";
+import { MemberAvatar } from "@/components/member/member-avatar";
 import { BlockUserButton } from "@/components/block-user-button";
 import { UserReportButton } from "@/components/user-report-button";
 import {
@@ -200,11 +200,10 @@ return (
                 <div className="relative -mt-14 shrink-0 sm:-mt-16">
                   <div className="h-28 w-28 overflow-hidden rounded-2xl bg-gradient-to-br from-electric-500 to-electric-600 shadow-lg ring-4 ring-white sm:h-32 sm:w-32">
                     {profile.avatar_url ? (
-                      <AvatarImage
+                      <MemberAvatar
                         src={getAvatarPublicUrl(profile.avatar_url)}
-                        alt={`${fullName}'s avatar`}
+                        alt={`${fullName}'s profile photo`}
                         initials={initial}
-                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center font-display text-3xl font-bold text-white sm:text-4xl">
