@@ -1,10 +1,11 @@
-import { MapPin, Navigation } from "lucide-react";
+import * as React from "react";
 
 /**
  * MapMotif — subtle location/map decoration for heroes and section
  * backgrounds. Purely decorative SVG: a dotted "Philippine-ish" island
- * cluster, a dashed travel route between two pins, and a soft radar pulse.
- * Render at low opacity behind content; never interactive.
+ * cluster and a dashed travel route between two pins. Render at low
+ * opacity behind content; never interactive. Icon accents were removed —
+ * they used to poke out past the hero board and read as stray UI.
  */
 export function MapMotif({
   className,
@@ -71,18 +72,7 @@ export function MapMotif({
           <circle cx="344" cy="74" r="4.5" fill="currentColor" />
         </g>
       </svg>
-
-      {/* Lucide pin accents for a friendlier, less abstract feel */}
-      <MapPin
-        aria-hidden="true"
-        size={20}
-        className="absolute -top-2 right-2 text-electric-500/50"
-      />
-      <Navigation
-        aria-hidden="true"
-        size={16}
-        className="absolute bottom-4 left-6 text-electric-500/40"
-      />
     </div>
   );
 }
+
