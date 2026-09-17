@@ -164,14 +164,26 @@ export function HeroBoard({
             </p>
           </div>
 
-          {/* Small print footer — reference number + call to action, like a
-              real filed notice */}
-          <div className="mt-4 flex items-center justify-between gap-3 border-t border-cork-700/30 pt-3 text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
-            <span className="shrink-0 tabular-nums">
+          {/* Small print footer — a stamped case number on the left, and the
+              poster's sign-off on the right. Styled as an action but rendered
+              as text: the board is aria-hidden decoration, so a real link
+              here would be an a11y violation (focusable inside aria-hidden). */}
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-dashed border-cork-700/40 pt-3">
+            <span
+              className="inline-flex shrink-0 -rotate-2 items-center rounded-[3px] border-2 border-cork-700/50 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.14em] text-cork-700/80 tabular-nums"
+              aria-hidden="true"
+            >
               № {newest.id.replace(/-/g, "").slice(0, 6).toUpperCase()}
             </span>
-            <span className="whitespace-nowrap">
-              Post yours free — findback.ph
+            <span className="inline-flex min-w-0 items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-cork-700 underline decoration-cork-700/40 decoration-dotted underline-offset-4">
+              <span className="truncate">
+                {newestIsLost
+                  ? "Found it? Post a sighting — free"
+                  : "Lost it? Post a notice — free"}
+              </span>
+              <span aria-hidden="true" className="shrink-0 text-[12px] leading-none">
+                →
+              </span>
             </span>
           </div>
         </article>
