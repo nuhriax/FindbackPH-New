@@ -39,7 +39,6 @@ const LINK_GROUPS: {
     heading: "Platform",
     links: [
       { label: "Contact Inbox", href: "/admin/messages", icon: Inbox },
-      { label: "Items", href: "/admin/reports", icon: FileText },
       { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
       { label: "Activity Log", href: "/admin/audit-logs", icon: History },
     ],
