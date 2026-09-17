@@ -92,14 +92,16 @@ export function VerificationCard() {
     try {
       const supabase = createClient();
       const e164 = toE164(phone);
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: e164,
-        options: { shouldCreateUser: false },
-      });
+      // Attach the phone to the SIGNED-IN account (updateUser), NOT the
+      // sign-in OTP flow — signInWithOtp is for phones that already own an
+      // account and fails with "Signups not allowed for otp" otherwise.
+      const { error } = await supabase.auth.updateUser({ phone: e164 });
       if (error) {
         setPhoneErr(
-          error.message.includes("not enabled") || error.message.includes("unsupported")
-            ? "Phone verification isn't switched on for the site yet — check back soon."
+          error.message.toLowerCase().includes("sms") ||
+            error.message.toLowerCase().includes("provider") ||
+            error.message.toLowerCase().includes("phone")
+            ? "SMS sending isn't set up for the site yet — check back soon."
             : `Couldn't send the code: ${error.message}`
         );
       } else {
@@ -122,7 +124,7 @@ export function VerificationCard() {
       const { error } = await supabase.auth.verifyOtp({
         phone: toE164(phone),
         token: otp.replace(/\D/g, ""),
-        type: "sms",
+        type: "phone_change",
       });
       if (error) {
         setPhoneErr(`That code didn't work: ${error.message}`);
