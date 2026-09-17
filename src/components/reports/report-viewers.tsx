@@ -97,7 +97,7 @@ export function ReportViewers({ viewers }: { viewers: ReportViewer[] }) {
         </span>
 
         <span className="min-w-0 flex-1 text-sm font-bold text-slate-900">
-          Seen by {viewers.length} {viewers.length === 1 ? "person" : "people"}
+          {viewers.length} {viewers.length === 1 ? "viewer" : "viewers"}
         </span>
 
         <span
