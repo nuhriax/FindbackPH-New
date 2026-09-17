@@ -2,7 +2,6 @@ import { BadgeCheck } from "lucide-react";
 
 import { MapMotif } from "@/components/map-motif";
 import { HeroSearch } from "@/components/home/hero-search";
-import { LiveActivityTicker } from "@/components/home/live-activity-ticker";
 import { HeroBoard } from "@/components/home/hero-board";
 import type { TickerItem } from "@/components/home/live-activity-ticker";
 
@@ -99,9 +98,8 @@ export function Hero({
           </p>
         </div>
 
-        {/* ── RIGHT: live board — newest post pinned left, matches on the
-            other side. Newest report is always the big top card; its best
-            opposite-kind match (if any) docks bottom-right as the reply. */}
+        {/* ── RIGHT: live board — the single newest community report as a
+            vintage notice poster. */}
         <div className="relative mx-auto hidden w-full max-w-md lg:block" aria-hidden="true">
           <div className="relative min-h-[24rem] py-2">
             <MapMotif className="absolute inset-0 opacity-70" tone="text-ocean-300" />
@@ -127,24 +125,6 @@ export function Hero({
         </div>
       </div>
 
-      {/* Sampayan — the ticker hangs on the string with no band behind it,
-          so the page background flows straight through. It shows reports
-          BEYOND the two already pinned on the board — the board is the
-          headline, the ticker is the long tail. Never the same item twice. */}
-      {recent.length > 2 && (
-        <div className="relative mt-10">
-          <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
-            <LiveActivityTicker
-              items={recent.slice(2, 6).map((r) => ({
-                title: r.title,
-                kind: r.kind,
-                city: r.city,
-                dateLabel: r.dateLabel,
-              }))}
-            />
-          </div>
-        </div>
-      )}
     </section>
   );
 }
