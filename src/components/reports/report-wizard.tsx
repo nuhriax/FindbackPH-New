@@ -29,6 +29,7 @@ import Link from "next/link";
 import { DraftAutoSave } from "./draft-autosave";
 import { track, flushSync } from "@/lib/analytics-client";
 import { uploadItemImagesClient } from "@/lib/file-upload-client";
+import { TurnstileWidget, TURNSTILE_ENABLED } from "@/components/auth/turnstile-widget";
 import type { ColorValue } from "@/lib/validation";
 
 import {
@@ -489,10 +490,38 @@ export function ReportWizard({ kind }: { kind: WizardKind }) {
               onEditStep={handleEditStep}
             />
 
-            {/* Human verification: intentionally removed from the report flow.
-                Spam is handled by the fleet-wide Postgres rate limiter on the
-                create actions. Turnstile can be re-added later once properly
-                configured in Cloudflare (valid key + domain allowlist). */}
+            {/* Human verification — rendered only on the Review step, only
+                when Turnstile is configured. Placed at the last step so the
+                token is fresh at submit time (tokens expire after ~5 min).
+                The server action verifies it and fails closed when missing. */}
+            {TURNSTILE_ENABLED && step === TOTAL_STEPS && (
+              <div
+                role="group"
+                aria-label="Security verification"
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4"
+              >
+                <p className="mb-2 text-sm font-semibold text-navy-900">
+                  Are you human?
+                </p>
+                <p className="mb-3 text-xs text-slate-500">
+                  One quick check before publishing — it keeps fake reports out.
+                </p>
+                <TurnstileWidget
+                  onVerify={(token) => {
+                    turnstileTokenRef.current = token;
+                  }}
+                  onError={() => {
+                    turnstileTokenRef.current = null;
+                  }}
+                  onExpire={() => {
+                    turnstileTokenRef.current = null;
+                  }}
+                  resetRef={(reset) => {
+                    turnstileResetRef.current = reset;
+                  }}
+                />
+              </div>
+            )}
 
             {error && (
               <WizardError
