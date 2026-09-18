@@ -256,18 +256,14 @@ export function WizardReviewList({
 
         {/* Final confirmation */}
         <div className="report-confirm-card flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 transition-all duration-200 has-[:checked]:border-navy-900 has-[:checked]:bg-navy-50 has-[:checked]:shadow-sm hover:border-slate-300">
-          <div className="relative mt-0.5 shrink-0">
-            <input
-              id="confirmAccurate"
-              name="confirmAccurate"
-              type="checkbox"
-              required
-              className="peer h-5 w-5 shrink-0 cursor-pointer appearance-none rounded-md border-[1.5px] border-slate-400 bg-white transition-colors duration-150 hover:border-navy-700 checked:border-navy-900 checked:bg-navy-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-900/25 focus-visible:ring-offset-2"
-            />
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-white opacity-0 transition-opacity duration-150 peer-checked:opacity-100">
-              <Check size={13} strokeWidth={3.5} className="text-white" aria-hidden="true" />
-            </div>
-          </div>
+          <input
+            id="confirmAccurate"
+            name="confirmAccurate"
+            type="checkbox"
+            required
+            aria-label="I confirm that the information in this report is accurate and safe to share."
+            className="mt-1 h-[18px] w-[18px] shrink-0 cursor-pointer accent-navy-900"
+          />
           <label
             htmlFor="confirmAccurate"
             className="cursor-pointer text-sm leading-relaxed text-slate-700"
