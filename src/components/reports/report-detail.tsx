@@ -282,7 +282,7 @@ export function ReportDetail({
               aria-label={backLabel}
               title={backLabel}
               className="
-                group inline-flex h-9 w-9 items-center justify-center rounded-full
+                group inline-flex h-10 w-10 items-center justify-center rounded-full
                 text-slate-400 transition-colors
                 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2
                 focus:ring-electric-400/40

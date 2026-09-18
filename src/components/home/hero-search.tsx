@@ -106,7 +106,7 @@ export function HeroSearch({ className }: { className?: string }) {
               maxLength={100}
               placeholder="What are you looking for? e.g. iPhone, wallet, school ID"
               aria-label="Search reports"
-              className="hero-search-input w-full border-0 bg-transparent p-0 text-sm text-ink shadow-none outline-none placeholder:text-ink-faint focus:outline-none focus:ring-0 focus:ring-offset-0"
+              className="hero-search-input w-full border-0 bg-transparent px-0 py-3.5 text-sm text-ink shadow-none outline-none placeholder:text-ink-faint focus:outline-none focus:ring-0 focus:ring-offset-0"
             />
           </div>
 
@@ -165,7 +165,7 @@ export function HeroSearch({ className }: { className?: string }) {
                     setActiveIndex(-1);
                   }
                 }}
-                className="hero-search-input w-full border-0 bg-transparent p-0 text-sm text-ink shadow-none outline-none placeholder:text-ink-faint focus:outline-none focus:ring-0 focus:ring-offset-0"
+                className="hero-search-input w-full border-0 bg-transparent px-0 py-3.5 text-sm text-ink shadow-none outline-none placeholder:text-ink-faint focus:outline-none focus:ring-0 focus:ring-offset-0"
               />
               {city ? (
                 <button

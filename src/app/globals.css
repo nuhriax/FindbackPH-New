@@ -56,6 +56,13 @@
 
   html {
     scroll-behavior: smooth;
+    /* Clip horizontal overflow at the document level. `overflow-x: clip` on
+       <body> alone does not stop pre-reveal motion transforms (MotionReveal's
+       ±60px slide-ins) from expanding the document's scrollable area, which
+       produced a real horizontal scrollbar on narrow screens. `clip` creates
+       no scroll container, so sticky positioning and smooth scroll are
+       unaffected. */
+    overflow-x: clip;
   }
 
   body {
@@ -197,20 +204,24 @@
 
 @layer components {
   /* --- Glass / luminous card surfaces ---------------------------------- */
+  /* NOTE: no backdrop-filter on text-bearing surfaces — Chrome/Windows
+     rasterizes children of backdrop-blurred elements on the GPU, which makes
+     the text render permanently soft/blurry. Near-opaque backgrounds keep the
+     same look with crisp text. */
   .card {
-    @apply rounded-card border border-slate-200/70 bg-white/80 shadow-soft backdrop-blur-md;
+    @apply rounded-card border border-slate-200/70 bg-white/95 shadow-soft;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:border-navy-200/90 hover:bg-white/90 hover:shadow-card-hover;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:border-navy-200/90 hover:bg-white hover:shadow-card-hover;
   }
 
   .glass {
-    @apply border border-white/70 bg-white/55 backdrop-blur-xl;
+    @apply border border-white/70 bg-white/85;
   }
 
   .surface {
-    @apply rounded-2xl border border-slate-200/60 bg-white/60 shadow-soft backdrop-blur-md;
+    @apply rounded-2xl border border-slate-200/60 bg-white/90 shadow-soft;
   }
 
   /* Full-page wrapper: gives every route a restrained, consistent entrance. */
@@ -228,8 +239,8 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-button border border-ocean-200 bg-white/75
-      px-5 py-2.5 font-semibold text-ocean-500 shadow-sm backdrop-blur transition-all duration-200
+    @apply inline-flex items-center justify-center gap-2 rounded-button border border-ocean-200 bg-white/95
+      px-5 py-2.5 font-semibold text-ocean-500 shadow-sm transition-all duration-200
       hover:-translate-y-px hover:border-sun-300 hover:bg-white hover:shadow-soft active:translate-y-0;
   }
 

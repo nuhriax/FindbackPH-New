@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 // ---------------------------------------------------------------------------
-// WizardSuccess â€” celebratory success screen shared by both report flows.
+// WizardSuccess — celebratory success screen shared by both report flows.
 //
 // Enhanced with confetti-like animation, better CTAs, and improved
 // visual hierarchy.
@@ -37,7 +37,7 @@ export function WizardSuccess({
         setActiveAction(null);
         return;
       } catch {
-        // user cancelled â€” fall through to copy
+        // user cancelled — fall through to copy
       }
     }
     try {
@@ -88,7 +88,7 @@ export function WizardSuccess({
           </h1>
         </MotionReveal>
 
-        {/* The report itself â€” anchors the moment to something concrete */}
+        {/* The report itself — anchors the moment to something concrete */}
         <MotionReveal delay={150}>
           <Link
             href={`${cfg.success.basePath}/${itemId}`}
@@ -96,7 +96,7 @@ export function WizardSuccess({
           >
             <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
             <span className="truncate">{itemTitle}</span>
-            <span className="shrink-0 text-xs font-semibold text-slate-400">view â†’</span>
+            <span className="shrink-0 text-xs font-semibold text-slate-400">view →</span>
           </Link>
         </MotionReveal>
 
@@ -107,7 +107,7 @@ export function WizardSuccess({
           </p>
         </MotionReveal>
 
-        {/* Next steps â€” connected timeline */}
+        {/* Next steps — connected timeline */}
         <MotionReveal delay={300}>
           <ol className="relative mx-auto mt-8 max-w-sm text-left">
             {/* vertical rail */}
@@ -160,7 +160,7 @@ export function WizardSuccess({
               ) : activeAction === "share" ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-transparent" />
-                  <span>Sharingâ€¦</span>
+                  <span>Sharing…</span>
                 </>
               ) : (
                 <>
@@ -172,7 +172,7 @@ export function WizardSuccess({
           </div>
         </MotionReveal>
 
-        {/* Secondary actions â€” quiet text links, single row */}
+        {/* Secondary actions — quiet text links, single row */}
         <MotionReveal delay={500}>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-sm text-slate-500">
             <Link
@@ -181,7 +181,7 @@ export function WizardSuccess({
             >
               Browse matches
             </Link>
-            <span aria-hidden="true" className="text-slate-300">Â·</span>
+            <span aria-hidden="true" className="text-slate-300">·</span>
             <button
               type="button"
               onClick={onReportAnother}
@@ -189,7 +189,7 @@ export function WizardSuccess({
             >
               Report another
             </button>
-            <span aria-hidden="true" className="text-slate-300">Â·</span>
+            <span aria-hidden="true" className="text-slate-300">·</span>
             <button
               type="button"
               onClick={printReport}
@@ -198,7 +198,7 @@ export function WizardSuccess({
             >
               Print
             </button>
-            <span aria-hidden="true" className="text-slate-300">Â·</span>
+            <span aria-hidden="true" className="text-slate-300">·</span>
             <Link
               href="/"
               className="rounded-lg px-2 py-1.5 font-medium transition hover:bg-slate-100 hover:text-slate-700"

@@ -50,7 +50,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
               {c.href && !isLast ? (
                 <Link
                   href={c.href}
-                  className="flex shrink-0 items-center gap-1.5 rounded-md px-1 py-0.5 font-medium transition-colors hover:bg-slate-100 hover:text-navy-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-400/50"
+                  className="flex shrink-0 items-center gap-1.5 rounded-md px-1 py-1.5 font-medium transition-colors hover:bg-slate-100 hover:text-navy-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-400/50"
                 >
                   {i === 0 && <Home size={13} aria-hidden="true" />}
                   <span className={i === 0 ? "sr-only sm:not-sr-only" : undefined}>{c.label}</span>

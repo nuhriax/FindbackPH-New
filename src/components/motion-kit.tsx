@@ -30,7 +30,7 @@ const offsets: Record<RevealDirection, { x?: number; y?: number; scale?: number;
   left: { x: 60 },
   right: { x: -60 },
   scale: { scale: 0.92 },
-  blur: { y: 24, filter: "blur(8px)" },
+  blur: { y: 24 },
 };
 
 type MotionRevealProps = {
@@ -66,7 +66,7 @@ export function MotionReveal({
     <Tag
       className={className}
       initial={{ opacity: 0, ...offset }}
-      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1, filter: "blur(0px)" }}
+      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "0px 0px -60px 0px" }}
       transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}
     >

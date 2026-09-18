@@ -109,14 +109,14 @@ export function ItemCard({
               setViewerOpen(true);
             }}
             className="
-              absolute right-3 top-3 z-10 flex h-8 w-8 items-center
+              absolute right-3 top-3 z-10 flex h-10 w-10 items-center
               justify-center rounded-full bg-slate-900/70 text-white
               shadow-md ring-1 ring-white/40 backdrop-blur-sm transition-all
               hover:bg-slate-900 hover:scale-105 focus:opacity-100 opacity-90
               md:opacity-0 md:group-hover:opacity-100
             "
           >
-            <ZoomIn size={15} />
+            <ZoomIn size={17} />
           </button>
         )}
 
@@ -147,14 +147,6 @@ export function ItemCard({
         <p className="mt-1.5 line-clamp-2 min-h-[2.5em] text-xs leading-5 text-ink-soft">
           {description ?? ""}
         </p>
-
-        {/* Handwritten annotation — the single Caveat moment on a notice:
-            shown only on lost notices offering a reward. */}
-        {kind === "lost" && typeof reward === "number" && reward > 0 && (
-          <span className="notice-annotation mt-1.5 self-end pr-1" aria-hidden="true">
-            reward, tawag lang po
-          </span>
-        )}
 
         <div className="mt-auto pt-4">
           {/* Meta row — location · views on top, date below. Two stacked

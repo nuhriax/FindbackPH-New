@@ -67,7 +67,7 @@ export default function DiscoverLoading() {
       <div className="mx-auto max-w-7xl px-4 pb-24 pt-5 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:gap-7">
           <div className="min-w-0 flex-1">
-            <div className="mb-4 flex items-end justify-between">
+            <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <div className="h-3 w-28 rounded skeleton" />
                 <div className="mt-2 h-8 w-44 rounded skeleton" />

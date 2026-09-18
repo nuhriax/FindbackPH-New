@@ -63,7 +63,7 @@ export function CookieConsent({ visible }: { visible: boolean }) {
           <button
             type="button"
             onClick={accept}
-            className="inline-flex min-h-[38px] items-center justify-center rounded-lg bg-sun-400 px-4 text-sm font-bold text-ink shadow-[0_2px_8px_-2px_rgba(239,164,48,0.5)] transition hover:bg-sun-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sun-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1c1e21] active:translate-y-px"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-sun-400 px-4 text-sm font-bold text-ink shadow-[0_2px_8px_-2px_rgba(239,164,48,0.5)] transition hover:bg-sun-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sun-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1c1e21] active:translate-y-px"
           >
             Accept
           </button>
