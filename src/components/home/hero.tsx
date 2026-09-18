@@ -56,7 +56,7 @@ export function Hero({
               : "The community board is live"}
           </p>
 
-          <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-[-0.03em] text-navy-900 sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="mt-6 font-display text-3xl font-bold leading-[1.08] tracking-[-0.03em] text-navy-900 sm:text-4xl lg:text-[3rem]">
             <span className="font-hand font-normal text-3xl text-cork-700 sm:text-4xl lg:text-[2.6rem]">
               Lost something?&nbsp;
             </span>
@@ -128,4 +128,3 @@ export function Hero({
     </section>
   );
 }
-

@@ -29,7 +29,7 @@ export function StickyActionBar({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t-2 border-cork-700 bg-kraft-100 px-3 shadow-[0_-8px_24px_-12px_rgba(36,30,23,0.35)] transition-transform duration-300 md:hidden",
+        "fixed inset-x-0 bottom-0 z-50 border-t-2 border-cork-700 bg-kraft-100 px-3 shadow-[0_-8px_24px_-12px_rgba(36,30,23,0.35)] transition-transform duration-300 md:hidden",
         shown ? "translate-y-0" : "translate-y-full",
         className
       )}

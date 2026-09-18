@@ -68,11 +68,11 @@ export function ReportHeader({
         className="
           min-w-0
           font-display
-          text-3xl
+          text-2xl
           font-bold
           tracking-[-0.02em]
           text-slate-900
-          sm:text-4xl
+          sm:text-3xl
         "
       >
         {displayTitle}

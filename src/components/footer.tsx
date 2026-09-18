@@ -75,7 +75,7 @@ export function Footer() {
           <FooterColumn title="Information" links={INFORMATION} />
 
           {/* Trust stats */}
-          <ul className="flex flex-row gap-4 sm:flex-col sm:gap-3">
+          <ul className="flex flex-col gap-4 sm:flex-col sm:gap-3">
             {TRUST_STATS.map((item) => (
               <li key={item.label} className="flex items-center gap-2.5">
                 <span

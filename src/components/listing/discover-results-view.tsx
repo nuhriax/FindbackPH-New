@@ -51,7 +51,7 @@ export function DiscoverResultsView({
         {headerLeft}
         {map && (
           <div
-            className="inline-flex items-center rounded-xl border border-slate-200 bg-white p-1 shadow-sm xl:hidden"
+            className="flex w-min items-center rounded-xl border border-slate-200 bg-white p-1 shadow-sm xl:hidden"
             role="tablist"
             aria-label="Results view"
           >

@@ -246,14 +246,21 @@ export async function fetchDiscoverPage(
   const perTableLimit = query.page * PAGE_SIZE;
 
   try {
-    const [lostResult, foundResult, lostCount, foundCount] = await Promise.all([
+    const [
+      lostResult,
+      foundResult,
+      lostCount,
+      foundCount,
+    ] = await Promise.all([
       feedRows(supabase, "lost_items", filters, perTableLimit),
       feedRows(supabase, "found_items", filters, perTableLimit),
       countRows(supabase, "lost_items", filters),
       countRows(supabase, "found_items", filters),
     ]);
 
-    const queryError = lostResult.error ?? foundResult.error;
+    const queryError =
+      lostResult.error ??
+      foundResult.error;
 
     const lostItems: FeedItem[] = ((lostResult.data ?? []) as Record<string, unknown>[]).map(
       (item) => ({ ...item, kind: "lost" as const })

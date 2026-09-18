@@ -235,7 +235,7 @@ export function HeroSearch({ className }: { className?: string }) {
 
           <button
             type="submit"
-            className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-lg bg-sun-400 px-6 text-sm font-bold text-ink shadow-[2px_2px_0_0_#241E17] transition hover:-translate-y-0.5 hover:bg-sun-300 active:translate-y-0.5 active:shadow-none"
+            className="inline-flex min-h-[48px] w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-sun-400 px-6 text-sm font-bold text-ink shadow-[2px_2px_0_0_#241E17] transition hover:-translate-y-0.5 hover:bg-sun-300 active:translate-y-0.5 active:shadow-none sm:w-auto"
           >
             <Search size={16} />
             Search
